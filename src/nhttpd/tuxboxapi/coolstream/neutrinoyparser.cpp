@@ -236,7 +236,7 @@ std::string  CNeutrinoYParser::func_get_bouquets_as_dropdown(CyhookHandler *, st
 		{
 			localizeBouquetNames();
 			yresult += string_printf("<option value=%u %s>%s</option>\n", i + 1, sel.c_str(),
-				(encodeString(g_bouquetManager->Bouquets[i]->lName.c_str())).c_str());
+				g_bouquetManager->Bouquets[i]->lName.c_str());
 		}
 			//yresult += string_printf("<option value=%u %s>%s</option>\n", i + 1, sel.c_str(), (encodeString(std::string(g_bouquetManager->Bouquets[i]->Name.c_str()))).c_str());
 	}
