@@ -49,7 +49,9 @@
 #include <gui/widget/stringinput.h>
 
 #include <driver/screen_max.h>
+#ifdef SCREENSHOT
 #include <driver/screenshot.h>
+#endif
 #include <driver/volume.h>
 
 #include <zapit/femanager.h>
@@ -260,6 +262,13 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		chooserDir(g_settings.logo_hdd_dir, false, action_str);
 		return menu_return::RETURN_REPAINT;
 	}
+#ifdef MARTII
+	else if(actionKey=="logo_dir_2") {
+		const char *action_str = "logo_2";
+		chooserDir(g_settings.logo_hdd_dir_2, false, action_str);
+		return menu_return::RETURN_REPAINT;
+	}
+#endif
 	else if(actionKey=="screenshot_dir") {
 		const char *action_str = "screenshot";
 		chooserDir(g_settings.screenshot_dir, true, action_str);
@@ -326,7 +335,11 @@ const CMenuOptionChooser::keyval  INFOBAR_SUBCHAN_DISP_POS_OPTIONS[INFOBAR_SUBCH
 	{ 4 , LOCALE_INFOVIEWER_SUBCHAN_INFOBAR }
 };
 
+#ifdef MARTII
+#define VOLUMEBAR_DISP_POS_OPTIONS_COUNT 7
+#else
 #define VOLUMEBAR_DISP_POS_OPTIONS_COUNT 6
+#endif
 const CMenuOptionChooser::keyval  VOLUMEBAR_DISP_POS_OPTIONS[VOLUMEBAR_DISP_POS_OPTIONS_COUNT]=
 {
 	{ 0 , LOCALE_SETTINGS_POS_TOP_RIGHT },
@@ -335,6 +348,9 @@ const CMenuOptionChooser::keyval  VOLUMEBAR_DISP_POS_OPTIONS[VOLUMEBAR_DISP_POS_
 	{ 3 , LOCALE_SETTINGS_POS_BOTTOM_RIGHT },
 	{ 4 , LOCALE_SETTINGS_POS_DEFAULT_CENTER },
 	{ 5 , LOCALE_SETTINGS_POS_HIGHER_CENTER }
+#ifdef MARTII
+	, { 6 , LOCALE_SETTINGS_POS_OFF }
+#endif
 };
 
 #define MENU_DISP_POS_OPTIONS_COUNT 5
@@ -432,7 +448,8 @@ int COsdSetup::showOsdSetup()
 	mf->setHint("", LOCALE_MENU_HINT_CHANNELLIST_SETUP);
 	osd_menu->addItem(mf);
 
-#ifdef SCREENSHOT
+//#ifdef SCREENSHOT
+#if defined(SCREENSHOT) || defined(MARTII)
 	//screenshot
 	CMenuWidget osd_menu_screenshot(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_SCREENSHOT);
 	showOsdScreenShotSetup(&osd_menu_screenshot);
@@ -506,6 +523,10 @@ int COsdSetup::showOsdSetup()
 	mc->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_COLOR);
 	osd_menu->addItem(mc);
 
+#ifdef MARTII
+	osd_menu->addItem(new CMenuOptionChooser(LOCALE_MENU_NUMBERS_AS_ICONS, &g_settings.menu_numbers_as_icons, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+ 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_OPTIONS_SHOW_BACKGROUND_PICTURE, &g_settings.show_background_picture, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+#endif
 	int res = osd_menu->exec(NULL, "");
 
 	delete osd_menu;
@@ -652,12 +673,20 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 	fontSettings->addIntroItems(LOCALE_FONTMENU_HEAD);
 
 	// select gui font file
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, g_settings.font_file, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+#else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, NULL, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+#endif
 	mf->setHint("", LOCALE_MENU_HINT_FONT_GUI);
 	fontSettings->addItem(mf);
 
 	// select teletext font file
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, g_settings.ttx_font_file, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+#else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, NULL, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+#endif
 	mf->setHint("", LOCALE_MENU_HINT_FONT_TTX);
 	fontSettings->addItem(mf);
 
@@ -789,6 +818,9 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_COLORED_EVENT);
 	menu_infobar->addItem(mc);
 
+#ifdef MARTII
+	menu_infobar->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_INFOBAR_AUTOSHOW_IF_CN, &g_settings.infobar_cn, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+#endif
 	// radiotext
 	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_RADIOTEXT, &g_settings.radiotext_enable, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_RADIOTEXT);
@@ -935,6 +967,17 @@ int COsdSetup::showContextChanlistMenu()
 	return res;
 }
 
+#ifdef MARTII
+void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
+{
+	menu_screenshot->addIntroItems(LOCALE_SCREENSHOT_MENU);
+	if((uint)g_settings.key_screenshot == CRCInput::RC_nokey)
+		menu_screenshot->addItem( new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCREENSHOT_INFO));
+	menu_screenshot->addItem(new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, g_settings.screenshot_dir, this, "screenshot_dir"));
+	menu_screenshot->addItem(new CMenuOptionNumberChooser(LOCALE_SCREENSHOT_PNG_COMPRESSION, &g_settings.screenshot_png_compression, true, 1, 9, NULL));
+	menu_screenshot->addItem(new CMenuOptionChooser(LOCALE_SCREENSHOT_BACKBUFFER, &g_settings.screenshot_backbuffer, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+}
+#else
 #ifdef SCREENSHOT
 //screenshot
 #define SCREENSHOT_FMT_OPTION_COUNT 3
@@ -985,4 +1028,5 @@ void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
 	mc->setHint("", LOCALE_MENU_HINT_SCREENSHOT_COVER);
 	menu_screenshot->addItem(mc);
 }
+#endif
 #endif

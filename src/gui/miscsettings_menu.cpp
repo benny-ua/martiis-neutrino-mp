@@ -42,6 +42,10 @@
 #include <gui/plugins.h>
 #include <gui/sleeptimer.h>
 #include <gui/zapit_setup.h>
+#ifdef MARTII
+#include <gui/batchepg.h>
+#include <gui/kerneloptions.h>
+#endif
 
 #include <gui/widget/icons.h>
 #include <gui/widget/stringinput.h>
@@ -52,6 +56,9 @@
 
 //#define ONE_KEY_PLUGIN
 
+#ifdef MARTII
+extern Zapit_config zapitCfg;
+#endif
 extern CPlugins       * g_PluginList;
 
 CMiscMenue::CMiscMenue()
@@ -134,6 +141,33 @@ const CMenuOptionChooser::keyval MISCSETTINGS_FILESYSTEM_IS_UTF8_OPTIONS[MISCSET
 
 
 #ifdef CPU_FREQ
+#ifdef MARTII
+#define CPU_FREQ_OPTION_COUNT 6
+const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS[CPU_FREQ_OPTION_COUNT] =
+{
+	{ 0, LOCALE_CPU_FREQ_DEFAULT, NULL },
+	{ 450, NONEXISTANT_LOCALE, "450 Mhz"},
+	{ 500, NONEXISTANT_LOCALE, "500 Mhz"},
+	{ 550, NONEXISTANT_LOCALE, "550 Mhz"},
+	{ 600, NONEXISTANT_LOCALE, "600 Mhz"},
+	{ 650, NONEXISTANT_LOCALE, "650 Mhz"}
+};
+#define CPU_FREQ_OPTION_STANDBY_COUNT 11
+const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS_STANDBY[CPU_FREQ_OPTION_STANDBY_COUNT] =
+{
+	{ 0, LOCALE_CPU_FREQ_DEFAULT, NULL },
+	{ 200, NONEXISTANT_LOCALE, "200 Mhz"},
+	{ 250, NONEXISTANT_LOCALE, "250 Mhz"},
+	{ 300, NONEXISTANT_LOCALE, "300 Mhz"},
+	{ 350, NONEXISTANT_LOCALE, "350 Mhz"},
+	{ 400, NONEXISTANT_LOCALE, "400 Mhz"},
+	{ 450, NONEXISTANT_LOCALE, "450 Mhz"},
+	{ 500, NONEXISTANT_LOCALE, "500 Mhz"},
+	{ 550, NONEXISTANT_LOCALE, "550 Mhz"},
+	{ 600, NONEXISTANT_LOCALE, "600 Mhz"},
+	{ 650, NONEXISTANT_LOCALE, "650 Mhz"}
+};
+#else
 #define CPU_FREQ_OPTION_COUNT 13
 const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS[CPU_FREQ_OPTION_COUNT] =
 {
@@ -151,6 +185,7 @@ const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS[CPU_FREQ_OPTION_COUNT] =
 	{ 550, NONEXISTANT_LOCALE, "550 Mhz"},
 	{ 600, NONEXISTANT_LOCALE, "600 Mhz"}
 };
+#endif
 #endif /*CPU_FREQ*/
 
 //show misc settings menue
@@ -212,6 +247,11 @@ int CMiscMenue::showMiscSettingsMenu()
 		misc_menue.addItem(mf);
 	}
 	//channellist
+#ifdef MARTII
+	CZapit::getInstance()->GetConfig(zapitCfg);
+	makeNewChannelsBouquet = zapitCfg.makeNewChannelsBouquet;
+	makeRemainingChannelsBouquet = zapitCfg.makeRemainingChannelsBouquet;
+#endif
 	CMenuWidget misc_menue_chanlist(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_CHANNELLIST);
 	showMiscSettingsMenuChanlist(&misc_menue_chanlist);
 	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, &misc_menue_chanlist, NULL, CRCInput::RC_2);
@@ -230,8 +270,19 @@ int CMiscMenue::showMiscSettingsMenu()
 	showMiscSettingsMenuCPUFreq(&misc_menue_cpu);
 	misc_menue.addItem( new CMenuForwarderNonLocalized("CPU", true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4));
 #endif /*CPU_FREQ*/
+#ifdef MARTII
+	KernelOptions_Menu kernelOptions;
+	misc_menue.addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_HEAD, true, NULL, &kernelOptions, NULL, CRCInput::RC_5));
+#endif
 
 	int res = misc_menue.exec(NULL, "");
+#ifdef MARTII
+	if (zapitCfg.makeNewChannelsBouquet != makeNewChannelsBouquet || zapitCfg.makeRemainingChannelsBouquet != makeRemainingChannelsBouquet) {
+		zapitCfg.makeNewChannelsBouquet = makeNewChannelsBouquet;
+		zapitCfg.makeRemainingChannelsBouquet = makeRemainingChannelsBouquet;
+		CZapit::getInstance()->SetConfig(&zapitCfg);
+	}
+#endif
 	delete fanNotifier;
 	delete sectionsdConfigNotifier;
 	if (miscNotifier)
@@ -353,6 +404,11 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	ms_epg->addItem(mf3);
 	ms_epg->addItem(mf4);
 
+#ifdef MARTII
+	ms_epg->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_FREESAT_ENABLE, &g_settings.epg_enable_freesat, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, sectionsdConfigNotifier));
+	ms_epg->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_VIASAT_ENABLE, &g_settings.epg_enable_viasat, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, sectionsdConfigNotifier));
+	ms_epg->addItem(new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS ,true, NULL, CNeutrinoApp::getInstance()->batchEPGSettings));
+#endif
 }
 
 //filebrowser settings
@@ -386,6 +442,11 @@ void CMiscMenue::showMiscSettingsMenuChanlist(CMenuWidget *ms_chanlist)
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_NEWLIST,     &g_settings.make_new_list           , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_MAKE_NEWLIST);
 	ms_chanlist->addItem(mc);
+#ifdef MARTII
+	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_OTHERS,     &g_settings.make_others_list         , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_MAKE_NEWLIST);
+	ms_chanlist->addItem(mc);
+#endif
 
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_REMOVEDLIST, &g_settings.make_removed_list       , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_MAKE_REMOVEDLIST);
@@ -412,6 +473,10 @@ void CMiscMenue::showMiscSettingsMenuCPUFreq(CMenuWidget *ms_cpu)
 
 	CCpuFreqNotifier * cpuNotifier = new CCpuFreqNotifier();
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_NORMAL, &g_settings.cpufreq, CPU_FREQ_OPTIONS, CPU_FREQ_OPTION_COUNT, true, cpuNotifier));
+#ifdef MARTII
+	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_STANDBY, &g_settings.standby_cpufreq, CPU_FREQ_OPTIONS_STANDBY, CPU_FREQ_OPTION_STANDBY_COUNT, true));
+#else
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_STANDBY, &g_settings.standby_cpufreq, CPU_FREQ_OPTIONS, CPU_FREQ_OPTION_COUNT, true));
+#endif
 }
 #endif /*CPU_FREQ*/

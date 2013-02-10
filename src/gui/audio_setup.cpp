@@ -136,7 +136,11 @@ int CAudioSetup::showAudioSetup()
 	as_oj_analogmode->setHint("", LOCALE_MENU_HINT_AUDIO_ANALOG_MODE);
 
 	//dd subchannel auto on/off
+#ifdef MARTII
+	CMenuOptionChooser * as_oj_ddsubchn 	= new CMenuOptionChooser(LOCALE_AUDIOMENU_DOLBYDIGITAL_AUTO, &g_settings.audio_DolbyDigital, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, audioSetupNotifier);
+#else
 	CMenuOptionChooser * as_oj_ddsubchn 	= new CMenuOptionChooser(LOCALE_AUDIOMENU_DOLBYDIGITAL, &g_settings.audio_DolbyDigital, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, audioSetupNotifier);
+#endif
 	as_oj_ddsubchn->setHint("", LOCALE_MENU_HINT_AUDIO_DD);
 
 	//dd via hdmi
@@ -191,7 +195,11 @@ int CAudioSetup::showAudioSetup()
 	audioSettings->addIntroItems(LOCALE_MAINSETTINGS_AUDIO);
 	//---------------------------------------------------------
 	audioSettings->addItem(as_oj_analogmode);
+#ifdef MARTII
+	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_DOLBYDIGITAL));
+#else
 	audioSettings->addItem(GenericMenuSeparatorLine);
+#endif
 	//---------------------------------------------------------
 	if (g_info.hw_caps->has_HDMI)
 		audioSettings->addItem(as_oj_dd_hdmi);
@@ -213,6 +221,17 @@ int CAudioSetup::showAudioSetup()
 #endif
 #if 0
 	audioSettings->addItem(mf);
+#endif
+#ifdef MARTII
+# ifdef HAVE_SPARK_HARDWARE
+	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_MIXER_VOLUME));
+	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG,
+		(int *)&g_settings.audio_mixer_volume_analog, true, 0, 100, audioSetupNotifier));
+	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI,
+		(int *)&g_settings.audio_mixer_volume_hdmi, true, 0, 100, audioSetupNotifier));
+	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF,
+		(int *)&g_settings.audio_mixer_volume_spdif, true, 0, 100, audioSetupNotifier));
+# endif
 #endif
 
 	int res = audioSettings->exec(NULL, "");

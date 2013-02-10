@@ -594,6 +594,9 @@ void CMovieBrowser::initGlobalSettings(void)
 	m_settings.browserRowWidth[4] = m_defaultRowWidth[m_settings.browserRowItem[4]]; 		//30;
 	m_settings.browserRowWidth[5] = m_defaultRowWidth[m_settings.browserRowItem[5]]; 		//30;
 
+#ifdef MARTII
+	m_settings.ts_only = 0;
+#endif
 }
 
 void CMovieBrowser::initFrames(void)
@@ -721,6 +724,9 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->lastRecordMaxItems = configfile.getInt32("mb_lastRecordMaxItems", NUMBER_OF_MOVIES_LAST);
 	settings->browser_serie_mode = configfile.getInt32("mb_browser_serie_mode", 0);
 	settings->serie_auto_create = configfile.getInt32("mb_serie_auto_create", 0);
+#ifdef MARTII
+        	settings->ts_only = configfile.getInt32("mb_ts_only", 0);
+#endif
 
 	settings->sorting.item = (MB_INFO_ITEM)configfile.getInt32("mb_sorting_item", MB_INFO_RECORDDATE);
 	settings->sorting.direction = (MB_DIRECTION)configfile.getInt32("mb_sorting_direction", MB_DIRECTION_UP);
@@ -768,6 +774,9 @@ bool CMovieBrowser::saveSettings(MB_SETTINGS* settings)
 	configfile.setInt32("mb_lastRecordMaxItems", settings->lastRecordMaxItems);
 	configfile.setInt32("mb_browser_serie_mode", settings->browser_serie_mode);
 	configfile.setInt32("mb_serie_auto_create", settings->serie_auto_create);
+#ifdef MARTII
+	configfile.setInt32("mb_ts_only", settings->ts_only);
+#endif
 
 	configfile.setInt32("mb_gui", settings->gui);
 
@@ -898,6 +907,12 @@ int CMovieBrowser::exec(CMenuTarget* parent, const std::string & actionKey)
             }
        }
     }
+#ifdef MARTII
+    else if(actionKey == "show_menu")
+    {
+	showMenu(NULL);
+    }
+#endif
      return returnval;
 }
 
@@ -1763,7 +1778,11 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 		 		onDeleteFile(*m_movieSelectionHandler, skipAsk);
 		}
 	}
+#ifdef MARTII
+	else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info)
+#else
 	else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info)
+#endif
 	{
 		if(m_movieSelectionHandler != NULL)
 		{
@@ -2491,8 +2510,45 @@ bool CMovieBrowser::loadTsFileNamesFromDir(const std::string & dirname)
 			}
 			else
 			{
+#ifdef MARTII
+				bool test = true;
+				std::string::size_type idx;
+				idx = flist[i].getFileName().rfind('.');
+				if (idx != std::string::npos) {
+					std::string extension = flist[i].getFileName().substr(idx+1);
+					const char *ext = extension.c_str();
+					test = strcasecmp(ext, "ts");
+					if (test && !m_settings.ts_only)
+						test = true
+# if HAVE_TRIPLEDRAGON
+						    && strcasecmp(ext, "vdr")
+# else
+						    && strcasecmp(ext, "avi")
+						    && strcasecmp(ext, "mkv")
+						    && strcasecmp(ext, "wav")
+						    && strcasecmp(ext, "asf")
+						    && strcasecmp(ext, "aiff")
+# endif
+						    && strcasecmp(ext, "mpg")
+						    && strcasecmp(ext, "mpeg")
+						    && strcasecmp(ext, "m2p")
+						    && strcasecmp(ext, "mpv")
+						    && strcasecmp(ext, "vob")
+						    && strcasecmp(ext, "m2ts")
+						    && strcasecmp(ext, "mp4")
+						    && strcasecmp(ext, "mov")
+# ifdef HAVE_SPARK_HARDWARE
+						    && strcasecmp(ext, "vdr")
+						    && strcasecmp(ext, "flv")
+						    && strcasecmp(ext, "wmv")
+# endif
+					;
+				}
+				if (test)
+#else
 				int test=flist[i].getFileName().find(".ts");
 				if( test == -1)
+#endif
 				{
 					//TRACE("[mb] other file: '%s'\r\n",movieInfo.file.Name.c_str());
 				}
@@ -2500,7 +2556,15 @@ bool CMovieBrowser::loadTsFileNamesFromDir(const std::string & dirname)
 				{
 					m_movieInfo.clearMovieInfo(&movieInfo); // refresh structure
 					movieInfo.file.Name = flist[i].Name;
+#ifdef MARTII
+					if(!m_movieInfo.loadMovieInfo(&movieInfo)) {
+						movieInfo.epgChannel = string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD));
+						movieInfo.epgTitle = flist[i].getFileName().substr(0, idx);
+					}
+					if (true) {
+#else
 					if(m_movieInfo.loadMovieInfo(&movieInfo)) { //FIXME atm we show only ts+xml (records) here
+#endif
 						movieInfo.file.Mode = flist[i].Mode;
 						//movieInfo.file.Size = flist[i].Size;
 						movieInfo.file.Size = get_full_len((char *)flist[i].Name.c_str());
@@ -2972,7 +3036,11 @@ int CMovieBrowser::showMovieInfoMenu(MI_MOVIE_INFO* movie_info)
 }
 
 extern "C" int pinghost( const char *hostname );
+#ifdef MARTII
+bool CMovieBrowser::showMenu(MI_MOVIE_INFO* movie_info)
+#else
 bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
+#endif
 {
     /* first clear screen */
     m_pcWindow->paintBackground();
@@ -3066,12 +3134,20 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
     optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_HIDE_SERIES,       (int*)(&m_settings.browser_serie_mode), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
     optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_SERIE_AUTO_CREATE, (int*)(&m_settings.serie_auto_create), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
     //optionsMenu.addItem(GenericMenuSeparator);
+#ifdef MARTII
+    optionsMenu.addItem(GenericMenuSeparatorLine);
+    int ts_only = m_settings.ts_only;
+    optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_TS_ONLY,           (int*)(&m_settings.ts_only), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
+#endif
 
 /********************************************************************/
 /**  main menu ******************************************************/
     CMovieHelp* movieHelp = new CMovieHelp();
     CNFSSmallMenu* nfs =    new CNFSSmallMenu();
 
+#ifdef MARTII
+    if (movie_info) {
+#endif
     CMenuWidget mainMenu(LOCALE_MOVIEBROWSER_HEAD, NEUTRINO_ICON_MOVIEPLAYER);
     mainMenu.addIntroItems(LOCALE_MOVIEBROWSER_MENU_MAIN_HEAD);
     mainMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_HEAD, (m_movieSelectionHandler != NULL), NULL, this,   "show_movie_info_menu",    CRCInput::RC_red,    NEUTRINO_ICON_BUTTON_RED));
@@ -3085,6 +3161,10 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
     //mainMenu.addItem(GenericMenuSeparator);
 
     mainMenu.exec(NULL, " ");
+#ifdef MARTII
+    } else
+	optionsMenu.exec(NULL, "");
+#endif
 
     // post menu handling
     if (m_parentalLock != MB_PARENTAL_LOCK_OFF_TMP)
@@ -3105,6 +3185,12 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
             m_settings.browserRowWidth[i] = 1;
     }
 
+#ifdef MARTII
+    if (movie_info) {
+	if (ts_only != m_settings.ts_only)
+	     loadMovies();
+	else
+#endif
     if(dirMenu.isChanged())
         loadMovies();
 
@@ -3115,6 +3201,10 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
     refreshFilterList();
     refreshMovieInfo();
     refresh();
+#ifdef MARTII
+    } else
+	saveSettings(&m_settings);
+#endif
 
    for(i=0; i<MB_MAX_DIRS ;i++)
    {
@@ -3571,7 +3661,12 @@ int CFileChooser::exec(CMenuTarget* parent, const std::string & /*actionKey*/)
         *dirPath = browser.getSelectedFile()->Name;
         short a = dirPath->compare(0,5,"/mnt/");
         short b = dirPath->compare(0,7,"/media/");
+#ifdef MARTII
+        short c = dirPath->compare(0,5,"/tmp/");
+        if(a != 0 && b != 0 && c != 0)
+#else
         if(a != 0 && b != 0)
+#endif
             *dirPath ="";   // We clear the  string if the selected folder is not at leaset /mnt/ or /hdd (There is no other possibility to clear this)
     }
 

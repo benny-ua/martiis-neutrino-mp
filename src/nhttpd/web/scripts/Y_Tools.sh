@@ -229,7 +229,9 @@ do_mount()
 			cmd="mount -t nfs $ip:$dir $local_dir -o $options1"
 			;;
 		1)
-			cmd="mount -t cifs $ip/$dir $local_dir -o username=$username,password=$password,unc=//$ip/$dir,$options1";
+			#cmd="mount -t cifs $ip/$dir $local_dir -o username=$username,password=$password,unc=//$ip/$dir,$options1";
+			# martii: mount with UTF8 option set
+			cmd="mount -t cifs $ip/$dir $local_dir -o username=$username,password=$password,iocharset=utf8,unc=//$ip/$dir,$options1";
 			;;
 		2)
 			cmd="lufsd none $local_dir -o fs=ftpfs,username=$username,password=$password,host=$ip,root=/$dir,$options1";

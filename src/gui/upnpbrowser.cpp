@@ -55,6 +55,9 @@
 #include <gui/eventlist.h>
 #include <gui/color.h>
 #include <gui/infoviewer.h>
+#ifdef MARTII
+#include <gui/movieplayer.h>
+#endif
 
 #include <gui/widget/buttons.h>
 #include <gui/widget/icons.h>
@@ -68,6 +71,9 @@
 
 #include <video.h>
 extern cVideo * videoDecoder;
+#ifdef MARTII
+extern CPictureViewer * g_PicViewer;
+#endif
 
 #ifdef ConnectLineBox_Width
 #undef ConnectLineBox_Width
@@ -113,7 +119,14 @@ int CUpnpBrowserGui::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 
 	g_Zapit->stopPlayBack();
 
+#ifdef MARTII
+	if (g_settings.show_background_picture)
+#endif
 	videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+#ifdef MARTII
+	else
+		CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+#endif
 
 	// tell neutrino we're in audio mode
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , NeutrinoMessages::mode_audio );
@@ -162,6 +175,9 @@ int CUpnpBrowserGui::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 	// Start Sectionsd
 	g_Sectionsd->setPauseScanning(false);
 	videoDecoder->StopPicture();
+#ifdef MARTII
+	g_Zapit->startPlayBack();
+#endif
 
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , m_LastMode );
 	g_RCInput->postMsg( NeutrinoMessages::SHOW_INFOBAR, 0 );
@@ -336,6 +352,22 @@ std::vector<UPnPEntry> *CUpnpBrowserGui::decodeResult(std::string result)
 						pref=2;
 					}
 #endif
+#ifdef MARTII
+					if (mime.substr(0,6) == "image/" && pref < 1)
+					{
+						preferred=i;
+					}
+					if (mime == "image/jpeg" && pref < 1)
+					{
+						preferred=i;
+						pref=1;
+					}
+					if (mime == "image/gif" && pref < 2)
+					{
+						preferred=i;
+						pref=2;
+					}
+#endif
 					if (mime == "audio/mpeg" && pref < 3)
 					{
 						preferred=i;
@@ -346,6 +378,23 @@ std::vector<UPnPEntry> *CUpnpBrowserGui::decodeResult(std::string result)
 						preferred=i;
 						pref=4;
 					}
+#ifdef MARTII
+					if (mime.substr(0,6) == "video/" && pref < 5)
+					{
+						preferred=i;
+						pref=5;
+					}
+					if (mime == "video/x-flv" && pref < 6)
+					{
+						preferred=i;
+						pref=6;
+					}
+					if (mime == "video/mp4" && pref < 7)
+					{
+						preferred=i;
+						pref=7;
+					}
+#endif
 				}
 			}
 			p = node->GetAttributeValue("id");
@@ -378,7 +427,8 @@ void CUpnpBrowserGui::selectDevice()
 
 	CHintBox *scanBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_UPNPBROWSER_SCANNING)); // UTF-8
 	scanBox->paint();
-#if 0
+//#if 0
+#ifdef MARTII
 	try {
 		m_devices = m_socket->Discover("urn:schemas-upnp-org:service:ContentDirectory:1");
 	}
@@ -389,7 +439,9 @@ void CUpnpBrowserGui::selectDevice()
 		return;
 	}
 #endif
+#ifndef MARTII
 	m_devices = m_socket->Discover("urn:schemas-upnp-org:service:ContentDirectory:1");
+#endif
 	scanBox->hide();
 
 	if (m_devices.empty())
@@ -446,7 +498,8 @@ void CUpnpBrowserGui::selectDevice()
 		else if ( msg == CRCInput::RC_blue)
 		{
 			scanBox->paint();
-#if 0
+//#if 0
+#ifdef MARTII
 			try {
 				m_devices = m_socket->Discover("urn:schemas-upnp-org:service:ContentDirectory:1");
 			}
@@ -457,7 +510,9 @@ void CUpnpBrowserGui::selectDevice()
 				return;
 			}
 #endif
+#ifndef MARTII
 			m_devices = m_socket->Discover("urn:schemas-upnp-org:service:ContentDirectory:1");
+#endif
 			scanBox->hide();
 			if (m_devices.empty())
 			{
@@ -499,11 +554,19 @@ void CUpnpBrowserGui::playnext(void)
 {
 	while (true)
 	{
+#ifdef MARTII
+		timeout = 0;
+#endif
 		std::list<UPnPAttribute>attribs;
 		std::list<UPnPAttribute>results;
 		std::list<UPnPAttribute>::iterator i;
 		std::stringstream sindex;
 		std::vector<UPnPEntry> *entries = NULL;
+#ifndef MARTII
+		bool rfound = false;
+		bool nfound = false;
+		bool tfound = false;
+#endif
 
 		sindex << m_playid;
 		attribs.push_back(UPnPAttribute("ObjectID", m_playfolder));
@@ -513,7 +576,8 @@ void CUpnpBrowserGui::playnext(void)
 		attribs.push_back(UPnPAttribute("RequestedCount", "1"));
 		attribs.push_back(UPnPAttribute("SortCriteria", ""));
 
-#if 0
+//#if 0
+#ifdef MARTII
 		try
 		{
 			results=m_devices[m_selecteddevice].SendSOAP("urn:schemas-upnp-org:service:ContentDirectory:1", "Browse", attribs);
@@ -525,7 +589,9 @@ void CUpnpBrowserGui::playnext(void)
 			return;
 		}
 #endif
+#ifndef MARTII
 		results=m_devices[m_selecteddevice].SendSOAP("urn:schemas-upnp-org:service:ContentDirectory:1", "Browse", attribs);
+#endif
 		for (i=results.begin(); i!=results.end(); ++i)
 		{
 			if (i->first=="NumberReturned")
@@ -536,9 +602,11 @@ void CUpnpBrowserGui::playnext(void)
 					return;
 				}
 			}
+#ifndef MARTII
 			if (i->first=="TotalMatches")
 			{
 			}
+#endif
 			if (i->first=="Result")
 			{
 				entries=decodeResult(i->second);
@@ -553,6 +621,22 @@ void CUpnpBrowserGui::playnext(void)
 				std::string protocol, prot, network, mime, additional;
 				protocol=(*entries)[0].resources[preferred].protocol;
 				splitProtocol(protocol, prot, network, mime, additional);
+#ifdef MARTII
+				if (mime.substr(0,6) != "image/") {
+					m_frameBuffer->Clear();
+					CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+				}
+#endif
+#ifdef MARTII
+				if (mime == "audio/mpeg" || mime == "audio/x-vorbis+ogg") {
+					m_playing_entry = (*entries)[0];
+					m_playing_entry_is_shown = false;
+					CAudiofile mp3((*entries)[0].resources[preferred].url, mime == "audio/mpeg" ? CFile::FILE_MP3 : CFile::FILE_OGG);
+					CAudioPlayer::getInstance()->play(&mp3, g_settings.audioplayer_highprio == 1);
+					return;
+				}
+				
+#else
 				if (mime == "audio/mpeg")
 				{
 					m_playing_entry = (*entries)[0];
@@ -569,6 +653,34 @@ void CUpnpBrowserGui::playnext(void)
 					CAudioPlayer::getInstance()->play(&mp3, g_settings.audioplayer_highprio == 1);
 					return;
 				}
+#endif
+#ifdef MARTII
+				else if (mime.substr(0,6) == "video/")
+				{
+					g_settings.streaming_server_url = std::string((*entries)[0].resources[preferred].url); //FIXME
+					if (CAudioPlayer::getInstance()->getState() != CBaseDec::STOP)
+						CAudioPlayer::getInstance()->stop();
+					CMoviePlayerGui::getInstance().exec(NULL, "netstream");
+					return;
+				}
+				else if (mime.substr(0,6) == "image/")
+				{
+					timeout = time(NULL) + atoi(g_settings.picviewer_slide_time);
+					g_PicViewer->SetScaling((CPictureViewer::ScalingMode)g_settings.picviewer_scaling);
+					g_PicViewer->SetVisible(g_settings.screen_StartX, g_settings.screen_EndX, g_settings.screen_StartY, g_settings.screen_EndY);
+					CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+
+					if (g_settings.video_Format==3)
+						g_PicViewer->SetAspectRatio(16.0/9);
+					else
+						g_PicViewer->SetAspectRatio(4.0/3);
+
+					g_PicViewer->ShowImage((*entries)[0].resources[preferred].url, false);
+					m_frameBuffer->blit();
+					g_PicViewer->Cleanup();
+					return;
+				}
+#endif
 			}
 		} else {
 			neutrino_msg_t      msg;
@@ -582,6 +694,10 @@ void CUpnpBrowserGui::playnext(void)
 			}
 		}
 	}
+#ifdef MARTII
+	m_frameBuffer->Clear();
+	CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+#endif
 }
 
 //------------------------------------------------------------------------
@@ -626,7 +742,8 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			attribs.push_back(UPnPAttribute("StartingIndex", sindex.str()));
 			attribs.push_back(UPnPAttribute("RequestedCount", scount.str()));
 			attribs.push_back(UPnPAttribute("SortCriteria", ""));
-#if 0
+//#if 0
+#ifdef MARTII
 			try
 			{
 				results=m_devices[m_selecteddevice].SendSOAP("urn:schemas-upnp-org:service:ContentDirectory:1", "Browse", attribs);
@@ -639,7 +756,9 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 				return endall;
 			}
 #endif
+#ifndef MARTII
 			results=m_devices[m_selecteddevice].SendSOAP("urn:schemas-upnp-org:service:ContentDirectory:1", "Browse", attribs);
+#endif
 			for (i=results.begin(); i!=results.end(); ++i)
 			{
 				if (i->first=="NumberReturned")
@@ -682,6 +801,9 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 
 		if (changed)
 		{
+#ifdef MARTII
+		if (!timeout)
+#endif
 			paintItem(entries, selected - index, dirnum - index, index);
 			changed=false;
 		}
@@ -698,10 +820,12 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			loop=false;
 			endall=true;
 		}
+#ifndef MARTII
 		else if (msg == CRCInput::RC_left)
 		{
 			loop=false;
 		}
+#endif
 
 		else if (msg_repeatok == CRCInput::RC_up && selected > 0)
 		{
@@ -714,7 +838,11 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			changed=true;
 		}
 
+#ifdef MARTII
+		else if ((msg == CRCInput::RC_green || (int) msg == g_settings.key_channelList_pageup) && selected > 0)
+#else
 		else if (msg == CRCInput::RC_green && selected > 0)
+#endif
 		{
 			if (index > 0)
 			{
@@ -738,7 +866,11 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			changed=true;
 		}
 
+#ifdef MARTII
+		else if ((msg == CRCInput::RC_red || (int) msg == g_settings.key_channelList_pagedown) && selected + 1 < dirnum)
+#else
 		else if (msg == CRCInput::RC_red && selected + 1 < dirnum)
+#endif
 		{
 			if (index < ((dirnum - 1) / m_listmaxshow) * m_listmaxshow)
 			{
@@ -784,6 +916,47 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 						CAudiofile mp3((*entries)[selected - index].resources[preferred].url, CFile::FILE_OGG);
 						CAudioPlayer::getInstance()->play(&mp3, g_settings.audioplayer_highprio == 1);
 					}
+#ifdef MARTII
+					else if (mime.substr(0,6) == "video/")
+					{
+						m_frameBuffer->Clear();
+						CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+						g_settings.streaming_server_url = std::string((*entries)[selected - index].resources[preferred].url); //FIXME
+						CMoviePlayerGui::getInstance().exec(NULL, "netstream");
+						if (g_settings.show_background_picture)
+							videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+						else
+							CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+						changed = true;
+					}
+					else if (mime.substr(0,6) == "image/")
+					{
+						CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+						g_PicViewer->SetScaling((CPictureViewer::ScalingMode)g_settings.picviewer_scaling);
+						g_PicViewer->SetVisible(g_settings.screen_StartX, g_settings.screen_EndX, g_settings.screen_StartY, g_settings.screen_EndY);
+
+						if (g_settings.video_Format==3)
+							g_PicViewer->SetAspectRatio(16.0/9);
+						else
+							g_PicViewer->SetAspectRatio(4.0/3);
+
+						g_PicViewer->ShowImage((*entries)[selected - index].resources[preferred].url, false);
+						m_frameBuffer->blit();
+						g_PicViewer->Cleanup();
+
+						while (true)
+						{
+							g_RCInput->getMsg(&msg, &data, 10); // 1 sec timeout to update play/stop state display
+
+							if (msg == CRCInput::RC_home || msg == CRCInput::RC_ok)
+								break;
+							CNeutrinoApp::getInstance()->handleMsg(msg, data);
+						}
+						CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+						m_frameBuffer->Clear();
+						changed = true;
+					}
+#endif
 					m_playing_entry = (*entries)[selected - index];
 #if 0 // TODO !
 // #ifdef ENABLE_PICTUREVIEWER
@@ -846,6 +1019,29 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 		{
 			CNeutrinoApp::getInstance()->handleMsg( msg, data );
 		}
+#ifdef MARTII
+		else if (msg == (neutrino_msg_t) CRCInput::RC_setup)
+		{
+			m_frameBuffer->Clear();
+			CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::SHOW_MAINSETTINGS, 0);
+			paintItem(entries, selected - index, dirnum - index, index);
+		}
+		else if (m_folderplay && msg == (neutrino_msg_t) CRCInput::RC_stop) {
+			timeout = 0;
+			m_folderplay = false;
+		}
+		else if (m_folderplay && msg == (neutrino_msg_t) CRCInput::RC_prev) {
+			timeout = 0;
+			m_playid -= 2;
+			if (m_playid < 0)
+				m_playid = 0;
+		}
+		else if (m_folderplay && msg == (neutrino_msg_t) CRCInput::RC_next) {
+			timeout = 0;
+			if (CAudioPlayer::getInstance()->getState() != CBaseDec::STOP)
+				CAudioPlayer::getInstance()->stop();
+		}
+#endif
 
 		else
 		{
@@ -854,7 +1050,11 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			changed=true;
 		}
 
+#ifdef MARTII
+		if (m_folderplay && ((!timeout || (timeout <= time(NULL))) && (CAudioPlayer::getInstance()->getState() == CBaseDec::STOP)))
+#else
 		if (m_folderplay && (CAudioPlayer::getInstance()->getState() == CBaseDec::STOP))
+#endif
 			playnext();
 	}
 	if (entries)
@@ -1048,6 +1248,9 @@ void CUpnpBrowserGui::paintDevice()
 	::paintButtons(m_x, top, 0, 1, &RescanButton, m_width, m_buttonHeight);
 
 	clearItem2DetailsLine(); // clear it
+#ifdef MARTII
+	m_frameBuffer->blit();
+#endif
 }
 
 //------------------------------------------------------------------------
@@ -1168,6 +1371,9 @@ void CUpnpBrowserGui::paintItem(std::vector<UPnPEntry> *entry, unsigned int sele
 	top = m_y + (m_height - m_info_height - 2 * m_buttonHeight);
 	m_frameBuffer->paintBoxRel(m_x, top, m_width, m_buttonHeight+2, COL_INFOBAR_SHADOW_PLUS_1, RADIUS_LARGE, CORNER_BOTTOM);
 	::paintButtons(m_x, top, 0, 4, BrowseButtons, m_width, m_buttonHeight);
+#ifdef MARTII
+	m_frameBuffer->blit();
+#endif
 }
 
 
@@ -1293,7 +1499,11 @@ void CUpnpBrowserGui::paintItem2DetailsLine (int pos, unsigned int /*ch_index*/)
 	fb_pixel_t col2 = COL_MENUCONTENT_PLUS_1;
 
 	// Clear
+#ifdef MARTII
+	m_frameBuffer->paintBackgroundBoxRel(xpos, m_y + m_title_height, ConnectLineBox_Width, m_height - (m_y + m_title_height));
+#else
 	m_frameBuffer->paintBackgroundBoxRel(xpos, m_y + m_title_height, ConnectLineBox_Width, m_height+m_info_height-(m_y + m_title_height));
+#endif
 	if (pos < 0) 
 		m_frameBuffer->paintBackgroundBoxRel(m_x, m_y + (m_height - m_info_height - 1 * m_buttonHeight) + 2, m_width, m_info_height);
 

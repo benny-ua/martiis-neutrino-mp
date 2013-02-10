@@ -22,6 +22,10 @@
 #include <video.h>
 #include <sys/stat.h>
 #include <global.h>
+#ifdef MARTII
+#include <sys/time.h>
+#include <system/set_threadname.h>
+#endif
 
 /* same as in rcinput.h... */
 #define KEY_TTTV	KEY_FN_1
@@ -29,7 +33,11 @@
 #define KEY_REVEAL	KEY_FN_D
 
 #ifdef HAVE_SPARK_HARDWARE
+#ifdef MARTII
+#define MARK_FB(a, b, c, d) if ((fb_pixel_t *)p == lfb) CFrameBuffer::getInstance()->mark(a, b, (a) + (c), (b) + (d))
+#else
 #define MARK_FB(a, b, c, d) if (p == lfb) CFrameBuffer::getInstance()->mark(a, b, (a) + (c), (b) + (d))
+#endif
 #else
 #define MARK_FB(a, b, c, d)
 #endif
@@ -43,12 +51,20 @@ static int ttx_req_pause;
 static int sub_pid, sub_page;
 static bool use_gui;
 static int cfg_national_subset;
+#ifdef MARTII
+bool isTtxEplayer = false;
+#endif
+
 
 static int screen_x, screen_y, screen_w, screen_h;
 
 //#define USE_FBPAN // FBIOPAN_DISPLAY seems to be working in current driver
 
+#ifdef MARTII
+fb_pixel_t *getFBp(int *y)
+#else
 unsigned char *getFBp(int *y)
+#endif
 {
 	if (*y < (int)var_screeninfo.yres)
 		return lfb;
@@ -59,13 +75,26 @@ unsigned char *getFBp(int *y)
 
 void FillRect(int x, int y, int w, int h, int color)
 {
+#ifdef MARTII
+	fb_pixel_t *p = getFBp(&y);
+	MARK_FB(x, y, w, h);
+	p += x + y * fix_screeninfo.line_length;
+	fb_pixel_t col = argb[color];
+	if (w > 0)
+		for (int count = 0; count < h; count++) {
+			fb_pixel_t *dest0 = p;
+			for (int i = 0; i < w; i++)
+				*dest0++ = col;
+			p += fix_screeninfo.line_length;
+		}
+#else
 	unsigned char *p = getFBp(&y);
 	MARK_FB(x, y, w, h);
 	p += x*4 + y * fix_screeninfo.line_length;
 #if !HAVE_TRIPLEDRAGON
-	unsigned int col = bgra[color][3] << 24 | bgra[color][2] << 16 | bgra[color][1] << 8 | bgra[color][0];
+	unsigned int col = argb[color][3] << 24 | argb[color][2] << 16 | argb[color][1] << 8 | argb[color][0];
 #else
-	unsigned int col = *((unsigned int*)bgra[color]);
+	unsigned int col = *((unsigned int*)argb[color]);
 #endif
 	if (w > 0)
 		for (int count = 0; count < h; count++) {
@@ -74,6 +103,7 @@ void FillRect(int x, int y, int w, int h, int color)
 				*(dest0++) = col;
 			p += fix_screeninfo.line_length;
 		}
+#endif
 }
 
 
@@ -84,7 +114,11 @@ void FillBorder(int color)
 	FillRect(StartX, ys                     ,displaywidth,StartY                                    ,color);
 	FillRect(StartX, ys+StartY+25*fontheight,displaywidth,var_screeninfo.yres-(StartY+25*fontheight),color);
 
+#ifdef MARTII
+	if (screenmode[boxed] == 0 )
+#else
 	if (screenmode == 0 )
+#endif
 		FillRect(StartX+displaywidth, ys,var_screeninfo.xres-(StartX+displaywidth),var_screeninfo.yres   ,color);
 }
 
@@ -276,9 +310,10 @@ void ClearB(int color)
 {
 	FillRect(0,                   0, var_screeninfo.xres, var_screeninfo.yres, color); /* framebuffer */
 	FillRect(0, var_screeninfo.yres, var_screeninfo.xres, var_screeninfo.yres, color); /* backbuffer */
-	CFrameBuffer::getInstance()->blit();
+		CFrameBuffer::getInstance()->blit();
 }
 #endif
+
 int  GetCurFontWidth()
 {
 	int mx = (displaywidth)%(40-nofirst); // # of unused pixels
@@ -319,6 +354,28 @@ void setfontwidth(int newwidth)
 	}
 }
 
+#ifdef MARTII
+void setcolors(unsigned short *pcolormap, int offset, int number) {
+	int j = offset; /* index in global color table */
+	int trans_tmp=25-trans_mode;
+
+	argb[transp2] = (((trans_tmp+7)<<11 | 0x7FF)>>8) << 24;
+
+	for (int i = 0; i < number; i++) {
+		int r = (pcolormap[i] << 12 & 0xF000) >> 8;
+		int g = (pcolormap[i] << 8 & 0xF000) >> 8;
+		int b = (pcolormap[i] << 4 & 0xF000) >> 8;
+
+		r = (r * (0x3f+(color_mode<<3))) >> 8;
+		g = (g * (0x3f+(color_mode<<3))) >> 8;
+		b = (b * (0x3f+(color_mode<<3))) >> 8;
+
+		argb[j] &= 0xff000000;
+		argb[j] |= (r << 16) | (g << 8) | b;
+		j++;
+	}
+}
+#else
 #if HAVE_TRIPLEDRAGON
 #define _A 0
 #define _R 1
@@ -337,7 +394,7 @@ void setcolors(unsigned short *pcolormap, int offset, int number)
 
 	trans_tmp=25-trans_mode;
 
-	bgra[transp2][_A]=((trans_tmp+7)<<11 | 0x7FF)>>8;
+	argb[transp2][_A]=((trans_tmp+7)<<11 | 0x7FF)>>8;
 
 	for (i = 0; i < number; i++)
 	{
@@ -349,13 +406,14 @@ void setcolors(unsigned short *pcolormap, int offset, int number)
 		g = (g * (0x3f+(color_mode<<3))) >> 8;
 		b = (b * (0x3f+(color_mode<<3))) >> 8;
 
-		bgra[j][_R]=r;
-		bgra[j][_G]=g;
-		bgra[j][_B]=b;
+		argb[j][_R]=r;
+		argb[j][_G]=g;
+		argb[j][_B]=b;
 
 		j++;
 	}
 }
+#endif
 
 /* hexdump of page contents to stdout for debugging */
 void dump_page()
@@ -1073,34 +1131,34 @@ int eval_triplet(int iOData, tstCachedPage *pstCachedPage,
 
 int setnational(unsigned char sec)
 {
-        switch (sec)
-        {
-                case 0x08:
-                        return NAT_PL; //polish
-                case 0x16:
-                case 0x36:
-                        return NAT_TR; //turkish
-                case 0x1d:
-                        return NAT_SR; //serbian, croatian, slovenian
-                case 0x20:
-                        return NAT_SC; // serbian, croatian
-                case 0x24:
-                        return NAT_RB; // russian, bulgarian
-                case 0x25:
-                        return NAT_UA; // ukrainian
-                case 0x22:
-                        return NAT_ET; // estonian
-                case 0x23:
-                        return NAT_LV; // latvian, lithuanian
-                case 0x37:
-                        return NAT_GR; // greek
-                case 0x55:
-                        return NAT_HB; // hebrew
-                case 0x47:
-                case 0x57:
-                        return NAT_AR; // arabic
-        }
-        return countryconversiontable[sec & 0x07];
+	switch (sec)
+	{
+		case 0x08:
+			return NAT_PL; //polish
+		case 0x16:
+		case 0x36:
+			return NAT_TR; //turkish
+		case 0x1d:
+			return NAT_SR; //serbian, croatian, slovenian
+		case 0x20:
+			return NAT_SC; // serbian, croatian
+		case 0x24:
+			return NAT_RB; // russian, bulgarian
+		case 0x25:
+			return NAT_UA; // ukrainian
+		case 0x22:
+			return NAT_ET; // estonian
+		case 0x23:
+			return NAT_LV; // latvian, lithuanian
+		case 0x37:
+			return NAT_GR; // greek
+		case 0x55:
+			return NAT_HB; // hebrew
+		case 0x47:
+		case 0x57:
+			return NAT_AR; // arabic
+	}
+	return countryconversiontable[sec & 0x07];
 }
 
 /* evaluate level 2.5 information */
@@ -1196,7 +1254,7 @@ void eval_l25()
 		for (packet = 1; packet <= 4; packet++)
 		{
 			unsigned char *ptriplet = pagedata + 40*(packet-1);
- 			int idata = dehamming[*ptriplet];
+			int idata = dehamming[*ptriplet];
 			int triplet;
 
 			if (idata == 0xff || 0 == (idata & 1))	/* hamming error or no pointer data: ignore packet */
@@ -1518,7 +1576,11 @@ void eval_l25()
 			}
 		}
 
+#ifdef MARTII
+		if (boxed || transpmode[boxed]) {
+#else
 		if (boxed || transpmode) {
+#endif
 			FillBorder(transp);
 		} else if(use_gui) {
 			FillBorder(FullScrColor);
@@ -1546,6 +1608,9 @@ static void cleanup_fb_pan()
 static void* reader_thread(void * /*arg*/)
 {
 	printf("TuxTxt subtitle thread started\n");
+#ifdef MARTII
+	set_threadname("ttx_reader_thread");
+#endif
 	reader_running = 1;
 	//ttx_paused = 0;
 	while(reader_running) {
@@ -1572,7 +1637,11 @@ void tuxtx_pause_subtitle(bool pause)
 		printf("TuxTxt subtitle unpause, running %d pid %d page %d\n", reader_running, sub_pid, sub_page);
 		ttx_paused = 0;
 		if(!reader_running && sub_pid && sub_page)
+#ifdef MARTII
+			tuxtx_main(0, sub_pid, sub_page, 0, isTtxEplayer);
+#else
 			tuxtx_main(0, sub_pid, sub_page);
+#endif
 	}
 	else {
 		if(!reader_running)
@@ -1631,12 +1700,22 @@ int tuxtx_subtitle_running(int *pid, int *page, int *running)
 	return ret;
 }
 
+#ifdef MARTII
+int tuxtx_main(int _rc, int pid, int page, int source, bool isEplayer)
+#else
 int tuxtx_main(int _rc, int pid, int page, int source)
+#endif
 {
 	char cvs_revision[] = "$Revision: 1.95 $";
 
+#ifdef MARTII
+	isTtxEplayer = isEplayer;
+#endif
 	use_gui = 1;
 	boxed = 0;
+#ifdef MARTII
+	oldboxed = boxed;
+#endif
 //printf("to init tuxtxt\n");fflush(stdout);
 #if !TUXTXT_CFG_STANDALONE
 	int initialized = tuxtxt_init();
@@ -1647,6 +1726,9 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 		sub_pid = pid;
 		use_gui = 0;
 		boxed = 1;
+#ifdef MARTII
+		oldboxed = boxed;
+#endif
 	}
 #endif
 
@@ -1657,17 +1739,30 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 
 	fb = -1;
 #ifdef USE_FBPAN
-        if ((fb=open("/dev/fb/0", O_RDWR)) == -1)
-        {
-                perror("TuxTxt <open /dev/fb/0>");
-                return 0;
-        }
+#ifdef FB_DEVICE
+	if ((fb=open(FB_DEVICE, O_RDWR)) == -1)
+#else
+	if ((fb=open("/dev/fb/0", O_RDWR)) == -1)
+#endif
+	{
+#ifdef FB_DEVICE
+		perror("TuxTxt <open " FB_DEVICE ">");
+#else
+		perror("TuxTxt <open /dev/fb/0>");
+#endif
+		return 0;
+	}
 #endif
 
 	rc = _rc;
 	CFrameBuffer *fbp = CFrameBuffer::getInstance();
+#ifdef MARTII
+	lfb = fbp->getFrameBufferPointer();
+	lbb = fbp->getBackBufferPointer();
+#else
 	lfb = (unsigned char *)fbp->getFrameBufferPointer();
 	lbb = (unsigned char *)fbp->getBackBufferPointer();
+#endif
 
 	tuxtxt_cache.vtxtpid = pid;
 
@@ -1696,7 +1791,11 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 	struct fb_var_screeninfo *var;
 	var = fbp->getScreenInfo();
 	memcpy(&var_screeninfo, var, sizeof(struct fb_var_screeninfo));
+# ifdef MARTII
+	fix_screeninfo.line_length = var_screeninfo.xres;
+# else
 	fix_screeninfo.line_length = var_screeninfo.xres * sizeof(fb_pixel_t);
+# endif
 #endif
 	/* set variable screeninfo for double buffering */
 	var_screeninfo.yoffset      = 0;
@@ -1726,7 +1825,12 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 
 	printf("[tuxtxt] screen is %dx%d at %dx%d border %d\n", ex-sx, ey-sy, sx, sy, tx);
 	/* initialisations */
+#ifdef MARTII
+	transpmode[0] = 0;
+	transpmode[1] = 0;
+#else
 	transpmode = 0;
+#endif
 
 	if (Init(source) == 0)
 		return 0;
@@ -1736,11 +1840,19 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 		return 1;
 	}
 	//transpmode = 1;
+#ifdef MARTII
+	// clear input queue
+	while (GetRCCode() == 1);
+#endif
 	/* main loop */
 	do {
 		if (GetRCCode() == 1)
 		{
+#ifdef MARTII
+			if (transpmode[boxed] == 2) /* TV mode */
+#else
 			if (transpmode == 2) /* TV mode */
+#endif
 			{
 				switch (RCCode)
 				{
@@ -1771,7 +1883,11 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 				case RC_MINUS:
 				case RC_DBOX:
 				case RC_STANDBY:
+#ifdef MARTII
+					transpmode[boxed] = 1; /* switch to normal mode */
+#else
 					transpmode = 1; /* switch to normal mode */
+#endif
 					SwitchTranspMode();
 					break;		/* and evaluate key */
 
@@ -1800,7 +1916,7 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 				if (boxed)
 				{
 				    subtitledelay++;
-		    		    // display subtitledelay
+				    // display subtitledelay
 				    PosY = StartY;
 				    char ns[10];
 				    SetPosX(1);
@@ -1811,14 +1927,14 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 				    RenderCharFB(ns[4],&atrtable[ATR_WB]);
 				}
 				else
-    				    GetNextSubPage(1);
+				    GetNextSubPage(1);
 				break;
 			case RC_LEFT:
 				if (boxed)
 				{
 				    subtitledelay--;
 				    if (subtitledelay < 0) subtitledelay = 0;
-		    		    // display subtitledelay
+				    // display subtitledelay
 				    PosY = StartY;
 				    char ns[10];
 				    SetPosX(1);
@@ -1854,10 +1970,18 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 			case RC_YELLOW: ColorKey(next_10);		break;
 			case RC_BLUE:	 ColorKey(next_100);		break;
 			case RC_PLUS:	 SwitchZoomMode();		break;
+#ifdef MARTII
+			case RC_MINUS:	 SwitchScreenMode(-1);prevscreenmode[boxed] = screenmode[boxed]; break;
+#else
 			case RC_MINUS:	 SwitchScreenMode(-1);prevscreenmode = screenmode; break;
+#endif
 			case RC_MUTE:	 SwitchTranspMode();	break;
 			case RC_TEXT:
+#ifdef MARTII
+				if(transpmode[boxed] == 1)
+#else
 				if(transpmode == 1)
+#endif
 					RCCode = RC_HOME;
 				SwitchTranspMode();
 				break;
@@ -1873,7 +1997,11 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 		RenderPage();
 	} while ((RCCode != RC_HOME) && (RCCode != RC_STANDBY));
 	/* if transparent mode was selected, remember the original mode */
+#ifdef MARTII
+	screenmode[boxed] = prevscreenmode[boxed];
+#else
 	screenmode = prevscreenmode;
+#endif
 
 	/* exit */
 	CleanUp();
@@ -1886,7 +2014,7 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 		tuxtxt_close();
 #endif
 
- 	printf("Tuxtxt: plugin ended\n");
+	printf("Tuxtxt: plugin ended\n");
 	return 1;
 }
 
@@ -1976,7 +2104,12 @@ int Init(int source)
 		mkdir(TUXTXTDIR, 0755);
 
 	/* config defaults */
+#ifdef MARTII
+	screenmode[0] = 0;
+	screenmode[1] = 0;
+#else
 	screenmode = 0;
+#endif
 	screen_mode1 = 0;
 	color_mode   = 10;
 	trans_mode   = 1;
@@ -2043,7 +2176,13 @@ int Init(int source)
 			else if (1 == sscanf(line, "TTFShiftY %i", &ival))
 				TTFShiftY = ival;
 			else if (1 == sscanf(line, "Screenmode %i", &ival))
+#ifdef MARTII
+				screenmode[0] = ival;
+			else if (1 == sscanf(line, "ScreenmodeBoxed %i", &ival))
+				screenmode[1] = ival;
+#else
 				screenmode = ival;
+#endif
 			else if (1 == sscanf(line, "ShowFLOF %i", &ival))
 				showflof = ival & 1;
 			else if (1 == sscanf(line, "Show39 %i", &ival))
@@ -2068,7 +2207,12 @@ int Init(int source)
 		fclose(conf);
 	}
 	saveconfig = 0;
+#ifdef MARTII
+	savedscreenmode[0] = screenmode[0];
+	savedscreenmode[1] = screenmode[1];
+#else
 	savedscreenmode = screenmode;
+#endif
 	national_subset_secondary = NAT_DEFAULT;
 
 	fontwidth = 0;	/* initialize at first setting */
@@ -2163,7 +2307,11 @@ int Init(int source)
 			typettf.height = (FT_UShort) 23;
 		}
 
+#ifdef MARTII
+		typettf.flags = FT_LOAD_RENDER;
+#else
 		typettf.flags = FT_LOAD_MONOCHROME;
+#endif
 
 		if ((error = FTC_Manager_LookupFace(manager, typettf.face_id, &face)))
 		{
@@ -2250,12 +2398,21 @@ int Init(int source)
 	fcntl(rc, F_SETFL, O_NONBLOCK);
 	gethotlist();
 
+#ifdef MARTII
+	SwitchScreenMode(screenmode[use_gui ? 0 : 1]);
+#else
 	if(use_gui)
 		SwitchScreenMode(screenmode);
 	else
 		SwitchScreenMode(0);
+#endif
 
+#ifdef MARTII
+	prevscreenmode[0] = screenmode[0];
+	prevscreenmode[1] = screenmode[1];
+#else
 	prevscreenmode = screenmode;
+#endif
 
 	printf("TuxTxt: init ok\n");
 
@@ -2269,10 +2426,20 @@ int Init(int source)
 
 void CleanUp()
 {
+#ifdef MARTII
+	int curscreenmode[2];
+	curscreenmode[0] = screenmode[0];
+	curscreenmode[1] = screenmode[1];
+#else
 	int curscreenmode = screenmode;
+#endif
 
 	/* hide and close pig */
+#ifdef MARTII
+	if (screenmode[0])
+#else
 	if (screenmode)
+#endif
 		SwitchScreenMode(0); /* turn off divided screen */
 	//close(pig);
 
@@ -2302,7 +2469,11 @@ void CleanUp()
 		savehotlist();
 
 	/* save config */
+#ifdef MARTII
+	if (saveconfig || curscreenmode[0] != savedscreenmode[0] || curscreenmode[1] != savedscreenmode[1])
+#else
 	if (saveconfig || curscreenmode != savedscreenmode)
+#endif
 	{
 		if ((conf = fopen(TUXTXTCONF, "wt")) == 0)
 		{
@@ -2323,7 +2494,12 @@ void CleanUp()
 			fprintf(conf, "TTFHeightFactor16 %d\n", TTFHeightFactor16);
 			fprintf(conf, "TTFShiftX %d\n", TTFShiftX);
 			fprintf(conf, "TTFShiftY %d\n", TTFShiftY);
+#ifdef MARTII
+			fprintf(conf, "Screenmode %d\n", curscreenmode[0]);
+			fprintf(conf, "ScreenmodeBoxed %d\n", curscreenmode[1]);
+#else
 			fprintf(conf, "Screenmode %d\n", curscreenmode);
+#endif
 			fprintf(conf, "ShowFLOF %d\n", showflof);
 			fprintf(conf, "Show39 %d\n", show39);
 			fprintf(conf, "ShowLevel2p5 %d\n", showl25);
@@ -2344,6 +2520,10 @@ void CleanUp()
  ******************************************************************************/
 int GetTeletextPIDs()
 {
+#ifdef MARTII
+	if (isTtxEplayer)
+		return 0;
+#endif
 	int pat_scan, pmt_scan, sdt_scan, desc_scan, pid_test, byte, diff, first_sdt_sec;
 
 	unsigned char bufPAT[1024];
@@ -2866,18 +3046,37 @@ void ConfigMenu(int Init)
 	}
 
 	/* reset to normal mode */
+#ifdef MARTII
+	if (zoommode[0])
+		zoommode[0] = 0;
+#else
 	if (zoommode)
 		zoommode = 0;
+#endif
 
+#ifdef MARTII
+	if (transpmode[0])
+#else
 	if (transpmode)
+#endif
 	{
+#ifdef MARTII
+		oldtrans = transpmode[0];
+		transpmode[0] = 0;
+#else
 		oldtrans = transpmode;
 		transpmode = 0;
+#endif
 		ClearBB(black);
 	}
 
+#ifdef MARTII
+	oldscreenmode = screenmode[0];
+	if (screenmode[0])
+#else
 	oldscreenmode = screenmode;
 	if (screenmode)
+#endif
 		SwitchScreenMode(0); /* turn off divided screen */
 
 	hotindex = getIndexOfPageInHotlist();
@@ -3375,7 +3574,11 @@ void ConfigMenu(int Init)
 						RCCode = -1;
 						if (oldscreenmode)
 							SwitchScreenMode(oldscreenmode); /* restore divided screen */
+#ifdef MARTII
+						transpmode[boxed] = oldtrans;
+#else
 						transpmode = oldtrans;
+#endif
 						return;
 					}
 					break;
@@ -3439,7 +3642,11 @@ void ConfigMenu(int Init)
 	RCCode = -1;
 	if (oldscreenmode)
 		SwitchScreenMode(oldscreenmode); /* restore divided screen */
+#ifdef MARTII
+	transpmode[boxed] = oldtrans;
+#else
 	transpmode = oldtrans;
+#endif
 }
 
 /******************************************************************************
@@ -3473,9 +3680,17 @@ void PageInput(int Number)
 	}
 
 	/* show pageinput */
+#ifdef MARTII
+	if (zoommode[0] == 2)
+#else
 	if (zoommode == 2)
+#endif
 	{
+#ifdef MARTII
+		zoommode[0] = 1;
+#else
 		zoommode = 1;
+#endif
 		CopyBB2FB();
 	}
 
@@ -3568,8 +3783,13 @@ void GetNextPageOne(int up)
 	/* update page */
 	if (tuxtxt_cache.page != lastpage)
 	{
+#ifdef MARTII
+		if (zoommode[boxed] == 2)
+			zoommode[boxed] = 1;
+#else
 		if (zoommode == 2)
 			zoommode = 1;
+#endif
 
 		tuxtxt_cache.subpage = subp;
 		hintmode = 0;
@@ -3605,8 +3825,13 @@ void GetNextSubPage(int offset)
 			tuxtxt_cache.zap_subpage_manual = 1;
 
 			/* update page */
+#ifdef MARTII
+			if (zoommode[boxed] == 2) /* if zoomed to lower half */
+				zoommode[boxed] = 1; /* activate upper half */
+#else
 			if (zoommode == 2) /* if zoomed to lower half */
 				zoommode = 1; /* activate upper half */
+#endif
 
 			tuxtxt_cache.subpage = loop;
 			hintmode = 0;
@@ -3630,8 +3855,13 @@ void ColorKey(int target)
 {
 	if (!target)
 		return;
+#ifdef MARTII
+	if (zoommode[boxed] == 2)
+		zoommode[boxed] = 1;
+#else
 	if (zoommode == 2)
 		zoommode = 1;
+#endif
 	lastpage     = tuxtxt_cache.page;
 	tuxtxt_cache.page         = target;
 	tuxtxt_cache.subpage      = tuxtxt_cache.subpagetable[tuxtxt_cache.page];
@@ -3650,7 +3880,11 @@ void ColorKey(int target)
 void PageCatching()
 {
 	int val, byte;
+#ifdef MARTII
+	int oldzoommode = zoommode[boxed];
+#else
 	int oldzoommode = zoommode;
+#endif
 
 	pagecatching = 1;
 
@@ -3658,12 +3892,20 @@ void PageCatching()
 	inputcounter = 2;
 
 	/* show info line */
+#ifdef MARTII
+	zoommode[boxed] = 0;
+#else
 	zoommode = 0;
+#endif
 	PosX = StartX;
 	PosY = StartY + 24*fontheight;
 	for (byte = 0; byte < 40-nofirst; byte++)
 		RenderCharFB(catchmenutext[menulanguage][byte], &atrtable[catchmenutext[menulanguage][byte+40] - '0' + ATR_CATCHMENU0]);
+#ifdef MARTII
+	zoommode[boxed] = oldzoommode;
+#else
 	zoommode = oldzoommode;
+#endif
 
 	/* check for pagenumber(s) */
 	catch_row    = 1;
@@ -3732,8 +3974,13 @@ void PageCatching()
 	} while (RCCode != RC_OK);
 
 	/* set new page */
+#ifdef MARTII
+	if (zoommode[boxed] == 2)
+		zoommode[boxed] = 1;
+#else
 	if (zoommode == 2)
 		zoommode = 1;
+#endif
 
 	lastpage     = tuxtxt_cache.page;
 	tuxtxt_cache.page         = catched_page;
@@ -3860,7 +4107,11 @@ void RenderCatchedPage()
 	int zoom = 0;
 
 	/* handle zoom */
+#ifdef MARTII
+	if (zoommode[boxed])
+#else
 	if (zoommode)
+#endif
 		zoom = 1<<10;
 
 	if (pc_old_row || pc_old_col) /* not at first call */
@@ -3868,7 +4119,11 @@ void RenderCatchedPage()
 		/* restore pagenumber */
 		SetPosX(pc_old_col);
 
+#ifdef MARTII
+		if (zoommode[boxed] == 2)
+#else
 		if (zoommode == 2)
+#endif
 			PosY = StartY + (pc_old_row-12)*fontheight*((zoom>>10)+1);
 		else
 			PosY = StartY + pc_old_row*fontheight*((zoom>>10)+1);
@@ -3882,20 +4137,40 @@ void RenderCatchedPage()
 	pc_old_col = catch_col;
 
 	/* mark pagenumber */
+#ifdef MARTII
+	if (zoommode[boxed] == 1 && catch_row > 11)
+#else
 	if (zoommode == 1 && catch_row > 11)
+#endif
 	{
+#ifdef MARTII
+		zoommode[boxed] = 2;
+#else
 		zoommode = 2;
+#endif
 		CopyBB2FB();
 	}
+#ifdef MARTII
+	else if (zoommode[boxed] == 2 && catch_row < 12)
+#else
 	else if (zoommode == 2 && catch_row < 12)
+#endif
 	{
+#ifdef MARTII
+		zoommode[boxed] = 1;
+#else
 		zoommode = 1;
+#endif
 		CopyBB2FB();
 	}
 	SetPosX(catch_col);
 
 
+#ifdef MARTII
+	if (zoommode[boxed] == 2)
+#else
 	if (zoommode == 2)
+#endif
 		PosY = StartY + (catch_row-12)*fontheight*((zoom>>10)+1);
 	else
 		PosY = StartY + catch_row*fontheight*((zoom>>10)+1);
@@ -3924,13 +4199,24 @@ void SwitchZoomMode()
 	if (tuxtxt_cache.subpagetable[tuxtxt_cache.page] != 0xFF)
 	{
 		/* toggle mode */
+#ifdef MARTII
+		zoommode[boxed]++;
+
+		if (zoommode[boxed] == 3)
+			zoommode[boxed] = 0;
+#else
 		zoommode++;
 
 		if (zoommode == 3)
 			zoommode = 0;
+#endif
 
 #if TUXTXT_DEBUG
+#ifdef MARTII
+		printf("TuxTxt <SwitchZoomMode: %d (boxed: %d)>\n", zoommode[boxed], boxed);
+#else
 		printf("TuxTxt <SwitchZoomMode: %d>\n", zoommode);
+#endif
 #endif
 		/* update page */
 		tuxtxt_cache.pageupdate = 1; /* FIXME */
@@ -3947,16 +4233,34 @@ void SwitchScreenMode(int newscreenmode)
 	//struct v4l2_format format;
 
 	/* reset transparency mode */
+#ifdef MARTII
+	if (boxed) {
+		ClearFB(transp);
+		videoDecoder->Pig(-1, -1, -1, -1);
+	}
+	if (transpmode[boxed])
+		transpmode[boxed] = 0;
+#else
 	if (transpmode)
 		transpmode = 0;
+#endif
 
 	if (newscreenmode < 0) /* toggle mode */
+#ifdef MARTII
+		screenmode[boxed]++;
+	else /* set directly */
+		screenmode[boxed] = newscreenmode;
+
+	if ((screenmode[boxed] > 2) || (screenmode[boxed] < 0))
+		screenmode[boxed] = 0;
+#else
 		screenmode++;
 	else /* set directly */
 		screenmode = newscreenmode;
 
 	if ((screenmode > 2) || (screenmode < 0))
 		screenmode = 0;
+#endif
 
 #if TUXTXT_DEBUG
 	printf("TuxTxt <SwitchScreenMode: %d>\n", screenmode);
@@ -3966,19 +4270,31 @@ void SwitchScreenMode(int newscreenmode)
 	tuxtxt_cache.pageupdate = 1;
 
 	/* clear back buffer */
+#ifdef MARTII
+	clearbbcolor = screenmode[boxed]?transp:static_cast<int>(FullScrColor);
+#else
 	clearbbcolor = screenmode?transp:static_cast<int>(FullScrColor);
+#endif
 
 	if(use_gui)
 		ClearBB(clearbbcolor);
 
 	/* set mode */
+#ifdef MARTII
+	if (screenmode[boxed])								 /* split */
+#else
 	if (screenmode)								 /* split */
+#endif
 	{
 		ClearFB(clearbbcolor);
 
 		int fw, tx, ty, tw, th;
 
+#ifdef MARTII
+		if (screenmode[boxed]==1) /* split with topmenu */
+#else
 		if (screenmode==1) /* split with topmenu */
+#endif
 		{
 			int x = screen_x;
 			int w = screen_w;
@@ -4021,6 +4337,9 @@ void SwitchScreenMode(int newscreenmode)
 		setfontwidth(fw);
 
 		CFrameBuffer *f = CFrameBuffer::getInstance();
+#ifdef MARTII
+		if (!boxed && (f->get3DMode() == CFrameBuffer::Mode3D_off))
+#endif
 		videoDecoder->Pig(tx, ty, tw, th,
 				  f->getScreenWidth(true), f->getScreenHeight(true));
 #if 0
@@ -4060,6 +4379,12 @@ void SwitchScreenMode(int newscreenmode)
 		displaywidth= (ex-sx);
 		StartX = sx; //+ (ex-sx - 40*fontwidth) / 2; /* center screen */
 	}
+#ifdef MARTII
+	if (boxed) {
+		ClearBB(transp);
+		StartX = (screen_w - displaywidth) / 2;
+	}
+#endif
 }
 
 /******************************************************************************
@@ -4068,9 +4393,22 @@ void SwitchScreenMode(int newscreenmode)
 
 void SwitchTranspMode()
 {
+#ifdef MARTII
+	if (screenmode[boxed])
+#else
 	if (screenmode)
+#endif
 	{
+#ifdef MARTII
+		prevscreenmode[boxed] = screenmode[boxed];
+#else
 		prevscreenmode = screenmode;
+#endif
+#ifdef MARTII
+		if (boxed)
+			videoDecoder->Pig(-1, -1, -1, -1);
+		else
+#endif
 		SwitchScreenMode(0); /* turn off divided screen */
 	}
 	/* toggle mode */
@@ -4081,21 +4419,44 @@ void SwitchTranspMode()
 		transpmode++; /* backward to immediately switch to TV-screen */
 #endif
 	/* transpmode: 0 normal, 1 transparent, 2 off */
+#ifdef MARTII
+	transpmode[boxed]++;
+	if(transpmode[boxed] > 2)
+		transpmode[boxed] = 0;
+#else
 	transpmode ++;
 	if(transpmode > 2)
 		transpmode = 0;
+#endif
 
 #if TUXTXT_DEBUG
+#ifdef MARTII
+	printf("TuxTxt <SwitchTranspMode: %d, boxed: %d>\n", transpmode, boxed);
+#else
 	printf("TuxTxt <SwitchTranspMode: %d>\n", transpmode);
+#endif
 #endif
 
 	/* set mode */
+#ifdef MARTII
+	if (boxed && !transpmode[boxed])
+	{
+		ClearBB(transp);
+		tuxtxt_cache.pageupdate = 1;
+	}
+	else if (!transpmode[boxed])
+#else
 	if (!transpmode) /* normal text-only */
+#endif
 	{
 		ClearBB(FullScrColor);
 		tuxtxt_cache.pageupdate = 1;
 	}
+#ifdef MARTII
+	else if (transpmode[boxed] == 1) /* semi-transparent BG with FG text */
+#else
 	else if (transpmode == 1) /* semi-transparent BG with FG text */
+#endif
 	{
 		ClearBB(transp);
 		tuxtxt_cache.pageupdate = 1;
@@ -4132,7 +4493,11 @@ void SwitchHintMode()
 
 void RenderDRCS( //FIX ME
 	unsigned char *s,	/* pointer to char data, parity undecoded */
+#ifdef MARTII
+	fb_pixel_t *d,	/* pointer to frame buffer of top left pixel */
+#else
 	unsigned char *d,	/* pointer to frame buffer of top left pixel */
+#endif
 	unsigned char *ax, /* array[0..12] of x-offsets, array[0..10] of y-offsets for each pixel */
 	unsigned char fgcolor, unsigned char bgcolor)
 {
@@ -4165,7 +4530,11 @@ void RenderDRCS( //FIX ME
 //					memset(d + ax[x], f1, ax[x+1] - ax[x]);
 					for (ltmp=0 ; ltmp <= (ax[x+1]-ax[x]); ltmp++)
 					{
-						memmove(d + ax[x]*4 +ltmp*4,bgra[f1],4);
+#ifdef MARTII
+						*(d + ax[x] + ltmp) = argb[f1];
+#else
+						memmove(d + ax[x]*4 +ltmp*4,argb[f1],4);
+#endif
 					}
 				}
 				if (ax[x+7] > ax[x+6])
@@ -4173,7 +4542,11 @@ void RenderDRCS( //FIX ME
 //					memset(d + ax[x+6], f2, ax[x+7] - ax[x+6]); /* 2nd byte 6 pixels to the right */
 					for (ltmp=0 ; ltmp <= (ax[x+7]-ax[x+6]); ltmp++)
 					{
-						memmove(d + ax[x+6]*4 +ltmp*4,bgra[f2],4);
+#ifdef MARTII
+						*(d + ax[x+6] + ltmp) = argb[f2];
+#else
+						memmove(d + ax[x+6]*4 +ltmp*4,argb[f2],4);
+#endif
 					}
 
 				}
@@ -4188,19 +4561,43 @@ void RenderDRCS( //FIX ME
 
 void DrawVLine(int x, int y, int l, int color)
 {
+#ifdef MARTII
+	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t col = argb[color];
+	MARK_FB(x, y, 0, l);
+	p += x + y * fix_screeninfo.line_length;
+
+	for ( ; l > 0 ; l--)
+	{
+		*p = col;
+		p += fix_screeninfo.line_length;
+	}
+#else
 	unsigned char *p = getFBp(&y);
 	MARK_FB(x, y, 0, l);
 	p += x*4 + y * fix_screeninfo.line_length;
 
 	for ( ; l > 0 ; l--)
 	{
-		memmove(p,bgra[color],4);
+		memmove(p,argb[color],4);
 		p += fix_screeninfo.line_length;
 	}
+#endif
 }
 
 void DrawHLine(int x, int y, int l, int color)
 {
+#ifdef MARTII
+	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t col = argb[color];
+	MARK_FB(x, y, l, 0);
+	p += x + y * fix_screeninfo.line_length;
+	while (l > 0)
+	{
+		*p++ = col;
+		l--;
+	}
+#else
 	int ltmp;
 	unsigned char *p = getFBp(&y);
 	MARK_FB(x, y, l, 0);
@@ -4208,9 +4605,10 @@ void DrawHLine(int x, int y, int l, int color)
 	{
 		for (ltmp=0; ltmp <= l; ltmp++)
 		{
-			memmove(p + x*4 + ltmp*4 + y * fix_screeninfo.line_length, bgra[color], 4);
+			memmove(p + x*4 + ltmp*4 + y * fix_screeninfo.line_length, argb[color], 4);
 		}
 	}
+#endif
 }
 
 void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int bgcolor, int set)
@@ -4224,6 +4622,14 @@ void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int bgcolo
 
 void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
 {
+#ifdef MARTII
+	for (int yoffset = 0; yoffset < h; yoffset++) {
+		int l = l0 + ((l1-l0) * yoffset + h/2) / h;
+		int xoffset = (xoffset1 * yoffset + h/2) / h;
+		if (l > 0)
+			DrawHLine(xoffset + x0, yoffset + y0, l, color);
+	}
+#else
 	unsigned char *p = getFBp(&y0);
 	MARK_FB(x0, y0, l0, h);
 	p += x0 * 4 + y0 * fix_screeninfo.line_length;
@@ -4240,14 +4646,32 @@ void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
 		{
 			for (ltmp=0; ltmp <= l; ltmp++)
 			{
-				memmove(p + xoffset*4 +ltmp*4, bgra[color], 4);
+				memmove(p + xoffset*4 +ltmp*4, argb[color], 4);
 			}
 		}
 		p += fix_screeninfo.line_length;
 	}
+#endif
 }
 void FlipHorz(int x, int y, int w, int h)
 {
+#ifdef MARTII
+	uint32_t buf[w];
+	fb_pixel_t *p = getFBp(&y);
+	MARK_FB(x, y, w, h);
+	p += x + y * fix_screeninfo.line_length;
+
+	for (int h1 = 0 ; h1 < h ; h1++) {
+		memcpy(buf, p, w * 4);
+		for (int w1 = 0 ; w1 < w ; w1++) {
+			if (w1 + x > (int) fix_screeninfo.line_length)
+				fprintf(stderr, "%s: x=%d out of bounds\n", __func__, w1 + x);
+			else
+				*(p + w1) = *(buf + w - w1 - 1);
+		}
+		p += fix_screeninfo.line_length;
+	}
+#else
 	unsigned char *buf= new unsigned char[w*4];
 	unsigned char *p = getFBp(&y);
 	MARK_FB(x, y, w, h);
@@ -4266,9 +4690,27 @@ void FlipHorz(int x, int y, int w, int h)
 		}
 		delete [] buf;
 	}
+#endif
 }
 void FlipVert(int x, int y, int w, int h)
 {
+#ifdef MARTII
+	fb_pixel_t buf[w];
+	fb_pixel_t *p1, *p2;
+	fb_pixel_t *p = getFBp(&y);
+	p += x + y * fix_screeninfo.line_length;
+
+	w *= 4;
+
+	for (int h1 = 0 ; h1 < h/2 ; h1++) {
+		p1 = p+(h1*fix_screeninfo.line_length);
+		p2 = p+(h-(h1+1))*fix_screeninfo.line_length;
+
+		memmove(buf, p1, w);
+		memmove(p1, p2, w);
+		memmove(p2, buf, w);
+	}
+#else
 	unsigned char *buf= new unsigned char[w*4];
 	unsigned char *p1, *p2;
 	unsigned char *p = getFBp(&y);
@@ -4287,6 +4729,7 @@ void FlipVert(int x, int y, int w, int h)
 		}
 		delete [] buf;
 	}
+#endif
 }
 
 int ShapeCoord(int param, int curfontwidth, int curfontheight)
@@ -4400,6 +4843,64 @@ void DrawShape(int x, int y, int shapenumber, int curfontwidth, int curfontheigh
 /******************************************************************************
  * RenderChar                                                                 *
  ******************************************************************************/
+#ifdef MARTII
+struct colors_struct
+{
+	uint32_t fgcolor, bgcolor;
+	uint32_t colors[256];
+};
+
+#define COLORS_LRU_SIZE 16
+static struct colors_struct *colors_lru_array[COLORS_LRU_SIZE] = { NULL };
+
+static uint32_t *lookup_colors(uint32_t fgcolor, uint32_t bgcolor)
+{
+	struct colors_struct *cs;
+	int i = 0;
+	for (i = 0; i < COLORS_LRU_SIZE; i++)
+		if (colors_lru_array[i] && colors_lru_array[i]->fgcolor == fgcolor && colors_lru_array[i]->bgcolor == bgcolor) {
+			cs = colors_lru_array[i];
+			for (int j = i; j > 0; j--)
+				colors_lru_array[j] = colors_lru_array[j - 1];
+			colors_lru_array[0] = cs;
+			return cs->colors;
+		}
+	i--;
+	cs = colors_lru_array[i];
+	if (!cs)
+		cs = (struct colors_struct *) calloc(1, sizeof(struct colors_struct));
+	for (int j = i; j > 0; j--)
+		colors_lru_array[j] = colors_lru_array[j - 1];
+	cs->fgcolor = fgcolor;
+	cs->bgcolor = bgcolor;
+
+	int ro = var_screeninfo.red.offset;
+	int go = var_screeninfo.green.offset;
+	int bo = var_screeninfo.blue.offset;
+	int to = var_screeninfo.transp.offset;
+	int rm = (1 << var_screeninfo.red.length) - 1;
+	int gm = (1 << var_screeninfo.green.length) - 1;
+	int bm = (1 << var_screeninfo.blue.length) - 1;
+	int tm = (1 << var_screeninfo.transp.length) - 1;
+	int fgr = ((int)fgcolor >> ro) & rm;
+	int fgg = ((int)fgcolor >> go) & gm;
+	int fgb = ((int)fgcolor >> bo) & bm;
+	int fgt = ((int)fgcolor >> to) & tm;
+	int deltar = (((int)bgcolor >> ro) & rm) - fgr;
+	int deltag = (((int)bgcolor >> go) & gm) - fgg;
+	int deltab = (((int)bgcolor >> bo) & bm) - fgb;
+	int deltat = (((int)bgcolor >> to) & tm) - fgt;
+	for (i = 0; i < 256; i++)
+		cs->colors[255 - i] =
+			(((fgr + deltar * i / 255) & rm) << ro) |
+			(((fgg + deltag * i / 255) & gm) << go) |
+			(((fgb + deltab * i / 255) & bm) << bo) |
+			(((fgt + deltat * i / 255) & tm) << to);
+
+	colors_lru_array[0] = cs;
+	return cs->colors;
+}
+#endif
 
 void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 {
@@ -4481,7 +4982,11 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 		Attribute->bg = t;
 	}
 	fgcolor = Attribute->fg;
+#ifdef MARTII
+	if (transpmode[boxed] == 1 && PosY < StartY + 24*fontheight)
+#else
 	if (transpmode == 1 && PosY < StartY + 24*fontheight)
+#endif
 	{
 		if (fgcolor == transp) /* outside boxed elements (subtitles, news) completely transparent */
 			bgcolor = transp;
@@ -4536,9 +5041,15 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 			{
 				int x,y,f,c;
 				y = yoffset;
+#ifdef MARTII
+				fb_pixel_t *p = getFBp(&y);
+				MARK_FB(PosX, PosY, curfontwidth, fontheight);
+				p += PosX + PosY * fix_screeninfo.line_length;
+#else
 				unsigned char *p = getFBp(&y);
 				MARK_FB(PosX, PosY, curfontwidth, fontheight);
 				p += PosX * 4 + PosY * fix_screeninfo.line_length;
+#endif
 
 				for (y=0; y<fontheight;y++)
 				{
@@ -4547,7 +5058,11 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 						for (x=0; x<curfontwidth*xfactor;x++)
 						{
 							c = (y&4 ? (x/3)&1 :((x+3)/3)&1);
-							memmove((p+x*4),bgra[(c ? fgcolor : bgcolor)],4);
+#ifdef MARTII
+							*(p + x) = argb[c ? fgcolor : bgcolor];
+#else
+							memmove((p+x*4),argb[(c ? fgcolor : bgcolor)],4);
+#endif
 						}
 						p += fix_screeninfo.line_length;
 					}
@@ -4584,9 +5099,17 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 			}
 			axdrcs[12] = curfontwidth; /* adjust last x-offset according to position, FIXME: double width */
 			int y = yoffset;
+#ifdef MARTII
+			fb_pixel_t *q = getFBp(&y);
+#else
 			unsigned char *q = getFBp(&y);
+#endif
 			RenderDRCS(p,
+#ifdef MARTII
+					q + PosX + PosY * fix_screeninfo.line_length,
+#else
 					q + PosX * 4 + PosY * fix_screeninfo.line_length,
+#endif
 					axdrcs, fgcolor, bgcolor);
 		}
 		else
@@ -4805,7 +5328,11 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 
 	/* render char */
 	sbitbuffer = sbit->buffer;
+#ifdef MARTII
+	char localbuffer[8000]; // should be enough to store one character-bitmap...
+#else
 	char localbuffer[1000]; // should be enough to store one character-bitmap...
+#endif
 	// add diacritical marks
 	if (Attribute->diacrit)
 	{
@@ -4844,14 +5371,23 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 					for (Pitch = 0; Pitch < sbit->pitch; Pitch++)
 					{
 						if (sbit_diacrit->pitch > Pitch && sbit_diacrit->height > Row)
+#ifdef MARTII
+							if (sbitbuffer[Row*sbit->pitch+Pitch] < sbit_diacrit->buffer[Row*sbit->pitch+Pitch])
+								sbitbuffer[Row*sbit->pitch+Pitch] = sbit_diacrit->buffer[Row*sbit->pitch+Pitch];
+#else
 							sbitbuffer[Row*sbit->pitch+Pitch] |= sbit_diacrit->buffer[Row*sbit->pitch+Pitch];
+#endif
 					}
 				}
 			}
 		}
 	}
 
+#ifdef MARTII
+	fb_pixel_t *p;
+#else
 	unsigned char *p;
+#endif
 	int f; /* running counter for zoom factor */
 
 	Row = factor * (ascender - sbit->top + TTFShiftY);
@@ -4862,22 +5398,68 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 
 	int y = yoffset;
 	p = getFBp(&y);
+#ifdef MARTII
+	p += PosX + (PosY + Row) * fix_screeninfo.line_length; /* running pointer into framebuffer */
+
+	uint32_t *colors = lookup_colors(argb[fgcolor], argb[bgcolor]);
+
+#else
 	p += PosX * 4 + (PosY + Row) * fix_screeninfo.line_length; /* running pointer into framebuffer */
+#endif
 
 	for (Row = sbit->height; Row; Row--) /* row counts up, but down may be a little faster :) */
 	{
 		int pixtodo = (usettf ? sbit->width : curfontwidth);
+#ifdef MARTII
+		fb_pixel_t *pstart = p;
+		fb_pixel_t bgcol = argb[bgcolor];
+#else
 		char *pstart = (char*) p;
+#endif
 
 		for (Bit = xfactor * (sbit->left + TTFShiftX); Bit > 0; Bit--) /* fill left margin */
 		{
 			for (f = factor-1; f >= 0; f--)
-				memmove((p + f*fix_screeninfo.line_length),bgra[bgcolor],4);/*bgcolor*/
+#ifdef MARTII
+				*(p + f*fix_screeninfo.line_length) = bgcol;
+			p++;
+#else
+				memmove((p + f*fix_screeninfo.line_length),argb[bgcolor],4);/*bgcolor*/
 			p+=4;
+#endif
 			if (!usettf)
 				pixtodo--;
 		}
 
+#ifdef MARTII
+		for (Pitch = sbit->width; Pitch; Pitch--)
+		{
+			uint32_t color;
+
+			if (--pixtodo < 0)
+				break;
+
+			if (*sbitbuffer) /* set -> foreground */
+				color = colors[*sbitbuffer];
+			else /* not set -> background */
+				color = argb[bgcolor];
+
+			for (f = factor-1; f >= 0; f--)
+				*(p + f*fix_screeninfo.line_length) = color;
+			p++;
+
+			if (xfactor > 1) /* double width */
+			{
+				for (f = factor-1; f >= 0; f--)
+					*(p + f*fix_screeninfo.line_length) = color;
+				p++;
+
+				if (!usettf)
+					pixtodo--;
+			}
+			sbitbuffer++;
+		}
+#else
 		for (Pitch = sbit->pitch; Pitch; Pitch--)
 		{
 			for (Bit = 0x80; Bit; Bit >>= 1)
@@ -4893,14 +5475,24 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 					color = bgcolor;
 
 				for (f = factor-1; f >= 0; f--)
-					memmove((p + f*fix_screeninfo.line_length),bgra[color],4);
+#ifdef MARTII
+					*(p + f*fix_screeninfo.line_length) = argb[color];
+				p++;
+#else
+					memmove((p + f*fix_screeninfo.line_length),argb[color],4);
 				p+=4;
+#endif
 
 				if (xfactor > 1) /* double width */
 				{
 					for (f = factor-1; f >= 0; f--)
-						memmove((p + f*fix_screeninfo.line_length),bgra[color],4);
+#ifdef MARTII
+						*(p + f*fix_screeninfo.line_length) = argb[color];
+					p++;
+#else
+						memmove((p + f*fix_screeninfo.line_length),argb[color],4);
 					p+=4;
+#endif
 
 					if (!usettf)
 						pixtodo--;
@@ -4908,15 +5500,25 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 			}
 			sbitbuffer++;
 		}
+#endif
 		for (Bit = (usettf ? (curfontwidth - xfactor*(sbit->width + sbit->left + TTFShiftX)) : pixtodo);
 				Bit > 0; Bit--) /* fill rest of char width */
 		{
 			for (f = factor-1; f >= 0; f--)
-				memmove((p + f*fix_screeninfo.line_length),bgra[bgcolor],4);
+#ifdef MARTII
+				*(p + f*fix_screeninfo.line_length) = argb[bgcolor];
+			p++;
+#else
+				memmove((p + f*fix_screeninfo.line_length),argb[bgcolor],4);
 			p+=4;
+#endif
 		}
 
+#ifdef MARTII
+		p = pstart + factor*fix_screeninfo.line_length;
+#else
 		p = (unsigned char*) pstart + factor*fix_screeninfo.line_length;
+#endif
 	}
 
 	Row = ascender - sbit->top + sbit->height + TTFShiftY;
@@ -4933,7 +5535,11 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 
 void RenderCharFB(int Char, tstPageAttr *Attribute)
 {
+#ifdef MARTII
+	RenderChar(Char, Attribute, zoommode[boxed], var_screeninfo.yoffset);
+#else
 	RenderChar(Char, Attribute, zoommode, var_screeninfo.yoffset);
+#endif
 }
 
 /******************************************************************************
@@ -5009,7 +5615,11 @@ void RenderMessage(int Message)
 
 	memmove(&message_1[24], versioninfo, 4);
 	/* reset zoom */
+#ifdef MARTII
+	zoommode[boxed] = 0;
+#else
 	zoommode = 0;
+#endif
 
 	/* set colors */
 	fbcolor   = transp;
@@ -5086,6 +5696,9 @@ void RenderMessage(int Message)
 	for (byte = 0; byte < 38; byte++)
 		RenderCharFB(message_6[byte], &atrtable[imenuatr + 2]);
 	national_subset = national_subset_back;
+#ifdef MARTII
+	CFrameBuffer::getInstance()->blit();
+#endif
 }
 
 /******************************************************************************
@@ -5111,7 +5724,11 @@ void DoFlashing(int startrow)
 	int srow = startrow;
 	int erow = 24;
 	int factor=1;
+#ifdef MARTII
+	switch (zoommode[boxed])
+#else
 	switch (zoommode)
+#endif
 	{
 		case 1: erow = 12; factor=2;break;
 		case 2: srow = 12; factor=2;break;
@@ -5206,7 +5823,11 @@ void RenderPage()
 	/* update lcd */
 	UpdateLCD();
 
+#ifdef MARTII
+	if (transpmode[boxed] != 2 && delaystarted)
+#else
 	if (transpmode != 2 && delaystarted)
+#endif
 	{
 	    struct timeval tv;
     	    gettimeofday(&tv,NULL);
@@ -5216,7 +5837,11 @@ void RenderPage()
 
 
 	/* update page or timestring */
+#ifdef MARTII
+	if (transpmode[boxed] != 2 && tuxtxt_cache.pageupdate && tuxtxt_cache.page_receiving != tuxtxt_cache.page && inputcounter == 2)
+#else
 	if (transpmode != 2 && tuxtxt_cache.pageupdate && tuxtxt_cache.page_receiving != tuxtxt_cache.page && inputcounter == 2)
+#endif
 	{
 		if (boxed && subtitledelay)
 		{
@@ -5242,14 +5867,27 @@ void RenderPage()
 
 		if (boxed)
 		{
+#ifdef MARTII
+			if (oldboxed != boxed)
+				SwitchScreenMode(screenmode[boxed]);
+#else
 			if (screenmode != 0)
 				SwitchScreenMode(0); /* turn off divided screen */
+#endif
 		}
 		else
 		{
+#ifdef MARTII
+			if (oldboxed != boxed)
+				SwitchScreenMode(screenmode[boxed]);
+#else
 			if (screenmode != prevscreenmode && !transpmode)
 				SwitchScreenMode(prevscreenmode);
+#endif
 		}
+#ifdef MARTII
+		oldboxed = boxed;
+#endif
 
  		/* display first column?  */
 		nofirst = show39;
@@ -5269,7 +5907,11 @@ void RenderPage()
 		fontwidth_topmenusmall = (TVENDX - TOPMENUSTARTX) / TOPMENUCHARS;
 		//fontwidth_small = (TV169FULLSTARTX-sx)  / (40-nofirst);
 		fontwidth_small = (screen_w / 2)  / (40 - nofirst);
+#ifdef MARTII
+		switch(screenmode[boxed])
+#else
 		switch(screenmode)
+#endif
 		{
 			case 0:
 			case 1: setfontwidth(fontwidth_normal);
@@ -5279,7 +5921,11 @@ void RenderPage()
 				displaywidth = screen_w / 2;
 				break;
 		}
+#ifdef MARTII
+		if (transpmode[boxed] || boxed)
+#else
 		if (transpmode || (boxed && !screenmode))
+#endif
 		{
 			FillBorder(transp);//ClearBB(transp);
 			clearbbcolor = transp;
@@ -5323,9 +5969,17 @@ void RenderPage()
 		/* update framebuffer */
 		CopyBB2FB();
 	}
+#ifdef MARTII
+	else if (use_gui && transpmode[boxed] != 2)
+#else
 	else if (use_gui && transpmode != 2)
+#endif
 	{
+#ifdef MARTII
+		if (zoommode[boxed] != 2)
+#else
 		if (zoommode != 2)
+#endif
 		{
 			PosY = StartY;
 			if (tuxtxt_cache.subpagetable[tuxtxt_cache.page] == 0xff)
@@ -5390,7 +6044,11 @@ void RenderPage()
 		DoFlashing(startrow);
 		national_subset = national_subset_bak;
 	}
+#ifdef MARTII
+	else if (transpmode[boxed] == 2 && tuxtxt_cache.pageupdate == 2)
+#else
 	else if (transpmode == 2 && tuxtxt_cache.pageupdate == 2)
+#endif
 	{
 #if TUXTXT_DEBUG
 		printf("received Update flag for page %03x\n",tuxtxt_cache.page);
@@ -5521,7 +6179,11 @@ void CreateLine25()
 	}
 
 	if (tuxtxt_cache.bttok &&
+#ifdef MARTII
+		 !boxed && screenmode[0] == 1) /* TOP-Info present, divided screen -> create TOP overview */
+#else
 		 screenmode == 1) /* TOP-Info present, divided screen -> create TOP overview */
+#endif
 	{
 		char line[TOPMENUCHARS];
 		int current;
@@ -5628,7 +6290,11 @@ void CreateLine25()
 
 void CopyBB2FB()
 {
+#ifdef MARTII
+	fb_pixel_t *src, *dst, *topsrc;
+#else
 	unsigned char *src, *dst, *topsrc;
+#endif
 	int fillcolor, i, screenwidth, swtmp;
 #ifdef HAVE_SPARK_HARDWARE
 	CFrameBuffer *f = CFrameBuffer::getInstance();
@@ -5639,7 +6305,11 @@ void CopyBB2FB()
 		CreateLine25();
 
 	/* copy backbuffer to framebuffer */
+#ifdef MARTII
+	if (!zoommode[boxed])
+#else
 	if (!zoommode)
+#endif
 	{
 #ifdef USE_FBPAN
 		/* if yoffset != 0, we had active page 1, and activate 0 */
@@ -5657,7 +6327,11 @@ void CopyBB2FB()
 		f->blit2FB(lbb, var_screeninfo.xres, var_screeninfo.yres, 0, 0, 0, 0, true);
 		f->blit();
 #else
+#ifdef MARTII
+		memcpy(lfb, lbb, fix_screeninfo.line_length*var_screeninfo.yres * sizeof(fb_pixel_t));
+#else
 		memcpy(lfb, lbb, fix_screeninfo.line_length*var_screeninfo.yres);
+#endif
 #endif
 #endif
 
@@ -5690,22 +6364,42 @@ void CopyBB2FB()
 #endif
 	/* copy line25 in normal height */
 	if (!pagecatching )
+#ifdef MARTII
+		memmove(dst+(24*fontheight)*fix_screeninfo.line_length, src + (24*fontheight)*fix_screeninfo.line_length, fix_screeninfo.line_length*fontheight * sizeof(fb_pixel_t));
+#else
 		memmove(dst+(24*fontheight)*fix_screeninfo.line_length, src + (24*fontheight)*fix_screeninfo.line_length, fix_screeninfo.line_length*fontheight);
+#endif
 
+#ifdef MARTII
+	if (transpmode[boxed])
+#else
 	if (transpmode)
+#endif
 		fillcolor = transp;
 	else
 		fillcolor = FullScrColor;
 
+#ifdef MARTII
+	if (zoommode[boxed] == 2)
+#else
 	if (zoommode == 2)
+#endif
 		src += 12*fontheight*fix_screeninfo.line_length;
 
 	/* copy topmenu in normal height (since PIG also keeps dimensions) */
+#ifdef MARTII
+	if (screenmode[boxed] == 1)
+#else
 	if (screenmode == 1)
+#endif
 	{
 		screenwidth = ( TV43STARTX ) * 4;
 #ifdef HAVE_SPARK_HARDWARE
 		int cx = var_screeninfo.xres - TV43STARTX;	/* x start */
+#ifdef MARTII
+		if (boxed)
+			cx = (screen_w - 40 * fontwidth) / 2;
+#endif
 		int cw = TV43STARTX;				/* width */
 		int cy = StartY;
 		int ch = 24*fontheight;
@@ -5724,7 +6418,11 @@ void CopyBB2FB()
 		}
 #endif
 	}
+#ifdef MARTII
+	else if (screenmode[boxed] == 2)
+#else
 	else if (screenmode == 2)
+#endif
 		screenwidth = ( TV169FULLSTARTX ) * 4;
 	else
 		screenwidth = fix_screeninfo.line_length;//var_screeninfo.xres;
@@ -5733,15 +6431,27 @@ void CopyBB2FB()
 	{
 		for (swtmp=0; swtmp<=screenwidth; swtmp++)
 		{
-			memmove(dst - i*fix_screeninfo.line_length+swtmp*4, bgra[fillcolor], 4);
+#ifdef MARTII
+			*(dst - i*fix_screeninfo.line_length+swtmp) = argb[fillcolor];
+#else
+			memmove(dst - i*fix_screeninfo.line_length+swtmp*4, argb[fillcolor], 4);
+#endif
 		}
 	}
 
 	for (i = 12*fontheight; i; i--)
 	{
+#ifdef MARTII
+		memmove(dst, src, screenwidth * sizeof(fb_pixel_t));
+#else
 		memmove(dst, src, screenwidth);
+#endif
 		dst += fix_screeninfo.line_length;
+#ifdef MARTII
+		memmove(dst, src, screenwidth * sizeof(fb_pixel_t));
+#else
 		memmove(dst, src, screenwidth);
+#endif
 		dst += fix_screeninfo.line_length;
 		src += fix_screeninfo.line_length;
 	}
@@ -5750,11 +6460,17 @@ void CopyBB2FB()
 	{
 		for (swtmp=0; swtmp<= screenwidth;swtmp++)
 		{
-			memmove(dst + fix_screeninfo.line_length*(fontheight+i)+swtmp*4, bgra[fillcolor], 4);
+#ifdef MARTII
+			*(dst + fix_screeninfo.line_length*(fontheight+i)+swtmp) = argb[fillcolor];
+#else
+			memmove(dst + fix_screeninfo.line_length*(fontheight+i)+swtmp*4, argb[fillcolor], 4);
+#endif
 		}
 	}
 #ifdef HAVE_SPARK_HARDWARE
+#ifndef MARTII
 	f->mark(0, 0, var_screeninfo.xres, var_screeninfo.yres);
+#endif
 	f->blit();
 #endif
 }
@@ -6075,7 +6791,11 @@ void DecodePage()
 						page_char + 20 * (DRCSCOLS * row + col + 2),
 						lfb
 						+ (StartY + fontheight + DRCSYSPC * row + var_screeninfo.yres - var_screeninfo.yoffset) * fix_screeninfo.line_length
+#ifdef MARTII
+						+ (StartX + DRCSXSPC * col),
+#else
 						+ (StartX + DRCSXSPC * col)*4,
+#endif
 						ax, white, black);
 
 			memset(page_char + 40, 0xff, 24*40); /* don't render any char below row 0 */
@@ -6459,7 +7179,6 @@ int GetRCCode()
 	}
 	return 0;
 }
-
 #if 0
 #if 1
 int GetRCCode()
@@ -6520,6 +7239,9 @@ int GetRCCode()
 				case KEY_INFO:		RCCode = RC_HELP;	break;
 				case KEY_MENU:		RCCode = RC_DBOX;	break;
 				case KEY_EXIT:		RCCode = RC_HOME;	break;
+#ifdef MARTII
+				case KEY_HOME:		RCCode = RC_HOME;	break;
+#endif
 				case KEY_POWER:		RCCode = RC_STANDBY;	break;
 				}
 printf("[tuxtxt] new key, code %X\n", RCCode);

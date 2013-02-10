@@ -38,6 +38,9 @@ class CNetworkConfig
 	std::string orig_ifname;
 	std::string orig_ssid;
 	std::string orig_key;
+#ifdef MARTII
+	std::string orig_encryption;
+#endif
 
 	void copy_to_orig(void);
 	void init_vars(void);
@@ -56,6 +59,9 @@ class CNetworkConfig
 	std::string ifname;
 	std::string ssid;
 	std::string key;
+#ifdef MARTII
+	std::string encryption; // WPA or WPA2
+#endif
 	bool        inet_static;
 	bool	    wireless;
 

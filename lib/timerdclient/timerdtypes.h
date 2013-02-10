@@ -69,6 +69,9 @@ class CTimerd
 			TIMER_SLEEPTIMER,
 			TIMER_EXEC_PLUGIN,
  			TIMER_IMMEDIATE_RECORD
+#ifdef MARTII
+ 			, TIMER_BATCHEPG
+#endif
 		};
 		
 		enum CTimerEventStates 

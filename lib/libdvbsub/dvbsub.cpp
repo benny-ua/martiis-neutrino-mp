@@ -13,9 +13,14 @@
 #include <cerrno>
 
 #include <zapit/include/dmx.h>
+#ifdef MARTII
+#include <system/set_threadname.h>
+#include <poll.h>
+#endif
 
 #include "Debug.hpp"
 #include "PacketQueue.hpp"
+#include "semaphore.h"
 #include "helpers.hpp"
 #include "dvbsubtitle.h"
 
@@ -43,6 +48,10 @@ static int dvbsub_paused = true;
 static int dvbsub_pid;
 static int dvbsub_stopped;
 static int pid_change_req;
+#ifdef MARTII
+static bool isEplayer = false;
+static int eplayer_fd = -1;
+#endif
 
 cDvbSubtitleConverter *dvbSubtitleConverter;
 static void* reader_thread(void *arg);
@@ -52,7 +61,11 @@ static void clear_queue();
 int dvbsub_init() {
 	int trc;
 
+#ifdef MARTII
+	sub_debug.set_level(0);
+#else
 	sub_debug.set_level(3);
+#endif
 
 	reader_running = true;
 	dvbsub_stopped = 1;
@@ -90,14 +103,29 @@ int dvbsub_pause()
 	return 0;
 }
 
+#ifdef MARTII
+int dvbsub_start(int pid, bool _isEplayer)
+#else
 int dvbsub_start(int pid)
+#endif
 {
+#ifdef MARTII
+	isEplayer = _isEplayer;
+	if (isEplayer && !dvbsub_paused)
+		return 0;
+	else
+#endif
 	if(!dvbsub_paused && (pid == 0)) {
 		return 0;
 	}
 
+#ifdef MARTII
+	if (isEplayer || pid) {
+		if(isEplayer || pid != dvbsub_pid) {
+#else
 	if(pid) {
 		if(pid != dvbsub_pid) {
+#endif
 			dvbsub_pause();
 			if(dvbSubtitleConverter)
 				dvbSubtitleConverter->Reset();
@@ -110,7 +138,11 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 	while(!dvbsub_stopped)
 		usleep(10);
 #endif
+#ifdef MARTII
+	if(isEplayer || dvbsub_pid > 0) {
+#else
 	if(dvbsub_pid > 0) {
+#endif
 		dvbsub_stopped = 0;
 		dvbsub_paused = false;
 		if(dvbSubtitleConverter)
@@ -145,6 +177,9 @@ void dvbsub_setpid(int pid)
 {
 	dvbsub_pid = pid;
 
+#ifdef MARTII
+	if (!isEplayer)
+#endif
 	if(dvbsub_pid == 0)
 		return;
 
@@ -172,7 +207,13 @@ int dvbsub_close()
 		pthread_cond_broadcast(&readerCond);
 		pthread_mutex_unlock(&readerMutex);
 
+#ifdef MARTII
+// dvbsub_close() is called at shutdown time only. Instead of waiting for
+// the threads to terminate just detach. --martii
+		pthread_detach(threadReader);
+#else
 		pthread_join(threadReader, NULL);
+#endif
 		threadReader = 0;
 	}
 	if(threadDvbsub) {
@@ -182,7 +223,11 @@ int dvbsub_close()
 		pthread_cond_broadcast(&packetCond);
 		pthread_mutex_unlock(&packetMutex);
 
+#ifdef MARTII
+		pthread_detach(threadDvbsub);
+#else
 		pthread_join(threadDvbsub, NULL);
+#endif
 		threadDvbsub = 0;
 	}
 	printf("[dvb-sub] stopped\n");
@@ -192,11 +237,38 @@ int dvbsub_close()
 
 static cDemux * dmx;
 
+#ifdef MARTII
+static int64_t stc_offset = 0;
 
+void dvbsub_set_stc_offset(int64_t o) {
+	stc_offset = o;
+}
+#endif
+
+#ifdef MARTII
+// FIXME. Should use
+//   player->playback->Command(player, PLAYBACK_PTS, STC);
+// below, but that probably isn't worth it.
+extern long long int latestPts; // from libeplayer3/container/container_ffmpeg.c
+#endif
 void dvbsub_get_stc(int64_t * STC)
 {
+#ifdef MARTII
+	if (isEplayer) {
+		*STC = (int64_t) latestPts;
+		*STC -= stc_offset;
+		return;
+	}
+	if(dmx) {
+		dmx->getSTC(STC);
+		*STC -= stc_offset;
+		return;
+	}
+	*STC = 0;
+#else
 	if(dmx)
 		dmx->getSTC(STC);
+#endif
 }
 
 static int64_t get_pts(unsigned char * packet)
@@ -239,6 +311,29 @@ static void clear_queue()
 	pthread_mutex_unlock(&packetMutex);
 }
 
+#ifdef MARTII
+static int eRead(uint8_t *buf, int len)
+{
+	int count = 0;
+	struct pollfd fds;
+	fds.fd = eplayer_fd;
+	fds.events = POLLIN | POLLHUP | POLLERR;
+	do {
+		fds.revents = 0;
+		poll(&fds, 1, 1000);
+		if (fds.revents & (POLLHUP|POLLERR)) {
+			dvbsub_stop();
+			return -1;
+		}
+		int l = read(eplayer_fd, buf + count, len - count);
+		if (l < 0)
+			return -1;
+		count += l;
+	} while(count < len);
+	return count;
+}
+#endif
+
 static void* reader_thread(void * /*arg*/)
 {
 	uint8_t tmp[16];  /* actually 6 should be enough */
@@ -247,12 +342,20 @@ static void* reader_thread(void * /*arg*/)
 	uint16_t packlen;
 	uint8_t* buf;
 	bool bad_startcode = false;
+#ifdef MARTII
+	set_threadname("dvbsub_reader_thread");
+#endif
 
         dmx = new cDemux(0);
 #if HAVE_TRIPLEDRAGON
 	dmx->Open(DMX_PES_CHANNEL, NULL, 16*1024);
 #else
         dmx->Open(DMX_PES_CHANNEL, NULL, 64*1024);
+#endif
+#ifdef MARTII
+	static const char DVBSUBTITLEPIPE[] 	= "/tmp/.eplayer3_dvbsubtitle";
+	mkfifo(DVBSUBTITLEPIPE, 0644);
+	eplayer_fd = open (DVBSUBTITLEPIPE, O_RDONLY | O_NONBLOCK);
 #endif
 	while (reader_running) {
 		if(dvbsub_stopped /*dvbsub_paused*/) {
@@ -274,6 +377,9 @@ static void* reader_thread(void * /*arg*/)
 			dvbsub_stopped = 0;
 			sub_debug.print(Debug::VERBOSE, "%s (re)started with pid 0x%x\n", __FUNCTION__, dvbsub_pid);
 		}
+#ifdef MARTII
+		if (!isEplayer)
+#endif
 		if(pid_change_req) {
 			pid_change_req = 0;
 			clear_queue();
@@ -286,15 +392,56 @@ static void* reader_thread(void * /*arg*/)
 		len = 0;
 		count = 0;
 
+#ifdef MARTII
+		if (isEplayer)
+			len = eRead(tmp, 6);
+		else
+#endif
 		len = dmx->Read(tmp, 6, 1000);
 		if(len <= 0)
 			continue;
+#ifdef MARTII
+		if(!memcmp(tmp, "\x00\x00\x01\xbe", 4)) { // padding stream
+			packlen =  getbits(tmp, 4*8, 16) + 6;
+			count = 6;
+			buf = (uint8_t*) malloc(packlen);
 
+			// actually, we're doing slightly too much here ...
+			memmove(buf, tmp, 6);
+			/* read rest of the packet */
+			while((count < packlen) && !dvbsub_stopped) {
+#ifdef MARTII
+				if (isEplayer)
+					len = eRead(buf + count, packlen-count);
+				else
+#endif
+				len = dmx->Read(buf+count, packlen-count, 1000);
+				if (len < 0) {
+#ifdef MARTII
+					break;
+#else
+					continue;
+#endif
+				} else {
+					count += len;
+				}
+			}
+			free(buf);
+			buf = NULL;
+			continue;
+		}
+#endif
 		if(memcmp(tmp, "\x00\x00\x01\xbd", 4)) {
 			if (!bad_startcode) {
 				sub_debug.print(Debug::VERBOSE, "[subtitles] bad start code: %02x%02x%02x%02x\n", tmp[0], tmp[1], tmp[2], tmp[3]);
 				bad_startcode = true;
 			}
+#ifdef MARTII
+			if (isEplayer) {
+				char b[65536];
+				while (read(eplayer_fd, b, sizeof(b)) > 0);
+			}
+#endif
 			continue;
 		}
 		bad_startcode = false;
@@ -307,9 +454,18 @@ static void* reader_thread(void * /*arg*/)
 		memmove(buf, tmp, 6);
 		/* read rest of the packet */
 		while((count < packlen) && !dvbsub_stopped) {
+#ifdef MARTII
+			if (isEplayer)
+				len = eRead(buf+count, packlen-count);
+			else
+#endif
 			len = dmx->Read(buf+count, packlen-count, 1000);
 			if (len < 0) {
+#ifdef MARTII
+				break;
+#else
 				continue;
+#endif
 			} else {
 				count += len;
 			}
@@ -344,6 +500,12 @@ static void* reader_thread(void * /*arg*/)
 	dmx->Stop();
 	delete dmx;
 	dmx = NULL;
+#ifdef MARTII
+	if (eplayer_fd > -1) {
+		close(eplayer_fd);
+		eplayer_fd = -1;
+	}
+#endif
 
 	sub_debug.print(Debug::VERBOSE, "%s shutdown\n", __FUNCTION__);
 	pthread_exit(NULL);
@@ -353,6 +515,9 @@ static void* dvbsub_thread(void* /*arg*/)
 {
 	struct timespec restartWait;
 	struct timeval now;
+#ifdef MARTII
+	set_threadname("dvbsub_thread");
+#endif
 
 	sub_debug.print(Debug::VERBOSE, "%s started\n", __FUNCTION__);
 	if (!dvbSubtitleConverter)

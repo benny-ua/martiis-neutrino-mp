@@ -32,6 +32,11 @@
 #include <eitd/sectionsd.h>
 #include <cs_api.h>
 #include <system/configure_network.h>
+#ifdef MARTII
+#include <hardware_caps.h>
+#include <system/localize_bouquetnames.h>
+#include <dirent.h>
+#endif
 
 extern CBouquetManager *g_bouquetManager;
 
@@ -123,6 +128,9 @@ const CNeutrinoYParser::TyFuncCall CNeutrinoYParser::yFuncCallList[]=
 	{"set_timer_form",				&CNeutrinoYParser::func_set_timer_form},
 	{"bouquet_editor_main",			&CNeutrinoYParser::func_bouquet_editor_main},
 	{"set_bouquet_edit_form",		&CNeutrinoYParser::func_set_bouquet_edit_form},
+#ifdef MARTII
+	{"get_logo_name",		&CNeutrinoYParser::func_get_logo_name},
+#endif
 
 };
 //-------------------------------------------------------------------------
@@ -221,8 +229,14 @@ std::string  CNeutrinoYParser::func_get_bouquets_as_dropdown(CyhookHandler *, st
 		ZapitChannelList * channels = mode == CZapitClient::MODE_RADIO ? &g_bouquetManager->Bouquets[i]->radioChannels : &g_bouquetManager->Bouquets[i]->tvChannels;
 		sel=(nr==(i+1)) ? "selected=\"selected\"" : "";
 		if(!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || do_show_hidden == "true"))
+#ifdef MARTII
+			localizeBouquetNames();
+			yresult += string_printf("<option value=%u %s>%s</option>\n", i + 1, sel.c_str(),
+				(encodeString(g_bouquetManager->Bouquets[i]->lName.c_str())).c_str());
+#else
 			yresult += string_printf("<option value=%u %s>%s</option>\n", i + 1, sel.c_str(),
 				std::string(g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) :g_bouquetManager->Bouquets[i]->Name.c_str()).c_str());
+#endif
 			//yresult += string_printf("<option value=%u %s>%s</option>\n", i + 1, sel.c_str(), (encodeString(std::string(g_bouquetManager->Bouquets[i]->Name.c_str()))).c_str());
 	}
 	return yresult;
@@ -242,7 +256,12 @@ std::string  CNeutrinoYParser::func_get_bouquets_as_templatelist(CyhookHandler *
 	for (int i = 0; i < (int) g_bouquetManager->Bouquets.size(); i++) {
 		ZapitChannelList * channels = mode == CZapitClient::MODE_RADIO ? &g_bouquetManager->Bouquets[i]->radioChannels : &g_bouquetManager->Bouquets[i]->tvChannels;
 		if(!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || do_show_hidden == "true")) {
+#ifdef MARTII
+			localizeBouquetNames();
+			yresult += string_printf(ytemplate.c_str(), i + 1, g_bouquetManager->Bouquets[i]->lName.c_str());
+#else
 			yresult += string_printf(ytemplate.c_str(), i + 1, g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : g_bouquetManager->Bouquets[i]->Name.c_str());
+#endif
 			yresult += "\r\n";
 		}
 	}
@@ -329,8 +348,21 @@ std::string CNeutrinoYParser::func_get_bouquets_with_epg(CyhookHandler *hh, std:
 	std::string timestr;
 	bool have_logos = false;
 
+#ifdef MARTII
+	if (hh->WebserverConfigList["Tuxbox.DisplayLogos"] == "true") {
+		DIR *d;
+		d = opendir(g_settings.logo_hdd_dir.c_str());
+		if (!d)
+			d = opendir(g_settings.logo_hdd_dir_2.c_str());
+		if (d) {
+			closedir(d);
+			have_logos = true;
+		}
+	}
+#else
 	if(hh->WebserverConfigList["Tuxbox.LogosURL"] != "")
 		have_logos = true;
+#endif
 	for(int j = 0; j < (int) channels.size(); j++)
 	{
 		CZapitChannel * channel = channels[j];
@@ -651,6 +683,12 @@ std::string  CNeutrinoYParser::func_get_partition_list(CyhookHandler *, std::str
 //-------------------------------------------------------------------------
 std::string  CNeutrinoYParser::func_get_boxtype(CyhookHandler *, std::string)
 {
+#ifdef MARTII // should be: HAVE_HARDWARE_SPARK
+	std::string  boxname;
+	hw_caps_t *caps = get_hwcaps();
+	if (caps)
+		boxname = string(caps->boxvendor) + " " + string(caps->boxname);
+#else
 	unsigned int system_rev = cs_get_revision();
 	std::string boxname = "Coolstream ";
 
@@ -687,6 +725,7 @@ std::string  CNeutrinoYParser::func_get_boxtype(CyhookHandler *, std::string)
 	}
 
 	boxname += (g_info.delivery_system == DVB_S || (system_rev == 1)) ? " SAT":" CABLE";
+#endif
 	return boxname;
 }
 //-------------------------------------------------------------------------
@@ -1026,9 +1065,15 @@ std::string  CNeutrinoYParser::func_bouquet_editor_main(CyhookHandler *hh, std::
 			yresult += string_printf(para.c_str(), classname, akt.c_str(),
 				i + 1, lock_action.c_str(), lock_img.c_str(), lock_alt.c_str(), //lock
 				i + 1, hidden_action.c_str(), hidden_img.c_str(), hidden_alt.c_str(), //hhidden
+#ifdef MARTII
+				i + 1, bouquet->lName.c_str(), bouquet->lName.c_str(), //link
+				i + 1, bouquet->lName.c_str(), //rename
+				i + 1, bouquet->lName.c_str(), //delete
+#else
 				i + 1, bouquet->Name.c_str(), bouquet->Name.c_str(), //link
 				i + 1, bouquet->Name.c_str(), //rename
 				i + 1, bouquet->Name.c_str(), //delete
+#endif
 				down_show.c_str(), i + 1, //down arrow
 				up_show.c_str(), i + 1); //up arrow
 		}
@@ -1078,3 +1123,17 @@ std::string  CNeutrinoYParser::func_set_bouquet_edit_form(CyhookHandler *hh, std
 	else
 		return "No Bouquet selected";
 }
+#ifdef MARTII
+//-------------------------------------------------------------------------
+// func: Get Logo Name
+//-------------------------------------------------------------------------
+std::string  CNeutrinoYParser::func_get_logo_name(CyhookHandler *hh, std::string channelId)
+{
+	if (hh->WebserverConfigList["Tuxbox.DisplayLogos"] == "true") {
+		t_channel_id cid;
+		if (1 == sscanf(channelId.c_str(), "%llx", &cid))
+			return NeutrinoAPI->getLogoFile(hh->WebserverConfigList["Tuxbox.LogosURL"] /* unused */, cid);
+	}
+	return "";
+}
+#endif

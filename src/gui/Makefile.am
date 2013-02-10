@@ -1,4 +1,5 @@
-AM_CPPFLAGS = -fno-rtti -fno-exceptions -D__STDC_FORMAT_MACROS
+AM_CPPFLAGS = -fno-rtti -D__STDC_FORMAT_MACROS
+#AM_CPPFLAGS = -fno-rtti -fno-exceptions -D__STDC_FORMAT_MACROS
 #AM_CPPFLAGS = -fno-rtti
 BUILT_SOURCES  = git_version.h
 git_version.h: makeversion
@@ -50,10 +51,13 @@ endif
 noinst_LIBRARIES = libtimerlist.a libneutrino_gui.a libneutrino_gui2.a
 
 libneutrino_gui_a_SOURCES = \
+	3dsetup.cpp \
+	adzap.cpp \
 	audio_select.cpp \
 	audio_setup.cpp \
 	audioplayer.cpp \
 	audioplayer_setup.cpp\
+	batchepg.cpp \
 	bookmarkmanager.cpp \
 	bouquetlist.cpp \
 	channellist.cpp \
@@ -64,6 +68,7 @@ libneutrino_gui_a_SOURCES = \
 	eventlist.cpp \
 	favorites.cpp \
 	filebrowser.cpp \
+	followscreenings.cpp \
 	imageinfo.cpp \
 	info_menue.cpp \
 	infoviewer.cpp \
@@ -78,6 +83,7 @@ libneutrino_gui_a_SOURCES = \
 	network_service.cpp \
 	network_setup.cpp \
 	nfs.cpp \
+	opkg_manager.cpp \
 	osd_setup.cpp \
 	osdlang_setup.cpp \
 	parentallock_setup.cpp \
@@ -87,6 +93,7 @@ libneutrino_gui_a_SOURCES = \
 	pluginlist.cpp \
 	plugins.cpp \
 	proxyserver_setup.cpp \
+	psisetup.cpp \
 	rc_lock.cpp \
 	record_setup.cpp \
 	scan.cpp \
@@ -108,13 +115,21 @@ libneutrino_gui_a_SOURCES = \
 	user_menue_setup.cpp \
 	vfd_setup.cpp \
 	videosettings.cpp \
+	webtv.cpp \
+	webtv_setup.cpp \
 	zapit_setup.cpp
+
+if ENABLE_GRAPHLCD
+libneutrino_gui_a_SOURCES += \
+	glcdsetup.cpp
+endif
 
 libneutrino_gui2_a_SOURCES = \
 	cam_menu.cpp \
 	color.cpp \
 	hdd_menu.cpp \
 	infoclock.cpp \
+	kerneloptions.cpp \
 	motorcontrol.cpp
 
 if ENABLE_UPNP

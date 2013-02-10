@@ -73,6 +73,9 @@ struct NeutrinoMessages {
 		UNLOCK_RC               =       CRCInput::RC_Messages + 20,
 		REBOOT                  =       CRCInput::RC_Messages + 21,
 		RELOAD_SETUP            =       CRCInput::RC_Messages + 22,
+#ifdef MARTII
+		SHOW_MAINSETTINGS       =       CRCInput::RC_Messages + 23,
+#endif
 
 		EVT_VOLCHANGED                           = CRCInput::RC_Events + 1,
 		EVT_MUTECHANGED                          = CRCInput::RC_Events + 2,
@@ -147,6 +150,9 @@ struct NeutrinoMessages {
 
 		/* neutrino */
 		EVT_RECORDING_ENDED                      = CRCInput::RC_WithData + 23
+#ifdef MARTII
+		, EVT_BATCHEPG				 = CRCInput::RC_WithData + 24
+#endif
 	};
 	enum
 	{

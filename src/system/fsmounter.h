@@ -89,6 +89,9 @@ class CFSMounter
 	FS_Support m_cifs_sup;
 	FS_Support m_lufs_sup;
 */
+#ifdef MARTII
+	static void *automount_thread(void *);
+#endif
  public:
 	CFSMounter();
 	static bool isMounted(const char * const local_dir);
@@ -96,6 +99,10 @@ class CFSMounter
 					  const FSType fstype, const char * const username, const char * const password, 
 					  char * options1, char * options2);
 	static bool automount();
+#ifdef MARTII
+	static void automount_async_start();
+	static void automount_async_stop();
+#endif
 	static CFSMounter::UMountRes umount(const char * const dir = NULL);
 	static void getMountedFS(MountInfos& fs); 
 	static FS_Support fsSupported(const FSType fs, const bool keep_modules = false);

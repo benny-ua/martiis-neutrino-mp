@@ -1084,7 +1084,11 @@ bool CFileBrowser::exec(const char * const dirname)
 				}
 			}
 		}
+#ifdef MARTII
+		else if (msg==(uint32_t)g_settings.key_help)
+#else
 		else if (msg==CRCInput::RC_help)
+#endif
 		{
 			if (++g_settings.filebrowser_sortmethod >= FILEBROWSER_NUMBER_OF_SORT_VARIANTS)
 				g_settings.filebrowser_sortmethod = 0;

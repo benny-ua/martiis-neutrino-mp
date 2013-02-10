@@ -96,6 +96,16 @@ GENRE.TRAVEL_HOBBIES.5 Kochen
 GENRE.TRAVEL_HOBBIES.6 Einkauf
 GENRE.TRAVEL_HOBBIES.7 Garten
 GENRE.UNKNOWN Unbekannt
+adzap Werbezapper
+adzap.announce In 15 Sekunden wird umgeschaltet auf
+adzap.cancel Deaktiviert
+adzap.commit (Nach Zeitänderung (OK) drücken)
+adzap.disable Deaktivieren
+adzap.enable Einmalig aktivieren
+adzap.minute Minute
+adzap.minutes Minuten
+adzap.monitor Daueraktiv bei aktueller Sendung
+adzap.switchback Zurückschalten nach
 apidselector.head Sprachauswahl
 audio.srs_algo Art
 audio.srs_algo_light einfach
@@ -112,10 +122,15 @@ audiomenu.avs avs
 audiomenu.avsync A/V sync
 audiomenu.avsync_am Audio master
 audiomenu.clockrec 
-audiomenu.dolbydigital DD-Unterkanal automatisch
+audiomenu.dolbydigital Dolby Digital
+audiomenu.dolbydigital.auto DD-Unterkanal automatisch
 audiomenu.hdmi_dd Dolby Digital über HDMI
 audiomenu.hdmi_dd_auto automatisch
 audiomenu.hdmi_dd_force erzwingen
+audiomenu.mixer_volume Mixer-Lautstärke
+audiomenu.mixer_volume_analog Analog
+audiomenu.mixer_volume_hdmi HDMI
+audiomenu.mixer_volume_spdif S/PDIF
 audiomenu.monoleft mono links
 audiomenu.monoright mono rechts
 audiomenu.pref_lang Sprache
@@ -174,6 +189,17 @@ audioplayer.spectrum LCD Skala
 audioplayer.stop Stopp
 audioplayer.title_artist Titel, Interpret
 audioplayerpicsettings.general Audioplayer/Bildbetrachter
+batchepg.epg.mhw1 MHW1
+batchepg.epg.mhw2 MHW2
+batchepg.epg.off Aus
+batchepg.epg.standard Standard
+batchepg.hint EPG-Informationen werden aktualisiert. Bitte warten. Kanal:
+batchepg.refresh Aktualisierung starten
+batchepg.refreshall Alle aktualisieren
+batchepg.run_at_shutdown Aktualisierung vor Ausschalten
+batchepg.save Einstellungen speichern
+batchepg.settings Einstellungen
+batchepg.standard_wait_time Wartezeit für normalen EPG
 bookmarkmanager.delete Löschen
 bookmarkmanager.name Bookmarks
 bookmarkmanager.rename Umbenennen
@@ -305,6 +331,7 @@ epgviewer.More_Screenings Weitere Termine auf diesem Kanal
 epgviewer.More_Screenings_short Weitere Termine
 epgviewer.nodetailed Keine ausführlichen Informationen verfügbar
 epgviewer.notfound Keine Programminformationen (EPG) gefunden
+epgviewer.select_screening Terminauswahl
 eventfinder.head EPG-Suche
 eventfinder.keyword Suche nach Textpassage
 eventfinder.search Suche
@@ -351,27 +378,35 @@ extra.fec_s2_qpsk_7_8 7/8 S2_QPSK
 extra.fec_s2_qpsk_8_9 8/9 S2_QPSK
 extra.fec_s2_qpsk_9_10 9/10 S2_QPSK
 extra.key_current_transponder Aktuelle Transponder Taste
+extra.key_help Hilfe-Taste
 extra.key_list_end Listenende
 extra.key_list_start Listenanfang
+extra.key_next43mode Nächstes Seitenformat
 extra.key_plugin One-touch-Plugin
 extra.key_screenshot Screenshot Taste
+extra.key_showclock Zeitanzeige
+extra.key_switchformat Nächste Auflösung
+extra.key_timerlist Timer-Liste
 extra.key_timeshift Timeshift
 extra.key_unlock Entsperrtaste
 extra.ladirection Breitengrad-Ausrichtung
 extra.latitude Breitengrad
-extra.loadconfig Neutrino Einstellungen: Laden von
-extra.loadkeys Lade Tastenbelegung von
+extra.loadconfig Laden von
+extra.loadkeys Laden von
 extra.lodirection Längengrad-Ausrichtung
 extra.longitude Längengrad
 extra.menu_left_exit "links" = Menü zurück
+extra.neutrinosettings.title Neutrino-Einstellungen
 extra.north Norden
+extra.record_bufsize Schreib-Puffer in MB
+extra.record_bufsize_dmx DMX-Puffer in MB
 extra.record_time Max. Aufnahmezeit in Stunden
 extra.rotor_swap Rotor dreht Ost/West
 extra.rounded_corners Eckendarstellung
 extra.rounded_corners_off eckig
 extra.rounded_corners_on abgerundet
-extra.saveconfig Neutrino Einstellungen: Sichern als
-extra.savekeys Speichere Tastenbelegung als
+extra.saveconfig Sichern als
+extra.savekeys Speichern als
 extra.scrambled_message Verschlüsselung melden
 extra.show_mute_icon Mute-Icon bei Lautstärke 0
 extra.sms_channel SMS-Modus Kanal
@@ -399,6 +434,8 @@ extra.volume_digits Lautstärkeanzeige Ziffern
 extra.volume_pos Lautstärkeanzeige
 extra.west Westen
 extra.zap_cycle Zap nur in Bouquet
+extra.zapit_bouquetname_newchannels Neue Kanäle
+extra.zapit_bouquetname_others Andere
 extra.zapit_fe_timeout Tuning Timeout (1=10ms)
 extra.zapit_hvoltage High (13.5/ 18.5) Voltage
 extra.zapit_make_bouquet Kanalliste auffüllen
@@ -537,6 +574,34 @@ fontsize.menu Menütext
 fontsize.menu_hint Menü-Hilfe
 fontsize.menu_info Menüinfo
 fontsize.menu_title Menütitel
+glcd.brightness Helligkeit
+glcd.brightness_standby Helligkeit in Standby
+glcd.color.black Schwarz
+glcd.color.blue Blau
+glcd.color.cyan Blaugrün
+glcd.color.green Grün
+glcd.color.magenta Magenta
+glcd.color.red Rot
+glcd.color.white Weiss
+glcd.color.yellow Gelb
+glcd.enable GraphLCD aktiv
+glcd.font Schrift
+glcd.head GraphLCD
+glcd.mirror_osd OSD-Menü auf GraphLCD anzeigen
+glcd.restart Neu erkennen
+glcd.scroll_speed Scroll-Geschwindigkeit
+glcd.select.bar Fortschrittsbalken-Farbe
+glcd.select.bg Hintergrund-Farbe
+glcd.select.fg Vordergrund-Farbe
+glcd.show_logo Sender-Logo anzeigen
+glcd.size_bar Fortschrittsbalken-Größe
+glcd.size_channel Sender-Größe
+glcd.size_epg EPG-Größe
+glcd.size_logo Logo-Größe
+glcd.size_time Uhrzeit-Größe
+glcd.size_time_standby Uhrzeit-Größe in Standby
+glcd.time_in_standby Zeitanzeige in Standby
+glcd.volume Lautstärke
 hdd_10min 10 min.
 hdd_1min 1 min.
 hdd_20min 20 min.
@@ -555,6 +620,8 @@ hdd_format_warn Formatierung wird gestartet
 hdd_fs Dateisystem
 hdd_manage Laufwerke verwalten
 hdd_middle Mittel
+hdd_mount einhängen
+hdd_mount_umount Laufwerke ein-/aushängen
 hdd_noise Akustikkontrolle (AAM)
 hdd_not_found Keine Festplatte
 hdd_reiser ReiserFS
@@ -562,6 +629,7 @@ hdd_removable_device Wechseldatenträger
 hdd_settings Laufwerke
 hdd_sleep Ausschalten nach...
 hdd_slow Langsam
+hdd_umount aushängen
 hdd_umount_warn Laufwerk aushängen
 imageinfo.creator Ersteller:
 imageinfo.date Datum:
@@ -591,7 +659,17 @@ infoviewer.subservice Bildregie
 infoviewer.waittime Warte auf Uhrzeit...
 ipsetup.hint_1 Benutzen Sie 0..9 oder hoch/runter
 ipsetup.hint_2 OK speichert, EXIT bricht ab
+kerneloptions.apply Einstellungen anwenden
+kerneloptions.disabled deaktiviert
+kerneloptions.enabled aktiviert
+kerneloptions.head Kernel-Optionen
+kerneloptions.loaded geladen
+kerneloptions.lsmod Status
+kerneloptions.modules Kernel-Module
+kerneloptions.not_loaded nicht geladen
+kerneloptions.reset Einstellungen zurücksetzen
 keybindingmenu.RC Fernbedienung abstimmen
+keybindingmenu.accept_other_remotes Andere Fernbedienungen akzeptieren
 keybindingmenu.addrecord Aufnahme-Timer hinzufügen
 keybindingmenu.addremind Umschalt-Timer hinzufügen
 keybindingmenu.allchannels_on_ok Kanalliste
@@ -604,7 +682,8 @@ keybindingmenu.cancel Kanalliste schließen
 keybindingmenu.channeldown Kanal runter
 keybindingmenu.channellist Kanalliste
 keybindingmenu.channelup Kanal hoch
-keybindingmenu.head Tasten-Belegungen bearbeiten
+keybindingmenu.edit Bearbeiten
+keybindingmenu.head Tastenbelegung
 keybindingmenu.lastchannel Letzter Kanal
 keybindingmenu.misc Sonstige
 keybindingmenu.mode_left_right_key_tv Funktion li/re Tasten im TV-Modus
@@ -613,6 +692,8 @@ keybindingmenu.mode_left_right_key_tv_volume Lautstärkeregelung
 keybindingmenu.mode_left_right_key_tv_vzap Virtual Zap
 keybindingmenu.mode_left_right_key_tv_zap Umschalten
 keybindingmenu.modechange Moduswechsel
+keybindingmenu.multimedia Multimedia
+keybindingmenu.navigation Navigation
 keybindingmenu.pagedown Seite weiter
 keybindingmenu.pageup Seite zurück
 keybindingmenu.poweroff Standby EIN/AUS
@@ -631,6 +712,7 @@ keybindingmenu.sort Sortierreihenfolge ändern
 keybindingmenu.subchanneldown Unterkanal zurück
 keybindingmenu.subchannelup Unterkanal weiter
 keybindingmenu.tvradiomode Fernseh-/Radio-Modus
+keybindingmenu.video Video
 keybindingmenu.zaphistory Zapping-History Bouquet
 keychooser.head Neue Taste einstellen
 keychooser.text1 Bitte Taste drücken
@@ -649,7 +731,11 @@ lcdcontroler.brightnessdeepstandby Deep-Standby
 lcdcontroler.brightnessstandby Standby
 lcdmenu.dim_brightness nach Dimm-Timeout
 lcdmenu.dim_time Dimm-Timeout
-lcdmenu.head VFD Einstellungen
+lcdmenu.displaymode.running Anzeige im Betrieb
+lcdmenu.displaymode.standby Anzeige im Standby
+lcdmenu.displaymode.timeoff Ohne Uhrzeit
+lcdmenu.displaymode.timeonly Nur Uhrzeit
+lcdmenu.head LED/LCD Einstellungen
 lcdmenu.lcdcontroler Helligkeit
 lcdmenu.statusline Statuszeile
 lcdmenu.statusline.both Lautstärke/Fortschritt
@@ -689,7 +775,7 @@ mainsettings.audio Audio
 mainsettings.head Einstellungen
 mainsettings.keybinding Tasten
 mainsettings.language Sprache
-mainsettings.lcd VFD-Display
+mainsettings.lcd LED/LCD-Display
 mainsettings.manage Einstellungen verwalten
 mainsettings.misc Erweiterte Einstellungen
 mainsettings.network Netzwerk
@@ -1076,6 +1162,8 @@ menu.hint_volume_digits Zifferndarstellung der Lautstärkeanzeige ein/ausschalte
 menu.hint_volume_pos Hier können Sie die Anzeigeposition der Lautstärkeanzeige auswählen
 menu.hint_zap_cycle Dadurch wird nur innerhalb des aktiven Bouquets gezappt
 menu.next Weiter (Menü zum Beenden)
+menu.numbers_as_icons Menü-Zahlen als Icons
+messagebox.accept Wollen Sie die Änderungen beibehalten?
 messagebox.back Zurück
 messagebox.cancel Abbruch
 messagebox.discard Wollen Sie die Änderungen verwerfen?
@@ -1091,6 +1179,12 @@ miscsettings.colored_events_0 keine
 miscsettings.colored_events_1 aktuelle
 miscsettings.colored_events_2 nächste
 miscsettings.energy Energieverbrauch
+miscsettings.epg.batch.head EPG-Aktualisierung
+miscsettings.epg.batch.settings EPG-Aktualisierung
+miscsettings.epg.freesat Freesat EPG
+miscsettings.epg.freesat.enable Freesat EPG aktivieren
+miscsettings.epg.viasat VIASAT EPG
+miscsettings.epg.viasat.enable VIASAT EPG aktivieren
 miscsettings.epg_cache EPG-Cache (Tage)
 miscsettings.epg_cache_hint1 EPG-Daten im Voraus zwischenspeichern?
 miscsettings.epg_cache_hint2 (Angabe in Tagen)
@@ -1107,9 +1201,11 @@ miscsettings.epg_old_events_hint1 Wie lange abgelaufene EPG-Daten aufheben?
 miscsettings.epg_old_events_hint2 Angabe in Stunden
 miscsettings.epg_save EPG zwischenspeichern
 miscsettings.epg_save_standby EPG speichern in Standby-Modus
+miscsettings.epg_saving EPG-Daten werden gespeichert ...
 miscsettings.general Allgemein
 miscsettings.head Erweitert
 miscsettings.infobar Infobar
+miscsettings.infobar_autoshow_if_cn Infobar bei Sendungsbeginn
 miscsettings.infobar_casystem_display CA-System Anzeige
 miscsettings.infobar_casystem_mini Mini
 miscsettings.infobar_casystem_mode Diskret
@@ -1122,7 +1218,8 @@ miscsettings.infobar_disp_4 Logo+Kanalname/Kanalnummer
 miscsettings.infobar_disp_5 Logo/Signalbalken
 miscsettings.infobar_disp_6 Logo+Kanalnummer/Signalbalken
 miscsettings.infobar_disp_log Logo
-miscsettings.infobar_logo_hdd_dir Logo Verz.
+miscsettings.infobar_logo_hdd_dir Logo Verzeichnis
+miscsettings.infobar_logo_hdd_dir_e2 Logo Verz. 2
 miscsettings.infobar_sat_display Kabel-/Satellitenanbieter
 miscsettings.infobar_show Info bei EPG Änderungen
 miscsettings.infobar_show_dd_available DD-Verfügbarkeit anzeigen
@@ -1131,6 +1228,7 @@ miscsettings.infobar_show_res_simple einfach
 miscsettings.infobar_show_sysfs_hdd Füllstandanzeige (sysFS & hdd)
 miscsettings.infobar_show_tuner Aktiven Tuner anzeigen
 miscsettings.radiotext Radiotext
+miscsettings.restart Die Änderung wird bei Neustart aktiv.
 miscsettings.shutdown_count Komplett ausschalten nach
 miscsettings.shutdown_count_hint1 Zeit (in Minuten), nach der vom Standby in
 miscsettings.shutdown_count_hint2 den Deep-Standby geschalten wird (0 = aus)
@@ -1151,7 +1249,7 @@ motorcontrol.install_menu Motor Installation
 motorcontrol.motor_pos (a) Motorposition:
 motorcontrol.movement (b) Bewegung:
 motorcontrol.msec Millisekunden
-motorcontrol.no_mode keine Sorge (wasn das?)
+motorcontrol.no_mode egal
 motorcontrol.notdef nicht benutzt
 motorcontrol.override übersteuern
 motorcontrol.pos_decrease Motorposition runter (a)
@@ -1206,7 +1304,7 @@ moviebrowser.error_no_movies Keine Filme gefunden
 moviebrowser.foot_filter Filter:
 moviebrowser.foot_play Film starten
 moviebrowser.foot_sort Sortieren:
-moviebrowser.head TS Filmarchiv (eigene Aufnahmen)
+moviebrowser.head Movie-Browser
 moviebrowser.head_filter Filme nach Kategorie filtern:
 moviebrowser.head_playlist Zuletzt gesehen:
 moviebrowser.head_recordlist Zuletzt aufgenommen:
@@ -1245,7 +1343,7 @@ moviebrowser.info_videoformat Bild
 moviebrowser.last_play_max_items Zeilen 'zuletzt aufgenommen'
 moviebrowser.last_record_max_items Zeilen 'zuletzt gesehen'
 moviebrowser.load_default Lade Voreinstellung
-moviebrowser.menu_directories_head Verzeichnisse/Freier Speicher
+moviebrowser.menu_directories_head Verzeichnisse
 moviebrowser.menu_help_head Hilfe
 moviebrowser.menu_main_bookmarks Markierungen
 moviebrowser.menu_main_head Einstellungen
@@ -1287,6 +1385,7 @@ moviebrowser.short_size Grösse
 moviebrowser.short_title Titel
 moviebrowser.start_head Film starten von Position:
 moviebrowser.start_record_start Aufnahmestart
+moviebrowser.ts_only Nur Aufnahmen zeigen
 moviebrowser.update_if_dest_empty_only Übernehmen nur wenn Ziel leer
 moviebrowser.use_dir Verzeichnis verwenden
 moviebrowser.use_movie_dir Wiedergabeverzeichnis verwenden
@@ -1296,8 +1395,10 @@ movieplayer.bookmarkname Bookmark Name
 movieplayer.bookmarkname_hint1 Geben Sie den Namen für das neue Lesezeichen ein
 movieplayer.bookmarkname_hint2 
 movieplayer.defplugin Start-Plugin
-movieplayer.fileplayback Abspielen (Multiformat)
+movieplayer.fileplayback Datei-Browser
 movieplayer.head Movieplayer
+movieplayer.networkplayback Abspielen (Netstream)
+movieplayer.networkplayback.url Stream-URL
 movieplayer.toomanybookmarks Sie haben bereits zu viele Lesezeichen angelegt.\nEs muß erst ein anderes gelöscht werden.
 movieplayer.tshelp1 Stopp
 movieplayer.tshelp10 ca. 10 Minuten zurück
@@ -1311,16 +1412,19 @@ movieplayer.tshelp6 ca. 1 Minute zurück
 movieplayer.tshelp7 ca. 1 Minute vor
 movieplayer.tshelp8 ca. 5 Minuten zurück
 movieplayer.tshelp9 ca. 5 Minuten vor
-movieplayer.tsplayback TS Abspielen
+movieplayer.tsplayback Abspielen
 mpkey.audio Audiotrack
 mpkey.bookmark Speichere Lesezeichen
 mpkey.forward Vorlauf
+mpkey.goto Zeiteingabe
+mpkey.next3dmode Nächster 3D-Modus
 mpkey.pause Pause
 mpkey.play Play
 mpkey.plugin Starte Plugin
 mpkey.rewind Rücklauf
 mpkey.stop Stopp
 mpkey.time Zeitanzeige
+mpkey.vtxt Teletext
 networkmenu.apply_settings Änderungen werden übernommen...
 networkmenu.apply_settings_now Änderungen jetzt zuweisen?
 networkmenu.broadcast Broadcast
@@ -1352,6 +1456,7 @@ networkmenu.setuponstartup Beim Start Netzwerk setzen
 networkmenu.show Aktive Einstellungen zeigen
 networkmenu.ssid Netzwerkname (SSID)
 networkmenu.test Netzwerk testen
+networkmenu.wlan_security Sicherheit
 neutrino_starting Neutrino wird gestartet...
 nfs.alreadymounted Verzeichnis bereits gemountet.
 nfs.automount Beim Start mounten
@@ -1389,6 +1494,7 @@ options.off aus
 options.on ein
 options.on.without_messages ohne Msg
 options.serial seriell
+options.show_background_picture Hintergrundbild zeigen
 parentallock.bouquetmode Bouquets sind standardmässig
 parentallock.changepin PIN-Code festlegen
 parentallock.changepin_hint1 Geben Sie hier Ihren neuen PIN-Code ein!
@@ -1415,6 +1521,7 @@ personalize.button_red Rot
 personalize.button_yellow Gelb
 personalize.disabled deaktiviert
 personalize.enabled aktiviert
+personalize.features Erweiterungen
 personalize.head Menüs anpassen
 personalize.help Hilfe
 personalize.help_line1 Die Personalisierung ermöglicht es, die wichtigsten
@@ -1483,11 +1590,16 @@ pinprotection.head PIN-Abfrage
 pinprotection.wrongcode Geben Sie den Code nocheinmal ein!
 plugins.hdd_dir Plugin HDD Verz.
 plugins.result Pluginausgabe
+plugintype.disabled Deaktiviert
+plugintype.game Spiel
+plugintype.script Skript
+plugintype.tool Werkzeug
 progressbar.color Fortschrittsbalken Farbe
 rclock.lockmsg Die Fernbedienung wird gesperrt.\n Um die Sperre aufzuheben, bitte\n <ROT> und <MENU> auf der Fernbedienung\n drücken.
 rclock.menueadd FB sperren
 rclock.title Fernbedienung sperren
 rclock.unlockmsg Fernbedienung reaktiviert...
+recording.failed Aufzeichnung ist fehlgeschlagen!
 recording.is_running Folgende Aufnahme läuft bereits! Neue Aufnahme starten?
 recording.start Starte Aufnahme, bitte warten...!
 recording.stop Beende Aufnahme, bitte warten...!
@@ -1496,6 +1608,7 @@ recordingmenu.apids_ac3 AC3 Tonspuren aufnehmen
 recordingmenu.apids_alt Alternative Tonspuren aufn.
 recordingmenu.apids_std Standard Tonspur aufnehmen
 recordingmenu.defdir Aufnahmeverzeichnis
+recordingmenu.dvbsub_pids Untertitel aufnehmen
 recordingmenu.end_of_recording_epg EPG aktuelles Event
 recordingmenu.end_of_recording_max max. Aufnahmezeit
 recordingmenu.end_of_recording_name Ende der Sofortaufnahme
@@ -1507,6 +1620,7 @@ recordingmenu.multimenu.rec_akt Aufnahme aktueller Kanal
 recordingmenu.multimenu.stop_all Alle Aufnahmen beenden
 recordingmenu.multimenu.timeshift Timeshift
 recordingmenu.off aus
+recordingmenu.pmt_pid PMT aufnehmen
 recordingmenu.record_is_not_running Keine laufende Aufnahme verfügbar!
 recordingmenu.record_is_running Aufnahme läuft!
 recordingmenu.save_in_channeldir Speichere im Kanalverzeichnis
@@ -1517,6 +1631,7 @@ recordingmenu.slow_warn Warnung bei langsamen Aufnahmemedien
 recordingmenu.timeshift Timeshift
 recordingmenu.tsdir Timeshift Aufnahmeverzeichnis
 recordingmenu.vcr Videorekorder
+recordingmenu.vtxt_pid Teletext aufnehmen
 recordingmenu.zap_on_announce Umschalten bei Ankündigung
 recordtimer.announce Die Aufnahme beginnt in wenigen Minuten.
 repeatblocker.hint_1 Mindestzeit (in ms) zwischen 2 Tastendrücken
@@ -1614,8 +1729,10 @@ scants.startnow Kanalsuche starten
 scants.test Empfangstest
 scants.transponders Transponder:
 scrambled_channel Verschlüsselung aktiv
-screensetup.lowerright grün = Bildrand unten, rechts
-screensetup.upperleft rot = Bildrand oben, links
+screensetup.lowerright Bildrand unten rechts
+screensetup.remove Rahmen entfernen
+screensetup.upperleft Bildrand oben links
+screenshot.backbuffer Sekundärer Buffer (Back Buffer)
 screenshot.count Screenshot Anzahl
 screenshot.cover Erzeuge Filmcover für Moviebrowser
 screenshot.defdir Screenshot Verzeichnis
@@ -1623,10 +1740,15 @@ screenshot.format Screenshot Format
 screenshot.info Screenshot Taste ist nicht belegt
 screenshot.menu Screenshot
 screenshot.osd OSD Auflösung
+screenshot.png_compression PNG-Komprimierungsstärke
 screenshot.res Screenshot Auflösung
 screenshot.scale Screenshot Skalierung
 screenshot.tv TV Auflösung
 screenshot.video Screenshot mit Video Hintergrund
+servicemenu.boot_params_ask Soll wirklich SPARK gebootet werden?
+servicemenu.boot_params_head Änderung der Boot-Parameter
+servicemenu.boot_params_hint Bitte den Receiver nicht ausschalten!
+servicemenu.boot_spark Jetzt SPARK booten
 servicemenu.getplugins Plugins neu laden
 servicemenu.getplugins_hint Plugins werden neu geladen,\nbitte warten...
 servicemenu.head Service
@@ -1634,24 +1756,29 @@ servicemenu.imageinfo Imageinfo
 servicemenu.reload Kanallisten neu laden
 servicemenu.reload_hint Kanallisten werden neu geladen,\nbitte warten...
 servicemenu.restart Neutrino neu starten
+servicemenu.restart_cam CAM neu starten
 servicemenu.restart_hint Neutrino wird neu gestartet...
 servicemenu.restart_refused_recording Aufnahme läuft. Neustart nicht möglich.
+servicemenu.restart_tuner Tuner neu starten
+servicemenu.restarting_cam CAM wird neu gestartet
+servicemenu.restarting_tuner Tuner wird neu gestartet
 servicemenu.scants Kanalsuche
 servicemenu.update Software-Aktualisierung
-settings.backup Image-Einstellungen: Sichern
+settings.backup Sichern
 settings.backup_failed Sicherung fehlgeschlagen!
 settings.help Hilfe
 settings.menu_hints Menühinweise anzeigen
 settings.menu_pos Menüposition
-settings.missingoptionsconffile Die Neutrino Einstellungen wurden erweitert.\nDie neuen Werte werden auf Standard gesetzt.
-settings.noconffile Die Neutrino Einstellungen wurden nicht\ngefunden. Es werden Standardwerte benutzt.
+settings.missingoptionsconffile Die Neutrino-Einstellungen wurden erweitert.\nDie neuen Werte werden auf Standard gesetzt.
+settings.noconffile Die Neutrino-Einstellungen wurden nicht\ngefunden. Es werden Standardwerte benutzt.
 settings.pos_bottom_left unten links
 settings.pos_bottom_right unten rechts
 settings.pos_default_center oben Mitte
 settings.pos_higher_center unten Mitte
+settings.pos_off aus
 settings.pos_top_left oben links
 settings.pos_top_right oben rechts
-settings.restore Image-Einstellungen: Wiederherstellen
+settings.restore Wiederherstellen
 settings.restore_warn Alle Settings werden ersetzt.\nDie Box wird neu gestartet.\nWeiter?
 shutdown.recoding_query Aufnahme läuft. Trotzdem beenden?
 shutdowntimer.announce Die Box wird in 1 Min. heruntergefahren.\nShutdown abbrechen?
@@ -1666,6 +1793,7 @@ streaminfo.aratio_unknown unbekannt
 streaminfo.audiotype Audiotyp
 streaminfo.average_bitrate Durchschnitt
 streaminfo.bitrate Bitrate
+streaminfo.casystems Cryptsysteme
 streaminfo.framerate Bildrate
 streaminfo.framerate_unknown unbekannt
 streaminfo.head Tech. Information
@@ -1679,11 +1807,21 @@ streaming.slow System oder Datenträger zu langsam! Bitte ggf. einige Aufnahmen 
 streaming.write_error Die Aufnahme wurde leider abgebrochen,\nda ein Fehler beim Schreiben der Daten auftrat.
 stringinput.caps Groß-/Kleinbuchstaben
 stringinput.clear Alles löschen
+subtitles.delay Verzögerung DVB-Untertitel
 subtitles.head Untertitel
 subtitles.stop Untertitel aus
 terrestrialsetup.provider DVB-T Region
+three.d.off Deaktiviert
+three.d.save Für Kanal speichern
+three.d.settings 3D-Einstellung
+three.d.settings.general Verfahren
+three.d.sideside Side-by-Side
+three.d.tile Tile
+three.d.topbottom Top-and-Bottom
 timer.eventrecord.msg Die Sendung wurde zur Aufnahme vorgemerkt.
 timer.eventrecord.title Aufnahme vormerken
+timer.eventremoved.msg Die Aufnahme der Sendung wurde storniert.
+timer.eventremoved.title Aufnahme storniert
 timer.eventtimed.msg Die Sendung wurde vorgemerkt.
 timer.eventtimed.title Sendung vormerken
 timerbar.channelswitch Umschalten
@@ -1692,6 +1830,7 @@ timerlist.alarmtime Alarmzeit
 timerlist.apids Audio PIDs
 timerlist.apids_dflt Voreingestellte Tonspuren aufn.
 timerlist.ask_to_delete Das Löschen des Timers beendet auch die laufende Aufnahme!\n%sTrotzdem fortsetzen?
+timerlist.batchepg EPG-Aktualisierung
 timerlist.bouquetselect Bouquet wählen
 timerlist.channel Kanal
 timerlist.channelselect Kanal wählen
@@ -1736,6 +1875,7 @@ timerlist.standby.off Aufwachen aus Standby
 timerlist.standby.on In Standby gehen
 timerlist.stoptime Stoppzeit
 timerlist.type Timertyp
+timerlist.type.batchepg EPG aktualisieren
 timerlist.type.execplugin Plugin ausführen
 timerlist.type.nextprogram Nächstes Programm
 timerlist.type.record Aufnahme
@@ -1777,6 +1917,7 @@ usermenu.button_green Benutzermenü 'grün'
 usermenu.button_red Benutzermenü 'rot'
 usermenu.button_yellow Benutzermenü 'gelb'
 usermenu.head Benutzermenü
+usermenu.item_adzap Werbezapper
 usermenu.item_bar ---- Trennung ----
 usermenu.item_epg_misc EPG Funktionen
 usermenu.item_none (frei)
@@ -1806,17 +1947,26 @@ videomenu.dbdr_deblock deBlock
 videomenu.dbdr_none aus
 videomenu.enabled_modes Videosysteme auf der VF-Taste
 videomenu.fullscreen Vollbild
-videomenu.hdmi_cec CSTLink (HDMI-CEC)
-videomenu.hdmi_cec_mode Receiver verwenden
+videomenu.hdmi_cec HDMI-CEC
+videomenu.hdmi_cec_broadcast Senden an alle Geräte
+videomenu.hdmi_cec_mode Aktivieren
 videomenu.hdmi_cec_mode_off nein
 videomenu.hdmi_cec_mode_recorder als Sat/Kabel PVR
 videomenu.hdmi_cec_mode_tuner als Sat/Kabel STB
 videomenu.hdmi_cec_standby Aktiviere CEC Standby
+videomenu.hdmi_cec_standby_not_timer nicht bei Timer
 videomenu.hdmi_cec_view_on Aktiviere CEC View on
 videomenu.hue Farbton
 videomenu.letterbox Letterbox
 videomenu.panscan Pan & Scan
 videomenu.panscan2 14:9 Pan & Scan
+videomenu.psi Farbeinstellungen
+videomenu.psi.brightness Helligkeit
+videomenu.psi.contrast Kontrast
+videomenu.psi.reset Standard-Einstellungen
+videomenu.psi.saturation Sättigung
+videomenu.psi.step Videoregler-Schrittweite
+videomenu.psi.tint Farbton
 videomenu.saturation Sättigung
 videomenu.scart Scart
 videomenu.screensetup Bildbereich
@@ -1830,6 +1980,8 @@ videomenu.videoformat_149 14:9
 videomenu.videoformat_169 16:9
 videomenu.videoformat_43 4:3
 videomenu.videomode Videosystem
+webtv.head WebTV
+webtv.xml WebTV-XML-Datei
 wizard.initial_settings Grundeinstellungen gefunden
 wizard.install_settings Kanalliste für Astra 19.2°E installieren?
 wizard.welcome_head Willkommen zur Ersteinrichtung Ihres Receivers!

@@ -91,7 +91,12 @@ bool CConfigFile::loadConfig(const std::string & filename)
 
 bool CConfigFile::saveConfig(const char * const filename)
 {
+#ifdef MARTII
+	std::string tmpname = std::string(filename) + ".tmp";
+	std::ofstream configFile(tmpname.c_str());
+#else
 	std::ofstream configFile(filename);
+#endif
 
 	if (configFile != NULL)
 	{
@@ -103,7 +108,12 @@ bool CConfigFile::saveConfig(const char * const filename)
 		configFile.close();
 		sync();
 
+#ifdef MARTII
+		chmod(tmpname.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+		rename(tmpname.c_str(), filename);
+#else
 		chmod(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+#endif
 
 		return true;
 	}

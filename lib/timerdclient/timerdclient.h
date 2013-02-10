@@ -59,6 +59,10 @@ class CTimerdClient:private CBasicClient
 			EVT_SLEEPTIMER,
 			EVT_REMIND,
 			EVT_EXEC_PLUGIN
+#ifdef MARTII
+			, EVT_BATCHEPG
+			, EVT_ANNOUNCE_BATCHEPG
+#endif
 		};
 
 		void registerEvent(unsigned int eventID, unsigned int clientID, const char * const udsName);

@@ -44,6 +44,9 @@
 #include <gui/widget/hintbox.h>
 #include <gui/widget/messagebox.h>
 #include <gui/widget/stringinput.h>
+#ifdef MARTII
+#include <system/localize_bouquetnames.h>
+#endif
 #include <zapit/client/zapittools.h>
 
 extern CBouquetManager *g_bouquetManager;
@@ -102,7 +105,11 @@ void CBEBouquetWidget::paintItem(int pos)
 		if ((*Bouquets)[current]->bHidden)
 			frameBuffer->paintIcon(NEUTRINO_ICON_HIDDEN, x + 10, ypos, iheight);
 
+#ifdef MARTII
+		g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->RenderString(x+iconoffset+20, ypos + iheight - (iheight-fheight)/2, width-iconoffset-20, (*Bouquets)[current]->lName, color, 0, true);
+#else
 		g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->RenderString(x+iconoffset+20, ypos + iheight - (iheight-fheight)/2, width-iconoffset-20, (*Bouquets)[current]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : (*Bouquets)[current]->Name, color, 0, true);
+#endif
 	}
 }
 
@@ -237,6 +244,9 @@ int CBEBouquetWidget::exec(CMenuTarget* parent, const std::string & /*actionKey*
         x = frameBuffer->getScreenX() + (frameBuffer->getScreenWidth() - width) / 2;
         y = frameBuffer->getScreenY() + (frameBuffer->getScreenHeight() - height) / 2;
 
+#ifdef MARTII
+	localizeBouquetNames();
+#endif
 	Bouquets = &g_bouquetManager->Bouquets;
 	paintHead();
 	paint();
@@ -390,7 +400,11 @@ int CBEBouquetWidget::exec(CMenuTarget* parent, const std::string & /*actionKey*
 			{
 				if (selected < Bouquets->size()) /* Bouquets->size() might be 0 */
 				{
+#ifdef MARTII
+					CBEChannelWidget* channelWidget = new CBEChannelWidget((*Bouquets)[selected]->lName, selected);
+#else
 					CBEChannelWidget* channelWidget = new CBEChannelWidget((*Bouquets)[selected]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : (*Bouquets)[selected]->Name, selected);
+#endif
 					channelWidget->exec( this, "");
 					if (channelWidget->hasChanged())
 						bouquetsChanged = true;
@@ -437,7 +451,11 @@ void CBEBouquetWidget::deleteBouquet()
 	if (selected >= Bouquets->size()) /* Bouquets->size() might be 0 */
 		return;
 
+#ifdef MARTII
+	if (ShowMsgUTF(LOCALE_FILEBROWSER_DELETE, (*Bouquets)[selected]->lName, CMessageBox::mbrNo, CMessageBox::mbYes|CMessageBox::mbNo)!=CMessageBox::mbrYes)
+#else
 	if (ShowMsgUTF(LOCALE_FILEBROWSER_DELETE, (*Bouquets)[selected]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : (*Bouquets)[selected]->Name, CMessageBox::mbrNo, CMessageBox::mbYes|CMessageBox::mbNo)!=CMessageBox::mbrYes)
+#endif
 		return;
 
 	g_bouquetManager->deleteBouquet(selected);
@@ -505,6 +523,10 @@ void CBEBouquetWidget::renameBouquet()
 {
 	if ((*Bouquets)[selected]->bFav)
 		return;
+#ifdef MARTII
+	if((*Bouquets)[selected]->Name.find("extra.zapit_bouquetname_") == 0)
+		return;
+#endif
 
 	std::string newName = inputName((*Bouquets)[selected]->Name.c_str(), LOCALE_BOUQUETEDITOR_NEWBOUQUETNAME);
 	if (newName != (*Bouquets)[selected]->Name)

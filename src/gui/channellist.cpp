@@ -836,7 +836,11 @@ int CChannelList::show()
 			}
 		}
 
+#ifdef MARTII
+		else if ((msg == CRCInput::RC_info) || (msg == (uint32_t) g_settings.key_help)) {
+#else
 		else if ((msg == CRCInput::RC_info) || (msg == CRCInput::RC_help)) {
+#endif
 			hide();
 			CChannelEvent *p_event=NULL;
 			if (displayNext)
@@ -1188,12 +1192,21 @@ int CChannelList::numericZap(int key)
 		}
 		return res;
 	}
+#ifdef MARTII
+	if ((key == g_settings.key_zaphistory) || (key == g_settings.key_current_transponder)) {
+		if((!autoshift && CNeutrinoApp::getInstance()->recordingstatus) || (key == g_settings.key_current_transponder)) {
+#else
 	if ((key == g_settings.key_zaphistory) || (key == CRCInput::RC_games)) {
 		if((!autoshift && CNeutrinoApp::getInstance()->recordingstatus) || (key == CRCInput::RC_games)) {
+#endif
 			CChannelList * orgList = CNeutrinoApp::getInstance()->channelList;
 			CChannelList * channelList = new CChannelList(g_Locale->getText(LOCALE_CHANNELLIST_CURRENT_TP), false, true);
 
+#ifdef MARTII
+			if(key == g_settings.key_current_transponder) {
+#else
 			if(key == CRCInput::RC_games) {
+#endif
 				t_channel_id recid = chanlist[selected]->channel_id >> 16;
 				for ( unsigned int i = 0 ; i < orgList->chanlist.size(); i++) {
 					if((orgList->chanlist[i]->channel_id >> 16) == recid)

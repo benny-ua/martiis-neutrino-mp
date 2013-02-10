@@ -123,6 +123,9 @@ CPictureViewerGui::~CPictureViewerGui()
 //------------------------------------------------------------------------
 int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 {
+#ifdef MARTII
+	CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+#endif
 	audioplayer = false;
 	if (actionKey == "audio")
 		audioplayer = true;
@@ -214,6 +217,9 @@ int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , m_LastMode );
 
 	// always exit all
+#ifdef MARTII
+	CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+#endif
 	return menu_return::RETURN_REPAINT;
 }
 
@@ -281,7 +287,11 @@ int CPictureViewerGui::show()
 				view(next);
 			}
 		}
+#ifdef MARTII
+		else if (msg == CRCInput::RC_left || msg == (uint32_t) g_settings.key_channelList_pageup)
+#else
 		else if (msg == CRCInput::RC_left)
+#endif
 		{
 			if (!playlist.empty())
 			{
@@ -300,7 +310,11 @@ int CPictureViewerGui::show()
 				}
 			}
 		}
+#ifdef MARTII
+		else if (msg == CRCInput::RC_right || msg == (uint32_t) g_settings.key_channelList_pagedown)
+#else
 		else if (msg == CRCInput::RC_right)
+#endif
 		{
 			if (!playlist.empty())
 			{
@@ -470,7 +484,11 @@ int CPictureViewerGui::show()
 				}
 			}
 		}
+#ifdef MARTII
+		else if (msg==(uint32_t)g_settings.key_help)
+#else
 		else if (msg==CRCInput::RC_help)
+#endif
 		{
 			if (m_state == MENU)
 			{

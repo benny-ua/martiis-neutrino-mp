@@ -51,6 +51,13 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#ifdef MARTII
+#include <libdvbsub/dvbsub.h>
+#include <audio.h>
+#include <driver/volume.h>
+#include <driver/nglcd.h>
+#include <gui/widget/stringinput_ext.h>
+#endif
 
 //extern CPlugins *g_PluginList;
 #ifndef HAVE_COOL_HARDWARE
@@ -63,6 +70,9 @@ extern cVideo * videoDecoder;
 extern CRemoteControl *g_RemoteControl;	/* neutrino.cpp */
 extern CInfoClock *InfoClock;
 extern bool has_hdd;
+#ifdef MARTII
+extern cAudio * audioDecoder;
+#endif
 
 #define TIMESHIFT_SECONDS 3
 
@@ -85,13 +95,38 @@ CMoviePlayerGui::CMoviePlayerGui()
 
 CMoviePlayerGui::~CMoviePlayerGui()
 {
+#ifndef MARTII
 	playback->Close();
+#endif
 	delete moviebrowser;
 	delete filebrowser;
 	delete bookmarkmanager;
+#ifndef MARTII
 	delete playback;
+#endif
 	instance_mp = NULL;
 }
+#ifdef MARTII
+// for libeplayer3/libass subtitles
+static void framebuffer_callback(
+	unsigned char** destination,
+	unsigned int *screen_width,
+	unsigned int *screen_height,
+	unsigned int *destStride,
+	int *framebufferFD)
+{
+	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
+	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer(true);
+	*framebufferFD = frameBuffer->getFileHandle();
+	fb_var_screeninfo s;
+	ioctl(*framebufferFD, FBIOGET_VSCREENINFO, &s);
+	*screen_width = s.xres;
+	*screen_height = s.yres;
+	fb_fix_screeninfo fix;
+	ioctl(*framebufferFD, FBIOGET_FSCREENINFO, &fix);
+	*destStride = fix.line_length;
+}
+#endif
 
 void CMoviePlayerGui::Init(void)
 {
@@ -99,7 +134,9 @@ void CMoviePlayerGui::Init(void)
 
 	frameBuffer = CFrameBuffer::getInstance();
 
+#ifndef MARTII
 	playback = new cPlayback(3);
+#endif
 	moviebrowser = new CMovieBrowser();
 	bookmarkmanager = new CBookmarkManager();
 
@@ -121,8 +158,10 @@ void CMoviePlayerGui::Init(void)
 	tsfilefilter.addFilter("m2ts");
 	tsfilefilter.addFilter("mp4");
 	tsfilefilter.addFilter("mov");
+#ifdef MARTII
 	tsfilefilter.addFilter("m3u");
 	tsfilefilter.addFilter("pls");
+#endif
 #ifdef HAVE_SPARK_HARDWARE
 	tsfilefilter.addFilter("vdr");
 	tsfilefilter.addFilter("flv");
@@ -145,6 +184,10 @@ void CMoviePlayerGui::Init(void)
 	speed = 1;
 	timeshift = 0;
 	numpida = 0;
+#ifdef MARTII
+	numpidd = 0;
+	numpids = 0;
+#endif
 }
 
 void CMoviePlayerGui::cutNeutrino()
@@ -202,6 +245,10 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		perror(MOVIEPLAYER_START_SCRIPT " failed");
 	
 	isMovieBrowser = false;
+#ifdef MARTII
+	bool isHTTP = false;
+	isWebTV = false;
+#endif
 	isBookmark = false;
 	timeshift = 0;
 	if (actionKey == "tsmoviebrowser") {
@@ -223,15 +270,39 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		isBookmark = true;
 	}
 #endif
+#ifdef MARTII
+	else if (actionKey == "netstream" || actionKey == "webtv")
+	{
+		isHTTP = true;
+		isWebTV = actionKey == "webtv";
+		full_name = g_settings.streaming_server_url;
+		file_name = (isWebTV ? g_settings.streaming_server_name : g_settings.streaming_server_url);
+		p_movie_info = NULL;
+		is_file_player = 1;
+		PlayFile (isWebTV);
+	}
+#endif
 	else {
 		return menu_return::RETURN_REPAINT;
 	}
 
+#ifdef MARTII
+	std::string oldservicename = CVFD::getInstance()->getServicename();
+#endif
+#ifdef MARTII
+	if (!isHTTP)
+#endif
 	while(SelectFile()) {
+#ifdef MARTII
+		CVFD::getInstance()->showServicename(full_name.c_str());
+#endif
 		PlayFile();
 		if(timeshift)
 			break;
 	}
+#ifdef MARTII
+	CVFD::getInstance()->showServicename(oldservicename.c_str());
+#endif
 
 	bookmarkmanager->flush();
 
@@ -254,7 +325,11 @@ void CMoviePlayerGui::updateLcd()
 	std::string lcd;
 	std::string name;
 
+#ifdef MARTII
+	if (isMovieBrowser && p_movie_info && strlen(p_movie_info->epgTitle.c_str()) && strncmp(p_movie_info->epgTitle.c_str(), "not", 3))
+#else
 	if (isMovieBrowser && strlen(p_movie_info->epgTitle.c_str()) && strncmp(p_movie_info->epgTitle.c_str(), "not", 3))
+#endif
 		name = p_movie_info->epgTitle;
 	else
 		name = file_name;
@@ -288,6 +363,10 @@ void CMoviePlayerGui::fillPids()
 		return;
 
 	numpida = 0; currentapid = 0;
+#ifdef MARTII
+	numpidd = 0; currentdpid = 0xffff;
+	numpids = 0; currentspid = 0xffff;
+#endif
 	if(!p_movie_info->audioPids.empty()) {
 		currentapid = p_movie_info->audioPids[0].epgAudioPid;
 		currentac3 = p_movie_info->audioPids[0].atype;
@@ -317,6 +396,20 @@ bool CMoviePlayerGui::SelectFile()
 		language[i].clear();
 	}
 	numpida = 0; currentapid = 0;
+#ifdef MARTII
+	// clear subtitlepids
+	for (int i = 0; i < numpids; i++) {
+		spids[i] = 0;
+		slanguage[i].clear();
+	}
+	numpids = 0; currentspid = 0xffff;
+	// clear dvbsubtitlepids
+	for (int i = 0; i < numpidd; i++) {
+		dpids[i] = 0;
+		dlanguage[i].clear();
+	}
+	numpidd = 0; currentdpid = 0xffff;
+#endif
 
 	is_file_player = false;
 	p_movie_info = NULL;
@@ -424,7 +517,11 @@ bool CMoviePlayerGui::SelectFile()
 	return ret;
 }
 
+#ifdef MARTII
+void CMoviePlayerGui::PlayFile(bool doCutNeutrino)
+#else
 void CMoviePlayerGui::PlayFile(void)
+#endif
 {
 	neutrino_msg_t msg;
 	neutrino_msg_data_t data;
@@ -442,7 +539,14 @@ void CMoviePlayerGui::PlayFile(void)
 	printf("Startplay at %d seconds\n", startposition/1000);
 	handleMovieBrowser(CRCInput::RC_nokey, position);
 
+#ifdef MARTII
+	if(doCutNeutrino)
+#endif
 	cutNeutrino();
+#ifdef MARTII
+	playback = new cPlayback(3, &framebuffer_callback);
+	playback->SetTeletextPid(0);
+#endif
 	playback->Open(is_file_player ? PLAYMODE_FILE : PLAYMODE_TS);
 
 	printf("IS FILE PLAYER: %s\n", is_file_player ?  "true": "false" );
@@ -454,9 +558,33 @@ void CMoviePlayerGui::PlayFile(void)
 	}
 
 	file_prozent = 0;
+#ifdef MARTII
+	CFrameBuffer::Mode3D old3dmode = frameBuffer->get3DMode();
+//	if (p_movie_info  && p_movie_info->epgId)
+//		g_Zapit->getVolumePercent((unsigned int *) &g_settings.current_volume_percent, p_movie_info->epgId, currentapid, currentac3 == 1);
+#ifdef ENABLE_GRAPHLCD
+	nGLCD::MirrorOSD(false);
+	if (p_movie_info)
+		nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
+#endif
+#endif
 	if(!playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration)) {
 		playback->Close();
 	} else {
+#ifdef MARTII
+		if(!numpida){
+			playback->FindAllPids(apids, ac3flags, &numpida, language);
+			if (p_movie_info)
+				for (int i = 0; i < numpida; i++) {
+					EPG_AUDIO_PIDS pids;
+					pids.epgAudioPid = apids[i];
+					pids.selected = 0;
+					pids.atype = ac3flags[i];
+					pids.epgAudioPidName = language[i];
+					p_movie_info->audioPids.push_back(pids);
+				}
+		}
+#endif
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, true);
 		if(timeshift) {
@@ -499,6 +627,10 @@ void CMoviePlayerGui::PlayFile(void)
 
 	while (playstate >= CMoviePlayerGui::PLAY)
 	{
+#ifdef MARTII
+		if (p_movie_info)
+			nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle, duration ? (100 * position / duration) : 0);
+#endif
 		if (update_lcd) {
 			update_lcd = false;
 			updateLcd();
@@ -511,6 +643,9 @@ void CMoviePlayerGui::PlayFile(void)
 		g_RCInput->getMsg(&msg, &data, 10);	// 1 secs..
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
+#ifdef MARTII
+			if (!isWebTV)
+#endif
 			if(playback->GetPosition(position, duration)) {
 				if(duration > 100)
 					file_prozent = (unsigned char) (position / (duration / 100));
@@ -519,8 +654,10 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 
 				playback->GetSpeed(speed);
+#ifndef MARTII
 #ifdef DEBUG
 				printf("CMoviePlayerGui::PlayFile: speed %d position %d duration %d (%d, %d%%)\n", speed, position, duration, duration-position, file_prozent);
+#endif
 #endif
 				/* in case ffmpeg report incorrect values */
 				int posdiff = duration - position;
@@ -541,6 +678,20 @@ void CMoviePlayerGui::PlayFile(void)
 			//g_PluginList->start_plugin_by_name (g_settings.movieplayer_plugin.c_str (), pidt);
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_stop) {
 			playstate = CMoviePlayerGui::STOPPED;
+#ifdef MARTII
+		} else if (msg == (neutrino_msg_t) CRCInput::RC_home) {
+			playstate = CMoviePlayerGui::STOPPED;
+		} else if (msg == (neutrino_msg_t) g_settings.mpkey_next3dmode) {
+			frameBuffer->set3DMode((CFrameBuffer::Mode3D)(((frameBuffer->get3DMode()) + 1) % CFrameBuffer::Mode3D_SIZE));
+		} else if( msg == (neutrino_msg_t) g_settings.key_next43mode) {
+			g_videoSettings->next43Mode();
+		} else if( msg == (neutrino_msg_t) g_settings.key_switchformat) {
+			g_videoSettings->SwitchFormat();
+		} else if (msg == (neutrino_msg_t) CRCInput::RC_setup) {
+			StopSubtitles(true);
+			CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::SHOW_MAINSETTINGS, 0);
+			StartSubtitles();
+#endif
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_play) {
 			if (playstate > CMoviePlayerGui::PLAY) {
 				update_lcd = true;
@@ -573,7 +724,13 @@ void CMoviePlayerGui::PlayFile(void)
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
 			handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_bookmark, position);
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_audio) {
+#ifdef MARTII
+			StopSubtitles(true);
+#endif
 			selectAudioPid(is_file_player);
+#ifdef MARTII
+			StartSubtitles();
+#endif
 			update_lcd = true;
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_time) {
 			FileTime.switchMode(position, duration);
@@ -622,14 +779,45 @@ void CMoviePlayerGui::PlayFile(void)
 			playback->SetPosition(-10 * 1000);
 		} else if (msg == CRCInput::RC_0) {	// cancel bookmark jump
 			handleMovieBrowser(CRCInput::RC_0, position);
+#ifdef MARTII
+		} else if (msg == (neutrino_msg_t) g_settings.mpkey_goto) {
+			char Value[10];
+			bool cancel = true;
+			playback->GetPosition(position, duration);
+			int ss = position/1000;
+			int hh = ss/3600;
+			ss -= hh * 3600;
+			int mm = ss/60;
+			ss -= mm * 60;
+#if 1 // eplayer lacks precision, omit seconds
+			snprintf(Value, sizeof(Value), "%.2d:%.2d", hh, mm);
+			ss = 0;
+#else
+			snprintf(Value, sizeof(Value), "%.2d:%.2d:%.2d", hh, mm, ss);
+#endif
+			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
+			jumpTime.exec(NULL, "");
+			jumpTime.hide();
+			if (!cancel && ((3 == sscanf(Value, "%d:%d:%d", &hh, &mm, &ss)) || (2 == sscanf(Value, "%d:%d", &hh, &mm))))
+				playback->SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
+		} else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
+#else
 		} else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
+#endif
 			callInfoViewer(duration, position);
 			update_lcd = true;
 			//showHelpTS();
+#ifdef MARTII
+		} else if(timeshift && (((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt) && (!p_movie_info || !p_movie_info->epgVTXPID)) || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
+#else
 		} else if(timeshift && (msg == CRCInput::RC_text || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
+#endif
 			bool restore = FileTime.IsVisible();
 			FileTime.hide();
 
+#ifdef MARTII
+			StopSubtitles(true);
+#endif
 			if( msg == CRCInput::RC_epg )
 				g_EventList->exec(CNeutrinoApp::getInstance()->channelList->getActiveChannel_ChannelID(), CNeutrinoApp::getInstance()->channelList->getActiveChannelName());
 			else if(msg == NeutrinoMessages::SHOW_EPG)
@@ -639,7 +827,16 @@ void CMoviePlayerGui::PlayFile(void)
 					tuxtxt_stop();
 				tuxtx_main(g_RCInput->getFileHandle(), g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
 				frameBuffer->paintBackground();
+#ifdef MARTII
+				//purge input queue
+				do
+					g_RCInput->getMsg(&msg, &data, 1);
+				while (msg != CRCInput::RC_timeout);
+#endif
 			}
+#ifdef MARTII
+			StartSubtitles();
+#endif
 			if(restore)
 				FileTime.show(position);
 #ifdef SCREENSHOT
@@ -671,6 +868,21 @@ void CMoviePlayerGui::PlayFile(void)
 			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
 				sc->EnableVideo(true);
 			sc->Start();
+#endif
+#ifdef MARTII
+		} else if (p_movie_info && p_movie_info->epgVTXPID && (msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
+			if(g_settings.cacheTXT)
+				tuxtxt_stop();
+			playback->SetTeletextPid(p_movie_info->epgVTXPID);
+			StopSubtitles(true);
+			tuxtx_main(g_RCInput->getFileHandle(), p_movie_info->epgVTXPID, 0, 2, true);
+			StartSubtitles();
+			playback->SetTeletextPid(0);
+			frameBuffer->paintBackground();
+			//purge input queue
+			do
+				g_RCInput->getMsg(&msg, &data, 1);
+			while (msg != CRCInput::RC_timeout);
 #endif
 
 		} else if ( msg == NeutrinoMessages::ANNOUNCE_RECORD ||
@@ -707,15 +919,27 @@ void CMoviePlayerGui::PlayFile(void)
 			handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_stop, position);
 		}
 	}
+#ifdef MARTII
+	frameBuffer->set3DMode(old3dmode);
+	if (p_movie_info)
+		nGLCD::unlockChannel();
+#endif
 
 	FileTime.hide();
 
 	playback->SetSpeed(1);
 	playback->Close();
+#ifdef MARTII
+	delete playback;
+	playback = NULL;
+#endif
 
 	CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, false);
 	CVFD::getInstance()->ShowIcon(VFD_ICON_PAUSE, false);
 
+#ifdef MARTII
+	if(doCutNeutrino)
+#endif
 	restoreNeutrino();
 
 	if (g_settings.mode_clock)
@@ -772,7 +996,11 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool fil
 			enabled = false;
 			break;
 		case 3: /*MP2*/
+#ifdef MARTII
+				apidtitle.append(" (MP2)");
+#else
 			apidtitle.append("( MP2)");
+#endif
 			break;
 		case 4: /*MP3*/
 			apidtitle.append(" (MP3)");
@@ -838,11 +1066,26 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	int select = -1;
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
+#ifdef MARTII
+	if(!numpida){
+		playback->FindAllPids(apids, ac3flags, &numpida, language);
+		if(numpida)
+			currentapid = apids[0];
+	}
+	std::string apidtitles[numpida];
+	if (!numpids) {
+		playback->FindAllSubtitlePids(spids, &numpids, slanguage);
+	} else if (!numpidd) {
+		// take pids from stream, for both movieplayer and fileplayer
+		playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
+	}
+#else
 	if(file_player && !numpida){
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
 		if(numpida)
 			currentapid = apids[0];
 	}
+#endif
 	for (unsigned int count = 0; count < numpida; count++) {
 		bool name_ok = false;
 		bool enabled = true;
@@ -856,11 +1099,20 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 			apidtitle = language[count];
 			name_ok = true;
 		}
+#ifdef MARTII
+		char apidnumber[20];
+#endif
 		if (!name_ok) {
+#ifndef MARTII
 			char apidnumber[20];
+#endif
 			sprintf(apidnumber, "Stream %d %X", count + 1, apids[count]);
 			apidtitle = apidnumber;
 		}
+#ifdef MARTII
+		if (p_movie_info && p_movie_info->epgId)
+			apidtitles[count] = std::string(apidtitle);
+#endif
 		addAudioFormat(count, apidtitle, file_player, enabled);
 		if(defpid && !enabled && (count < numpida)){
 			currentapid = apids[count+1];
@@ -888,11 +1140,73 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		}
 	}
 
+#ifdef MARTII
+	unsigned int shortcut_num = numpida + 1;
+	currentdpid = playback->GetDvbsubtitlePid();
+	currentspid = playback->GetSubtitlePid();
+	if (numpidd > 0 || numpids > 0)
+		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
+
+	CMPSubtitleChangeExec SubtitleChanger;
+	SubtitleChanger.playback = playback;
+
+	for (unsigned int count = 0; count < numpidd; count++) {
+		char spid[10];
+		snprintf(spid,sizeof(spid), "DVB:%d", dpids[count]);
+		char item[64];
+		snprintf(item,sizeof(item), "DVB: %s (track %x)", dlanguage[count].c_str(), dpids[count]);
+		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, dpids[count] != currentdpid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		shortcut_num++;
+	}
+	for (unsigned int count = 0; count < numpids; count++) {
+		char spid[10];
+		snprintf(spid,sizeof(spid), "SUB:%d", spids[count]);
+		char item[64];
+		snprintf(item,sizeof(item), "SUB: %s (track %x)", slanguage[count].c_str(), spids[count]);
+		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, spids[count] != currentspid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		shortcut_num++;
+	}
+	if (numpidd > 0)
+		APIDSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
+	if (numpidd > 0 || numpids > 0)
+		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
+
+#if 0
+	if (p_movie_info && p_movie_info->epgId) {
+		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
+
+		int percent[numpida];
+		for(unsigned int count = 0; count < numpida; count++ ) {
+			g_Zapit->getVolumePercent((unsigned int *) &percent[count], p_movie_info->epgId, apids[count], ac3flags[count] == 1);
+			int is_active = currentapid == apids[count];
+			APIDSelector.addItem(new CMenuOptionNumberChooser(NONEXISTANT_LOCALE, &percent[count],
+				is_active, 0, 999, audioSetupNotifierVolPercent, 0, 0, NONEXISTANT_LOCALE, apidtitles[count].c_str()));
+			if (is_active)
+				g_settings.current_volume_percent = percent[count];
+		}
+	}
+#endif
+#endif
 	APIDSelector.exec(NULL, "");
 	delete selector;
+#ifdef MARTII
+	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
 	printf("CMoviePlayerGui::selectAudioPid: selected %d (%x) current %x\n", select, (select >= 0) ? apids[select] : -1, currentapid);
+#else
+	printf("CMoviePlayerGui::selectAudioPid: selected %d (%x) current %x\n", select, (select >= 0) ? apids[select] : -1, currentapid);
+#endif
+#ifdef MARTII
+	if((select >= 0) && (select <= numpida) && (currentapid != apids[select])) {
+#else
 	if((select >= 0) && (currentapid != apids[select])) {
+#endif
 		currentapid = apids[select];
+#ifdef MARTII
+#if 0
+		if (p_movie_info && p_movie_info->epgId)
+			audioSetupNotifierVolPercent->setAPid(currentapid);
+#endif
+#endif
 		currentac3 = ac3flags[select];
 		playback->SetAPid(currentapid, currentac3);
 		printf("[movieplayer] apid changed to %d type %d\n", currentapid, currentac3);
@@ -1170,3 +1484,38 @@ void CMoviePlayerGui::showHelpTS()
 	helpbox.addLine(g_Locale->getText(LOCALE_MOVIEPLAYER_TSHELP12));
 	helpbox.show(LOCALE_MESSAGEBOX_INFO);
 }
+#ifdef MARTII
+void CMoviePlayerGui::StopSubtitles(bool b)
+{
+	printf("[neutrino] %s\n", __FUNCTION__);
+	//int ttx, ttxpid, ttxpage;
+	int dvbpid;
+
+	dvbpid = dvbsub_getpid();
+	//tuxtx_subtitle_running(&ttxpid, &ttxpage, &ttx);
+	if(dvbpid)
+		dvbsub_pause();
+	playback->SuspendSubtitle(true);
+//	if(ttx) {
+//		tuxtx_pause_subtitle(true);
+//		frameBuffer->paintBackground();
+//	}
+#ifdef ENABLE_GRAPHLCD
+	if (b)
+		nGLCD::MirrorOSD();
+#endif
+}
+
+void CMoviePlayerGui::StartSubtitles(bool show)
+{
+	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
+#ifdef ENABLE_GRAPHLCD
+	nGLCD::MirrorOSD(false);
+#endif
+	if(!show)
+		return;
+	dvbsub_start(0, true);
+//	tuxtx_pause_subtitle(false);
+	playback->SuspendSubtitle(false);
+}
+#endif

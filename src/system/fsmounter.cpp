@@ -260,6 +260,9 @@ CFSMounter::MountRes CFSMounter::mount(const char * const ip, const char * const
 		cmd += username;
 		cmd += ",password=";
 		cmd += password;
+#ifdef MARTII
+		cmd += ",iocharset=utf8";
+#endif
 		//cmd += ",unc=//"; for whats needed?
 		//cmd += ip;
 		//cmd += '/';
@@ -328,6 +331,29 @@ bool CFSMounter::automount()
 	}
 	return res;
 }
+#ifdef MARTII
+static pthread_t automount_threadid = 0;
+
+void *CFSMounter::automount_thread(void *)
+{
+	CFSMounter::automount();
+	pthread_exit(NULL);
+}
+
+void CFSMounter::automount_async_start()
+{
+	if (!automount_threadid)
+		pthread_create(&automount_threadid, 0, automount_thread, NULL);
+}
+
+void CFSMounter::automount_async_stop()
+{
+	if (automount_threadid) {
+		pthread_join(automount_threadid, NULL);
+		automount_threadid = 0;
+	}
+}
+#endif
 
 CFSMounter::UMountRes CFSMounter::umount(const char * const dir)
 {

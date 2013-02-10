@@ -138,7 +138,11 @@ class CRCInput
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
 #ifdef HAVE_SPARK_HARDWARE
+#ifdef MARTII
+#define NUMBER_OF_EVENT_DEVICES 1
+#else
 #define NUMBER_OF_EVENT_DEVICES 2
+#endif
 #else
 #define NUMBER_OF_EVENT_DEVICES 1
 #endif
@@ -223,7 +227,11 @@ class CRCInput
 			RC_forward	= KEY_FORWARD,
 			RC_rewind	= KEY_REWIND,
 			RC_stop		= KEY_STOP,
+#ifdef MARTII
+			RC_timeshift	= KEY_T,
+#else
 			RC_timeshift	= KEY_TIME,
+#endif
 			RC_mode		= KEY_MODE,
 			RC_games	= KEY_GAMES,
 			RC_next		= KEY_NEXT,
@@ -249,6 +257,24 @@ class CRCInput
 			RC_zoomin	= KEY_ZOOMIN,
 			RC_zoomout	= KEY_ZOOMOUT,
 
+#ifdef MARTII
+			/* SPARK keys */
+			RC_find		= KEY_FIND,
+			RC_pip		= KEY_PRESENTATION,
+			RC_archive	= KEY_ARCHIVE,
+			RC_fastforward	= KEY_FASTFORWARD,
+			RC_slow		= KEY_SLOW,
+			RC_playmode	= KEY_P,
+			RC_usb		= KEY_CLOSE,
+			RC_f1		= KEY_F1,
+			RC_f2		= KEY_F2,
+			RC_f3		= KEY_F3,
+			RC_f4		= KEY_F4,
+			RC_prog1	= KEY_PROG1,
+			RC_prog2	= KEY_PROG2,
+			RC_prog3	= KEY_PROG3,
+			RC_prog4	= KEY_PROG4,
+#endif
 			RC_timeout	= 0xFFFFFFFF,
 			RC_nokey	= 0xFFFFFFFE
 		};

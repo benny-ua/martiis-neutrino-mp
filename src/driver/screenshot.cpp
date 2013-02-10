@@ -21,6 +21,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef MARTII
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -402,3 +403,4 @@ void CScreenShot::MakeFileName(const t_channel_id channel_id)
 	printf("CScreenShot::MakeFileName: [%s]\n", fname);
 	filename = std::string(fname);
 }
+#endif

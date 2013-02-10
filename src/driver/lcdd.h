@@ -63,6 +63,9 @@ typedef enum
 	VFD_ICON_CAM1       = 0x0B000001,
 	VFD_ICON_COL2       = 0x0B000002,
 	VFD_ICON_CAM2       = 0x0C000001
+#ifdef MARTII
+	, VFD_ICON_RECORD
+#endif
 } vfd_icon;
 
 #ifdef LCD_UPDATE
@@ -173,6 +176,16 @@ class CLCD
 		void setled(int red, int green);
 		static void	*TimeThread(void *);
 		pthread_t	thrTime;
+#ifdef MARTII
+		int		fd;
+		int		time_notify_reader;
+		int		time_notify_writer;
+		int		waitSec;
+		bool		showclock;
+		bool		timeThreadRunning;
+		unsigned int	timeout_cnt;
+		int		vfd_version;
+#endif
 		bool		thread_running;
 #endif
 	public:
@@ -180,6 +193,9 @@ class CLCD
 		void wake_up();
 		void setled(void) { return; };
 		void setlcdparameter(void);
+#ifdef MARTII
+		void setlcdparameter(int, int);
+#endif
 
 		static CLCD* getInstance();
 		void init(const char * fontfile, const char * fontname,
@@ -190,6 +206,9 @@ class CLCD
 		MODES getMode() { return mode; };
 
 		void showServicename(const std::string name, const bool clear_epg = false);
+#ifdef MARTII
+		std::string getServicename(void) { return servicename; }
+#endif
 		void setEPGTitle(const std::string title);
 		void setMovieInfo(const AUDIOMODES playmode, const std::string big, const std::string small, const bool centered = false);
 		void setMovieAudio(const bool is_ac3);
@@ -227,14 +246,22 @@ class CLCD
 
 		void setMuted(bool);
 
+#ifdef MARTII
+		void resume(bool showLastServiceName = false);
+#else
 		void resume();
+#endif
 		void pause();
 
 		void Lock();
 		void Unlock();
 		void Clear();
 		void ShowIcon(vfd_icon icon, bool show);
+#ifdef MARTII
+		void ShowText(const char * str, bool rescheduleTime = true);
+#else
 		void ShowText(const char *s) { showServicename(std::string(s), true); };
+#endif
 #ifndef HAVE_TRIPLEDRAGON
 		~CLCD();
 #endif

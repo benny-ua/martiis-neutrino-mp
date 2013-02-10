@@ -63,9 +63,15 @@
 #include <gui/filebrowser.h>
 
 #include <driver/screen_max.h>
+#ifdef SCREENSHOT
 #include <driver/screenshot.h>
+#endif
 
 #include <system/debug.h>
+#ifdef MARTII
+#include <sys/socket.h>
+#include <sys/un.h>
+#endif
 
 
 CKeybindSetup::CKeybindSetup()
@@ -183,10 +189,26 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_MPKEY_AUDIO,			&g_settings.mpkey_audio, 		LOCALE_MENU_HINT_KEY_MPAUDIO },
 	{LOCALE_MPKEY_TIME,			&g_settings.mpkey_time,			LOCALE_MENU_HINT_KEY_MPTIME },
 	{LOCALE_MPKEY_BOOKMARK,			&g_settings.mpkey_bookmark, 		LOCALE_MENU_HINT_KEY_MPBOOKMARK },
+#ifdef MARTII
+	{LOCALE_MPKEY_GOTO,			&g_settings.mpkey_goto,	 		NONEXISTANT_LOCALE},
+	{LOCALE_MPKEY_NEXT3DMODE,		&g_settings.mpkey_next3dmode,		NONEXISTANT_LOCALE},
+	{LOCALE_MPKEY_VTXT,			&g_settings.mpkey_vtxt,	 		NONEXISTANT_LOCALE},
+#endif
 	{LOCALE_EXTRA_KEY_TIMESHIFT,		&g_settings.key_timeshift,  		LOCALE_MENU_HINT_KEY_MPTIMESHIFT },
 	{LOCALE_MPKEY_PLUGIN,			&g_settings.mpkey_plugin,		LOCALE_MENU_HINT_KEY_MPPLUGIN },
 	/*{LOCALE_EXTRA_KEY_PLUGIN,		&g_settings.key_plugin,			},*/
 	{LOCALE_EXTRA_KEY_UNLOCK,		&g_settings.key_unlock,			LOCALE_MENU_HINT_KEY_UNLOCK},
+#ifdef MARTII
+	{LOCALE_EXTRA_KEY_TIMERLIST,		&g_settings.key_timerlist,		NONEXISTANT_LOCALE},
+	{LOCALE_EXTRA_KEY_SHOWCLOCK,		&g_settings.key_showclock,		NONEXISTANT_LOCALE},
+	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
+	{LOCALE_EXTRA_KEY_NEXT43MODE,		&g_settings.key_next43mode,		NONEXISTANT_LOCALE},
+	{LOCALE_EXTRA_KEY_SWITCHFORMAT,		&g_settings.key_switchformat,		NONEXISTANT_LOCALE},
+	{LOCALE_HDD_SETTINGS,			&g_settings.key_hddmenu,		NONEXISTANT_LOCALE},
+	{LOCALE_MOVIEBROWSER_HEAD,		&g_settings.key_tsplayback,		NONEXISTANT_LOCALE},
+	{LOCALE_MOVIEPLAYER_FILEPLAYBACK,	&g_settings.key_fileplayback,		NONEXISTANT_LOCALE},
+	{LOCALE_AUDIOPLAYER_NAME,		&g_settings.key_audioplayback,		NONEXISTANT_LOCALE},
+#endif
 	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT }
 };
 
@@ -205,7 +227,11 @@ int CKeybindSetup::showKeySetup()
 
 	//keysetup menu
 	CMenuWidget* keySettings = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP);
+#ifdef MARTII
+	keySettings->addIntroItems(LOCALE_MAINSETTINGS_KEYBINDING, LOCALE_KEYBINDINGMENU_HEAD);
+#else
 	keySettings->addIntroItems(LOCALE_MAINSETTINGS_KEYBINDING);
+#endif
 
 	//keybindings menu
 	CMenuWidget bindSettings(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING);
@@ -215,10 +241,17 @@ int CKeybindSetup::showKeySetup()
 	showKeyBindSetup(&bindSettings);
 	CMenuForwarder * mf;
 
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_EDIT, true, NULL, &bindSettings, NULL, CRCInput::convertDigitToKey(shortcut++));
+	mf->setHint("", LOCALE_MENU_HINT_KEY_BINDING);
+	keySettings->addItem(mf);
+	keySettings->addItem(GenericMenuSeparator);
+#else
 	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_HEAD, true, NULL, &bindSettings, NULL, CRCInput::convertDigitToKey(shortcut++));
 	mf->setHint("", LOCALE_MENU_HINT_KEY_BINDING);
 	keySettings->addItem(mf);
 	keySettings->addItem(GenericMenuSeparator);
+#endif
 
 	mf = new CMenuForwarder(LOCALE_EXTRA_LOADKEYS, true, NULL, this, "loadkeys", CRCInput::convertDigitToKey(shortcut++));
 	mf->setHint("", LOCALE_MENU_HINT_KEY_LOAD);
@@ -233,6 +266,10 @@ int CKeybindSetup::showKeySetup()
 	CStringInput keySettings_repeatBlocker(LOCALE_KEYBINDINGMENU_REPEATBLOCK, g_settings.repeat_blocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
 
 	keySettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_RC));
+#ifdef MARTII
+	g_settings.accept_other_remotes = access("/etc/lircd_predata_lock", R_OK) ? 1 : 0;
+	keySettings->addItem(new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES, &g_settings.accept_other_remotes, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this));
+#endif
 	if (RC_HW_SELECT) {
 		CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE, &g_settings.remote_control_hardware, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTIONS, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTION_COUNT, true);
 		mc->setHint("", LOCALE_MENU_HINT_KEY_HARDWARE);
@@ -303,6 +340,24 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", LOCALE_MENU_HINT_KEY_MOVIEPLAYER);
 	bindSettings->addItem(mf);
 
+#ifdef MARTII
+	//video
+	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VIDEO));
+	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++)
+		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
+
+	//multimedia
+	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MULTIMEDIA));
+	for (int i = KEY_MOVIEPLAYER; i <= KEY_AUDIOPLAYER; i++)
+		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
+
+	//navigation
+	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_NAVIGATION));
+	for (int i = KEY_PAGE_UP; i <= KEY_PAGE_DOWN; i++)
+		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
+	bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+	bindSettings->addItem(new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV, &g_settings.mode_left_right_key_tv, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_OPTIONS, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_COUNT, true));
+#endif
 	//misc
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MISC));
 	//bindSettings->addItem(new CMenuDForwarder(keydescription[KEY_PLUGIN], true, NULL, keychooser[KEY_PLUGIN]));
@@ -311,10 +366,16 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", key_settings[KEY_UNLOCK].hint);
 	bindSettings->addItem(mf);
 	// screenshot
-#ifdef SCREENSHOT
+#if defined(MARTII) || defined (SCREENSHOT)
 	mf = new CMenuDForwarder(key_settings[KEY_SCREENSHOT].keydescription, true, keychooser[KEY_SCREENSHOT]->getKeyName(), keychooser[KEY_SCREENSHOT]);
 	mf->setHint("", key_settings[KEY_SCREENSHOT].hint);
 	bindSettings->addItem(mf);
+#endif
+#ifdef MARTII
+	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_TIMERLIST].keydescription, true, keychooser[KEY_TIMERLIST]->getKeyName(), keychooser[KEY_TIMERLIST]));
+	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_SHOWCLOCK].keydescription, true, keychooser[KEY_SHOWCLOCK]->getKeyName(), keychooser[KEY_SHOWCLOCK]));
+	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
+	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_HDDMENU].keydescription, true, keychooser[KEY_HDDMENU]->getKeyName(), keychooser[KEY_HDDMENU]));
 #endif
 
 	//bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_ZAP_CYCLE, &g_settings.zap_cycle, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
@@ -356,7 +417,11 @@ void CKeybindSetup::showKeyBindChannellistSetup(CMenuWidget *bindSettings_chlist
 	CMenuOptionChooser *oj = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_BOUQUETHANDLING, &g_settings.bouquetlist_mode, KEYBINDINGMENU_BOUQUETHANDLING_OPTIONS, KEYBINDINGMENU_BOUQUETHANDLING_OPTION_COUNT, true );
 	bindSettings_chlist->addItem(oj);
 #endif
+#ifdef MARTII
+	for (int i = KEY_LIST_START; i <= KEY_CURRENT_TRANSPONDER; i++) {
+#else
 	for (int i = KEY_PAGE_UP; i <= KEY_CURRENT_TRANSPONDER; i++) {
+#endif
 		CMenuForwarder * mf = new CMenuDForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_chlist->addItem(mf);
@@ -391,6 +456,28 @@ void CKeybindSetup::showKeyBindMovieplayerSetup(CMenuWidget *bindSettings_mplaye
 
 bool CKeybindSetup::changeNotify(const neutrino_locale_t OptionName, void * /* data */)
 {
+#ifdef MARTII
+	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES)) {
+		struct sockaddr_un sun;
+		memset(&sun, 0, sizeof(sun));
+		sun.sun_family = AF_UNIX;
+		strcpy(sun.sun_path, "/var/run/lirc/lircd");
+		int lircd_sock = socket(AF_UNIX, SOCK_STREAM, 0);
+		if (lircd_sock > -1) {
+			if (!connect(lircd_sock, (struct sockaddr *) &sun, sizeof(sun))) {
+				if (g_settings.accept_other_remotes)
+					write(lircd_sock, "PREDATA_UNLOCK\n", 16);
+				else
+					write(lircd_sock, "PREDATA_LOCK\n", 14);
+			}
+			close(lircd_sock);
+		}
+		// work around junk data sent by vfd controller
+		sleep(2);
+		g_RCInput->clearRCMsg();
+		return false;
+	}
+#endif
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_REPEATBLOCK)) {
 		unsigned int fdelay = atoi(g_settings.repeat_blocker);

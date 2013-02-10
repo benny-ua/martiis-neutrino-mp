@@ -1,3 +1,6 @@
+#ifdef MARTII
+#include <aotom_main.h>
+#else
 /* ugly: this is copied from frontcontroller utility, but the driver
  * does not seem to provide userspace headers... :-( */
 
@@ -58,4 +61,5 @@ struct aotom_ioctl_data {
 #define VFDDISPLAYCHARS 0xc0425a00
 #define VFDDISPLAYCLR   0xc0425b00
 #define VFDSETMODE      0xc0425aff
+#endif
 

@@ -60,6 +60,12 @@ typedef struct fb_var_screeninfo t_fb_var_screeninfo;
 #ifdef USE_OPENGL
 class GLThreadObj;
 #endif
+#ifdef MARTII
+# ifdef HAVE_SPARK_HARDWARE
+#  define DEFAULT_XRES 1280
+#  define DEFAULT_YRES 720
+# endif
+#endif
 
 class CFrameBuffer;
 class CFbAccel
@@ -90,6 +96,17 @@ class CFbAccel
 		void update();
 #ifdef USE_NEVIS_GXA
 		void setupGXA(void);
+#endif
+#ifdef MARTII
+		int sX, sY, eX, eY;
+		int startX, startY, endX, endY;
+		t_fb_var_screeninfo s;
+		fb_pixel_t borderColor, borderColorOld;
+		void blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
+		void resChange(void);
+		void blitBB2FB(int fx0, int fy0, int fx1, int fy1, int tx0, int ty0, int tx1, int ty2);
+		void blitFB2FB(int fx0, int fy0, int fx1, int fy1, int tx0, int ty0, int tx1, int ty2);
+		void blitBoxFB(int x0, int y0, int x1, int y1, fb_pixel_t color);
 #endif
 };
 
@@ -173,7 +190,11 @@ class CFrameBuffer
 		int getFileHandle() const; //only used for plugins (games) !!
 		t_fb_var_screeninfo *getScreenInfo();
 
+#ifdef MARTII
+		fb_pixel_t * getFrameBufferPointer(bool real = false); // pointer to framebuffer
+#else
 		fb_pixel_t * getFrameBufferPointer() const; // pointer to framebuffer
+#endif
 		fb_pixel_t * getBackBufferPointer() const;  // pointer to backbuffer
 		unsigned int getStride() const;             // size of a single line in the framebuffer (in bytes)
 		unsigned int getScreenWidth(bool real = false);
@@ -272,6 +293,26 @@ class CFrameBuffer
 			};
 		void SetTransparent(int t){ m_transparent = t; }
 		void SetTransparentDefault(){ m_transparent = m_transparent_default; }
+#ifdef MARTII
+		bool OSDShot(const std::string &name);
+#if HAVE_SPARK_HARDWARE
+
+		enum Mode3D { Mode3D_off = 0, Mode3D_SideBySide, Mode3D_TopAndBottom, Mode3D_Tile, Mode3D_SIZE };
+		void set3DMode(Mode3D);
+		Mode3D get3DMode(void);
+	private:
+		enum Mode3D mode3D;
+
+	public:
+		void blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
+		fb_pixel_t getBorderColor(void) { return accel->borderColor; };
+		void setBorderColor(fb_pixel_t col = 0);
+		void setBorder(int sx, int sy, int ex, int ey);
+		void getBorder(int &sx, int &sy, int &ex, int &ey) { sx = accel->startX, sy = accel->startY, ex = accel->endX, ey = accel->endY;};
+		void resChange(void) { this->accel->resChange(); };
+		void ClearFB(void) { accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0); };
+# endif
+#endif
 };
 
 #endif

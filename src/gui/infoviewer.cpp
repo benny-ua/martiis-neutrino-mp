@@ -519,7 +519,11 @@ void CInfoViewer::showMovieTitle(const int playState, const std::string &Channel
 		CMoviePlayerGui::getInstance().file_prozent = 100;
 
 	char runningRest[32]; // %d can be 10 digits max...
+#ifdef MARTII
+	snprintf(runningRest, sizeof(runningRest), "%d / %d min", (curr_pos + 30000) / 60000, (duration - curr_pos + 30000) / 60000);
+#else
 	sprintf(runningRest, "%d / %d min", (curr_pos + 30000) / 60000, (duration + 30000) / 60000);
+#endif
 	display_Info(g_file_epg.c_str(), g_file_epg1.c_str(), true, false, CMoviePlayerGui::getInstance().file_prozent, NULL, runningRest);
 
 	const char *playicon = NULL;
@@ -812,7 +816,11 @@ void CInfoViewer::loop(bool show_dot)
 			g_RCInput->postMsg (msg, 0);
 			res = messages_return::cancel_info;
 		}
+#ifdef MARTII
+		else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
+#else
 		else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
+#endif
 			g_RCInput->postMsg (NeutrinoMessages::SHOW_EPG, 0);
 			res = messages_return::cancel_info;
 		} else if ((msg == NeutrinoMessages::EVT_TIMER) && (data == fader.GetTimer())) {
@@ -824,6 +832,11 @@ void CInfoViewer::loop(bool show_dot)
 			else
 				res = messages_return::cancel_info;
 		} else if ((msg == NeutrinoMessages::EVT_TIMER) && (data == sec_timer_id)) {
+#ifdef MARTII
+			// doesn't belong here, but easiest way to check for a change ...
+			if (is_visible && showButtonBar)
+				infoViewerBB->showIcon_CA_Status(0);
+#endif
 			showSNR ();
 			paintTime (show_dot, false);
 			showRecordIcon (show_dot);
@@ -1798,7 +1811,11 @@ int CInfoViewer::showChannelLogo(const t_channel_id logo_channel_id, const int c
 
 	std::string strAbsIconPath;
 
+#ifdef MARTII
+	int logo_w = 0, logo_h = 0;
+#else
 	int logo_w, logo_h;
+#endif
 	int logo_x = 0, logo_y = 0;
 	int res = 0;
 	int start_x = ChanNameX;
@@ -1811,11 +1828,21 @@ int CInfoViewer::showChannelLogo(const t_channel_id logo_channel_id, const int c
 	if (! logo_available)
 		return 0;
 
+#ifdef MARTII
+	if ((logo_w < 1) || (logo_h < 1)) // corrupt logo size?
+#else
 	if ((logo_w == 0) || (logo_h == 0)) // corrupt logo size?
+#endif
 	{
+#ifdef MARTII
+		fprintf(stderr, "[infoviewer] channel logo:\n"
+		       " -> %s (%s) has no or invalid size (w=%d h=%d)\n"
+		       " -> please check logo file!\n", strAbsIconPath.c_str(), ChannelName.c_str(), logo_w, logo_h);
+#else
 		printf("[infoviewer] channel logo: \n"
 		       " -> %s (%s) has no size\n"
 		       " -> please check logo file!\n", strAbsIconPath.c_str(), ChannelName.c_str());
+#endif
 		return 0;
 	}
 	int y_mid;

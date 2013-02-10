@@ -85,7 +85,11 @@ void CMotorControl::Init(void)
 
 	satfindpid = -1;
 
+#ifdef MARTII
+	width = w_max(600, 0);
+#else
 	width = w_max(470, 0);
+#endif
 	mheight = mheight - 2;
 	height = hheight + (20 * mheight) - 5;
 	height = h_max(height, 0);

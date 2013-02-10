@@ -49,7 +49,11 @@ function do_clearshot2(){
 		<button name="clearshot" ytype="clearshot" onclick="do_clearshot()">{=L:bc.osd.delete_shots=}</button>
 		&nbsp;Filename:<input type="text" value="a" id="file" size="16"/>
 		<br/>
+<!-- #ifdef MARTII -->
+		<img id="shot" src="" style="visibility:hidden;width:100%; background-color:#000000;"/>
+<!-- #else
 		<img id="shot" src="" style="visibility:hidden;"/>
+     #endif -->
 	</div>
 </div>
 </body>

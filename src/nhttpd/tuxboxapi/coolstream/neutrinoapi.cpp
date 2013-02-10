@@ -40,6 +40,10 @@
 #include <zapit/bouquets.h>
 #include <zapit/getservices.h>
 #include <eitd/sectionsd.h>
+#ifdef MARTII
+#include <driver/pictureviewer/pictureviewer.h>
+extern CPictureViewer *g_PicViewer;
+#endif
 
 extern CBouquetManager *g_bouquetManager;
 extern CFrontend * frontend;
@@ -476,6 +480,14 @@ std::string CNeutrinoAPI::getCryptInfoAsString(void) {
 }
 
 //-------------------------------------------------------------------------
+#ifdef MARTII
+std::string CNeutrinoAPI::getLogoFile(std::string _logoURL __attribute__((unused)), t_channel_id channelId) {
+	std::string channelIdAsString = string_printf( PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS , channelId & 0xFFFFFFFFFFFFULL);
+	std::string channelName = GetServiceName(channelId);
+	std::string logoString;
+	if (g_PicViewer->GetLogoName(channelId, channelIdAsString, logoString, NULL, NULL))
+		return logoString;
+#else
 std::string CNeutrinoAPI::getLogoFile(std::string _logoURL, t_channel_id channelId) {
 	std::string channelIdAsString = string_printf( PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS , channelId & 0xFFFFFFFFFFFFULL);
 	std::string channelName = GetServiceName(channelId);
@@ -494,6 +506,7 @@ std::string CNeutrinoAPI::getLogoFile(std::string _logoURL, t_channel_id channel
 	else if (access((_logoURL + channelName + ".gif").c_str(), 4) == 0)
 		return _logoURL + channelName + ".gif";
 	else
+#endif
 		return "";
 }
 

@@ -31,6 +31,9 @@
 #include <stdio.h>    /* printf       */
 #include <sys/time.h> /* gettimeofday */
 #include <driver/framebuffer.h>
+#ifdef MARTII
+#include <pthread.h>
+#endif
 class CPictureViewer
 {
 	struct cformathandler 
@@ -105,6 +108,17 @@ class CPictureViewer
 	int m_starty;
 	int m_endx;
 	int m_endy;
+#ifdef MARTII
+	std::string logo_hdd_dir;
+	std::string logo_hdd_dir_2;
+	struct logo_data {
+		std::string name;
+		int width;
+		int height;
+	};
+	std::map<uint64_t, logo_data> logo_map;
+	pthread_mutex_t logo_map_mutex;
+#endif
 	
 	CFormathandler * fh_getsize(const char *name,int *x,int *y, int width_wanted, int height_wanted);
 	void init_handlers(void);

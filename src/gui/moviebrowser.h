@@ -200,6 +200,9 @@ typedef struct
 
 	int reload;
 	int remount;
+#ifdef MARTII
+	int ts_only;
+#endif
 
 	int browser_serie_mode;
 	int serie_auto_create;

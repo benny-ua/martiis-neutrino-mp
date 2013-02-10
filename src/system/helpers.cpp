@@ -148,6 +148,28 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 
 int safe_mkdir(char * path)
 {
+#ifdef MARTII
+	struct statfs s;
+	size_t l = strlen(path);
+	char d[l + 3];
+	strncpy(d, path, l);
+
+	// skip trailing slashes
+	while (l > 0 && d[l - 1] == '/')
+		l--;
+	// find last slash
+	while (l > 0 && d[l - 1] != '/')
+		l--;
+	if (!l)
+		return -1;
+	// append a single dot
+	d[l++] = '.';
+	d[l] = 0;
+
+	if(statfs(d, &s) || (s.f_type == 0x72b6 /* JFFS2 */) || (s.f_type == 0x5941ff53 /* YAFFS2 */))
+		return -1;
+	return mkdir(path, 0755);
+#else
 	struct statfs s;
 	int ret = 0;
 	if(!strncmp(path, "/hdd", 4)) {
@@ -159,6 +181,7 @@ int safe_mkdir(char * path)
 	} else
 		mkdir(path, 0755);
 	return ret;
+#endif
 }
 
 /* function used to check is this dir writable, i.e. not flash, for record etc */
@@ -186,7 +209,11 @@ int check_dir(const char * dir)
 				ret = 0;
 				break; //ok
 			default:
+#ifdef MARTII
+				fprintf(stderr, "%s: Unknown File system type 0x%x\n", dir, (int)s.f_type);
+#else
 				fprintf(stderr, "%s Unknown filesystem type: 0x%x\n", dir, (int)s.f_type);
+#endif
 				break; // error
 		}
 	}
@@ -406,8 +433,11 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 			// is file
 			else if (S_ISREG(FileInfo.st_mode)) {
 				std::string save = "";
+#ifndef MARTII
+// I'm getting a linker error here. No idea why.
 				if (backupMode && (CExtUpdate::getInstance()->isBlacklistEntry(srcPath)))
 					save = ".save";
+#endif
 				copyFile(srcPath, (dstPath + save).c_str(), FileInfo.st_mode & 0x0FFF);
 			}
 		}

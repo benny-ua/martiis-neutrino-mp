@@ -45,6 +45,9 @@
 #include <gui/widget/messagebox.h>
 #include <gui/widget/mountchooser.h>
 #include <gui/pictureviewer.h>
+#ifdef MARTII
+#include <gui/followscreenings.h>
+#endif
 
 #include "widget/hintbox.h"
 #include "widget/buttons.h"
@@ -308,7 +311,9 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 	}
 	paint(channel_id);
 	showFunctionBar(true, channel_id);
+#ifndef MARTII
 	frameBuffer->blit();
+#endif
 
 	int oldselected = selected;
 
@@ -317,6 +322,9 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 	bool loop = true;
 	while (loop)
 	{
+#ifdef MARTII
+		frameBuffer->blit();
+#endif
 		g_RCInput->getMsgAbsoluteTimeout(&msg, &data, &timeoutEnd);
 
 		if ( msg <= CRCInput::RC_MaxRC )
@@ -468,6 +476,13 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 				}
 				if (recDir != NULL) //add/remove recording timer events and check/warn for conflicts
 				{
+#ifdef MARTII
+					CFollowScreenings m(channel_id,
+						evtlist[selected].startTime,
+						evtlist[selected].startTime + evtlist[selected].duration,
+						evtlist[selected].description, evtlist[selected].eventID, TIMERD_APIDS_CONF, true, "", &evtlist);
+					m.exec(NULL, "");
+#else
 					if (g_Timerd->addRecordTimerEvent(evtlist[selected].channelID ,
 								evtlist[selected].startTime,
 								evtlist[selected].startTime + evtlist[selected].duration,
@@ -494,6 +509,7 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 						//ShowLocalizedMessage(LOCALE_TIMER_EVENTRECORD_TITLE, LOCALE_TIMER_EVENTRECORD_MSG, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 						timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_EPG]);
 					}
+#endif
 				}
 				timerlist.clear();
 				g_Timerd->getTimerList (timerlist);
@@ -600,7 +616,11 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 			eplus.exec(NULL, "");
 			loop = false;
 		}
+#ifdef MARTII
+		else if (msg==(uint32_t)g_settings.key_help || msg==CRCInput::RC_right || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
+#else
 		else if (msg==CRCInput::RC_help || msg==CRCInput::RC_right || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
+#endif
 		{
 			if ( evtlist[selected].eventID != 0 )
 			{
@@ -650,7 +670,9 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 				res = menu_return::RETURN_EXIT_ALL;
 			}
 		}
+#ifndef MARTII
 		frameBuffer->blit();
+#endif
 	}
 
 	hide();
@@ -789,7 +811,9 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 		
 		
 	}
+#ifndef MARTII
 	frameBuffer->blit();
+#endif
 }
 void CNeutrinoEventList::paintHead(std::string _channelname, std::string _channelname_prev, std::string _channelname_next)
 {

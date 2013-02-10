@@ -206,6 +206,10 @@ int CRecordSetup::showRecordSetup()
 	//template
 	//CStringInput recordingSettings_filenameTemplate(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, &g_settings.recording_filename_template[0], 21, LOCALE_RECORDINGMENU_FILENAME_TEMPLATE_HINT, LOCALE_IPSETUP_HINT_2, "%/-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ");
 	//CMenuForwarder* mf11 = new CMenuForwarder(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, true, g_settings.recording_filename_template[0], &recordingSettings_filenameTemplate);
+#ifdef MARTII
+	recordingSettings->addItem(new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE, &g_settings.recording_bufsize, true, 1, 25, NULL) );
+	recordingSettings->addItem(new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE_DMX, &g_settings.recording_bufsize_dmx, true, 1, 25, NULL) );
+#endif
 	recordingSettings->addItem(GenericMenuSeparatorLine);
 
 	//timeshift
@@ -229,8 +233,17 @@ int CRecordSetup::showRecordSetup()
 	mf->setHint("", LOCALE_MENU_HINT_RECORD_APIDS);
 	recordingSettings->addItem(mf);
 
+#ifdef MARTII
+	recordingSettings->addItem(GenericMenuSeparatorLine);
+	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_pmt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_DVBSUB_PIDS, &g_settings.recording_stream_subtitle_pids, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_VTXT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+#endif
 	int res = recordingSettings->exec(NULL, "");
 	delete recordingSettings;
+#ifdef MARTII
+	CRecordManager::getInstance()->Config(g_settings.recording_stopsectionsd, g_settings.recording_stream_vtxt_pid, g_settings.recording_stream_pmt_pid, g_settings.recording_stream_subtitle_pids);
+#endif
 	return res;
 }
 

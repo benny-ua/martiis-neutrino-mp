@@ -10,6 +10,10 @@ function rcsim(_key) {
 	window.setTimeout("do_dboxshot()",750);
 }
 function do_dboxshot(){
+<!-- #ifdef MARTII -->
+	$('statusline').show();
+	$('buttons').hide();
+<!-- #endif -->
 	var res = dbox_exec_tools("fbshot fb /tmp/a.png");
 	var _shot = document.getElementById("shot");
 	_shot.src = "/tmp/a.png?"+Math.random();
@@ -38,7 +42,11 @@ function do_clearshot2(){
 		<table cellpadding="0">
 		<tr>
 			<td>{=include-block:Y_Blocks.txt;remote=}</td>
+<!-- #ifdef MARTII -->
+			<td><img id="shot" src="" {=if-empty:{=full=}~style="width:100%; background-color:#000000;"~=}/></td>
+<!-- #else
 			<td><img id="shot" src="" {=if-empty:{=full=}~style="width:600px"~=}/></td>
+     #endif -->
 		</tr>
 		</table>
 	</div>

@@ -38,5 +38,6 @@ libneutrino_system_a_SOURCES = \
 	helpers.cpp \
 	ping.c \
 	settings.cpp \
-	setting_helpers.cpp
-#	safe_system.c
+	setting_helpers.cpp \
+	localize_bouquetnames.cpp \
+	safe_system.c

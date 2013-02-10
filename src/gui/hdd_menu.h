@@ -25,6 +25,10 @@
 
 
 #include "widget/menue.h"
+#ifdef MARTII
+#include <string>
+#include <vector>
+#endif
 
 using namespace std;
 
@@ -48,6 +52,14 @@ class CHDDMenuHandler : public CMenuTarget
 {
 	private:
 		int width;
+#ifdef MARTII
+		struct hdd_s {
+			std::string devname;
+			CMenuForwarderNonLocalized *cmf;
+			bool mounted;
+		};
+		std::vector<hdd_s> hdd_list;
+#endif
 	public:
 		CHDDMenuHandler();
 		~CHDDMenuHandler();

@@ -36,6 +36,9 @@
 #include <timerdclient/timerdmsg.h>
 #include <sectionsdclient/sectionsdclient.h>
 #include <eitd/sectionsd.h>
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 #include <vector>
 #include <cstdlib>
@@ -84,6 +87,9 @@ CTimerManager* CTimerManager::getInstance()
 //------------------------------------------------------------
 void* CTimerManager::timerThread(void *arg)
 {
+#ifdef MARTII
+	set_threadname(__func__);
+#endif
 	pthread_mutex_t dummy_mutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t dummy_cond = PTHREAD_COND_INITIALIZER;
 	struct timespec wait;
@@ -634,6 +640,50 @@ void CTimerManager::loadRecordingSafety()
 		m_extraTimeEnd  = config.getInt32 ("EXTRA_TIME_END",0);
 	}
 }
+#ifdef MARTII
+// -------------------------------------------------------------------------------------
+void CTimerManager::setWakeupTime()
+{
+	time_t nextAnnounceTime=0;
+	bool status=false;
+	timer_is_rec = false;
+
+	if (pthread_mutex_trylock(&tm_eventsMutex) == EBUSY)
+	{
+		dprintf("error: mutex is still LOCKED\n");
+		return;
+	}
+
+	CTimerEventMap::iterator pos = events.begin();
+	for(;pos != events.end();pos++)
+	{
+		CTimerEvent *event = pos->second;
+		dprintf("%s: timer type %d state %d announceTime: %ld\n", __func__, event->eventType, event->eventState, event->announceTime);
+		if((event->eventType == CTimerd::TIMER_RECORD ||
+			 event->eventType == CTimerd::TIMER_ZAPTO ) &&
+			event->eventState < CTimerd::TIMERSTATE_ISRUNNING)
+		{
+			// Wir wachen nur für Records und Zaptos wieder auf
+			if(event->announceTime < nextAnnounceTime || nextAnnounceTime==0)
+			{
+				nextAnnounceTime=event->announceTime;
+				dprintf("shutdown: nextAnnounceTime %ld\n", nextAnnounceTime);
+				if ( event->eventType == CTimerd::TIMER_RECORD )
+					timer_is_rec = true;
+			}
+		}
+	}
+
+	timer_minutes = 0;
+	if(nextAnnounceTime != 0)
+	{
+		timer_minutes = (nextAnnounceTime - 3*60)/60;
+	}
+	dprintf("%s: timeset: %d timer_minutes %ld\n", __func__, timeset, timer_minutes);
+
+	pthread_mutex_unlock(&tm_eventsMutex);
+}
+#endif
 // -------------------------------------------------------------------------------------
 void CTimerManager::saveEventsToConfig()
 {
@@ -648,6 +698,9 @@ void CTimerManager::saveEventsToConfig()
 	{
 		CTimerEvent *event = pos->second;
 		dprintf("event #%d\n",event->eventID);
+#ifdef MARTII
+		if (event->eventType != CTimerd::TIMER_RECORD || event->eventState != CTimerd::TIMERSTATE_ISRUNNING)
+#endif
 		event->saveToConfig(&config);
 	}
 	dprintf("\n");
@@ -662,11 +715,16 @@ void CTimerManager::saveEventsToConfig()
 
 	// Freigeben !!!
 	pthread_mutex_unlock(&tm_eventsMutex);
+#ifdef MARTII
+	setWakeupTime();
+#endif
 }
 //------------------------------------------------------------
 bool CTimerManager::shutdown()
 {
+#ifndef MARTII
 	timerd_debug = 1; //FIXME
+#endif
 	time_t nextAnnounceTime=0;
 	bool status=false;
 	timer_is_rec = false;
@@ -684,6 +742,9 @@ bool CTimerManager::shutdown()
 		saveEventsToConfig();
 		dprintf("shutdown: saved config\n");
 	}
+#ifdef MARTII
+	setWakeupTime();
+#else
 	if (pthread_mutex_trylock(&tm_eventsMutex) == EBUSY)
 	{
 		dprintf("error: mutex is still LOCKED\n");
@@ -718,6 +779,7 @@ bool CTimerManager::shutdown()
 	dprintf("shutdown: timeset: %d timer_minutes %ld\n", timeset, timer_minutes);
 
 	pthread_mutex_unlock(&tm_eventsMutex);
+#endif
 	return status;
 }
 //------------------------------------------------------------
@@ -1462,4 +1524,16 @@ void CTimerEvent_ExecPlugin::saveToConfig(CConfigFile *config)
 	dprintf("set NAME_%s to %s (%p)\n",id.c_str(),name,name);
 
 }
+#ifdef MARTII
+//=============================================================
+// BatchEPG Event
+//=============================================================
+void CTimerEvent_BatchEPG::fireEvent()
+{
+	dprintf("BatchEPG Timer fired\n");
+	//event in neutrinos remoteq. schreiben
+	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_BATCHEPG,
+								  CEventServer::INITID_TIMERD);
+}
+#endif
 //=============================================================

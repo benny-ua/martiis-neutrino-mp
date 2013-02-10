@@ -54,6 +54,11 @@
 
 #include <cs_api.h>
 #include <video.h>
+#ifdef MARTII
+#include <zapit/zapit.h>
+#include "3dsetup.h"
+#include "screensetup.h"
+#endif
 
 extern cVideo *videoDecoder;
 extern int prev_video_mode;
@@ -353,6 +358,22 @@ int CVideoSettings::showVideoSetup()
 	if (vs_videomodes_fw != NULL)
 		videosetup->addItem(vs_videomodes_fw);	  //video modes submenue
 
+#ifdef MARTII
+	videosetup->addItem(GenericMenuSeparatorLine);
+	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));;
+	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_STEP, (int *)&g_settings.psi_step, true, 1, 100, NULL));
+	CPSISetupNotifier psiNotifier(CNeutrinoApp::getInstance()->chPSISetup);
+	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, &psiNotifier));
+	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_SATURATION, (int *)&g_settings.psi_saturation, true, 0, 255, &psiNotifier));
+	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_BRIGHTNESS, (int *)&g_settings.psi_brightness, true, 0, 255, &psiNotifier));
+	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_TINT, (int *)&g_settings.psi_tint, true, 0, 255, &psiNotifier));
+	videosetup->addItem(GenericMenuSeparatorLine);
+	videosetup->addItem(new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+
+	CScreenSetup channelScreenSetup;
+	channelScreenSetup.loadBorder(CZapit::getInstance()->GetCurrentChannelID());
+	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_SCREENSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
+#endif
 	int res = videosetup->exec(NULL, "");
 	selected = videosetup->getSelected();
 	delete videosetup;
@@ -392,6 +413,9 @@ void CVideoSettings::setupVideoSystem(bool do_ask)
 {
 	printf("[neutrino VideoSettings] %s setup videosystem...\n", __FUNCTION__);
 	videoDecoder->SetVideoSystem(g_settings.video_Mode); //FIXME
+#ifdef HAVE_SPARK_HARDWARE //MARTII
+	frameBuffer->resChange();
+#endif
 
 	if (do_ask)
 	{
@@ -402,6 +426,9 @@ void CVideoSettings::setupVideoSystem(bool do_ask)
 			{
 				g_settings.video_Mode = prev_video_mode;
 				videoDecoder->SetVideoSystem(g_settings.video_Mode);
+#ifdef HAVE_SPARK_HARDWARE //MARTII
+				frameBuffer->resChange();
+#endif
 			}
 			else
 				prev_video_mode = g_settings.video_Mode;
@@ -566,12 +593,18 @@ void CVideoSettings::nextMode(void)
 			g_settings.video_Mode = VIDEOMENU_VIDEOMODE_OPTIONS[curmode].key;
 			//CVFD::getInstance()->ShowText(text);
 			videoDecoder->SetVideoSystem(g_settings.video_Mode);
+#ifdef HAVE_SPARK_HARDWARE //MARTII
+			frameBuffer->resChange();
+#endif
 			//return;
 			disp_cur = 1;
 		}
 		else
 			break;
 	}
+#ifdef MARTII
+	frameBuffer->resChange();
+#endif
 	CVFD::getInstance()->showServicename(g_RemoteControl->getCurrentChannelName());
 	//ShowHintUTF(LOCALE_VIDEOMENU_VIDEOMODE, text, 450, 2);
 }

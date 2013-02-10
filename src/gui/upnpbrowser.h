@@ -95,6 +95,9 @@ class CUpnpBrowserGui : public CMenuTarget
 	int            m_playid;
 	time_t         m_time_played;
 	bool           m_playing_entry_is_shown;
+#ifdef MARTII
+	time_t         timeout;
+#endif
 
 	void selectDevice();
 	bool selectItem(std::string);

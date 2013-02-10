@@ -81,18 +81,28 @@ function do_check(){
 	=}
 
 	/*programs*/
-	{=var-set:fbshot={=if-file-exists:/bin/fbshot~/bin/fbshot~{=if-file-exists:/var/bin/fbshot~/var/bin/fbshot~false=}=}=}
+/* #ifdef MARTII */
+	{=var-set:fbshot=built-in=}
+/* #else */
+/*	{=var-set:DISABLED_fbshot={=if-file-exists:/bin/fbshot~/bin/fbshot~{=if-file-exists:/var/bin/fbshot~/var/bin/fbshot~false=}=}=} */
+/* #endif */
 	{=if-equal:{=var-get:fbshot=}~false~
 		sLog_addRow(sLog_body, "red", "Programs: fbshot is not installed. OSD Screenshot is disabled. "+y_url("Help-BoxControl-OSD_Screenshot"), "failed");
 	~
 		sLog_addRow(sLog_body, "green", "Programs: fbshot is installed at: {=var-get:fbshot=}. OSD Screenshot is enabled.", "ok");
 	=}
+/* #ifdef MARTII */
+	{=if-not-equal:{=global-var-get:boxhardware=}~spark~
+/* #endif */
 	{=var-set:dboxshot={=if-file-exists:/bin/dboxshot~/bin/dboxshot~{=if-file-exists:/var/bin/dboxshot~/var/bin/dboxshot~false=}=}=}
 	{=if-equal:{=var-get:dboxshot=}~false~
 		sLog_addRow(sLog_body, "red", "Programs: dboxshot is not installed. Remote &amp; OSD is disabled. <a href='http://www.yjogol.com/faq-diy' target='_blank'><b>[Download]<\/b><\/a>", "failed");
 	~
 		sLog_addRow(sLog_body, "green", "Programs: dboxshot is installed at: {=var-get:dboxshot=}. Remote &amp; OSD is enabled.", "ok");
 	=}
+/* #ifdef MARTII */
+	=}
+/* #endif */
 
 {=if-not-equal:{=global-var-get:boxtype=}~coolstream~
 	{=var-set:fcp={=if-file-exists:/sbin/fcp~/sbin/fcp~{=if-file-exists:/var/bin/fcp~/var/bin/fcp~{=if-file-exists:/bin/fcp~/bin/fcp~false=}=}=}=}

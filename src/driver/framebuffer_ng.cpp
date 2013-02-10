@@ -21,6 +21,10 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef MARTII
+#define _FILE_OFFSET_BITS 64
+#include <png.h>
+#endif
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -120,7 +124,36 @@ CFrameBuffer::CFrameBuffer()
 #ifdef USE_OPENGL
 	mpGLThreadObj = NULL;
 #endif
+#ifdef MARTII
+	accel->startX = 0;
+	accel->startY = 0;
+	accel->endX = DEFAULT_XRES - 1;
+	accel->endY = DEFAULT_YRES - 1;
+	accel->borderColor = 0;
+	accel->borderColorOld = 0x01010101;
+#endif
 }
+#ifdef MARTII
+void CFrameBuffer::setBorder(int sx, int sy, int ex, int ey)
+{
+	accel->startX = sx;
+	accel->startY = sy;
+	accel->endX = ex;
+	accel->endY = ey;
+	accel->sX = (accel->startX * accel->s.xres)/DEFAULT_XRES;
+	accel->sY = (accel->startY * accel->s.yres)/DEFAULT_YRES;
+	accel->eX = (accel->endX * accel->s.xres)/DEFAULT_XRES;
+	accel->eY = (accel->endY * accel->s.yres)/DEFAULT_YRES;
+	accel->borderColorOld = 0x01010101;
+};
+
+void CFrameBuffer::setBorderColor(fb_pixel_t col)
+{
+	if (!col && accel->borderColor)
+		accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0);
+	accel->borderColor = col;
+}
+#endif
 
 CFrameBuffer* CFrameBuffer::getInstance()
 {
@@ -198,6 +231,9 @@ void CFrameBuffer::init(const char * const fbDevice)
 		perror("FBIOGET_VSCREENINFO");
 		goto nolfb;
 	}
+#ifdef MARTII
+	resChange();
+#endif
 
 	memmove(&oldscreen, &screeninfo, sizeof(screeninfo));
 
@@ -382,6 +418,27 @@ unsigned int CFrameBuffer::getStride() const
 	return stride;
 }
 
+#ifdef MARTII
+unsigned int CFrameBuffer::getScreenWidth(bool)
+{
+	return DEFAULT_XRES;
+}
+
+unsigned int CFrameBuffer::getScreenHeight(bool)
+{
+	return DEFAULT_YRES;
+}
+
+unsigned int CFrameBuffer::getScreenX()
+{
+	return 0;
+}
+
+unsigned int CFrameBuffer::getScreenY()
+{
+	return 0;
+}
+#else
 unsigned int CFrameBuffer::getScreenWidth(bool real)
 {
 	if(real)
@@ -407,9 +464,18 @@ unsigned int CFrameBuffer::getScreenY()
 {
 	return g_settings.screen_StartY;
 }
+#endif
 
+#ifdef MARTII
+fb_pixel_t * CFrameBuffer::getFrameBufferPointer(bool real)
+#else
 fb_pixel_t * CFrameBuffer::getFrameBufferPointer() const
+#endif
 {
+#ifdef MARTII
+	if (real)
+		return lfb;
+#endif
 	if (active || (virtual_fb == NULL))
 		return accel->lbb;
 	else
@@ -1325,3 +1391,72 @@ void CFrameBuffer::paintMuteIcon(bool paint, int ax, int ay, int dx, int dy, boo
 		paintBackgroundBoxRel(ax, ay, dx, dy);
 	blit();
 }
+#ifdef MARTII
+CFrameBuffer::Mode3D CFrameBuffer::get3DMode() {
+	return mode3D;
+}
+
+void CFrameBuffer::set3DMode(Mode3D m) {
+	if (mode3D != m) {
+		accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0);
+		mode3D = m;
+		accel->borderColorOld = 0x01010101;
+		blit();
+	}
+}
+
+bool CFrameBuffer::OSDShot(const std::string &name) {
+	struct timeval ts, te;
+	gettimeofday(&ts, NULL);
+
+	size_t l = name.find_last_of(".");
+	if(l == std::string::npos)
+		return false;
+	if (name.substr(l) != ".png")
+		return false;
+	FILE *out = fopen(name.c_str(), "w");
+	if (!out)
+		return false;
+
+	unsigned int xres = DEFAULT_XRES;
+	unsigned int yres = DEFAULT_YRES;
+	fb_pixel_t *b = (fb_pixel_t *) accel->lbb;
+
+	if (!g_settings.screenshot_backbuffer) {
+		xres = accel->s.xres;
+		yres = accel->s.yres;
+		b = (fb_pixel_t *) lfb;
+	}
+
+	png_bytep row_pointers[yres];
+	png_structp png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING,
+		(png_voidp) NULL, (png_error_ptr) NULL, (png_error_ptr) NULL);
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+
+	png_init_io(png_ptr, out);
+
+	for (unsigned int y = 0; y < yres; y++)
+		row_pointers[y] = (png_bytep) (b + y * xres);
+
+	png_set_compression_level(png_ptr, g_settings.screenshot_png_compression);
+	png_set_bgr(png_ptr);
+	png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
+	png_set_IHDR(png_ptr, info_ptr, xres, yres, 8, PNG_COLOR_TYPE_RGBA,
+		PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+	png_write_info(png_ptr, info_ptr);
+	png_write_image(png_ptr, row_pointers);
+	png_write_end(png_ptr, NULL);
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	fclose(out);
+
+	gettimeofday(&te, NULL);
+	fprintf(stderr, "%s took %lld us\n", __func__, (te.tv_sec * 1000000LL + te.tv_usec) - (ts.tv_sec * 1000000LL + ts.tv_usec));
+	return true;
+}
+
+void CFrameBuffer::blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
+{
+	accel->blitIcon(src_width, src_height, fb_x, fb_y, width, height);
+}
+#endif

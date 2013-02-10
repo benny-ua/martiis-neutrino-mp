@@ -152,6 +152,9 @@ bool CUserMenu::showUserMenu(int button)
 		menu->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
 	else
 		menu->addItem(GenericMenuSeparator);
+#ifdef MARTII
+	StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
+#endif
 	
 	// go through any postition number
 	for (int pos = 0; pos < SNeutrinoSettings::ITEM_MAX ; pos++) {
@@ -320,7 +323,9 @@ bool CUserMenu::showUserMenu(int button)
 					menu_prev = SNeutrinoSettings::ITEM_PLUGIN;
 					neutrino_msg_t d_key = g_PluginList->getKey(count);
 					//printf("[neutrino usermenu] plugin %d, set key %d...\n", count, g_PluginList->getKey(count));
+#ifndef MARTII
 					StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
+#endif
 					keyhelper.get(&key,&icon, d_key);
 					menu_item = new CMenuForwarderNonLocalized(g_PluginList->getName(count), true, NULL, StreamFeaturesChanger, id, key, icon);
 
@@ -335,7 +340,9 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_VTXT;
 			keyhelper.get(&key,&icon, feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_VTXT]].key); //CRCInput::RC_blue
+#ifndef MARTII
 			StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
+#endif
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_VTXT, true, NULL, StreamFeaturesChanger, "teletext", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -400,6 +407,40 @@ bool CUserMenu::showUserMenu(int button)
 			}
 			break;
 #endif
+#ifdef MARTII
+		case SNeutrinoSettings::ITEM_ADZAP:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_ADZAP;
+			keyhelper.get(&key,&icon,CRCInput::RC_blue);
+			//keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_ADZAP, true, NULL, CNeutrinoApp::getInstance()->AdZapChanger, "adzap", key, icon);
+			menu->addItem(menu_item, 0);
+			break;
+		case SNeutrinoSettings::ITEM_EMU_RESTART:
+			if (!access("/etc/init.d/cam", X_OK)) {
+				menu_items++;
+				menu_prev = SNeutrinoSettings::ITEM_EMU_RESTART;
+				keyhelper.get(&key,&icon);
+				menu_item = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, CNeutrinoApp::getInstance(), "restartcam", key, icon);
+				menu->addItem(menu_item, 0);
+			}
+			break;
+		case SNeutrinoSettings::ITEM_TUNER_RESTART:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_TUNER_RESTART;
+			keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, CNeutrinoApp::getInstance(), "restarttuner", key, icon);
+			menu->addItem(menu_item, 0);
+			break;
+		case SNeutrinoSettings::ITEM_THREE_D_MODE:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_THREE_D_MODE;
+			keyhelper.get(&key,&icon);
+			//keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, "3dmode", key, icon);
+			menu->addItem(menu_item, 0);
+			break;
+#endif
 		default:
 			printf("[neutrino] WARNING! menu wrong item!!\n");
 			break;
@@ -458,6 +499,93 @@ bool CUserMenu::showUserMenu(int button)
  	return 0;
 }
 
+#ifdef MARTII
+const char *CUserMenu::getUserMenuButtonName(int button)
+{
+        if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
+                return false;
+
+	bool return_title = false;
+	neutrino_locale_t loc = NONEXISTANT_LOCALE;
+	char *text = NULL;
+
+	#define locCheck(L) if(loc != NONEXISTANT_LOCALE) return_title = true; else loc=L;continue
+
+        for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX && !return_title; pos++) {
+                switch(g_settings.usermenu[button][pos]) {
+                        case SNeutrinoSettings::ITEM_NONE:
+                        case SNeutrinoSettings::ITEM_BAR:
+				continue;
+                        case SNeutrinoSettings::ITEM_EPG_LIST:
+				locCheck(LOCALE_EPGMENU_EVENTLIST);
+                        case SNeutrinoSettings::ITEM_EPG_SUPER:
+				locCheck(LOCALE_EPGMENU_EPGPLUS);
+                        case SNeutrinoSettings::ITEM_EPG_INFO:
+                                locCheck(LOCALE_EPGMENU_EVENTINFO);
+                        case SNeutrinoSettings::ITEM_EPG_MISC:
+				return_title = true; continue;
+                        case SNeutrinoSettings::ITEM_AUDIO_SELECT:
+				if (g_RemoteControl->current_PIDs.APIDs.size() > 0)
+                        		text = g_RemoteControl->current_PIDs.APIDs[
+						g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
+				locCheck(LOCALE_AUDIOSELECTMENUE_HEAD);
+			case SNeutrinoSettings::ITEM_SUBCHANNEL:
+				if (!g_RemoteControl->subChannels.empty()) {
+					locCheck(g_RemoteControl->are_subchannels ? LOCALE_NVODSELECTOR_SUBSERVICE : LOCALE_NVODSELECTOR_HEAD);
+				}
+				continue;
+                        case SNeutrinoSettings::ITEM_RECORD:
+				locCheck(LOCALE_FAVORITES_MENUEADD);
+                        case SNeutrinoSettings::ITEM_MOVIEPLAYER_MB:
+                                locCheck(LOCALE_MOVIEBROWSER_HEAD);
+                        case SNeutrinoSettings::ITEM_TIMERLIST:
+                                locCheck(LOCALE_TIMERLIST_NAME);
+                        case SNeutrinoSettings::ITEM_FAVORITS:
+				locCheck(LOCALE_FAVORITES_MENUEADD);
+			case SNeutrinoSettings::ITEM_VTXT:
+				locCheck(LOCALE_USERMENU_ITEM_VTXT);
+                        case SNeutrinoSettings::ITEM_TECHINFO:
+                                locCheck(LOCALE_EPGMENU_STREAMINFO);
+                        case SNeutrinoSettings::ITEM_REMOTE:
+                                locCheck(LOCALE_RCLOCK_MENUEADD);
+                        case SNeutrinoSettings::ITEM_PLUGIN:
+				return_title = true;
+				continue;
+                        case SNeutrinoSettings::ITEM_IMAGEINFO:
+                                locCheck(LOCALE_SERVICEMENU_IMAGEINFO);
+                        case SNeutrinoSettings::ITEM_BOXINFO:
+				locCheck(LOCALE_EXTRA_DBOXINFO);
+                        case SNeutrinoSettings::ITEM_CAM:
+				locCheck(LOCALE_CI_SETTINGS);
+                        case SNeutrinoSettings::ITEM_CLOCK:
+				locCheck(!g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_ON:LOCALE_CLOCK_SWITCH_OFF);
+                        case SNeutrinoSettings::ITEM_GAMES:
+				locCheck(LOCALE_MAINMENU_GAMES);
+                        case SNeutrinoSettings::ITEM_SCRIPTS:
+				locCheck(LOCALE_MAINMENU_SCRIPTS);
+			case SNeutrinoSettings::ITEM_ADZAP:
+				locCheck(LOCALE_USERMENU_ITEM_ADZAP);
+                        case SNeutrinoSettings::ITEM_EMU_RESTART:
+				locCheck(LOCALE_SERVICEMENU_RESTART_CAM);
+                        case SNeutrinoSettings::ITEM_TUNER_RESTART:
+				locCheck(LOCALE_SERVICEMENU_RESTART_TUNER);
+                        case SNeutrinoSettings::ITEM_THREE_D_MODE:
+				locCheck(LOCALE_THREE_D_SETTINGS);
+                }
+        }
+
+	if (!return_title && (loc != NONEXISTANT_LOCALE)) {
+		if(text)
+			return text;
+		return g_Locale->getText(loc);
+	}
+	if (return_title && g_settings.usermenu_text[button].length())
+		return g_settings.usermenu_text[button].c_str();
+	if (return_title)
+		return g_Locale->getText(usermenu[button].def_name);
+	return NULL;
+}
+#endif
 /**************************************************************************************
 *          changeNotify - features menu recording start / stop                        *
 **************************************************************************************/

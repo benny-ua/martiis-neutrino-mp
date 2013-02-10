@@ -96,6 +96,7 @@ install_DATA =	accept.png \
 		visible.gif \
 		visible.png \
 		vlc.gif \
+		vlc_av.gif \
 		volumedown.png \
 		volumemute.png \
 		volumeunmute.png \

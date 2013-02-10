@@ -8,6 +8,7 @@ function form_init()
 	obj_set_radio_value('authenticate', "{=ini-get:/var/tuxbox/config/nhttpd.conf;mod_auth.authenticate;false=}");
 	obj_set_radio_value('threading', "{=ini-get:/var/tuxbox/config/nhttpd.conf;webserver.threading;false=}");
 	obj_set_radio_value('mod_sendfile_sendAll', "{=ini-get:/var/tuxbox/config/nhttpd.conf;mod_sendfile.sendAll;false=}");
+	obj_set_radio_value('Tuxbox_DisplayLogos', "{=ini-get:/var/tuxbox/config/nhttpd.conf;Tuxbox.DisplayLogos;true=}"); // MARTII
 }
 function do_submit()
 {
@@ -90,10 +91,29 @@ function do_submit()
 					<input type="radio" name="mod_sendfile_sendAll" value="true" />{=L:on=}
 				</td>
 			</tr>
+<!-- #ifdef MARTII -->
+			<tr>
+				<td>{=L:set.nhttpd.pid_separator=}</td>
+				<td colspan="3">
+					<select name="Tuxbox_PidSeparator" title="{=L:set.nhttpd.pid_separator=}">
+						<option value="," {=if-equal:~{=ini-get:/var/tuxbox/config/nhttpd.conf;Tuxbox.PidSeparator;,=}~,~selected="selected"=}>,</option>
+						<option value=":" {=if-equal:~{=ini-get:/var/tuxbox/config/nhttpd.conf;Tuxbox.PidSeparator;,=}~:~selected="selected"=}>:</option>
+					</select></td>
+				</td>
+			</tr>
+<!-- #endif -->
 			<tr><td colspan="2" class="y_form_header">{=L:logos=}</td></tr>
 			<tr>
+<!-- #ifdef MARTII -->
+				<td>{=L:set.nhttpd.display_logos=}</td>
+				<td>
+					<input type="radio" name="Tuxbox_DisplayLogos" value="false" />{=L:off=}&nbsp;
+					<input type="radio" name="Tuxbox_DisplayLogos" value="true" />{=L:on=}
+				</td>
+<!-- #else
 				<td>{=L:set.nhttpd.url_of_logos=}</td>
 				<td><input type="text" name="Tuxbox_LogosURL" size="60" value="{=ini-get:/var/tuxbox/config/nhttpd.conf;Tuxbox.LogosURL~cache=}" title="{=L:set.nhttpd.url_of_logos_desc=}"/></td>
+     #endif -->
 			</tr>
 			<tr><td colspan="2" class="y_form_header">{=L:set.nhttpd.server=}</td></tr>
 			{=if-not-equal:{=global-var-get:boxtype=}~coolstream~

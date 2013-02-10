@@ -170,6 +170,11 @@ void CSelectChannelWidget::InitZapitChannelHelper(CZapitClient::channelsMode mod
 			mwtv->addItem(chan_item);
 
 		}
+#ifdef MARTII
+		if (g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_others"
+		 || g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_newchannels")
+			continue;
+#endif
 		if(!channels.empty() && (!g_bouquetManager->Bouquets[i]->bHidden ))
 		{
 			mctv.addItem(new CMenuForwarderNonLocalized(g_bouquetManager->Bouquets[i]->Name.c_str(), true, NULL, mwtv));

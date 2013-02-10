@@ -58,6 +58,9 @@ class CNetworkSetup : public CMenuTarget, CChangeObserver
 		std::string network_hostname;
 		std::string network_ssid;
 		std::string network_key;
+#ifdef MARTII
+		int network_encryption;
+#endif
 		std::string mac_addr;
 
 		int old_network_dhcp;
@@ -71,11 +74,18 @@ class CNetworkSetup : public CMenuTarget, CChangeObserver
 		std::string old_ifname;
 		std::string old_network_ssid;
 		std::string old_network_key;
+#ifdef MARTII
+		int old_network_encryption;
+#endif
 		std::string old_mac_addr;
 
 
 		CMenuForwarder* dhcpDisable[5];
+#ifdef MARTII
+		CMenuItem* wlanEnable[3];
+#else
 		CMenuForwarder* wlanEnable[2];
+#endif
 
 		CSectionsdConfigNotifier* sectionsdConfigNotifier;
 			

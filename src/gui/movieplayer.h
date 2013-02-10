@@ -82,6 +82,20 @@ class CMoviePlayerGui : public CMenuTarget
 	unsigned short apids[REC_MAX_APIDS];
 	unsigned short ac3flags[REC_MAX_APIDS];
 	unsigned short currentapid, currentac3;
+#ifdef MARTII
+	// subtitle data
+	unsigned short numpids;
+	std::string    slanguage[REC_MAX_DPIDS];
+	unsigned short spids[REC_MAX_DPIDS];
+	unsigned short currentspid;
+	// dvb subtitle data
+	unsigned short numpidd;
+	std::string    dlanguage[REC_MAX_DPIDS];
+	unsigned short dpids[REC_MAX_DPIDS];
+	unsigned short currentdpid;
+
+	bool isWebTV;
+#endif
 
 	/* playback from MB */
 	bool isMovieBrowser;
@@ -104,7 +118,11 @@ class CMoviePlayerGui : public CMenuTarget
 	static CMoviePlayerGui* instance_mp;
 
 	void Init(void);
+#ifdef MARTII
+	void PlayFile(bool doCutNeutrino = true);
+#else
 	void PlayFile();
+#endif
 	void cutNeutrino();
 	void restoreNeutrino();
 
@@ -119,6 +137,10 @@ class CMoviePlayerGui : public CMenuTarget
 	void handleMovieBrowser(neutrino_msg_t msg, int position = 0);
 	bool SelectFile();
 	void updateLcd();
+#ifdef MARTII
+	void StopSubtitles(bool b);
+	void StartSubtitles(bool show = true);
+#endif
 
 	CMoviePlayerGui(const CMoviePlayerGui&) {};
 	CMoviePlayerGui();

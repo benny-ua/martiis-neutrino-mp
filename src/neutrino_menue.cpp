@@ -75,6 +75,9 @@
 #include "gui/update.h"
 #include "gui/vfd_setup.h"
 #include "driver/record.h"
+#ifdef MARTII
+#include "gui/opkg_manager.h"
+#endif
 
 
 extern CPlugins       * g_PluginList;
@@ -109,6 +112,9 @@ void CNeutrinoApp::InitMenu()
 
 	//personalize: neutrino.h, neutrino.cpp
 	personalize.enableUsermenu();
+#ifdef MARTII
+	personalize.enablePluginMenu();
+#endif
 	personalize.enablePinSetup();
 	personalize.addWidgets(menu_widgets, MENU_MAX);
 
@@ -333,7 +339,11 @@ void CNeutrinoApp::InitMenuSettings()
 	personalize.addItem(MENU_SETTINGS, mf, &g_settings.personalize[SNeutrinoSettings::P_MSET_KEYBINDING]);
 
 	// audioplayer/pictureviewer settings
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_MAINMENU_MEDIA, true, NULL, new CMediaPlayerSetup());
+#else
 	mf = new CMenuForwarder(LOCALE_AUDIOPLAYERPICSETTINGS_GENERAL, true, NULL, new CMediaPlayerSetup());
+#endif
 	mf->setHint(NEUTRINO_ICON_HINT_A_PIC, LOCALE_MENU_HINT_A_PIC);
 	personalize.addItem(MENU_SETTINGS, mf, &g_settings.personalize[SNeutrinoSettings::P_MSET_MEDIAPLAYER]);
 }
@@ -382,10 +392,24 @@ void CNeutrinoApp::InitMenuService()
 	//separator
 	personalize.addSeparator(MENU_SERVICE);
 
+#ifdef MARTII
+	//scripts 
+	bool show_scripts = g_PluginList->hasPlugin(CPlugins::P_TYPE_SCRIPT);
+	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_MAINMENU_SCRIPTS, show_scripts, NULL, new CPluginList(LOCALE_MAINMENU_SCRIPTS,CPlugins::P_TYPE_SCRIPT)), &g_settings.personalize[SNeutrinoSettings::P_MSER_SCRIPTS]);
+	
+	//restart tuner
+	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, this, "restarttuner") , &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_TUNER]);
+
+	//restart cam
+	if (!access("/etc/init.d/cam", X_OK))
+		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, this, "restartcam") , &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_CAM]);
+#endif
+#ifndef MARTII
 	//restart neutrino
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART   , true, NULL, this, "restart", CRCInput::RC_standby, NEUTRINO_ICON_BUTTON_POWER);
 	mf->setHint(NEUTRINO_ICON_HINT_SOFT_RESTART, LOCALE_MENU_HINT_SOFT_RESTART);
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART]);
+#endif
 
 	//reload plugins
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_GETPLUGINS, true, NULL, this, "reloadplugins");
@@ -394,6 +418,15 @@ void CNeutrinoApp::InitMenuService()
 
  	//separator
 	personalize.addSeparator(MENU_SERVICE);
+#ifdef MARTII
+	//boot spark now
+	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
+
+	//restart neutrino
+	mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART   , true, NULL, this, "restart", CRCInput::RC_standby, NEUTRINO_ICON_BUTTON_POWER);
+	mf->setHint(NEUTRINO_ICON_HINT_SOFT_RESTART, LOCALE_MENU_HINT_SOFT_RESTART);
+	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART]);
+#endif
 
 	//2nd section***************************************************************************************************
 
@@ -403,7 +436,12 @@ void CNeutrinoApp::InitMenuService()
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SERVICE_INFOMENU]);
 
 	//firmware update
+#ifdef MARTII
+	if (COPKGManager::hasOpkgSupport())
+		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager()) , &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+#else
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new CSoftwareUpdate());
 	mf->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_SW_UPDATE);
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+#endif
 }

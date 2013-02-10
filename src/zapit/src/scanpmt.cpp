@@ -120,6 +120,58 @@ bool CPmt::Parse(CZapitChannel * const channel)
 		memmove(p, buffer, pmtlen);
 		channel->setRawPmt(p, pmtlen);
 	}
+#ifdef MARTII
+#define PID_CONFIG_FILE CONFIGDIR "/zapit/supplemental_pids.conf"
+	// This file is maintained manually and is currently used for adding TTX subtitle pids on ARD/ZDF only. --martii
+	//
+	// channel_id descriptor_tag teletext_type type-specific-data
+	// channel_id           0x56             1 language
+	// channel_id           0x56             2 pid magazine page
+	// channel_id           0x56             5 pid magazine page
+
+	FILE  *SUPPIDS = fopen(PID_CONFIG_FILE, "r");
+	if (SUPPIDS) {
+		t_channel_id curChan =  channel->getChannelID();
+		char buf[128];
+		char tmp_Lang[4];
+		memset(tmp_Lang, 0, sizeof(tmp_Lang));
+		while (fgets(buf, sizeof(buf), SUPPIDS)) {
+			t_channel_id chan;
+			unsigned int desc, ty;
+			char typespecific[sizeof(buf)];
+			if ((buf[0] == '#') || !buf[0])
+				continue;
+			if (4 == sscanf(buf, "%llx %x %d %[^\n]", &chan, &desc, &ty, typespecific)) {
+				if (chan == curChan) {
+					switch(desc) {
+						case 0x56: {
+							switch(ty) {
+								case 1:
+									strncpy(tmp_Lang, typespecific, 3);
+									break;
+								case 2:
+								case 5: {
+									unsigned int elementary_PID;
+									unsigned int teletext_magazine_number;
+									unsigned int teletext_page_number;
+									if (3 == sscanf(typespecific, "%x %x %x", &elementary_PID,
+										&teletext_magazine_number, &teletext_page_number))
+										channel->addTTXSubtitle(elementary_PID, tmp_Lang,
+											(u_char) teletext_magazine_number,
+											(u_char) teletext_page_number, (ty == 5));
+										break;
+								}
+							}
+							break;
+
+						}
+					}
+				}
+			}
+		}
+		fclose(SUPPIDS);
+	}
+#endif
 
 	channel->setPidsFlag();
 	return true;

@@ -58,6 +58,16 @@
 #include <system/helpers.h>
 
 #include <zapit/client/zapittools.h>
+#ifdef MARTII
+#include "widget/textbox.h"
+#include "widget/messagebox.h"
+#include <poll.h>
+#include <fcntl.h>
+#include <vector>
+
+#include <video.h>
+extern cVideo * videoDecoder;
+#endif
 
 #include "plugins.h"
 /* for alexW images with old drivers:
@@ -263,6 +273,54 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 	}
 
 	inFile.close();
+#ifdef MARTII
+	//plugin_data->filename in g_settings.plugins_disabled/game/tool/script?!? => set type accordingly
+	bool found = false;
+	if (g_settings.plugins_disabled != "") {
+		char *s = strdup(g_settings.plugins_disabled.c_str());
+		char *t, *p = s;
+		while ((t = strsep(&p, ",")))
+			if (!strcmp(t, plugin_data->filename.c_str())) {
+				plugin_data->type = P_TYPE_DISABLED;
+				found = true;
+				break;
+			}
+		free(s);
+	}
+	if (!found && (g_settings.plugins_game != "")) {
+		char *s = strdup(g_settings.plugins_game.c_str());
+		char *t, *p = s;
+		while ((t = strsep(&p, ",")))
+			if (!strcmp(t, plugin_data->filename.c_str())) {
+				plugin_data->type = P_TYPE_GAME;
+				found = true;
+				break;
+			}
+		free(s);
+	}
+	if (!found && (g_settings.plugins_tool != "")) {
+		char *s = strdup(g_settings.plugins_tool.c_str());
+		char *t, *p = s;
+		while ((t = strsep(&p, ",")))
+			if (!strcmp(t, plugin_data->filename.c_str())) {
+				plugin_data->type = P_TYPE_TOOL;
+				found = true;
+				break;
+			}
+		free(s);
+	}
+	if (!found && (g_settings.plugins_script != "")) {
+		char *s = strdup(g_settings.plugins_script.c_str());
+		char *t, *p = s;
+		while ((t = strsep(&p, ",")))
+			if (!strcmp(t, plugin_data->filename.c_str())) {
+				plugin_data->type = P_TYPE_SCRIPT;
+				found = true;
+				break;
+			}
+		free(s);
+	}
+#endif
 	return !reject;
 }
 
@@ -319,9 +377,130 @@ void CPlugins::startScriptPlugin(int number)
 		return;
 	}
 	pid_t pid = 0;
+#ifdef MARTII
+	// workaround for manually messed up permissions
+	if (access(script, X_OK))
+		chmod(script, 0755);
+#endif
 	FILE *f = my_popen(pid,script,"r");
 	if (f != NULL)
 	{
+#ifdef MARTII
+		Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
+		int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
+		int h = lines_max * font->getHeight();
+		vector<std::string> lines(lines_max);
+		int lines_index = 0;
+		CBox textBoxPosition(frameBuffer->getScreenX(), frameBuffer->getScreenY(), frameBuffer->getScreenWidth(), h);
+		CTextBox textBox(script, font, 0, &textBoxPosition);
+		struct pollfd fds;
+		fds.fd = fileno(f);
+		fds.events = POLLIN | POLLHUP | POLLERR;
+		fcntl(fds.fd, F_SETFL, fcntl(fds.fd, F_GETFL, 0) | O_NONBLOCK);
+
+		std::string txt = "";
+		struct timeval tv;
+		gettimeofday(&tv,NULL);
+		uint64_t lastPaint = (uint64_t) tv.tv_usec + (uint64_t)((uint64_t) tv.tv_sec * (uint64_t) 1000000);
+		bool ok = true, nlseen = false, dirty = false;
+		char output[1024];
+		int off = 0;
+
+		do {
+			uint64_t now;
+			fds.revents = 0;
+			int r = poll(&fds, 1, 300);
+
+			if (r > 0) {
+				if (!feof(f)) {
+					gettimeofday(&tv,NULL);
+					now = (uint64_t) tv.tv_usec + (uint64_t)((uint64_t) tv.tv_sec * (uint64_t) 1000000);
+
+					int lines_read = 0;
+					while (fgets(output + off, sizeof(output) - off, f)) {
+						char *outputp = output + off;
+						dirty = true;
+
+						for (int i = off; output[i]; i++)
+							switch (output[i]) {
+								case '\b':
+									if (outputp > output)
+										outputp--;
+									*outputp = 0;
+									break;
+								case '\r':
+									outputp = output;
+									break;
+								case '\n':
+									nlseen = true;
+								default:
+									*outputp++ = output[i];
+									break;
+							}
+
+						if (outputp < output + sizeof(output))
+							*outputp = 0;
+						if (nlseen) {
+							lines_read++;
+							lines_index++;
+							lines_index %= lines_max;
+						}
+						lines[lines_index] = std::string(output);
+						txt = "";
+						for (int i = lines_index + 1; i < lines_max; i++)
+							txt += lines[i];
+						for (int i = 0; i <= lines_index; i++)
+							txt += lines[i];
+						if (((lines_read == lines_max) && (lastPaint + 100000 < now)) || (lastPaint + 250000 < now)) {
+							lines_read = 0;
+							textBox.setText(&txt);
+							textBox.paint();
+							lastPaint = now;
+							dirty = false;
+						}
+						if (nlseen) {
+							nlseen = false;
+							off = 0;
+						}
+					}
+				} else
+					ok = false;
+			} else if (r < 0)
+				ok = false;
+
+			gettimeofday(&tv,NULL);
+			now = (uint64_t) tv.tv_usec + (uint64_t)((uint64_t) tv.tv_sec * (uint64_t) 1000000);
+			if (r < 1 || dirty || lastPaint + 250000 < now) {
+				textBox.setText(&txt);
+				textBox.paint();
+				lastPaint = now;
+				dirty = false;
+			}
+		} while(ok);
+		pclose(f);
+
+		int iw, ih;
+		frameBuffer->getIconSize(NEUTRINO_ICON_BUTTON_OKAY, &iw, &ih);
+		int b_width = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MESSAGEBOX_OK), true) + 36 + ih + (RADIUS_LARGE / 2);
+
+		int fh = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight();
+		int b_height = std::max(fh, ih) + 8 + (RADIUS_LARGE / 2);
+		int xpos = frameBuffer->getScreenWidth() - b_width;
+		int ypos = h - b_height;
+		frameBuffer->paintBoxRel(xpos, ypos, b_width, b_height, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE);
+		frameBuffer->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos + ((b_height - ih) / 2), ypos + ((b_height - ih) / 2), ih);
+		g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(xpos + iw + 17, ypos + fh + ((b_height - fh) / 2), b_width - (iw + 21), g_Locale->getText(LOCALE_MESSAGEBOX_OK), COL_MENUCONTENT, 0, true);
+		frameBuffer->blit();
+
+		neutrino_msg_t msg;
+		neutrino_msg_data_t data;
+		do
+			g_RCInput->getMsg(&msg, &data, 100);
+		while (msg != CRCInput::RC_ok && msg != CRCInput::RC_home);
+
+		textBox.hide();
+		scriptOutput = "";
+#else
 		char *output=NULL;
 		size_t len = 0;
 		while (( getline(&output, &len, f)) != -1)
@@ -335,6 +514,7 @@ void CPlugins::startScriptPlugin(int number)
 		kill(pid,SIGTERM);
 		if(output)
 			free(output);
+#endif
 	}
 	else
 	{
@@ -348,13 +528,29 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	delScriptOutput();
 	/* export neutrino settings to the environment */
 	char tmp[32];
+#ifdef MARTII
+	sprintf(tmp, "%d", g_settings.screen_StartX_int);
+#else
 	sprintf(tmp, "%d", g_settings.screen_StartX);
+#endif
 	setenv("SCREEN_OFF_X", tmp, 1);
+#ifdef MARTII
+	sprintf(tmp, "%d", g_settings.screen_StartY_int);
+#else
 	sprintf(tmp, "%d", g_settings.screen_StartY);
+#endif
 	setenv("SCREEN_OFF_Y", tmp, 1);
+#ifdef MARTII
+	sprintf(tmp, "%d", g_settings.screen_EndX_int);
+#else
 	sprintf(tmp, "%d", g_settings.screen_EndX);
+#endif
 	setenv("SCREEN_END_X", tmp, 1);
+#ifdef MARTII
+	sprintf(tmp, "%d", g_settings.screen_EndY_int);
+#else
 	sprintf(tmp, "%d", g_settings.screen_EndY);
+#endif
 	setenv("SCREEN_END_Y", tmp, 1);
 
 	//bool ispip = strncmp(plugin_list[number].pluginfile.c_str(), "pip", 3) ? false : true;
@@ -590,10 +786,21 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	frameBuffer->Lock();
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	printf("Starting %s\n", plugin_list[number].pluginfile.c_str());
+#ifdef MARTII
+	// workaround for manually messed up permissions
+	if (access(plugin_list[number].pluginfile.c_str(), X_OK))
+		chmod(plugin_list[number].pluginfile.c_str(), 0755);
+#endif
 	my_system(plugin_list[number].pluginfile.c_str(), NULL, NULL);
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	frameBuffer->Unlock();
+#ifdef MARTII
+	frameBuffer->ClearFB();
+#endif
 	frameBuffer->paintBackground();
+#ifdef MARTII
+	videoDecoder->Pig(-1, -1, -1, -1);
+#endif
 	g_RCInput->restartInput();
 	g_RCInput->clearRCMsg();
 #endif

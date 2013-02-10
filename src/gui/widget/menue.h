@@ -92,6 +92,9 @@ class CMenuItem
 			
 	public:
 		bool           	active;
+#ifdef MARTII
+		bool		isStatic;
+#endif
 		neutrino_msg_t 	directKey;
 		neutrino_msg_t 	msg;
 		std::string    	iconName;
@@ -165,7 +168,11 @@ class CMenuSeparator : public CMenuItem
 		};
 
 
+#ifdef MARTII
+		CMenuSeparator(const int Type = 0, const neutrino_locale_t Text = NONEXISTANT_LOCALE, bool IsStatic = false);
+#else
 		CMenuSeparator(const int Type = 0, const neutrino_locale_t Text = NONEXISTANT_LOCALE);
+#endif
 		virtual ~CMenuSeparator(){}
 
 		int paint(bool selected=false);
@@ -207,8 +214,13 @@ class CMenuForwarder : public CMenuItem
 
  public:
 
+#ifdef MARTII
+	CMenuForwarder(const neutrino_locale_t Text, const bool Active=true, const char * const Option=NULL, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL, bool IsStatic = false);
+	CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL, bool IsStatic = false);
+#else
 	CMenuForwarder(const neutrino_locale_t Text, const bool Active=true, const char * const Option=NULL, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL);
 	CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL);
+#endif
 
 
 	virtual ~CMenuForwarder(){}
@@ -227,6 +239,10 @@ class CMenuForwarder : public CMenuItem
 		{
 			return active;
 		}
+#ifdef MARTII
+	void setOptionValue(const char * const Option);
+	void setOptionValue(const std::string &Option);
+#endif
 };
 
 class CMenuDForwarder : public CMenuForwarder

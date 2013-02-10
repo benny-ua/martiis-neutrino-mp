@@ -40,6 +40,9 @@
 #include <daemonc/remotecontrol.h>
 #include <driver/volume.h>
 #include <zapit/zapit.h>
+#ifdef ENABLE_GRAPHLCD
+#include <driver/nglcd.h>
+#endif
 
 #if HAVE_COOL_HARDWARE
 #include <gui/widget/progressbar.h>
@@ -172,6 +175,10 @@ void CVolume::Init()
 			x = ((sw - vbar_w) / 2) + x;
 			y = sh - sh/15;
 			break;
+#ifdef MARTII
+		case 6:// off
+			break;
+#endif
 	}
 
 	icon_x		= x + spacer;
@@ -225,7 +232,11 @@ void CVolume::setvol(int vol)
 	CZapit::getInstance()->SetVolume(vol);
 }
 
+#ifdef MARTII
+void CVolume::setVolume(const neutrino_msg_t key, const bool _bDoPaint, bool nowait)
+#else
 void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowait)
+#endif
 {
 	if (!g_RCInput) /* don't die... */
 		return;
@@ -244,6 +255,11 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 	int vol			= g_settings.current_volume;
 	fb_pixel_t * pixbuf	= NULL;
 
+#ifdef MARTII
+	bool bDoPaint = _bDoPaint;
+	if (g_settings.volume_pos == 6)
+		bDoPaint = false;
+#endif
 	if(bDoPaint) {
 		pixbuf = new fb_pixel_t[(vbar_w+ShadowOffset) * (vbar_h+ShadowOffset)];
 		if(pixbuf!= NULL)
@@ -291,6 +307,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 						g_settings.current_volume += g_settings.current_volume_step;
 					else
 						g_settings.current_volume = 100;
+#ifdef ENABLE_GRAPHLCD
+				nGLCD::ShowVolume(true);
+#endif
 				}				
 			}
 			else if ((msg == CRCInput::RC_minus) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_left))) {
@@ -323,6 +342,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 					
 					else if (g_settings.show_mute_icon == 0)
 						g_settings.current_volume = 0;
+#ifdef ENABLE_GRAPHLCD
+				nGLCD::ShowVolume(true);
+#endif
 				}				
 			}
 
@@ -360,6 +382,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 		}
 	} while (msg != CRCInput::RC_timeout);
 
+#ifdef ENABLE_GRAPHLCD
+	nGLCD::ShowVolume(false);
+#endif
 	if( (bDoPaint) && (pixbuf!= NULL) ) {
 		frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 		delete [] pixbuf;

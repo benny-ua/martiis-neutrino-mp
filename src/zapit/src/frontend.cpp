@@ -37,6 +37,9 @@
 #include <zapit/client/msgtypes.h>
 #include <zapit/frontend_c.h>
 #include <zapit/satconfig.h>
+#ifdef MARTII
+#include <hardware_caps.h>
+#endif
 
 extern transponder_list_t transponders;
 extern int zapit_debug;
@@ -165,6 +168,9 @@ typedef enum dvb_fec {
 /*********************************************************************************************************/
 CFrontend::CFrontend(int Number, int Adapter)
 {
+#ifdef MARTII
+	Number += get_hwcaps()->fe_offset;
+#endif
 	printf("[fe%d] New frontend on adapter %d\n", Number, Adapter);
 	fd		= -1;
 	fenumber	= Number;

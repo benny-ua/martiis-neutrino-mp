@@ -48,6 +48,9 @@
 #include <OpenThreads/Mutex>
 
 #define REC_MAX_APIDS 10
+#ifdef MARTII
+#define REC_MAX_DPIDS 10
+#endif
 #define FILENAMEBUFFERSIZE 1024
 #if HAVE_TRIPLEDRAGON
 /* I'm not able to get it to work with more than 1 recording at a time :-( */
@@ -89,7 +92,14 @@ class CRecordInstance
 		time_t		start_time;
 		bool		StreamVTxtPid;
 		bool		StreamPmtPid;
+#ifdef MARTII
+		bool		StreamSubtitlePids;
+#endif
+#ifdef MARTII
+		unsigned short	apids[REC_MAX_APIDS + REC_MAX_DPIDS];
+#else
 		unsigned short	apids[REC_MAX_APIDS];
+#endif
 		unsigned int	numpids;
 		CZapitClient::responseGetPIDs allpids;
 		int		recording_id;
@@ -112,7 +122,11 @@ class CRecordInstance
 		record_error_msg_t Start(CZapitChannel * channel);
 		void WaitRecMsg(time_t StartTime, time_t WaitTime);
 	public:		
+#ifdef MARTII
+		CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift = false, bool stream_vtxt_pid = false, bool stream_pmt_pid = false, bool stream_subtitle_pids = false);
+#else
 		CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift = false, bool stream_vtxt_pid = false, bool stream_pmt_pid = false);
+#endif
 		~CRecordInstance();
 
 		record_error_msg_t Record();
@@ -152,6 +166,9 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		std::string	TimeshiftDirectory;
 		bool		StreamVTxtPid;
 		bool		StreamPmtPid;
+#ifdef MARTII
+		bool		StreamSubtitlePids;
+#endif
 		bool		StopSectionsd;
 		int		last_mode;
 		bool		autoshift;
@@ -206,11 +223,18 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		bool RunStartScript(void);
 		bool RunStopScript(void);
 
+#ifdef MARTII
+		void Config(const bool stopsectionsd, const bool stream_vtxt_pid, const bool stream_pmt_pid, const bool stream_subtitle_pids)
+#else
 		void Config(const bool stopsectionsd, const bool stream_vtxt_pid, const bool stream_pmt_pid)
+#endif
 		{
 			StopSectionsd	= stopsectionsd;
 			StreamVTxtPid	= stream_vtxt_pid;
 			StreamPmtPid	= stream_pmt_pid;
+#ifdef MARTII
+			StreamSubtitlePids	= stream_subtitle_pids;
+#endif
 		};
 		void SetDirectory(const char * const directory) { Directory	= directory; };
 		void SetTimeshiftDirectory(const char * const directory) { TimeshiftDirectory	= directory; };

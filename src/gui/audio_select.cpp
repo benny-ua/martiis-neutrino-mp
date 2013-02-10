@@ -120,6 +120,7 @@ int CAudioSelectMenuHandler::doMenu ()
 	if (p_count)
 		AudioSelector.addItem(GenericMenuSeparatorLine);
 
+#ifndef MARTII // should be: HAVE_SPARK_HARDWARE
 	// -- setup menue for to Dual Channel Stereo
 	CMenuOptionChooser* oj = new CMenuOptionChooser(LOCALE_AUDIOMENU_ANALOG_MODE,
 			&g_settings.audio_AnalogMode,
@@ -133,6 +134,7 @@ int CAudioSelectMenuHandler::doMenu ()
 			true, audioSetupNotifier, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 
 	AudioSelector.addItem( oj );
+#endif
 
 	CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
 	int curnum = channelList->getActiveChannelNumber();
@@ -141,10 +143,16 @@ int CAudioSelectMenuHandler::doMenu ()
 	bool sep_added = false;
 	if(cc)
 	{
+#ifdef MARTII
+		bool have_dvb_sub = false;
+#endif
 		for (int i = 0 ; i < (int)cc->getSubtitleCount() ; ++i)
 		{
 			CZapitAbsSub* s = cc->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
+#ifdef MARTII
+				have_dvb_sub = true;
+#endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				printf("[neutrino] adding DVB subtitle %s pid %x\n", sd->ISO639_language_code.c_str(), sd->pId);
 				if(!sep_added)
@@ -178,6 +186,10 @@ int CAudioSelectMenuHandler::doMenu ()
 							!tuxtx_subtitle_running(&pid, &page, NULL), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			}
 		}
+#ifdef MARTII
+		if (have_dvb_sub)
+			AudioSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
+#endif
 
 		if(sep_added)
 			AudioSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
@@ -197,5 +209,11 @@ int CAudioSelectMenuHandler::doMenu ()
 					g_RemoteControl->current_PIDs.APIDs[i].desc));
 	}
 
+#ifdef MARTII
+	int res = AudioSelector.exec(NULL, "");
+	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
+	return res;
+#else
 	return AudioSelector.exec(NULL, "");
+#endif
 }

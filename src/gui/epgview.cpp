@@ -27,6 +27,9 @@
 
 #include <algorithm>
 #include <gui/epgview.h>
+#ifdef MARTII
+#include <gui/followscreenings.h>
+#endif
 
 #include <gui/widget/buttons.h>
 #include <gui/widget/hintbox.h>
@@ -589,7 +592,11 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 
 	/* neat for debugging duplicate event issues etc. */
 	char *epgid;
+#ifdef MARTII
+	if (asprintf(&epgid, "EPG ID:%08llX.%02X", epgData.eventID, epgData.table_id) >= 0)
+#else
 	if (asprintf(&epgid, "EPG ID:%04X.%02X", (int)((epgData.eventID)&0x0FFFF), epgData.table_id) >= 0)
+#endif
 	{
 		processTextToArray(""); // UTF-8
 		processTextToArray(epgid);
@@ -798,6 +805,15 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 						}
 						//if (recDir != NULL)
 						if (doRecord)
+#ifdef MARTII
+						{
+							CFollowScreenings m(channel_id,
+								epgData.epg_times.startzeit,
+								epgData.epg_times.startzeit + epgData.epg_times.dauer,
+								epgData.title, epgData.eventID, TIMERD_APIDS_CONF, true, recDir, &evtlist);
+							m.exec(NULL, "");
+						}
+#else
 						{
 							if (g_Timerd->addRecordTimerEvent(channel_id,
 											  epgData.epg_times.startzeit,
@@ -823,6 +839,7 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 								timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_EPG]);
 							}
 						}
+#endif
 					}
 					else
 						printf("timerd not available\n");

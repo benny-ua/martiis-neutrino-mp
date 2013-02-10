@@ -89,6 +89,12 @@ const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUN
 	{ SNeutrinoSettings::ITEM_CLOCK,		LOCALE_CLOCK_SWITCH_ON },
 	{ SNeutrinoSettings::ITEM_GAMES,		LOCALE_MAINMENU_GAMES },
 	{ SNeutrinoSettings::ITEM_SCRIPTS,		LOCALE_MAINMENU_SCRIPTS }
+#ifdef MARTII
+        , { SNeutrinoSettings::ITEM_ADZAP,		LOCALE_USERMENU_ITEM_ADZAP }
+        , { SNeutrinoSettings::ITEM_EMU_RESTART,	LOCALE_SERVICEMENU_RESTART_CAM }
+        , { SNeutrinoSettings::ITEM_TUNER_RESTART,	LOCALE_SERVICEMENU_RESTART_TUNER }
+        , { SNeutrinoSettings::ITEM_THREE_D_MODE,	LOCALE_THREE_D_SETTINGS }
+#endif
 };
 
 int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &)

@@ -55,15 +55,23 @@
 #include <neutrino.h>
 #include <cs_api.h>
 
+#ifdef MARTII
+#include <gui/cec_setup.h> // FIXME
+#endif
+
 //#define RCDEBUG
 //#define USE_GETTIMEOFDAY
 
 #define ENABLE_REPEAT_CHECK
 
 #if HAVE_SPARK_HARDWARE
+#ifdef MARTII
+const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
+#else
 /* this relies on event0 being the AOTOM frontpanel driver device
  * TODO: what if another input device is present? */
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
+#endif
 #else
 //const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
@@ -522,6 +530,9 @@ void CRCInput::getMsg_ms(neutrino_msg_t * msg, neutrino_msg_data_t * data, int T
 	getMsg_us(msg, data, (uint64_t) Timeout * 1000, bAllowRepeatLR);
 }
 
+#ifdef MARTII
+static bool firstKey = true;
+#endif
 void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint64_t Timeout, bool bAllowRepeatLR)
 {
 	static uint64_t last_keypress = 0ULL;
@@ -1160,6 +1171,12 @@ printf("[neutrino] CSectionsdClient::EVT_GOT_CN_EPG\n");
 								*data = (unsigned long) p;
 								dont_delete_p = true;
 								break;
+#ifdef MARTII
+							case CTimerdClient::EVT_BATCHEPG :
+								*msg = NeutrinoMessages::EVT_BATCHEPG;
+								*data = 0;
+								break;
+#endif
 
 							default :
 								printf("[neutrino] event INITID_TIMERD - unknown eventID 0x%x\n",  emsg.eventID );
@@ -1235,6 +1252,16 @@ printf("[neutrino] CSectionsdClient::EVT_GOT_CN_EPG\n");
 #ifdef RCDEBUG
 					printf("got keydown native key: %04x %04x, translate: %04x -%s-\n", ev.code, ev.code&0x1f, translate(ev.code, 0), getKeyName(translate(ev.code, 0)).c_str());
 					printf("rc_last_key %04x rc_last_repeat_key %04x\n\n", rc_last_key, rc_last_repeat_key);
+#endif
+#ifdef MARTII
+					if (firstKey) {
+						extern bool timer_wakeup; // timermanager.cpp
+						if (timer_wakeup) {
+							timer_wakeup = false;
+							CCECSetup cecsetup;
+							cecsetup.setCECSettings(true);
+						}
+					}
 #endif
 					uint64_t now_pressed;
 					bool keyok = true;
@@ -1520,7 +1547,11 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 			case RC_timeshift:
 				return "timeshift";
 			case RC_mode:
+#ifdef MARTII
+				return "v.format";
+#else
 				return "mode";
+#endif
 			case RC_record:
 				return "record";
 			case RC_pause:
@@ -1551,6 +1582,40 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 				return "analog off";
 			case RC_www:
 				return "window print";
+#ifdef MARTII
+			case RC_find:
+				return "find";
+			case RC_pip:
+				return "pip";
+			case RC_archive:
+				return "archive";
+			case RC_slow:
+				return "slow";
+			case RC_fastforward:
+				return "fast";
+			case RC_playmode:
+				return "play mode";
+			case RC_usb:
+				return "usb";
+			case RC_timer:
+				return "time";
+			case RC_f1:
+				return "f1";
+			case RC_f2:
+				return "f2";
+			case RC_f3:
+				return "f3";
+			case RC_f4:
+				return "f4";
+			case RC_prog1:
+				return "prog1";
+			case RC_prog2:
+				return "prog2";
+			case RC_prog3:
+				return "prog3";
+			case RC_prog4:
+				return "prog4";
+#endif
 			default:
 				printf("unknown key: %d (0x%x) \n", key, key);
 				return "unknown";
@@ -1584,6 +1649,11 @@ int CRCInput::translate(int code, int /*num*/)
 {
 	switch(code)
 	{
+#ifdef HAVE_SPARK_HARDWARE // MARTII
+		case KEY_EXIT:
+		case KEY_HOME:
+			return RC_home;
+#endif
 		case 0x100:
 			return RC_up;
 		case 0x101:

@@ -71,9 +71,15 @@ function init(){
 //]]>
 </script>
 </head>
+<!-- #ifdef MARTII -->
+{=var-set:lcshot=false=}
+{=var-set:fbshot=true=}
+{=var-set:dboxshot=false=}
+<!-- #else
 {=var-set:lcshot={=if-file-exists:/bin/lcshot~true~{=if-file-exists:/var/bin/lcshot~true~false=}=}=}
 {=var-set:fbshot={=if-file-exists:/bin/fbshot~true~{=if-file-exists:/var/bin/fbshot~true~{=if-file-exists:/bin/dboxshot~true~{=if-file-exists:/var/bin/dboxshot~true~false=}=}=}=}=}
 {=var-set:dboxshot={=if-file-exists:/bin/dboxshot~true~{=if-file-exists:/var/bin/dboxshot~true~false=}=}=}
+     #endif -->
 <body>
 <div class="y_menu_sec_box">
 	<div class="y_menu_sec_box_head"><h2>{=L:main.boxcontrol=}</h2></div>
@@ -92,6 +98,7 @@ function init(){
 				<li>
 					<a target="work" title="{=L:bc.menue.remote_desc=}" href="Y_Tools_Rcsim.yhtm">{=L:bc.menue.remote=}</a>
 				</li>
+<!-- #ifndef MARTII
 				{=if-not-equal:{=global-var-get:boxtype=}~coolstream~
 				<li>
 					{=if-equal:{=var-get:lcshot=}~true~
@@ -104,6 +111,7 @@ function init(){
 				<li>
 					<a target="work" title="{=L:bc.menue.tv_screenshot_desc=}" href="Y_Tools_tvshot.yhtm">{=L:bc.menue.tv_screenshot=}</a>
 				</li>
+     #endif -->
 				<li>
 					{=if-equal:{=var-get:fbshot=}~true~
 					<a target="work" title="{=L:bc.menue.osd_screenshot_desc=}" href="Y_Tools_fbshot.yhtm">{=L:bc.menue.osd_screenshot=}</a>
@@ -112,11 +120,19 @@ function init(){
 					=}
 				</li>
 				<li>
+<!-- #ifdef MARTII -->
+					{=if-equal:{=var-get:fbshot=}~true~
+					<a target="work" title="{=L:bc.menue.remote_osd_desc=}" href="Y_Tools_remote_osd.yhtm">{=L:bc.menue.remote_osd=}</a></li>
+					~
+					<li class="disabled" title="{=L:bc.menue.remote_osd_desc_ni=}">{=L:bc.menue.remote_osd=}</li>
+					=}
+<!-- #else
 					{=if-equal:{=var-get:dboxshot=}~true~
 					<a target="work" title="{=L:bc.menue.remote_osd_desc=}" href="Y_Tools_remote_osd.yhtm">{=L:bc.menue.remote_osd=}</a>
 					~
 					<a href="javascript:void(0)" class="disabled" title="{=L:bc.menue.remote_osd_desc_ni=}">{=L:bc.menue.remote_osd=}</a>
 					=}
+     #endif -->
 				</li>
 			</ul>
 		</div>

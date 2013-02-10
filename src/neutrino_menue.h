@@ -137,6 +137,9 @@ enum MN_WIDGET_ID
 	//personalize: to personalize sub menues
 	MN_WIDGET_ID_PERSONALIZE_USERMENU,
 	MN_WIDGET_ID_PERSONALIZE_FEATUREKEYS,
+#ifdef MARTII
+	MN_WIDGET_ID_PERSONALIZE_PLUGINS,
+#endif
 
 	//user menu setup
 	MN_WIDGET_ID_USERMENU_RED,

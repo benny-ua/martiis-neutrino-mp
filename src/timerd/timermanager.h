@@ -244,9 +244,23 @@ public:
 	void loadEventsFromConfig();
 	bool shutdown();
 	void shutdownOnWakeup(int currEventId);
+#ifdef MARTII
+	void setWakeupTime();
+#endif
 	void getRecordingSafety(int &pre, int &post){pre=m_extraTimeStart;post=m_extraTimeEnd;}
 	void setRecordingSafety(int pre, int post);
 	void loadRecordingSafety();
 };
 
+#ifdef MARTII
+class CTimerEvent_BatchEPG : public CTimerEvent
+{
+ public:
+	CTimerEvent_BatchEPG( time_t announceTimeArg, time_t alarmTimeArg, CTimerd::CTimerEventRepeat evrepeat = CTimerd::TIMERREPEAT_ONCE, uint32_t repeatcount = 1) :
+		CTimerEvent(CTimerd::TIMER_BATCHEPG, announceTimeArg, alarmTimeArg, (time_t) 0, evrepeat, repeatcount ){};
+	CTimerEvent_BatchEPG(CConfigFile *config, int iId):
+		CTimerEvent(CTimerd::TIMER_BATCHEPG, config, iId){};
+	virtual void fireEvent();
+};
+#endif
 #endif

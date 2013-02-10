@@ -101,6 +101,9 @@ neutrino_LDADD = \
 	-lOpenThreads \
 	-lrt -lpthread
 
+if ENABLE_GRAPHLCD
+neutrino_LDADD += -lglcddrivers -lglcdgraphics -lusb-1.0
+endif
 if ENABLE_GIFLIB
 neutrino_LDADD += -lgif
 else
@@ -144,7 +147,7 @@ endif
 endif
 if BOXTYPE_SPARK
 neutrino_LDADD += \
-	-lass
+	-lass -lasound
 endif
 if BOXTYPE_TRIPLE
 neutrino_LDADD += \

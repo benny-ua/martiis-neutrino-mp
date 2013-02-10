@@ -34,6 +34,10 @@
 
 
 #include <gui/widget/menue.h>
+#ifdef MARTII
+#include <zapit/client/zapittypes.h>
+#include <playback.h>
+#endif
 
 #include <string>
 
@@ -170,4 +174,12 @@ public:
         bool changeNotify(const neutrino_locale_t, void * data);
 };
 
+#ifdef MARTII
+class CMPSubtitleChangeExec : public CMenuTarget
+{
+	public:
+		int exec(CMenuTarget* parent, const std::string & actionKey);
+		cPlayback *playback;
+};
+#endif
 #endif

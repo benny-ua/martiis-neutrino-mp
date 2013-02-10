@@ -45,6 +45,11 @@
 #include "gui/rc_lock.h"
 #include "gui/user_menue.h"
 #include "gui/timerlist.h"
+#ifdef MARTII
+#include <gui/adzap.h>
+#include <gui/psisetup.h>
+#include <gui/3dsetup.h>
+#endif
 
 #include <string>
 
@@ -104,6 +109,9 @@ private:
 	CUserMenu 			usermenu;
 	int                             network_dhcp;
 	int                             network_automatic_start;
+#ifdef MARTII
+	CMenuWidget			*mainMenu;
+#endif
 
 	neutrino_font_descr_struct      font;
 
@@ -187,6 +195,11 @@ public:
 	CChannelList			*TVchannelList;
 	CChannelList			*RADIOchannelList;
 	CChannelList			*channelList;
+#ifdef MARTII
+	CAdZapMenu			*AdZapChanger;
+	CPSISetup			*chPSISetup;
+	C3DSetup			*threeDSetup;
+#endif
 
 	static CNeutrinoApp* getInstance();
 
@@ -221,13 +234,20 @@ public:
 	void SetChannelMode(int mode);
 	void quickZap(int msg);
 	void numericZap(int msg);
+# ifdef ENABLE_GRAPHLCD
+	void StopSubtitles(bool b = true);
+# else
 	void StopSubtitles();
+# endif
 	void StartSubtitles(bool show = true);
 	void SelectSubtitles();
 	void showInfo(void);
 	CConfigFile* getConfigFile() {return &configfile;};
 	bool 		SDTreloadChannels;
 	bool 		g_channel_list_changed;
+#ifdef MARTII
+	CMenuTarget			*batchEPGSettings;
+#endif
 };
 #endif
 

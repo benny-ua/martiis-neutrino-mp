@@ -725,7 +725,25 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 	int caids[] = {  0x900, 0xD00, 0xB00, 0x1800, 0x0500, 0x0100, 0x600,  0x2600, 0x4a00, 0x0E00 };
 	const char * white = (char *) "white";
 	const char * yellow = (char *) "yellow";
+#ifdef MARTII
+	const char * green = (char *) "green";
+#endif
 	int icon_space_offset = 0;
+#ifdef MARTII
+	int acaid = 0;
+	if(!notfirst) {
+		FILE *f = fopen("/tmp/ecm.info", "rt");
+		if (f) {
+			char buf[80];
+			if (fgets(buf, sizeof(buf), f) != NULL) {
+				char *b = strchr(buf, '0');
+				if (b)
+					sscanf(b, "%X", &acaid);
+			}
+			fclose(f);
+		}
+	}
+#endif
 
 	if(!g_InfoViewer->chanready) {
 		if (g_settings.casystem_display == 2) {
@@ -767,10 +785,19 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 				if((found = (caid == caids[i])))
 					break;
 			}
+#ifdef MARTII
+			if(g_settings.casystem_display) {
+				if ((caids[i] & 0xFF00) == (acaid & 0xFF00) || (caids[i] == 0x1700 && (acaid & 0xFF00) == 0x0600))
+					paint_ca_icons(caids[i], (char *) green, icon_space_offset);
+				else
+					paint_ca_icons(caids[i], (char *) (found ? yellow : white), icon_space_offset);
+			}
+#else
 			if(g_settings.casystem_display == 0)
 				paint_ca_icons(caids[i], (char *) (found ? yellow : white), icon_space_offset);
 			else if(found)
 				paint_ca_icons(caids[i], (char *) yellow, icon_space_offset);
+#endif
 		}
 	}
 }

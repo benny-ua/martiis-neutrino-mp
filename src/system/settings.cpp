@@ -78,6 +78,12 @@ const struct personalize_settings_t personalize_settings[SNeutrinoSettings::P_SE
 	{"personalize_reset_channels"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE}, 
 	{"personalize_restart"			, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
 	{"personalize_reload_plugins"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+#ifdef MARTII
+	{"personalize_service_scripts"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+	{"personalize_restart_tuner"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+	{"personalize_restart_cam"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+	{"personalize_boot_spark"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+#endif
 	{"personalize_infomenu_service"		, CPersonalizeGui::PERSONALIZE_MODE_NOTVISIBLE},
 	{"personalize_softupdate"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
 	
@@ -92,6 +98,9 @@ const struct personalize_settings_t personalize_settings[SNeutrinoSettings::P_SE
 	//media menu->movieplayer
 	{"personalize_mplayer_mbrowswer"	, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
 	{"personalize_mplayer_fileplay"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+#ifdef MARTII
+	{"personalize_mplayer_inetplay"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE},
+#endif
 	
 	//key
 	{"personalize_feat_key_fav"		, CPersonalizeGui::PERSONALIZE_FEAT_KEY_GREEN},

@@ -12,6 +12,10 @@
 #if TUXTXT_COMPRESS == 1
 #include <zlib.h>
 #endif
+#ifdef MARTII
+#include <poll.h>
+#include <system/set_threadname.h>
+#endif
 
 #include <zapit/include/dmx.h>
 
@@ -571,6 +575,10 @@ void tuxtxt_allocate_cache(int magazine)
 /******************************************************************************
  * CacheThread                                                                *
  ******************************************************************************/
+#ifdef MARTII
+int eplayer_fd = -1;
+extern bool isTtxEplayer;
+#endif
 static int stop_cache = 0;
 void *tuxtxt_CacheThread(void * /*arg*/)
 {
@@ -594,6 +602,9 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 	tstPageinfo *pageinfo_thread;
 
 	printf("TuxTxt running thread...(%04x)\n",tuxtxt_cache.vtxtpid);
+#ifdef MARTII
+	set_threadname("tuxtxt_CacheThread");
+#endif
 	tuxtxt_cache.receiving = 1;
 	nice(3);
 	while (!stop_cache)
@@ -607,7 +618,27 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 		/* read packet */
 		ssize_t readcnt;
 
-		readcnt = dmx->Read(pes_packet, sizeof (pes_packet), 1000);
+#ifdef MARTII
+		if (isTtxEplayer) {
+			struct pollfd fds;
+			fds.fd = eplayer_fd;
+			fds.events = POLLIN | POLLHUP | POLLERR;
+			fds.revents = 0;
+			readcnt = 0;
+			poll(&fds, 1, 1000);
+			readcnt = read(eplayer_fd, pes_packet, 6);
+			if (readcnt != 6)
+				continue;
+			size_t peslen = ((pes_packet[4]&0xff) << 8 )| (pes_packet[5]&0xff);
+			if (peslen > sizeof(pes_packet))
+				continue;
+			readcnt = read(eplayer_fd, pes_packet + 6, peslen);
+			if (readcnt != (ssize_t) peslen)
+				continue;
+			readcnt = peslen + 6;
+		} else
+#endif
+		readcnt = dmx->Read(pes_packet, sizeof(pes_packet), 1000);
 		//if (readcnt != sizeof(pes_packet))
 		if ((readcnt <= 0) || (readcnt % 184))
 		{
@@ -1081,10 +1112,18 @@ int tuxtxt_start_thread(int source)
 		return 0;
 
 	tuxtxt_cache.thread_starting = 1;
+#ifdef MARTII
+	if (isTtxEplayer) {
+		eplayer_fd = open("/tmp/.eplayer3_teletext", O_RDONLY | O_NONBLOCK);
+	} else {
+#endif
 	tuxtxt_init_demuxer(source);
 
 	dmx->pesFilter(tuxtxt_cache.vtxtpid);
 	dmx->Start();
+#ifdef MARTII
+	}
+#endif
 	stop_cache = 0;
 
 	/* create decode-thread */
@@ -1130,6 +1169,12 @@ int tuxtxt_stop_thread()
 		delete dmx;
 		dmx = NULL;
 	}
+#ifdef MARTII
+	if (isTtxEplayer && eplayer_fd > -1) {
+		close(eplayer_fd);
+		eplayer_fd = -1;
+	}
+#endif
 #if 0
 	if (tuxtxt_cache.dmx != -1)
 	{

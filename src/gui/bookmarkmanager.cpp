@@ -343,7 +343,11 @@ const CBookmark * CBookmarkManager::getBookmark(CMenuTarget* parent)
 			res=-1;
 			loop=false;
 		}
+#ifdef MARTII
+		else if ( msg == (uint32_t) g_settings.key_help )
+#else
 		else if ( msg == CRCInput::RC_help )
+#endif
 		{
 			// TODO Add Help
 		}

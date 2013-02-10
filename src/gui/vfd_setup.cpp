@@ -35,6 +35,9 @@
 
 
 #include "vfd_setup.h"
+#ifdef MARTII
+#include <gui/glcdsetup.h>
+#endif
 
 #include <global.h>
 #include <neutrino.h>
@@ -108,11 +111,35 @@ const CMenuOptionChooser::keyval LCD_INFO_OPTIONS[LCD_INFO_OPTION_COUNT] =
 	{ 1, LOCALE_LCD_INFO_LINE_CLOCK }
 };
 
+#ifdef MARTII
+#define OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT 4
+const CMenuOptionChooser::keyval OPTIONS_LCD_DISPLAYMODE_OPTIONS[OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT] =
+{
+        { LCD_DISPLAYMODE_OFF, LOCALE_OPTIONS_OFF },
+        { LCD_DISPLAYMODE_ON, LOCALE_OPTIONS_ON },
+	{ LCD_DISPLAYMODE_TIMEONLY, LOCALE_LCDMENU_DISPLAYMODE_TIMEONLY },
+	{ LCD_DISPLAYMODE_TIMEOFF, LOCALE_LCDMENU_DISPLAYMODE_TIMEOFF }
+};
+#endif
 int CVfdSetup::showSetup()
 {
 	CMenuWidget *vfds = new CMenuWidget(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_LCD, width, MN_WIDGET_ID_VFDSETUP);
 	vfds->addIntroItems(LOCALE_LCDMENU_HEAD);
 
+#ifdef MARTII
+	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_RUNNING,
+		&g_settings.lcd_setting[SNeutrinoSettings::LCD_DISPLAYMODE],
+		OPTIONS_LCD_DISPLAYMODE_OPTIONS, OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT, true, this));
+	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_STANDBY,
+		&g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE],
+		OPTIONS_LCD_DISPLAYMODE_OPTIONS, 2, true));
+#ifdef ENABLE_GRAPHLCD
+	vfds->addItem(GenericMenuSeparatorLine);
+	GLCD_Menu glcdMenu;
+	vfds->addItem(new CMenuForwarder(LOCALE_GLCD_HEAD, true, NULL,
+		&glcdMenu, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
+#endif
+#else
 	//vfd brightness menu
 	CMenuWidget lcd_sliders(LOCALE_LCDMENU_HEAD, NEUTRINO_ICON_LCD,width, MN_WIDGET_ID_VFDSETUP_LCD_SLIDERS);
 	showBrightnessSetup(&lcd_sliders);
@@ -139,6 +166,7 @@ int CVfdSetup::showSetup()
 	lcd_clock_channelname_menu->setHint("", LOCALE_MENU_HINT_VFD_INFOLINE);
 	vfds->addItem(oj);
 	vfds->addItem(lcd_clock_channelname_menu);
+#endif
 
 	int res = vfds->exec(NULL, "");
 
@@ -216,7 +244,13 @@ void CVfdSetup::showLedSetup(CMenuWidget *mn_led_widget)
 
 bool CVfdSetup::changeNotify(const neutrino_locale_t OptionName, void */* data */)
 {
-
+#ifdef MARTII
+	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_RUNNING) ||
+	    ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_STANDBY)) {
+		CVFD::getInstance()->ShowText(NULL);
+		CVFD::getInstance()->setlcdparameter();
+	} else
+#endif
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDCONTROLER_BRIGHTNESS))
 	{
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);

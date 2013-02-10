@@ -104,8 +104,28 @@ void COnOffNotifier::addItem(CMenuItem* menuItem)
 	toDisable.push_back(menuItem);
 }
 
+#ifdef MARTII
+bool CSectionsdConfigNotifier::changeNotify(const neutrino_locale_t OptionName, void *)
+#else
 bool CSectionsdConfigNotifier::changeNotify(const neutrino_locale_t, void *)
+#endif
 {
+#ifdef MARTII
+	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_MISCSETTINGS_EPG_FREESAT_ENABLE)) {
+		CHintBox hintBox(LOCALE_MISCSETTINGS_EPG_FREESAT, g_Locale->getText(LOCALE_MISCSETTINGS_RESTART)); // UTF-8
+		hintBox.paint();
+		sleep(2);
+		hintBox.hide();
+		return true;
+	}
+	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_MISCSETTINGS_EPG_VIASAT_ENABLE)) {
+		CHintBox hintBox(LOCALE_MISCSETTINGS_EPG_VIASAT, g_Locale->getText(LOCALE_MISCSETTINGS_RESTART)); // UTF-8
+		hintBox.paint();
+		sleep(2);
+		hintBox.hide();
+		return true;
+	}
+#endif
         CNeutrinoApp::getInstance()->SendSectionsdConfig();
         return false;
 }
@@ -191,7 +211,11 @@ bool CColorSetupNotifier::changeNotify(const neutrino_locale_t, void *)
 	return false;
 }
 
+#ifdef MARTII
+bool CAudioSetupNotifier::changeNotify(const neutrino_locale_t OptionName, void *data)
+#else
 bool CAudioSetupNotifier::changeNotify(const neutrino_locale_t OptionName, void *)
+#endif
 {
 	//printf("notify: %d\n", OptionName);
 #if 0 //FIXME to do ? manual audio delay
@@ -216,6 +240,19 @@ bool CAudioSetupNotifier::changeNotify(const neutrino_locale_t OptionName, void 
 	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIOMENU_CLOCKREC)) {
 		//.Clock recovery enable/disable
 		// FIXME add code here.
+#ifdef MARTII
+# ifdef HAVE_SPARK_HARDWARE
+	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG)) {
+		static mixerVolume m("Analog", "1");
+		m.setVolume((long)(*((int *)(data))));
+	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI)) {
+		static mixerVolume m("HDMI", "1");
+		m.setVolume((long)(*((int *)(data))));
+	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF)) {
+		static mixerVolume m("SPDIF", "1");
+		m.setVolume((long)(*((int *)(data))));
+# endif
+#endif
 	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIO_SRS_ALGO) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIO_SRS_NMGR) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIO_SRS_VOLUME)) {
@@ -285,6 +322,29 @@ printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, pt
 	}
         return menu_return::RETURN_EXIT;
 }
+#ifdef MARTII
+int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
+{
+	if(actionKey == "off") {
+		playback->SetDvbsubtitlePid(0xffff);
+		playback->SetSubtitlePid(0xffff);
+		dvbsub_stop();
+	} else if(!strncmp(actionKey.c_str(), "DVB", 3)) {
+		char const * pidptr = strchr(actionKey.c_str(), ':');
+		int pid = atoi(pidptr+1);
+		dvbsub_pause();
+		playback->SetSubtitlePid(0xffff);
+		playback->SetDvbsubtitlePid(pid);
+		dvbsub_start(pid, true);
+	} else if(!strncmp(actionKey.c_str(), "SUB", 3)) {
+		char const * pidptr = strchr(actionKey.c_str(), ':');
+		int pid = atoi(pidptr+1);
+		dvbsub_pause();
+		playback->SetSubtitlePid(pid);
+	}
+        return menu_return::RETURN_EXIT;
+}
+#endif
 
 int CNVODChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {

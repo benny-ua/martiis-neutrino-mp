@@ -51,6 +51,9 @@ typedef struct ZAPIT_start_arg
 typedef struct Zapit_config {
         int writeChannelsNames;
         int makeRemainingChannelsBouquet;
+#ifdef MARTII
+	int makeNewChannelsBouquet;
+#endif
         int saveLastChannel;
         int rezapTimeout;
         int fastZap;
@@ -229,6 +232,9 @@ class CZapit : public OpenThreads::Thread
 		void Abort() { abort_zapit = 1; };
 		bool Recording() { return currentMode & RECORD_MODE; };
 		bool makeRemainingChannelsBouquet() { return config.makeRemainingChannelsBouquet; };
+#ifdef MARTII
+		bool makeNewChannelsBouquet() { return config.makeNewChannelsBouquet; };
+#endif
 		bool scanSDT() { return config.scanSDT; };
 		bool scanPids() { return config.scanPids; };
 		void scanPids(bool enable) { config.scanPids = enable; };

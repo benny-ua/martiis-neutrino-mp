@@ -36,6 +36,9 @@
 #include <gui/widget/menue.h>
 
 #include <driver/framebuffer.h>
+#ifdef MARTII
+#include <zapit/client/zapittypes.h>
+#endif
 
 #include <string>
 
@@ -51,17 +54,37 @@ class CScreenSetup : public CMenuTarget
     int BoxWidth;
     int x_coord[2];
     int y_coord[2];
+#ifdef MARTII
+    fb_pixel_t color_bak;
+    int x_coord_bak[2];
+    int y_coord_bak[2];
+    t_channel_id channel_id;
+    int startX;
+    int startY;
+    int endX;
+    int endY;
+#endif
 
     void paint();
     void paintBorderUL();
     void paintBorderLR();
+#ifndef MARTII
     void paintCoords();
+#endif
     void paintBorder(int selected);
     void unpaintBorder(int selected);
     void paintIcons(int pselected);
 	
  public:
     CScreenSetup();
+#ifdef MARTII
+    void showBorder(t_channel_id cid);
+    void hideBorder();
+    void resetBorder(t_channel_id cid);
+    bool loadBorder(t_channel_id cid);
+    void loadBorders(void);
+    void saveBorders(void);
+#endif
     void hide();
     int exec(CMenuTarget* parent, const std::string & actionKey);
 

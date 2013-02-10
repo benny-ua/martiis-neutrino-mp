@@ -42,6 +42,9 @@
 #include <gui/pictureviewer.h>
 #if ENABLE_UPNP
 #include <gui/upnpbrowser.h>
+#ifdef MARTII
+#include <gui/webtv.h>
+#endif
 #endif
 
 #include <gui/widget/icons.h>
@@ -91,7 +94,15 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		if (audioPlayer == NULL)
 			audioPlayer = new CAudioPlayerGui();
+#ifdef MARTII
+		if (!g_settings.show_background_picture)
+			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+#endif
 		int res = audioPlayer->exec(NULL, "init");
+#ifdef MARTII
+		if (!g_settings.show_background_picture)
+			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+#endif
 		
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
@@ -99,8 +110,16 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		if (inetPlayer == NULL)
 			inetPlayer = new CAudioPlayerGui(true);
+#ifdef MARTII
+		if (!g_settings.show_background_picture)
+			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+#endif
 		int res = inetPlayer->exec(NULL, "init");
 		
+#ifdef MARTII
+		if (!g_settings.show_background_picture)
+			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+#endif
 		return res; //menu_return::RETURN_REPAINT;
 	}
 	else if (actionKey == "movieplayer")
@@ -113,6 +132,13 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 		return res;
 	}
+#ifdef MARTII
+	else if (actionKey == "webtv") {
+		CWebTV w;
+		w.exec(this, "");
+		return menu_return::RETURN_REPAINT;;
+	}
+#endif
 	
 	int res = initMenuMedia();
 	
@@ -139,14 +165,18 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	
 	CMenuForwarder *fw_audio = NULL;
 	CMenuForwarder *fw_inet = NULL;
+#ifndef MARTII
 	CMenuForwarder *fw_mp = NULL;
+#endif
 	CMenuForwarder *fw_pviewer = NULL;
 	CPictureViewerGui *pictureviewergui = NULL;
 #if ENABLE_UPNP
 	CUpnpBrowserGui *upnpbrowsergui = NULL;
 	CMenuForwarder *fw_upnp = NULL;
 #endif
+#ifndef MARTII
 	CMenuWidget *moviePlayer = NULL;
+#endif
 
 	if (usage_mode != MODE_VIDEO)
 	{
@@ -165,11 +195,13 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 
 	if (usage_mode == MODE_DEFAULT)
 	{
+#ifndef MARTII
 		//movieplayer
 		moviePlayer = new CMenuWidget(LOCALE_MAINMENU_MOVIEPLAYER, NEUTRINO_ICON_MULTIMEDIA, width, MN_WIDGET_ID_MEDIA_MOVIEPLAYER);
 		personalize->addWidget(moviePlayer);
 		fw_mp = new CMenuForwarder(LOCALE_MAINMENU_MOVIEPLAYER, true, NULL, moviePlayer, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
 		fw_mp->setHint(NEUTRINO_ICON_HINT_MOVIE, LOCALE_MENU_HINT_MOVIE);
+#endif
 
  		//pictureviewer
 		pictureviewergui = new CPictureViewerGui();
@@ -178,7 +210,11 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 #if ENABLE_UPNP
 		//upnp browser
 		upnpbrowsergui = new CUpnpBrowserGui();
+#ifdef MARTII
+		fw_upnp = new CMenuForwarder(LOCALE_UPNPBROWSER_HEAD, true, NULL, upnpbrowsergui, NULL, CRCInput::RC_0, NEUTRINO_ICON_BUTTON_YELLOW);
+#else
 		fw_upnp = new CMenuForwarder(LOCALE_UPNPBROWSER_HEAD, true, NULL, upnpbrowsergui, NULL, CRCInput::RC_0, NEUTRINO_ICON_BUTTON_0);
+#endif
 #endif
 //  		media->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, usage_mode == MODE_AUDIO ? CMenuWidget::BTN_TYPE_CANCEL : CMenuWidget::BTN_TYPE_BACK);
 	}
@@ -203,15 +239,29 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 		
+#ifdef MARTII
+#if ENABLE_UPNP
+		//upnp browser
+		personalize->addItem(media, fw_upnp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_UPNP]);
+#endif
+
+		//picture viewer
+		personalize->addItem(media, fw_pviewer, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_PVIEWER]);
+
+		showMoviePlayer(media, personalize);
+#else
 		//movieplayer
 		showMoviePlayer(moviePlayer,  personalize);
 		personalize->addItem(media, fw_mp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_MPLAYER], false, CPersonalizeGui::PERSONALIZE_SHOW_AS_ACCESS_OPTION);
+#endif
 		
+#ifndef MARTII
 		//picture viewer
 		personalize->addItem(media, fw_pviewer, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_PVIEWER]);
 #if ENABLE_UPNP		
 		//upnp browser
 		personalize->addItem(media, fw_upnp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_UPNP]);
+#endif
 #endif
 	}
 	
@@ -238,18 +288,31 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 //show movieplayer submenu with selectable items for moviebrowser or filebrowser
 void CMediaPlayerMenu::showMoviePlayer(CMenuWidget *moviePlayer, CPersonalizeGui *p)
 { 
+#ifdef MARTII
+	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "movieplayer");
+	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback");
+	
+	p->addSeparator(*moviePlayer, LOCALE_MAINMENU_MOVIEPLAYER, true);
+#else
 	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "movieplayer", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	fw_mbrowser->setHint(NEUTRINO_ICON_HINT_MB, LOCALE_MENU_HINT_MB);
 	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 	fw_file->setHint(NEUTRINO_ICON_HINT_FILEPLAY, LOCALE_MENU_HINT_FILEPLAY);
 	
 	p->addIntroItems(moviePlayer);
+#endif
 	
 	//moviebrowser
 	p->addItem(moviePlayer, fw_mbrowser, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_MBROWSER]);
 	
 	//fileplayback
 	p->addItem(moviePlayer, fw_file, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_FILEPLAY]);
+#ifdef MARTII
+	//networkplayback
+	CMenuForwarder *fw_network = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, this, "webtv");
+	p->addItem(moviePlayer, fw_network, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_INETPLAY]);
+#endif
+
 
 // #if 0
 // 	//moviePlayer->addItem(new CMenuForwarder(LOCALE_MOVIEPLAYER_PESPLAYBACK, true, NULL, moviePlayerGui, "pesplayback"));

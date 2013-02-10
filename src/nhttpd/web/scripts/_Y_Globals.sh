@@ -9,6 +9,11 @@
 # Definitions
 # -----------------------------------------------------------
 boxtype="coolstream"
+# #ifdef MARTII
+# leave "boxtype" alone (it differentiates between N and N-HD,
+# but set "boxhardware" to a somewhat meaningful value.
+boxhardware="spark"
+# #endif
 
 # -----------------------------------------------------------
 # Pathes
