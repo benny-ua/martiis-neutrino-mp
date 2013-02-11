@@ -179,33 +179,6 @@ void CLCD::showServicename(const std::string name, bool)
 	wake_up();
 }
 
-// from fp_control/Spark.c:
-
-static double modJulianDate(struct tm *theTime)
-{
-        double date;
-        int month;
-        int day;
-        int year;
-
-        year  = theTime->tm_year + 1900;
-        month = theTime->tm_mon + 1;
-        day   = theTime->tm_mday;
-
-        date = day - 32076 +
-                1461 * (year + 4800 + (month - 14)/12)/4 +
-                367 * (month - 2 - (month - 14)/12*12)/12 -
-                3 * ((year + 4900 + (month - 14)/12)/100)/4;
-
-        date += (theTime->tm_hour + 12.0)/24.0;
-        date += (theTime->tm_min)/1440.0;
-        date += (theTime->tm_sec)/86400.0;
-
-        date -= 2400000.5;
-
-        return date;
-}
-
 void CLCD::showTime(bool)
 {
 	int m = g_settings.lcd_setting[ (mode == MODE_STANDBY)
@@ -232,18 +205,9 @@ void CLCD::showTime(bool)
 	struct tm tm;
 	time_t now = time(NULL);
 	localtime_r(&now, &tm);
+	now += tm.tm_gmtoff;
 
-	struct aotom_ioctl_data vData;
-	double mjd = modJulianDate(&tm);
-	int mjd_int = mjd;
-
-	vData.u.time.time[0] = mjd_int >> 8;
-	vData.u.time.time[1] = mjd_int & 0xff;
-	vData.u.time.time[2] = tm.tm_hour;
-	vData.u.time.time[3] = tm.tm_min;
-	vData.u.time.time[4] = tm.tm_sec;
-
-	if (ioctl(fd, VFDSETTIME, &vData) < 0) {
+	if (ioctl(fd, VFDSETTIME2, &now) < 0) {
 		char buf[10];
 		strftime(buf, sizeof(buf), "%H%M", &tm);
 		ShowText(buf, false);
@@ -251,7 +215,7 @@ void CLCD::showTime(bool)
 	if (vfd_version != 4 && m != LCD_DISPLAYMODE_OFF)
 		ShowText(NULL);
 	waitSec = 60 - tm.tm_sec;
-	if (waitSec == 0)
+	if (waitSec <= 0)
 		waitSec = 60;
 }
 
