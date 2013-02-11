@@ -298,12 +298,14 @@ void CInfoViewerBB::getBBButtonInfo()
 	bbButtonMaxX = g_InfoViewer->ChanInfoX + 10;
 	int br = 0;
 	for (int i = 0; i < CInfoViewerBB::BUTTON_MAX; i++) {
+#ifndef MARTII
 		if ((i == CInfoViewerBB::BUTTON_SUBS) && (g_RemoteControl->subChannels.empty())) { // no subchannels
 			bbButtonInfo[i].paint = false;
 //			bbButtonInfo[i].x = -1;
 //			continue;
 		}
 		else
+#endif
 			bbButtonInfo[i].paint = true;
 		br += bbButtonInfo[i].w;
 		bbButtonInfo[i].x = bbButtonMaxX;
