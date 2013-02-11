@@ -124,14 +124,6 @@ CFrameBuffer::CFrameBuffer()
 #ifdef USE_OPENGL
 	mpGLThreadObj = NULL;
 #endif
-#ifdef MARTII
-	accel->startX = 0;
-	accel->startY = 0;
-	accel->endX = DEFAULT_XRES - 1;
-	accel->endY = DEFAULT_YRES - 1;
-	accel->borderColor = 0;
-	accel->borderColorOld = 0x01010101;
-#endif
 }
 #ifdef MARTII
 void CFrameBuffer::setBorder(int sx, int sy, int ex, int ey)
@@ -231,9 +223,6 @@ void CFrameBuffer::init(const char * const fbDevice)
 		perror("FBIOGET_VSCREENINFO");
 		goto nolfb;
 	}
-#ifdef MARTII
-	resChange();
-#endif
 
 	memmove(&oldscreen, &screeninfo, sizeof(screeninfo));
 
@@ -350,6 +339,15 @@ void CFrameBuffer::init(const char * const fbDevice)
 	}
 #endif
 	accel = new CFbAccel(this);
+#ifdef MARTII
+	accel->startX = 0;
+	accel->startY = 0;
+	accel->endX = DEFAULT_XRES - 1;
+	accel->endY = DEFAULT_YRES - 1;
+	accel->borderColor = 0;
+	accel->borderColorOld = 0x01010101;
+	resChange();
+#endif
 	return;
 
 nolfb:
