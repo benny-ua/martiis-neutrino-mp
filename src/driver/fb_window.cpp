@@ -48,7 +48,14 @@ CFBWindow::CFBWindow(const int _x, const int _y, const int _dx, const int _dy)
 CFBWindow::~CFBWindow(void)
 {
 	if (Background != NULL)
+#ifdef MARTII
+	{
+#endif
 		frameBuffer->RestoreScreen(x, y, dx, dy, Background);
+#ifdef MARTII
+		frameBuffer->blit();
+	}
+#endif
 	delete[] Background;
 }
 
