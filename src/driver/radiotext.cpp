@@ -81,6 +81,9 @@
 #include <system/settings.h>
 #include <neutrino.h>
 #include <gui/color.h>
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 extern "C" {
 #include "ringbuffer.h"
@@ -2373,12 +2376,19 @@ void CRadioText::setPid(uint inPid)
 
 void CRadioText::run()
 {
+#ifdef MARTII
+	set_threadname("CRadioText::run");
+#endif
 	uint current_pid = 0;
 
 	printf("CRadioText::run: ###################### Starting thread ######################\n");
 	audioDemux = new cDemux(1);
 	audioDemux->Open(DMX_PES_CHANNEL,0,128*1024);
 
+#ifdef MARTII
+	int buflen = 0;
+	unsigned char *buf = NULL;
+#endif
 	while(running) {
 		mutex.lock();
 		if (pid == 0) {
@@ -2401,10 +2411,41 @@ void CRadioText::run()
 		}
 		mutex.unlock();
 		if (pid) {
+#ifdef MARTII
+			int n;
+			unsigned char tmp[6];
+
+			n = audioDemux->Read(tmp, 6, 500);
+			if (n != 6) {
+				usleep(10000); /* save CPU if nothing read */
+				continue;
+			}
+			if (memcmp(tmp, "\000\000\001\300", 4))
+				continue;
+			int packlen = ((tmp[4] << 8) | tmp[5]) + 6;
+
+			if (buflen < packlen) {
+				if (buf)
+					free(buf);
+				buf = (unsigned char *) calloc(1, packlen);
+				buflen = packlen;
+			}
+			if (!buf)
+				break;
+			memcpy(buf, tmp, 6);
+		
+			while ((n < packlen) && running) {
+				int len = audioDemux->Read(buf + n, packlen - n, 500);
+				if (len < 0)
+					break;
+				n += len;
+			}
+#else
 			int n;
 			unsigned char buf[0x1FFFF];
 
 			n = audioDemux->Read(buf, sizeof(buf), 500 /*5000*/);
+#endif
 
 			if (n > 0) {
 				//printf("."); fflush(stdout);
@@ -2414,6 +2455,10 @@ void CRadioText::run()
 			}
 		}
 	}
+#ifdef MARTII
+	if (buf)
+		free(buf);
+#endif
 	delete audioDemux;
 	audioDemux = NULL;
 	printf("CRadioText::run: ###################### exit ######################\n");
