@@ -81,9 +81,17 @@ AC_ARG_ENABLE(mdev,
 	[  --enable-mdev disable broken neutrino mount hack, use with mdev],
 	[AC_DEFINE(ASSUME_MDEV,1,[disable broken neutrino mount hack, use with mdev])])
 
-AC_ARG_ENABLE(freesatepg,
-	[  --enable-freesatepg                  enable Freesat EPG code (experimental)],
-	[AC_DEFINE(ENABLE_FREESATEPG,1,[enable Freesat EPG code])])
+#AC_ARG_ENABLE(freesatepg,
+#	[  --enable-freesatepg                  enable Freesat EPG code (experimental)],
+#	[AC_DEFINE(ENABLE_FREESATEPG,1,[enable Freesat EPG code])])
+AC_DEFINE(ENABLE_FREESATEPG,1,[enable Freesat EPG code])
+AM_CONDITIONAL(ENABLE_FREESATEPG, test "$ENABLE_FREESATEPG")
+
+#AC_ARG_ENABLE(viasatepg,
+#	[  --enable-viasatepg                   enable Viasat EPG code (experimental)],
+#	[AC_DEFINE(ENABLE_VIASATEPG,1,[enable Viasat EPG code])])
+AC_DEFINE(ENABLE_VIASATEPG,1,[enable Viasat EPG code])
+AM_CONDITIONAL(ENABLE_VIASATEPG, test "$ENABLE_VIASATEPG")
 
 AC_ARG_ENABLE(graphlcd,
 	[  --enable-graphlcd                    enable GraphLCD support],
@@ -204,6 +212,7 @@ src/gui/widget/Makefile
 src/system/Makefile
 data/Makefile
 data/fonts/Makefile
+data/freesatepg/Makefile
 data/icons/Makefile
 data/inetradio/Makefile
 data/iso-codes/Makefile

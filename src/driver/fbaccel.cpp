@@ -30,7 +30,7 @@
 #endif
 
 #include <driver/framebuffer.h>
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
 #endif
 
@@ -775,7 +775,7 @@ void CFbAccel::blitBoxFB(int x0, int y0, int x1, int y1, fb_pixel_t color)
 
 void CFbAccel::blit()
 {
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::Blit();
 #endif
 	msync(lbb, DEFAULT_XRES * 4 * DEFAULT_YRES, MS_SYNC);

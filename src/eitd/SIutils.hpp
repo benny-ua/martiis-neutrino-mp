@@ -40,8 +40,10 @@ int saveStringToXMLfile(FILE *out, const char *string, int withControlCodes=0);
 // Entfernt die ControlCodes aus dem String (-> String wird evtl. kuerzer)
 void removeControlCodes(char *string);
 
+#ifndef MARTII
 #ifdef ENABLE_FREESATEPG
 std::string freesatHuffmanDecode(std::string input);
+#endif
 #endif
 
 #endif // SIUTILS_HPP

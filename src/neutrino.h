@@ -234,7 +234,7 @@ public:
 	void SetChannelMode(int mode);
 	void quickZap(int msg);
 	void numericZap(int msg);
-# ifdef ENABLE_GRAPHLCD
+# ifdef ENABLE_GRAPHLCD // MARTII
 	void StopSubtitles(bool b = true);
 # else
 	void StopSubtitles();

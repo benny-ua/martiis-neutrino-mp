@@ -104,28 +104,8 @@ void COnOffNotifier::addItem(CMenuItem* menuItem)
 	toDisable.push_back(menuItem);
 }
 
-#ifdef MARTII
-bool CSectionsdConfigNotifier::changeNotify(const neutrino_locale_t OptionName, void *)
-#else
 bool CSectionsdConfigNotifier::changeNotify(const neutrino_locale_t, void *)
-#endif
 {
-#ifdef MARTII
-	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_MISCSETTINGS_EPG_FREESAT_ENABLE)) {
-		CHintBox hintBox(LOCALE_MISCSETTINGS_EPG_FREESAT, g_Locale->getText(LOCALE_MISCSETTINGS_RESTART)); // UTF-8
-		hintBox.paint();
-		sleep(2);
-		hintBox.hide();
-		return true;
-	}
-	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_MISCSETTINGS_EPG_VIASAT_ENABLE)) {
-		CHintBox hintBox(LOCALE_MISCSETTINGS_EPG_VIASAT, g_Locale->getText(LOCALE_MISCSETTINGS_RESTART)); // UTF-8
-		hintBox.paint();
-		sleep(2);
-		hintBox.hide();
-		return true;
-	}
-#endif
         CNeutrinoApp::getInstance()->SendSectionsdConfig();
         return false;
 }

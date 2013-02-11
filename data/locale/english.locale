@@ -1184,10 +1184,6 @@ miscsettings.colored_events_2 next
 miscsettings.energy Energy
 miscsettings.epg.batch.head EPG Update
 miscsettings.epg.batch.settings EPG Update
-miscsettings.epg.freesat Freesat EPG
-miscsettings.epg.freesat.enable Enable Freesat EPG
-miscsettings.epg.viasat VIASAT EPG
-miscsettings.epg.viasat.enable Enable VIASAT EPG
 miscsettings.epg_cache EPG-Cache (Days)
 miscsettings.epg_cache_hint1 How long will EPG-Data in the future cached?
 miscsettings.epg_cache_hint2 Set in days.

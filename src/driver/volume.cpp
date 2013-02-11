@@ -40,7 +40,7 @@
 #include <daemonc/remotecontrol.h>
 #include <driver/volume.h>
 #include <zapit/zapit.h>
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
 #endif
 
@@ -307,7 +307,7 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 						g_settings.current_volume += g_settings.current_volume_step;
 					else
 						g_settings.current_volume = 100;
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::ShowVolume(true);
 #endif
 				}				
@@ -342,7 +342,7 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 					
 					else if (g_settings.show_mute_icon == 0)
 						g_settings.current_volume = 0;
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::ShowVolume(true);
 #endif
 				}				
@@ -382,7 +382,7 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 		}
 	} while (msg != CRCInput::RC_timeout);
 
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::ShowVolume(false);
 #endif
 	if( (bDoPaint) && (pixbuf!= NULL) ) {

@@ -1181,10 +1181,6 @@ miscsettings.colored_events_2 nächste
 miscsettings.energy Energieverbrauch
 miscsettings.epg.batch.head EPG-Aktualisierung
 miscsettings.epg.batch.settings EPG-Aktualisierung
-miscsettings.epg.freesat Freesat EPG
-miscsettings.epg.freesat.enable Freesat EPG aktivieren
-miscsettings.epg.viasat VIASAT EPG
-miscsettings.epg.viasat.enable VIASAT EPG aktivieren
 miscsettings.epg_cache EPG-Cache (Tage)
 miscsettings.epg_cache_hint1 EPG-Daten im Voraus zwischenspeichern?
 miscsettings.epg_cache_hint2 (Angabe in Tagen)

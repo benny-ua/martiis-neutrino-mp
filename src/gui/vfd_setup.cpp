@@ -133,7 +133,7 @@ int CVfdSetup::showSetup()
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_STANDBY,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE],
 		OPTIONS_LCD_DISPLAYMODE_OPTIONS, 2, true));
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	vfds->addItem(GenericMenuSeparatorLine);
 	GLCD_Menu glcdMenu;
 	vfds->addItem(new CMenuForwarder(LOCALE_GLCD_HEAD, true, NULL,

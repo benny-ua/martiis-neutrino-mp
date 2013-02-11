@@ -106,7 +106,7 @@
 #include <system/setting_helpers.h>
 #include <system/settings.h>
 #include <system/helpers.h>
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
 #endif
 #ifdef MARTII
@@ -579,7 +579,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.infobar_Text_green = configfile.getInt32( "infobar_Text_green", 0x64 );
 	g_settings.infobar_Text_blue = configfile.getInt32( "infobar_Text_blue", 0x64 );
 
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	g_settings.glcd_enable = configfile.getInt32("glcd_enable", 0);
 	g_settings.glcd_color_fg = configfile.getInt32("glcd_color_fg", GLCD::cColor::White);
 	g_settings.glcd_color_bg = configfile.getInt32("glcd_color_bg", GLCD::cColor::Black);
@@ -1139,7 +1139,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "infobar_Text_green", g_settings.infobar_Text_green );
 	configfile.setInt32( "infobar_Text_blue", g_settings.infobar_Text_blue );
 
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	configfile.setInt32("glcd_enable", g_settings.glcd_enable);
 	configfile.setInt32("glcd_color_fg", g_settings.glcd_color_fg);
 	configfile.setInt32("glcd_color_bg", g_settings.glcd_color_bg);
@@ -2054,7 +2054,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	CVFD::getInstance()->init(font.filename, font.name);
 	CVFD::getInstance()->Clear();
 	CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_NEUTRINO_STARTING));
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::getInstance();
 #endif
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2119,6 +2119,11 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	pthread_create (&timer_thread, NULL, timerd_main_thread, (void *)&timer_wakeup);
 	// timer_wakeup = false;
 
+#ifdef MARTII
+	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG, &g_settings.audio_mixer_volume_analog);
+	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF, &g_settings.audio_mixer_volume_spdif);
+	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI, &g_settings.audio_mixer_volume_hdmi);
+#endif
 	powerManager = new cPowerManager;
 	powerManager->Open();
 
@@ -2275,7 +2280,7 @@ void CNeutrinoApp::quickZap(int msg)
 {
 	int res;
 
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	StopSubtitles(false);
 #else
 	StopSubtitles();
@@ -2302,7 +2307,7 @@ void CNeutrinoApp::numericZap(int msg)
 
 void CNeutrinoApp::showInfo()
 {
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	StopSubtitles(false);
 #else
 	StopSubtitles();
@@ -2423,7 +2428,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 			}
 			else if( msg == (neutrino_msg_t) g_settings.key_subchannel_up || msg == (neutrino_msg_t) g_settings.key_subchannel_down) {
 				if( !g_RemoteControl->subChannels.empty() ) {
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 					StopSubtitles(false);
 #else
 					StopSubtitles();
@@ -2601,7 +2606,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 #ifdef MARTII
 			else if(msg == (uint32_t) g_settings.key_tsplayback) {
 				//open moviebrowser via media player menu object
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
 #endif
 				StopSubtitles();
@@ -2609,7 +2614,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
 				audioDecoder->setPercent(old_percent);
 				StartSubtitles(0);
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::unlockChannel();
 #endif
 			}
@@ -2621,7 +2626,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 #endif
 #ifdef MARTII
 			else if (msg == (uint32_t) g_settings.key_fileplayback) {
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
 				StopSubtitles();
@@ -2633,7 +2638,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 				audioDecoder->setPercent(old_percent);
 				StartSubtitles(0);
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::unlockChannel();
 #endif
 			}
@@ -2642,8 +2647,24 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				g_RemoteControl->setSubChannel(CRCInput::getNumericValue(msg));
 				g_InfoViewer->showSubchan();
 			}
+#ifdef MARTII
+			else if( ( msg == (uint32_t) g_settings.key_hddmenu )) {
+#ifdef ENABLE_GRAPHLCD // MARTII
+				StopSubtitles(false);
+#else
+				StopSubtitles();
+#endif
+				CHDDMenuHandler m;
+				m.exec(NULL, "hotkey");
+				StartSubtitles();
+			}
+			else if( ( msg == (uint32_t) g_settings.key_help ) || ( msg == CRCInput::RC_info) ||
+						(g_settings.infobar_cn && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
+						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
+#else
 			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
 						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
+#endif
 			{
 				bool show_info = ((msg != NeutrinoMessages::SHOW_INFOBAR) || (g_InfoViewer->is_visible || g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] != 0));
 			         // turn on LCD display
@@ -2653,7 +2674,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				if(show_info && channelList->getSize()) {
 					showInfo();
 				}
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)
 					nGLCD::Update();
 			} else if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) {
@@ -2758,7 +2779,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 #ifdef MARTII
 		threeDSetup->exec(NULL, "zapped");
 #endif
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 		nGLCD::Update();
 #endif
 #ifdef MARTII
@@ -3594,7 +3615,7 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			if (retcode == 1) {
 				CCECSetup cecsetup;
 				cecsetup.setCECSettings(false);
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::SetBrightness(0);
 #endif
 			}
@@ -3758,7 +3779,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 #ifdef MARTII
 		CCECSetup cecsetup;
 		cecsetup.setCECSettings(false);
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 		nGLCD::StandbyMode(true);
 #endif
 #endif
@@ -3843,7 +3864,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		if (timer_wakeup) {
 			CCECSetup cecsetup;
 			cecsetup.setCECSettings(true);
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 			nGLCD::StandbyMode(false);
 #endif
 		}
@@ -4202,7 +4223,7 @@ void stop_daemons(bool stopall)
 	if (!access("/etc/init.d/cam", X_OK))
 		safe_system("/etc/init.d/cam stop >/dev/null 2>/dev/null&");
 #endif
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::Exit();
 #endif
 	if (g_Radiotext) {
@@ -4482,7 +4503,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 		tconfig.saveConfig(fname);
 }
 
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 void CNeutrinoApp::StopSubtitles(bool b)
 #else
 void CNeutrinoApp::StopSubtitles()
@@ -4500,7 +4521,7 @@ void CNeutrinoApp::StopSubtitles()
 		tuxtx_pause_subtitle(true);
 		frameBuffer->paintBackground();
 	}
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	if (b)
 		nGLCD::MirrorOSD();
 #endif
@@ -4509,7 +4530,7 @@ void CNeutrinoApp::StopSubtitles()
 void CNeutrinoApp::StartSubtitles(bool show)
 {
 	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::MirrorOSD(false);
 #endif
 	if(!show)

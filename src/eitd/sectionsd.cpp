@@ -62,7 +62,9 @@
 
 /*static*/ bool reader_ready = true;
 static unsigned int max_events;
+#ifndef MARTII
 static bool notify_complete = false;
+#endif
 
 /* period to remove old events */
 #define HOUSEKEEPING_SLEEP (5 * 60) // sleep 5 minutes
@@ -90,6 +92,9 @@ extern bool epg_filter_except_current_next;
 
 static bool messaging_zap_detected = false;
 /*static*/ bool dvb_time_update = false;
+#ifdef MARTII
+static bool sendEvent_needed = false;
+#endif
 
 //NTP-Config
 #define CONF_FILE "/var/tuxbox/config/neutrino.conf"
@@ -129,6 +134,10 @@ static pthread_rwlock_t messagingLock = PTHREAD_RWLOCK_INITIALIZER;
 static CTimeThread threadTIME;
 static CEitThread threadEIT;
 static CCNThread threadCN;
+#ifdef ENABLE_VIASATEPG // MARTII
+// ViaSAT uses pid 0x39 instead of 0x12
+static CEitThread threadVSEIT("viasatThread", 0x39);
+#endif
 
 #ifdef ENABLE_FREESATEPG
 static CFreeSatThread threadFSEIT;
@@ -276,7 +285,11 @@ static bool deleteEvent(const event_id_t uniqueKey)
 		readLockMessaging();
 		// only if it is the current channel... and if we don't have them already.
 		if (evt.get_channel_id() == messaging_current_servicekey && 
+#ifdef MARTII
+				true) {
+#else
 				(messaging_got_CN != 0x03)) { 
+#endif
 xprintf("addEvent: current %016" PRIx64 " event %016" PRIx64 " running %d messaging_got_CN %d\n", messaging_current_servicekey, evt.get_channel_id(), evt.runningStatus(), messaging_got_CN);
 
 			unlockMessaging();
@@ -298,6 +311,9 @@ xprintf("addEvent: current %016" PRIx64 " event %016" PRIx64 " running %d messag
 					unlockMessaging();
 					dprintf("addevent-cn: added running (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
+#ifdef MARTII
+					sendEvent_needed = true;
+#endif
 				} else {
 					writeLockMessaging();
 					messaging_got_CN |= 0x01;
@@ -315,6 +331,9 @@ xprintf("addEvent: current %016" PRIx64 " event %016" PRIx64 " running %d messag
 					unlockMessaging();
 					dprintf("addevent-cn: added next    (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
+#ifdef MARTII
+					sendEvent_needed = true;
+#endif
 				} else {
 					dprintf("addevent-cn: not added next(%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
@@ -828,6 +847,9 @@ static void wakeupAll()
 #ifdef ENABLE_FREESATEPG
 	threadFSEIT.change(0);
 #endif
+#ifdef ENABLE_VIASATEPG
+	threadVSEIT.change(0);
+#endif
 #ifdef ENABLE_SDT
 	threadSDT.change(0);
 #endif
@@ -931,6 +953,9 @@ static void commandserviceChanged(int connfd, char *data, const unsigned dataLen
 #ifdef ENABLE_FREESATEPG
 		threadFSEIT.setCurrentService(messaging_current_servicekey);
 #endif
+#ifdef ENABLE_VIASATEPG
+		threadVSEIT.setCurrentService(messaging_current_servicekey);
+#endif
 #ifdef ENABLE_SDT
 		threadSDT.setCurrentService(messaging_current_servicekey);
 #endif
@@ -1001,6 +1026,9 @@ static void commandDumpStatusInformation(int /*connfd*/, char* /*data*/, const u
 		 "Number of cached nvod-events: %u\n"
 		 "Number of cached meta-services: %u\n"
 		 //    "Resource-usage: maxrss: %ld ixrss: %ld idrss: %ld isrss: %ld\n"
+#ifdef ENABLE_VIASATEPG
+		 "ViaSat enabled\n"
+#endif
 #ifdef ENABLE_FREESATEPG
 		 "FreeSat enabled\n"
 #else
@@ -1607,6 +1635,12 @@ CEitThread::CEitThread()
 	: CEventsThread("eitThread")
 {
 }
+#ifdef ENABLE_VIASATEPG // MARTII
+CEitThread::CEitThread(std::string tname, unsigned short pid)
+	: CEventsThread(tname, pid)
+{
+}
+#endif
 
 /* EIT thread hooks */
 void CEitThread::addFilters()
@@ -1635,8 +1669,10 @@ void CEitThread::beforeSleep()
 	writeLockMessaging();
 	messaging_zap_detected = false;
 	unlockMessaging();
+#ifndef MARTII
 	if(notify_complete)
 		system("/var/tuxbox/config/epgdone.sh");
+#endif
 }
 
 /********************************************************************************/
@@ -2098,6 +2134,9 @@ printf("SIevent size: %d\n", (int)sizeof(SIevent));
 #ifdef ENABLE_FREESATEPG
 	threadFSEIT.Start();
 #endif
+#ifdef ENABLE_VIASATEPG
+	threadVSEIT.Start();
+#endif
 #ifdef ENABLE_SDT
 	threadSDT.Start();
 #endif
@@ -2138,6 +2177,9 @@ printf("SIevent size: %d\n", (int)sizeof(SIevent));
 #ifdef ENABLE_FREESATEPG
 	threadFSEIT.StopRun();
 #endif
+#ifdef ENABLE_VIASATEPG
+	threadVSEIT.StopRun();
+#endif
 
 	xprintf("broadcasting...\n");
 
@@ -2168,6 +2210,10 @@ printf("SIevent size: %d\n", (int)sizeof(SIevent));
 #ifdef ENABLE_FREESATEPG
 	xprintf("join FSEIT\n");
 	threadFSEIT.Stop();
+#endif
+#ifdef ENABLE_VIASATEPG
+	xprintf("join VSEIT\n");
+	threadVSEIT.Stop();
 #endif
 #ifdef EXIT_CLEANUP
 	xprintf("[sectionsd] cleanup...\n");

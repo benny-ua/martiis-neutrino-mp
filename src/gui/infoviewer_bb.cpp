@@ -234,13 +234,20 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_EPG:
 			icon = NEUTRINO_ICON_BUTTON_RED;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
+#ifdef MARTII
+			text = CUserMenu::getUserMenuButtonName(0);
+#else
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_RED];
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
+#endif
 			break;
 		case CInfoViewerBB::BUTTON_AUDIO:
 			icon = NEUTRINO_ICON_BUTTON_GREEN;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
+#ifdef MARTII
+			text = CUserMenu::getUserMenuButtonName(1);
+#else
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_GREEN];
 			if (text == g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD))
 				text = "";
@@ -252,20 +259,29 @@ void CInfoViewerBB::getBBButtonInfo()
 					text = g_RemoteControl->current_PIDs.APIDs[selected].desc;
 				}
 			}
+#endif
 			break;
 		case CInfoViewerBB::BUTTON_SUBS:
 			icon = NEUTRINO_ICON_BUTTON_YELLOW;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
+#ifdef MARTII
+			text = CUserMenu::getUserMenuButtonName(2);
+#else
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_YELLOW];
 			if (text.empty())
 				text = g_Locale->getText((g_RemoteControl->are_subchannels) ? LOCALE_INFOVIEWER_SUBSERVICE : LOCALE_INFOVIEWER_SELECTTIME);
+#endif
 			break;
 		case CInfoViewerBB::BUTTON_FEAT:
 			icon = NEUTRINO_ICON_BUTTON_BLUE;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
+#ifdef MARTII
+			text = CUserMenu::getUserMenuButtonName(3);
+#else
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_BLUE];
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
+#endif
 			break;
 		default:
 			break;

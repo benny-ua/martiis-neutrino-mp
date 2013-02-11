@@ -560,13 +560,11 @@ void CMoviePlayerGui::PlayFile(void)
 	file_prozent = 0;
 #ifdef MARTII
 	CFrameBuffer::Mode3D old3dmode = frameBuffer->get3DMode();
-//	if (p_movie_info  && p_movie_info->epgId)
-//		g_Zapit->getVolumePercent((unsigned int *) &g_settings.current_volume_percent, p_movie_info->epgId, currentapid, currentac3 == 1);
-#ifdef ENABLE_GRAPHLCD
+#endif
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::MirrorOSD(false);
 	if (p_movie_info)
 		nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
-#endif
 #endif
 	if(!playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration)) {
 		playback->Close();
@@ -1171,21 +1169,6 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	if (numpidd > 0 || numpids > 0)
 		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
 
-#if 0
-	if (p_movie_info && p_movie_info->epgId) {
-		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-
-		int percent[numpida];
-		for(unsigned int count = 0; count < numpida; count++ ) {
-			g_Zapit->getVolumePercent((unsigned int *) &percent[count], p_movie_info->epgId, apids[count], ac3flags[count] == 1);
-			int is_active = currentapid == apids[count];
-			APIDSelector.addItem(new CMenuOptionNumberChooser(NONEXISTANT_LOCALE, &percent[count],
-				is_active, 0, 999, audioSetupNotifierVolPercent, 0, 0, NONEXISTANT_LOCALE, apidtitles[count].c_str()));
-			if (is_active)
-				g_settings.current_volume_percent = percent[count];
-		}
-	}
-#endif
 #endif
 	APIDSelector.exec(NULL, "");
 	delete selector;
@@ -1201,12 +1184,6 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	if((select >= 0) && (currentapid != apids[select])) {
 #endif
 		currentapid = apids[select];
-#ifdef MARTII
-#if 0
-		if (p_movie_info && p_movie_info->epgId)
-			audioSetupNotifierVolPercent->setAPid(currentapid);
-#endif
-#endif
 		currentac3 = ac3flags[select];
 		playback->SetAPid(currentapid, currentac3);
 		printf("[movieplayer] apid changed to %d type %d\n", currentapid, currentac3);
@@ -1500,7 +1477,7 @@ void CMoviePlayerGui::StopSubtitles(bool b)
 //		tuxtx_pause_subtitle(true);
 //		frameBuffer->paintBackground();
 //	}
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	if (b)
 		nGLCD::MirrorOSD();
 #endif
@@ -1509,7 +1486,7 @@ void CMoviePlayerGui::StopSubtitles(bool b)
 void CMoviePlayerGui::StartSubtitles(bool show)
 {
 	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::MirrorOSD(false);
 #endif
 	if(!show)

@@ -228,6 +228,9 @@ class CEitThread : public CEventsThread
 		void beforeSleep();
 	public:
 		CEitThread();
+#if defined(MARTII) && defined(ENABLE_FREESATEPG)
+		CEitThread(std::string tname, unsigned short pid = 0x12);
+#endif
 };
 
 class CFreeSatThread : public CEventsThread

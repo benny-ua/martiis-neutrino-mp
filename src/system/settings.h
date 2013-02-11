@@ -180,7 +180,7 @@ struct SNeutrinoSettings
 	int network_ntpenable;
 	char ifname[10];
 	
-#ifdef ENABLE_GRAPHLCD
+#ifdef ENABLE_GRAPHLCD // MARTII
         int		glcd_enable;
         uint32_t	glcd_color_fg;
         uint32_t	glcd_color_bg;

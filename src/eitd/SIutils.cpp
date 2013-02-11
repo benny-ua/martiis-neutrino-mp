@@ -187,6 +187,7 @@ void removeControlCodes(char *string)
 	return ;
 }
 
+#ifndef MARTII
 #ifdef ENABLE_FREESATEPG
 #include "FreesatTables.hpp"
 std::string freesatHuffmanDecode(std::string input)
@@ -295,3 +296,4 @@ std::string freesatHuffmanDecode(std::string input)
 	else return input;
 }
 #endif
+#endif // MARTII

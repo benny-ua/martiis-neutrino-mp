@@ -40,6 +40,9 @@
 #include "xmlutil.h"
 #include "eitd.h"
 #include "debug.h"
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 void addEvent(const SIevent &evt, const time_t zeit, bool cn = false);
 extern MySIeventsOrderServiceUniqueKeyFirstStartTimeEventUniqueKey mySIeventsOrderServiceUniqueKeyFirstStartTimeEventUniqueKey;
@@ -268,8 +271,17 @@ void deleteOldfileEvents(char *epgdir)
 	}
 }
 
+#ifdef MARTII
+static bool insertEventsfromFile_running = false;
+#endif
+
 void *insertEventsfromFile(void * data)
 {
+#ifdef MARTII
+	set_threadname(__func__);
+	insertEventsfromFile_running = true;
+#endif
+	insertEventsfromFile_running = true;
 	reader_ready=false;
 	xmlDocPtr event_parser = NULL;
 	xmlNodePtr eventfile = NULL;
@@ -318,7 +330,11 @@ void *insertEventsfromFile(void * data)
 
 			while (event) {
 
+#ifdef MARTII
+				SIevent e(onid,tsid,sid,xmlGetNumericAttribute(event, "id", 32));
+#else
 				SIevent e(onid,tsid,sid,xmlGetNumericAttribute(event, "id", 16));
+#endif
 				uint8_t tid = xmlGetNumericAttribute(event, "tid", 16);
 				if(tid)
 					e.table_id = tid;
