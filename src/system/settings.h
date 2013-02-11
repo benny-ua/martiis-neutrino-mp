@@ -100,6 +100,7 @@ struct SNeutrinoSettings
 	int infobar_show_dd_available;
 #ifdef MARTII
 	int show_background_picture;
+	int fe_offset;
 #endif
 	//audio
 	int audio_AnalogMode;

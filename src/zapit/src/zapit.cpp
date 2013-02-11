@@ -150,6 +150,9 @@ void CZapit::SendEvent(const unsigned int eventID, const void* eventbody, const 
 		eventServer->sendEvent(eventID, CEventServer::INITID_ZAPIT, eventbody, eventbodysize);
 }
 
+#ifdef MARTII
+int feOffset = 0;
+#endif
 void CZapit::SaveSettings(bool write)
 {
 	if (current_channel) {
@@ -208,6 +211,9 @@ void CZapit::SaveSettings(bool write)
 		configfile.setInt32("diseqcRepeats", live_fe->getDiseqcRepeats());
 		configfile.setInt32("diseqcType", live_fe->getDiseqcType());
 		configfile.setInt32("motorRotationSpeed", config.motorRotationSpeed);
+#endif
+#ifdef MARTII
+		configfile.setInt32("feOffset", feOffset);
 #endif
 		if (configfile.getModifiedFlag())
 			configfile.saveConfig(CONFIGFILE);
@@ -326,6 +332,9 @@ void CZapit::LoadSettings()
 	/* FIXME FE specific, to be removed */
 	diseqcType				= (diseqc_t)configfile.getInt32("diseqcType", NO_DISEQC);
 	config.motorRotationSpeed		= configfile.getInt32("motorRotationSpeed", 18); // default: 1.8 degrees per second
+#ifdef MARTII
+	feOffset				= configfile.getInt32("feOffset", -1);
+#endif
 
 	printf("[zapit.cpp] diseqc type = %d\n", diseqcType);
 

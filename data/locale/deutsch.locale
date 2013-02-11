@@ -377,6 +377,7 @@ extra.fec_s2_qpsk_5_6 5/6 S2_QPSK
 extra.fec_s2_qpsk_7_8 7/8 S2_QPSK
 extra.fec_s2_qpsk_8_9 8/9 S2_QPSK
 extra.fec_s2_qpsk_9_10 9/10 S2_QPSK
+extra.imagesettings.title Image-Einstellungen
 extra.key_current_transponder Aktuelle Transponder Taste
 extra.key_help Hilfe-Taste
 extra.key_list_end Listenende
@@ -436,6 +437,7 @@ extra.west Westen
 extra.zap_cycle Zap nur in Bouquet
 extra.zapit_bouquetname_newchannels Neue Kanäle
 extra.zapit_bouquetname_others Andere
+extra.zapit_fe_offset FE-Offset
 extra.zapit_fe_timeout Tuning Timeout (1=10ms)
 extra.zapit_hvoltage High (13.5/ 18.5) Voltage
 extra.zapit_make_bouquet Kanalliste auffüllen

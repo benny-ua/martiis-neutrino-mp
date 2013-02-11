@@ -405,8 +405,6 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	ms_epg->addItem(mf4);
 
 #ifdef MARTII
-	ms_epg->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_FREESAT_ENABLE, &g_settings.epg_enable_freesat, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, sectionsdConfigNotifier));
-	ms_epg->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_VIASAT_ENABLE, &g_settings.epg_enable_viasat, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, sectionsdConfigNotifier));
 	ms_epg->addItem(new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS ,true, NULL, CNeutrinoApp::getInstance()->batchEPGSettings));
 #endif
 }
