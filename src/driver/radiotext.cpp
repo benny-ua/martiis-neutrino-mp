@@ -2386,8 +2386,8 @@ void CRadioText::run()
 	audioDemux->Open(DMX_PES_CHANNEL,0,128*1024);
 
 #ifdef MARTII
-	unsigned char buf[0x1ffff];
-	int n = 0, found = 0, packlen = 0;
+	int buflen = 0;
+	unsigned char *buf = NULL;
 #endif
 	while(running) {
 		mutex.lock();
@@ -2399,13 +2399,7 @@ void CRadioText::run()
 			cond.wait(&pidmutex);
 			pidmutex.unlock();
 			mutex.lock();
-#ifdef MARTII
-			n = found = packlen = 0;
-#endif
 		}
-#ifdef MARTII
-		else
-#endif
 		if (pid && (current_pid != pid)) {
 			current_pid = pid;
 			printf("CRadioText::run: ###################### Setting PID 0x%x ######################\n", getPid());
@@ -2414,79 +2408,44 @@ void CRadioText::run()
 				pid = 0;
 				printf("CRadioText::run: ###################### failed to start PES filter ######################\n");
 			}
-#ifdef MARTII
-			n = found = packlen = 0;
-#endif
 		}
 		mutex.unlock();
 		if (pid) {
 #ifdef MARTII
-			int len = audioDemux->Read(buf + n, sizeof(buf) - n, 500);
-			if (len < 1) {
+			int n;
+			unsigned char tmp[6];
+
+			n = audioDemux->Read(tmp, 6, 500);
+			if (n != 6) {
 				usleep(10000); /* save CPU if nothing read */
 				continue;
 			}
-			unsigned char *t = buf + n;
-			n += len;
-			if (found < 6) {
-				unsigned char *e = buf + n;
-				while (t < e && found < 6) {
-					switch(*t) {
-					case 0x00:
-						if (found == 0 || found == 1)
-							found++;
-						else
-							found = 0;
-						break;
-					case 0x01:
-						if (found == 2)
-							found++;
-						else
-							found = 0;
-						break;
-					case 0xc0:
-						if (found == 3)
-							found++, packlen = 0;
-						else
-							found = 0;
-						break;
-					default:
-						if (found == 4 || found == 5)
-							found++, packlen |= *t;
-						else
-							found = 0;
-					}
-					t++;
-				}
-			}
-			if (found < 6) {
-				if (found) {
-					memmove(buf, t - found, buf + n - t - found);
-					n = found;
-				} else
-					n = 0;
+			if (memcmp(tmp, "\000\000\001\300", 4))
 				continue;
+			int packlen = ((tmp[4] << 8) | tmp[5]) + 6;
+
+			if (buflen < packlen) {
+				if (buf)
+					free(buf);
+				buf = (unsigned char *) calloc(1, packlen);
+				buflen = packlen;
 			}
-
-			if (n < packlen)
-				continue;
-
-			mutex.lock();
-			PES_Receive(buf, packlen);
-			mutex.unlock();
-
-			if (n > packlen) {
-				memmove(buf, buf + packlen, n - packlen);
-				n -= packlen;
-			} else
-				n = 0;
-			packlen = 0;
-			found = 0;
+			if (!buf)
+				break;
+			memcpy(buf, tmp, 6);
+		
+			while ((n < packlen) && running) {
+				int len = audioDemux->Read(buf + n, packlen - n, 500);
+				if (len < 0)
+					break;
+				n += len;
+			}
 #else
 			int n;
 			unsigned char buf[0x1FFFF];
 
 			n = audioDemux->Read(buf, sizeof(buf), 500 /*5000*/);
+#endif
 
 			if (n > 0) {
 				//printf("."); fflush(stdout);
@@ -2494,9 +2453,12 @@ void CRadioText::run()
 				PES_Receive(buf, n);
 				mutex.unlock();
 			}
-#endif
 		}
 	}
+#ifdef MARTII
+	if (buf)
+		free(buf);
+#endif
 	delete audioDemux;
 	audioDemux = NULL;
 	printf("CRadioText::run: ###################### exit ######################\n");
