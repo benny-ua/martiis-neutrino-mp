@@ -107,4 +107,5 @@ install_DATA =	accept.png \
 		yjogol.gif \
 		y.png \
 		zap.png \
-		zee.jpg
+		zee.jpg \
+		spark.jpg
