@@ -73,9 +73,6 @@ class CBouquetManager
 {
 	private:
 		CZapitBouquet * remainChannels;
-#ifdef MARTII
-		CZapitBouquet * newChannels;
-#endif
 
 		void renumChannels(ZapitChannelList &list, int &counter, char * pname = NULL);
 		void makeRemainingChannelsBouquet(void);
@@ -87,11 +84,7 @@ class CBouquetManager
 		void writeBouquet(FILE * bouq_fd, uint32_t i);
 
 	public:
-#ifdef MARTII
-		CBouquetManager() { remainChannels = NULL; newChannels = NULL; };
-#else
 		CBouquetManager() { remainChannels = NULL; };
-#endif
 		~CBouquetManager();
 		class ChannelIterator
 		{

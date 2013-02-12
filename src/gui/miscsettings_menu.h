@@ -32,9 +32,6 @@
 #include <system/settings.h>
 
 #include <string>
-#ifdef MARTII
-#include <zapit/zapit.h>
-#endif
 
 //#define CPU_FREQ
 
@@ -56,10 +53,6 @@ class CMiscMenue : public CMenuTarget
 #ifdef CPU_FREQ
 		void showMiscSettingsMenuCPUFreq(CMenuWidget *ms_cpu);
 #endif /*CPU_FREQ*/
-#ifdef MARTII
-		int makeRemainingChannelsBouquet;
-		int makeNewChannelsBouquet;
-#endif
 	public:
 		CMiscMenue();
 		~CMiscMenue();

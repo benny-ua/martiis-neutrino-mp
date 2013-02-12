@@ -233,6 +233,15 @@ CFbAccel::CFbAccel(CFrameBuffer *_fb)
 		bpafd = -1;
 		return;
 	}
+#ifdef MARTII
+	startX = 0;
+	startY = 0;
+	endX = DEFAULT_XRES - 1;
+	endY = DEFAULT_YRES - 1;
+	borderColor = 0;
+	borderColorOld = 0x01010101;
+	resChange();
+#endif
 #endif
 
 #ifdef USE_NEVIS_GXA
@@ -832,6 +841,7 @@ void CFbAccel::blit()
 		blitFB2FB(s.xres/3, s.yres/3, (s.xres * 2)/3, (s.yres * 2)/3, s.xres/3, (s.yres * 2)/3, (s.xres * 2)/3, s.yres - 1);
 		break;
 	}
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	if(ioctl(fb->fd, STMFBIO_SYNC_BLITTER) < 0)
 		perror("CFrameBuffer::blit ioctl STMFBIO_SYNC_BLITTER 2");
 		
@@ -974,7 +984,7 @@ void CFbAccel::mark(int, int, int, int)
 }
 #endif
 #ifdef MARTII
-void CFbAccel::blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
+void CFbAccel::blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
 {
 	if (!src_width || !src_height)
 		return;
@@ -982,12 +992,12 @@ void CFbAccel::blitIcon(int src_width, int src_height, int fb_x, int fb_y, int w
 	memset(&blt_data, 0, sizeof(STMFBIO_BLT_EXTERN_DATA));
 	blt_data.operation  = BLT_OP_COPY;
 	blt_data.ulFlags    = BLT_OP_FLAGS_BLEND_SRC_ALPHA | BLT_OP_FLAGS_BLEND_DST_MEMORY;	// we need alpha blending
-	blt_data.srcOffset  = 0;
+//	blt_data.srcOffset  = 0;
 	blt_data.srcPitch   = src_width * 4;
 	blt_data.dstOffset  = lbb_off;
 	blt_data.dstPitch   = fb->stride;
-	blt_data.src_top    = 0;
-	blt_data.src_left   = 0;
+//	blt_data.src_top    = 0;
+//	blt_data.src_left   = 0;
 	blt_data.src_right  = src_width;
 	blt_data.src_bottom = src_height;
 	blt_data.dst_left   = fb_x;
@@ -1017,5 +1027,30 @@ void CFbAccel::resChange(void)
 	eX = (endX * s.xres)/DEFAULT_XRES;
 	eY = (endY * s.yres)/DEFAULT_YRES;
 	borderColorOld = 0x01010101;
+}
+
+void CFbAccel::setBorder(int sx, int sy, int ex, int ey)
+{
+	startX = sx;
+	startY = sy;
+	endX = ex;
+	endY = ey;
+	sX = (startX * s.xres)/DEFAULT_XRES;
+	sY = (startY * s.yres)/DEFAULT_YRES;
+	eX = (endX * s.xres)/DEFAULT_XRES;
+	eY = (endY * s.yres)/DEFAULT_YRES;
+	borderColorOld = 0x01010101;
+}
+
+void CFbAccel::setBorderColor(fb_pixel_t col)
+{
+	if (!col && borderColor)
+		blitBoxFB(0, 0, s.xres - 1, s.yres - 1, 0);
+	borderColor = col;
+}
+
+void CFbAccel::ClearFB(void)
+{
+	blitBoxFB(0, 0, s.xres - 1, s.yres - 1, 0);
 }
 #endif

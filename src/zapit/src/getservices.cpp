@@ -289,23 +289,6 @@ bool CServiceManager::GetAllUnusedChannels(ZapitChannelList &list)
 	return (!list.empty());
 }
 
-#ifdef MARTII
-bool CServiceManager::GetAllNewChannels(ZapitChannelList &list)
-{
-	list.clear();
-	for (channel_map_iterator_t it = allchans.begin(); it != allchans.end(); it++) {
-		if (it->second.isNewChannel)
-			list.push_back(&(it->second));
-	}
-	return (list.size() != 0);
-}
-
-void CServiceManager::ResetNewChannelsFlag(void)
-{
-	for (channel_map_iterator_t it = allchans.begin(); it != allchans.end(); it++)
-		it->second.isNewChannel = false;
-}
-#endif
 bool CServiceManager::GetAllSatelliteChannels(ZapitChannelList &list, t_satellite_position position)
 {
 	list.clear();

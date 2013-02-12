@@ -533,9 +533,6 @@ void CServiceScan::SaveServices()
 
 bool CServiceScan::ScanProviders()
 {
-#ifdef MARTII
-	CServiceManager::getInstance()->ResetNewChannelsFlag();
-#endif
 
 	flags = *((int *)scan_arg);
 	scanBouquetManager = new CBouquetManager();

@@ -125,27 +125,6 @@ CFrameBuffer::CFrameBuffer()
 	mpGLThreadObj = NULL;
 #endif
 }
-#ifdef MARTII
-void CFrameBuffer::setBorder(int sx, int sy, int ex, int ey)
-{
-	accel->startX = sx;
-	accel->startY = sy;
-	accel->endX = ex;
-	accel->endY = ey;
-	accel->sX = (accel->startX * accel->s.xres)/DEFAULT_XRES;
-	accel->sY = (accel->startY * accel->s.yres)/DEFAULT_YRES;
-	accel->eX = (accel->endX * accel->s.xres)/DEFAULT_XRES;
-	accel->eY = (accel->endY * accel->s.yres)/DEFAULT_YRES;
-	accel->borderColorOld = 0x01010101;
-};
-
-void CFrameBuffer::setBorderColor(fb_pixel_t col)
-{
-	if (!col && accel->borderColor)
-		accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0);
-	accel->borderColor = col;
-}
-#endif
 
 CFrameBuffer* CFrameBuffer::getInstance()
 {
@@ -339,15 +318,6 @@ void CFrameBuffer::init(const char * const fbDevice)
 	}
 #endif
 	accel = new CFbAccel(this);
-#ifdef MARTII
-	accel->startX = 0;
-	accel->startY = 0;
-	accel->endX = DEFAULT_XRES - 1;
-	accel->endY = DEFAULT_YRES - 1;
-	accel->borderColor = 0;
-	accel->borderColorOld = 0x01010101;
-	resChange();
-#endif
 	return;
 
 nolfb:
@@ -1390,20 +1360,23 @@ void CFrameBuffer::paintMuteIcon(bool paint, int ax, int ay, int dx, int dy, boo
 	blit();
 }
 #ifdef MARTII
-CFrameBuffer::Mode3D CFrameBuffer::get3DMode() {
+CFrameBuffer::Mode3D CFrameBuffer::get3DMode()
+{
 	return mode3D;
 }
 
-void CFrameBuffer::set3DMode(Mode3D m) {
+void CFrameBuffer::set3DMode(Mode3D m)
+{
 	if (mode3D != m) {
-		accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0);
+		accel->ClearFB();
 		mode3D = m;
 		accel->borderColorOld = 0x01010101;
 		blit();
 	}
 }
 
-bool CFrameBuffer::OSDShot(const std::string &name) {
+bool CFrameBuffer::OSDShot(const std::string &name)
+{
 	struct timeval ts, te;
 	gettimeofday(&ts, NULL);
 
@@ -1427,7 +1400,7 @@ bool CFrameBuffer::OSDShot(const std::string &name) {
 	}
 
 	png_bytep row_pointers[yres];
-	png_structp png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING,
+	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 		(png_voidp) NULL, (png_error_ptr) NULL, (png_error_ptr) NULL);
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 
@@ -1453,8 +1426,38 @@ bool CFrameBuffer::OSDShot(const std::string &name) {
 	return true;
 }
 
-void CFrameBuffer::blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
+void CFrameBuffer::blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
 {
-	accel->blitIcon(src_width, src_height, fb_x, fb_y, width, height);
+	accel->blitArea(src_width, src_height, fb_x, fb_y, width, height);
+}
+
+void CFrameBuffer::resChange(void)
+{
+	accel->resChange();
+}
+
+void CFrameBuffer::setBorder(int sx, int sy, int ex, int ey)
+{
+	accel->setBorder(sx, sy, ex, ey);
+}
+
+void CFrameBuffer::getBorder(int &sx, int &sy, int &ex, int &ey)
+{
+	accel->getBorder(sx, sy, ex, ey);
+}
+
+void CFrameBuffer::setBorderColor(fb_pixel_t col)
+{
+	accel->setBorderColor(col);
+}
+
+fb_pixel_t CFrameBuffer::getBorderColor(void)
+{
+	return accel->getBorderColor();
+}
+
+void CFrameBuffer::ClearFB(void)
+{
+	accel->ClearFB();
 }
 #endif

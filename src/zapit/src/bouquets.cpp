@@ -227,11 +227,7 @@ void CBouquetManager::saveBouquets(void)
 	bouq_fd = fopen(BOUQUETS_XML, "w");
 	fprintf(bouq_fd, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zapit>\n");
 	for (unsigned int i = 0; i < Bouquets.size(); i++) {
-#ifdef MARTII
-		if (Bouquets[i] != remainChannels && Bouquets[i] != newChannels) {
-#else
 		if (Bouquets[i] != remainChannels) {
-#endif
 			DBG("save Bouquets: name %s user: %d\n", Bouquets[i]->Name.c_str(), Bouquets[i]->bUser);
 			if(!Bouquets[i]->bUser) {
 				writeBouquet(bouq_fd, i);
@@ -251,11 +247,7 @@ void CBouquetManager::saveUBouquets(void)
 	ubouq_fd = fopen(UBOUQUETS_XML, "w");
 	fprintf(ubouq_fd, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<zapit>\n");
 	for (unsigned int i = 0; i < Bouquets.size(); i++) {
-#ifdef MARTII
-		if (Bouquets[i] != remainChannels && Bouquets[i] != newChannels) {
-#else
 		if (Bouquets[i] != remainChannels) {
-#endif
 			if(Bouquets[i]->bUser) {
 				writeBouquet(ubouq_fd, i);
 			}
@@ -435,10 +427,6 @@ void CBouquetManager::makeRemainingChannelsBouquet(void)
 	ZapitChannelList unusedChannels;
 	//FIXME services loaded before config.
 	//bool tomake = CZapit::getInstance()->makeRemainingChannelsBouquet();
-#ifdef MARTII
-	bool tomake = CZapit::getInstance()->makeRemainingChannelsBouquet();
-	bool tomake_new = CZapit::getInstance()->makeNewChannelsBouquet();
-#endif
 
 	/* reset channel number and has_bouquet flag */
 	CServiceManager::getInstance()->ResetChannelNumbers();
@@ -453,40 +441,13 @@ void CBouquetManager::makeRemainingChannelsBouquet(void)
 		renumChannels((*it)->radioChannels, j, (*it)->bUser ? NULL : (char *) (*it)->Name.c_str());
 	}
 
-#ifdef MARTII
-	if (newChannels) {
-		deleteBouquet(newChannels);
-		newChannels = NULL;
-	}
-	if(tomake_new) {
-		ZapitChannelList newChannelList;
-		if (CServiceManager::getInstance()->GetAllNewChannels(newChannelList)) {
-			newChannels = addBouquet("extra.zapit_bouquetname_newchannels", true); // UTF-8 encoded
-			sort(newChannelList.begin(), newChannelList.end(), CmpChannelByChName());
-
-			for (ZapitChannelList::const_iterator it = newChannelList.begin(); it != newChannelList.end(); it++)
-				newChannels->addService(*it);
-			
-			renumChannels(newChannels->tvChannels, i);
-			renumChannels(newChannels->radioChannels, j);
-		}
-	}
-#endif
 	if(/*!tomake ||*/ CServiceManager::getInstance()->GetAllUnusedChannels(unusedChannels) == false)
 		return;
 
 	sort(unusedChannels.begin(), unusedChannels.end(), CmpChannelByChName());
 
 #ifdef MARTII
-	if (remainChannels) {
-		deleteBouquet(remainChannels);
-		remainChannels = NULL;
-	}
-
-	if (Bouquets.size() == 0)
-		remainChannels = addBouquet("channellist.head", false); // UTF-8 encoded
-	else
-		remainChannels = addBouquet("extra.zapit_bouquetname_others", true); // UTF-8 encoded
+	remainChannels = addBouquet("extra.zapit_bouquetname_others", true); // UTF-8 encoded
 #else
 	// TODO: use locales
 	remainChannels = addBouquet( Bouquets.empty()  ? "All Channels" : "Other", false); // UTF-8 encoded
@@ -499,12 +460,6 @@ void CBouquetManager::makeRemainingChannelsBouquet(void)
 
 	renumChannels(remainChannels->tvChannels, i);
 	renumChannels(remainChannels->radioChannels, j);
-#ifdef MARTII
-	if (!tomake && Bouquets.size() > 1) {
-		deleteBouquet(remainChannels);
-		remainChannels = NULL;
-	}
-#endif
 }
 
 void CBouquetManager::renumServices()
@@ -538,11 +493,7 @@ CZapitBouquet* CBouquetManager::addBouquet(const std::string & name, bool ub, bo
 
 void CBouquetManager::deleteBouquet(const unsigned int id)
 {
-#ifdef MARTII
- 	if (id < Bouquets.size() && Bouquets[id] != remainChannels && Bouquets[id] != newChannels)
-#else
 	if (id < Bouquets.size() && Bouquets[id] != remainChannels)
-#endif
 		deleteBouquet(Bouquets[id]);
 }
 
@@ -689,9 +640,6 @@ void CBouquetManager::clearAll()
 
 	Bouquets.clear();
 	remainChannels = NULL;
-#ifdef MARTII
-	newChannels = NULL;
-#endif
 }
 
 CBouquetManager::ChannelIterator::ChannelIterator(CBouquetManager* owner, const bool TV)

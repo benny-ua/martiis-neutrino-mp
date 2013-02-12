@@ -57,9 +57,6 @@ void CZapitChannel::Init()
 	type = 0;
 	number = 0;
 	scrambled = 0;
-#ifdef MARTII
-	isNewChannel = false;
-#endif
 	pname = NULL;
 	pmtPid = 0;
 	resetPids();

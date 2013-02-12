@@ -140,10 +140,6 @@ class CServiceManager
 		bool GetAllSatelliteChannels(ZapitChannelList &list, t_satellite_position position);
 		bool GetAllTransponderChannels(ZapitChannelList &list, transponder_id_t tpid);
 		bool GetAllUnusedChannels(ZapitChannelList &list);
-#ifdef MARTII
-		bool GetAllNewChannels(ZapitChannelList &list);
-		void ResetNewChannelsFlag(void);
-#endif
 
 		bool IsChannelTVChannel(const t_channel_id channel_id);
 

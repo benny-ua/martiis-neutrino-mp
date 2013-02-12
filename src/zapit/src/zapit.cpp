@@ -68,6 +68,9 @@
 #include <video_td.h>
 #include <audio_td.h>
 #endif
+#ifdef MARTII
+#include <hardware_caps.h>
+#endif
 
 #include <driver/abstime.h>
 #include <libdvbsub/dvbsub.h>
@@ -179,9 +182,6 @@ void CZapit::SaveSettings(bool write)
 		configfile.setBool("writeChannelsNames", config.writeChannelsNames);
 #endif
 		configfile.setBool("makeRemainingChannelsBouquet", config.makeRemainingChannelsBouquet);
-#ifdef MARTII
-		configfile.setBool("makeNewChannelsBouquet", config.makeNewChannelsBouquet);
-#endif
 		configfile.setInt32("feTimeout", config.feTimeout);
 
 		configfile.setInt32("rezapTimeout", config.rezapTimeout);
@@ -312,9 +312,6 @@ void CZapit::LoadSettings()
 	/* FIXME Channels renum should be done for all channels atm. TODO*/
 	//config.makeRemainingChannelsBouquet	= configfile.getBool("makeRemainingChannelsBouquet", 1);
 	config.makeRemainingChannelsBouquet	= 1;
-#ifdef MARTII
-	config.makeNewChannelsBouquet		= configfile.getBool("makeNewChannelsBouquet", true);
-#endif
 	config.scanPids				= configfile.getBool("scanPids", 0);
 	config.scanSDT				= configfile.getInt32("scanSDT", 0);
 	config.cam_ci				= configfile.getInt32("cam_ci", 2);
@@ -333,7 +330,9 @@ void CZapit::LoadSettings()
 	diseqcType				= (diseqc_t)configfile.getInt32("diseqcType", NO_DISEQC);
 	config.motorRotationSpeed		= configfile.getInt32("motorRotationSpeed", 18); // default: 1.8 degrees per second
 #ifdef MARTII
-	feOffset				= configfile.getInt32("feOffset", -1);
+	feOffset				= configfile.getInt32("feOffset", 0);
+	if (feOffset < 0 || get_hwcaps()->fe_offset_max < feOffset)
+		feOffset = 0;
 #endif
 
 	printf("[zapit.cpp] diseqc type = %d\n", diseqcType);
@@ -1466,18 +1465,12 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 		CZapitMessages::commandInt msg;
 		CBasicServer::receive_data(connfd, &msg, sizeof(msg));
 		videoDecoder->SetVideoSystem(msg.val);
-#ifdef HAVE_SPARK_HARDWARE //MARTII
-		CFrameBuffer::getInstance()->resChange();
-#endif
                 break;
         }
 #endif
 #if 0
         case CZapitMessages::CMD_SET_NTSC: {
 		videoDecoder->SetVideoSystem(8);
-#ifdef HAVE_SPARK_HARDWARE //MARTII
-		CFrameBuffer::getInstance()->resChange();
-#endif
                 break;
         }
 #endif

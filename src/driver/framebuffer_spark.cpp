@@ -1574,7 +1574,7 @@ void CFrameBuffer::blitRect(int x, int y, int width, int height, unsigned long c
 	blit_unlock();
 }
 
-void CFrameBuffer::blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
+void CFrameBuffer::blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
 {
 	STMFBIO_BLT_EXTERN_DATA blt_data;
 	memset(&blt_data, 0, sizeof(STMFBIO_BLT_EXTERN_DATA));

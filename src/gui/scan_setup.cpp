@@ -502,10 +502,9 @@ void CScanSetup::addScanMenuFrontendSetup(CMenuWidget * setupMenu)
 
 #ifdef MARTII
 	extern int feOffset;
-	if (g_info.hw_caps->fe_offset_max > 0) {
-		CMenuOptionNumberChooser * lc = new CMenuOptionNumberChooser(LOCALE_EXTRA_ZAPIT_FE_OFFSET, (int *)&feOffset, true, 0, g_info.hw_caps->fe_offset_max);
-		setupMenu->addItem(lc);
-	}
+	CMenuOptionNumberChooser * lc = new CMenuOptionNumberChooser(LOCALE_EXTRA_ZAPIT_FE_OFFSET, (int *)&feOffset,
+		g_info.hw_caps->fe_offset_max > 0, 0, g_info.hw_caps->fe_offset_max);
+	setupMenu->addItem(lc);
 #endif
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_SATSETUP_FE_MODE, (int *)&femode, SATSETUP_FRONTEND_MODE, SATSETUP_FRONTEND_MODE_COUNT, allow_start && (count > 1), this, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED, true);
 	mc->setHint("", LOCALE_MENU_HINT_SCAN_FEMODE);

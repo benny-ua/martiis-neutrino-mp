@@ -804,16 +804,17 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 							//recDir = NULL;
 						}
 						//if (recDir != NULL)
-						if (doRecord)
 #ifdef MARTII
+						if (doRecord && !call_fromfollowlist)
 						{
 							CFollowScreenings m(channel_id,
 								epgData.epg_times.startzeit,
 								epgData.epg_times.startzeit + epgData.epg_times.dauer,
 								epgData.title, epgData.eventID, TIMERD_APIDS_CONF, true, recDir, &evtlist);
 							m.exec(NULL, "");
-						}
-#else
+						} else
+#endif
+						if (doRecord)
 						{
 							if (g_Timerd->addRecordTimerEvent(channel_id,
 											  epgData.epg_times.startzeit,
@@ -839,7 +840,6 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 								timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_EPG]);
 							}
 						}
-#endif
 					}
 					else
 						printf("timerd not available\n");

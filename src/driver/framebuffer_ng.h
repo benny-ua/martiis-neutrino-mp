@@ -102,11 +102,16 @@ class CFbAccel
 		int startX, startY, endX, endY;
 		t_fb_var_screeninfo s;
 		fb_pixel_t borderColor, borderColorOld;
-		void blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
+		void blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
 		void resChange(void);
 		void blitBB2FB(int fx0, int fy0, int fx1, int fy1, int tx0, int ty0, int tx1, int ty2);
 		void blitFB2FB(int fx0, int fy0, int fx1, int fy1, int tx0, int ty0, int tx1, int ty2);
 		void blitBoxFB(int x0, int y0, int x1, int y1, fb_pixel_t color);
+		void setBorder(int sx, int sy, int ex, int ey);
+		void getBorder(int &sx, int &sy, int &ex, int &ey) { sx = startX, sy = startY, ex = endX, ey = endY;};
+		void setBorderColor(fb_pixel_t col = 0);
+		fb_pixel_t getBorderColor(void) { return borderColor; };
+		void ClearFB(void);
 #endif
 };
 
@@ -304,13 +309,13 @@ class CFrameBuffer
 		enum Mode3D mode3D;
 
 	public:
-		void blitIcon(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
-		fb_pixel_t getBorderColor(void) { return accel->borderColor; };
-		void setBorderColor(fb_pixel_t col = 0);
+		void blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
+		void ClearFB(void);
+		void resChange(void);
 		void setBorder(int sx, int sy, int ex, int ey);
-		void getBorder(int &sx, int &sy, int &ex, int &ey) { sx = accel->startX, sy = accel->startY, ex = accel->endX, ey = accel->endY;};
-		void resChange(void) { this->accel->resChange(); };
-		void ClearFB(void) { accel->blitBoxFB(0, 0, accel->s.xres - 1, accel->s.yres - 1, 0); };
+		void getBorder(int &sx, int &sy, int &ex, int &ey);
+		void setBorderColor(fb_pixel_t col = 0);
+		fb_pixel_t getBorderColor(void);
 # endif
 #endif
 };

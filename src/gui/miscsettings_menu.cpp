@@ -56,9 +56,6 @@
 
 //#define ONE_KEY_PLUGIN
 
-#ifdef MARTII
-extern Zapit_config zapitCfg;
-#endif
 extern CPlugins       * g_PluginList;
 
 CMiscMenue::CMiscMenue()
@@ -141,7 +138,7 @@ const CMenuOptionChooser::keyval MISCSETTINGS_FILESYSTEM_IS_UTF8_OPTIONS[MISCSET
 
 
 #ifdef CPU_FREQ
-#ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE // MARTII
 #define CPU_FREQ_OPTION_COUNT 6
 const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS[CPU_FREQ_OPTION_COUNT] =
 {
@@ -247,11 +244,6 @@ int CMiscMenue::showMiscSettingsMenu()
 		misc_menue.addItem(mf);
 	}
 	//channellist
-#ifdef MARTII
-	CZapit::getInstance()->GetConfig(zapitCfg);
-	makeNewChannelsBouquet = zapitCfg.makeNewChannelsBouquet;
-	makeRemainingChannelsBouquet = zapitCfg.makeRemainingChannelsBouquet;
-#endif
 	CMenuWidget misc_menue_chanlist(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_CHANNELLIST);
 	showMiscSettingsMenuChanlist(&misc_menue_chanlist);
 	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, &misc_menue_chanlist, NULL, CRCInput::RC_2);
@@ -276,13 +268,6 @@ int CMiscMenue::showMiscSettingsMenu()
 #endif
 
 	int res = misc_menue.exec(NULL, "");
-#ifdef MARTII
-	if (zapitCfg.makeNewChannelsBouquet != makeNewChannelsBouquet || zapitCfg.makeRemainingChannelsBouquet != makeRemainingChannelsBouquet) {
-		zapitCfg.makeNewChannelsBouquet = makeNewChannelsBouquet;
-		zapitCfg.makeRemainingChannelsBouquet = makeRemainingChannelsBouquet;
-		CZapit::getInstance()->SetConfig(&zapitCfg);
-	}
-#endif
 	delete fanNotifier;
 	delete sectionsdConfigNotifier;
 	if (miscNotifier)
@@ -440,11 +425,6 @@ void CMiscMenue::showMiscSettingsMenuChanlist(CMenuWidget *ms_chanlist)
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_NEWLIST,     &g_settings.make_new_list           , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_MAKE_NEWLIST);
 	ms_chanlist->addItem(mc);
-#ifdef MARTII
-	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_OTHERS,     &g_settings.make_others_list         , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	mc->setHint("", LOCALE_MENU_HINT_MAKE_NEWLIST);
-	ms_chanlist->addItem(mc);
-#endif
 
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_MAKE_REMOVEDLIST, &g_settings.make_removed_list       , OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_MAKE_REMOVEDLIST);

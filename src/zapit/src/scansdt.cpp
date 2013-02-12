@@ -279,9 +279,6 @@ bool CSdt::ParseServiceDescriptor(ServiceDescription * service, ServiceDescripto
 				real_type, satellitePosition, freq_id);
 
 		CServiceManager::getInstance()->AddCurrentChannel(channel);
-#ifdef MARTII
-		channel->isNewChannel = true;
-#endif
 
 		channel->scrambled = free_ca;
 		if(pat.Parse(channel)) {

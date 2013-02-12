@@ -173,9 +173,6 @@ class CZapitChannel
 		casys_map_t			camap;
 
 		bool				bAlwaysLocked;
-#ifdef MARTII
-		bool				isNewChannel;
-#endif
 
 		int				number;
 		CChannelEvent			currentEvent,nextEvent;
