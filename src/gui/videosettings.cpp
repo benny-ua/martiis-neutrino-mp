@@ -330,7 +330,11 @@ int CVideoSettings::showVideoSetup()
 				videomodes.addItem(new CMenuOptionChooser(VIDEOMENU_VIDEOMODE_OPTIONS[i].valname, &g_settings.enabled_video_modes[i], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, &anotify));
 		//anotify.changeNotify(NONEXISTANT_LOCALE, 0);
 
+#ifdef MARTII
+		vs_videomodes_fw = new CMenuForwarder(LOCALE_VIDEOMENU_ENABLED_MODES, true, NULL, &videomodes, NULL, CRCInput::RC_mode);
+#else
 		vs_videomodes_fw = new CMenuForwarder(LOCALE_VIDEOMENU_ENABLED_MODES, true, NULL, &videomodes, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED );
+#endif
 		vs_videomodes_fw->setHint("", LOCALE_MENU_HINT_VIDEO_MODES);
 	}
 

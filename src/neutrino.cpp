@@ -392,12 +392,8 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_dbdr = configfile.getInt32("video_dbdr", 0);
 
 	for(int i = 0; i < VIDEOMENU_VIDEOMODE_OPTION_COUNT; i++) {
-#ifdef MARTII
-		g_settings.enabled_video_modes[i] = 1;
-#else
 		sprintf(cfg_key, "enabled_video_mode_%d", i);
 		g_settings.enabled_video_modes[i] = configfile.getInt32(cfg_key, 0);
-#endif
 	}
 #ifndef MARTII
 #if VIDEOMENU_VIDEOMODE_OPTION_COUNT > 3
