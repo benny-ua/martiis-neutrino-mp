@@ -342,22 +342,38 @@ void *insertEventsfromFile(void * data)
 
 				node = event->xmlChildrenNode;
 
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "name")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "name") != NULL) {
+#endif
 					e.setName(	std::string(ZapitTools::UTF8_to_Latin1(xmlGetAttribute(node, "lang"))),
 							std::string(xmlGetAttribute(node, "string")));
 					node = node->xmlNextNode;
 				}
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "text")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "text") != NULL) {
+#endif
 					e.setText(	std::string(ZapitTools::UTF8_to_Latin1(xmlGetAttribute(node, "lang"))),
 							std::string(xmlGetAttribute(node, "string")));
 					node = node->xmlNextNode;
 				}
 #ifdef USE_ITEM_DESCRIPTION
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "item")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "item") != NULL) {
+#endif
 					e.item = std::string(xmlGetAttribute(node, "string"));
 					node = node->xmlNextNode;
 				}
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "item_description")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "item_description") != NULL) {
+#endif
 					e.itemDescription = std::string(xmlGetAttribute(node, "string"));
 					node = node->xmlNextNode;
 				}
@@ -371,13 +387,21 @@ void *insertEventsfromFile(void * data)
 							std::string(xmlGetAttribute(node, "string")));
 					node = node->xmlNextNode;
 				}
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "time")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "time") != NULL) {
+#endif
 					e.times.insert(SItime(xmlGetNumericAttribute(node, "start_time", 10),
 								xmlGetNumericAttribute(node, "duration", 10)));
 					node = node->xmlNextNode;
 				}
 
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "content")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "content") != NULL) {
+#endif
 					char cl = xmlGetNumericAttribute(node, "class", 16);
 					e.contentClassification += cl;
 					cl = xmlGetNumericAttribute(node, "user", 16);
@@ -385,7 +409,11 @@ void *insertEventsfromFile(void * data)
 					node = node->xmlNextNode;
 				}
 
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "component")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "component") != NULL) {
+#endif
 					SIcomponent c;
 					c.streamContent = xmlGetNumericAttribute(node, "stream_content", 16);
 					c.componentType = xmlGetNumericAttribute(node, "type", 16);
@@ -395,7 +423,11 @@ void *insertEventsfromFile(void * data)
 					e.components.push_back(c);
 					node = node->xmlNextNode;
 				}
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "parental_rating")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "parental_rating") != NULL) {
+#endif
 #if 0
 					e.ratings.insert(SIparentalRating(std::string(ZapitTools::UTF8_to_Latin1(xmlGetAttribute(node, "country"))),
 								(unsigned char) xmlGetNumericAttribute(node, "rating", 10)));
@@ -404,7 +436,11 @@ void *insertEventsfromFile(void * data)
 								(unsigned char) xmlGetNumericAttribute(node, "rating", 10)));
 					node = node->xmlNextNode;
 				}
+#ifdef MARTII
+				while ((node = xmlGetNextOccurence(node, "linkage")) != NULL) {
+#else
 				while (xmlGetNextOccurence(node, "linkage") != NULL) {
+#endif
 					SIlinkage l;
 					l.linkageType = xmlGetNumericAttribute(node, "type", 16);
 					l.transportStreamId = xmlGetNumericAttribute(node, "transport_stream_id", 16);
