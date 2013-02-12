@@ -117,10 +117,10 @@ int CAudioSelectMenuHandler::doMenu ()
 		AudioSelector.addItem(fw, (i == g_RemoteControl->current_PIDs.PIDs.selected_apid));
 		shortcut_num = i+1;
 	}
+#ifndef MARTII // should be: HAVE_SPARK_HARDWARE
 	if (p_count)
 		AudioSelector.addItem(GenericMenuSeparatorLine);
 
-#ifndef MARTII // should be: HAVE_SPARK_HARDWARE
 	// -- setup menue for to Dual Channel Stereo
 	CMenuOptionChooser* oj = new CMenuOptionChooser(LOCALE_AUDIOMENU_ANALOG_MODE,
 			&g_settings.audio_AnalogMode,
