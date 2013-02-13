@@ -2586,9 +2586,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
 				media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
 				media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
-				int old_percent = audioDecoder->setPercent(100);
 				media->exec(NULL, "");
-				audioDecoder->setPercent(old_percent);
 			}
 #else
 			else if( (msg == CRCInput::RC_audio) && g_settings.audio_run_player) {
@@ -2608,7 +2606,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				StopSubtitles();
 				int old_percent = audioDecoder->getPercent();
 				CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
-				audioDecoder->setPercent(old_percent);
 				StartSubtitles(0);
 #ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::unlockChannel();
@@ -2632,7 +2629,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
 				if(mode == NeutrinoMessages::mode_radio )
 					videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
-				audioDecoder->setPercent(old_percent);
 				StartSubtitles(0);
 #ifdef ENABLE_GRAPHLCD // MARTII
 				nGLCD::unlockChannel();
