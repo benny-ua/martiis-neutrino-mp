@@ -151,6 +151,9 @@ void GLThreadObj::initKeys()
 
 void GLThreadObj::run()
 {
+#ifdef MARTII
+	set_threadname(name.c_str());
+#endif
 	setupCtx();
 	setupOSDBuffer();
 

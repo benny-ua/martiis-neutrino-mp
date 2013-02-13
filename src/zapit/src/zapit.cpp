@@ -70,6 +70,7 @@
 #endif
 #ifdef MARTII
 #include <hardware_caps.h>
+#include <system/set_threadname.h>
 #endif
 
 #include <driver/abstime.h>
@@ -2274,6 +2275,9 @@ static bool zapit_parse_command(CBasicMessage::Header &rmsg, int connfd)
 
 void CZapit::run()
 {
+#ifdef MARTII
+	set_threadname("CZapit::run");
+#endif
 #if HAVE_SPARK_HARDWARE
 	bool v_stopped = false;
 #endif
@@ -2462,6 +2466,9 @@ bool CZapitSdtMonitor::Stop()
 
 void CZapitSdtMonitor::run()
 {
+#ifdef MARTII
+	set_threadname("CZapitSdtMonitor::run");
+#endif
 	time_t /*tstart,*/ tcur, wtime = 0;
 	t_transport_stream_id           transport_stream_id = 0;
 	t_original_network_id           original_network_id = 0;

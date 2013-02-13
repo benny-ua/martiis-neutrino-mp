@@ -56,6 +56,9 @@
 #include <driver/streamts.h>
 #include <driver/record.h>
 #include <driver/genpsi.h>
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 /* experimental mode:
  * stream not possible, if record running
@@ -160,6 +163,9 @@ void CStreamInstance::RemoveClient(int clientfd)
 
 void CStreamInstance::run()
 {
+#ifdef MARTII
+	set_threadname("CStreamInstance::run");
+#endif
 	printf("CStreamInstance::run: %" PRIx64 "\n", channel_id);
 
 #ifndef HAVE_COOL_HARDWARE
@@ -390,6 +396,9 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 
 void CStreamManager::run()
 {
+#ifdef MARTII
+	set_threadname("CStreamManager::run");
+#endif
 	struct sockaddr_in servaddr;
 	int clilen = sizeof(servaddr);;
 

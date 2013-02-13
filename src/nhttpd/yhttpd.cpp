@@ -322,6 +322,9 @@ bool Cyhttpd::Configure() {
 // Main Webserver call
 //-----------------------------------------------------------------------------
 void Cyhttpd::run() {
+#ifdef MARTII
+	set_threadname("Cyhttpd::run");
+#endif
 	if (webserver) {
 		if (flag_threading_off)
 			webserver->is_threading = false;

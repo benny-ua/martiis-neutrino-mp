@@ -27,6 +27,9 @@
 #include "ysocket.h"
 #include "yconnection.h"
 #include "yrequest.h"
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 //=============================================================================
 // Initialization of static variables
@@ -117,6 +120,9 @@ CWebserver::~CWebserver() {
 #define MAX_TIMEOUTS_TO_CLOSE 10
 #define MAX_TIMEOUTS_TO_TEST 100
 bool CWebserver::run(void) {
+#ifdef MARTII
+	set_threadname("CWebserver::run");
+#endif
 	if (!listenSocket.listen(port, HTTPD_MAX_CONNECTIONS)) {
 		dperror("Socket cannot bind and listen. Abort.\n");
 		return false;

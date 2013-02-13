@@ -90,6 +90,7 @@
 #ifdef MARTII
 #include "gui/batchepg.h"
 #include "gui/screensetup.h"
+#include <system/set_threadname.h>
 #endif
 #if HAVE_COOL_HARDWARE
 #include "gui/widget/progressbar.h"
@@ -1995,6 +1996,9 @@ long timer_wakeup = 0;
 #endif
 int CNeutrinoApp::run(int argc, char **argv)
 {
+#ifdef MARTII
+	set_threadname("CNeutrinoApp::run");
+#endif
 time_t starttime = time_monotonic_ms();
 	CmdParser(argc, argv);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2604,7 +2608,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
 #endif
 				StopSubtitles();
-				int old_percent = audioDecoder->getPercent();
 				CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
 				StartSubtitles(0);
 #ifdef ENABLE_GRAPHLCD // MARTII
@@ -2623,7 +2626,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
 				StopSubtitles();
-				int old_percent = audioDecoder->getPercent();
 				if(mode == NeutrinoMessages::mode_radio )
 					videoDecoder->StopPicture();
 				CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
