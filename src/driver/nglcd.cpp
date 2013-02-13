@@ -43,8 +43,7 @@ nGLCD::nGLCD() {
 	lcd = NULL;
 	Channel = "Neutrino";
 	hw_caps_t *caps = get_hwcaps();
-	if (caps)
-			Epg = string(caps->boxvendor) + " " + string(caps->boxname);
+	Epg = string(caps->boxvendor) + " " + string(caps->boxname);
 
 	sem_init(&sem, 0, 1);
 
