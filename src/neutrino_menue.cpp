@@ -419,8 +419,17 @@ void CNeutrinoApp::InitMenuService()
  	//separator
 	personalize.addSeparator(MENU_SERVICE);
 #ifdef MARTII
+	//firmware update via opkg
+	if (COPKGManager::hasOpkgSupport()) {
+		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager(), NULL, CRCInput::RC_nokey, "nosuchicon"), &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+ 		//separator
+		personalize.addSeparator(MENU_SERVICE);
+	}
+
+#ifdef HAVE_SPARK_HARDWARE
 	//boot spark now
 	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
+#endif
 
 	//restart neutrino
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART   , true, NULL, this, "restart", CRCInput::RC_standby, NEUTRINO_ICON_BUTTON_POWER);
@@ -435,11 +444,8 @@ void CNeutrinoApp::InitMenuService()
 	mf->setHint(NEUTRINO_ICON_HINT_INFO, LOCALE_MENU_HINT_INFO);
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SERVICE_INFOMENU]);
 
+#ifndef MARTII
 	//firmware update
-#ifdef MARTII
-	if (COPKGManager::hasOpkgSupport())
-		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager()) , &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
-#else
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new CSoftwareUpdate());
 	mf->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_SW_UPDATE);
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
