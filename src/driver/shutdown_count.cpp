@@ -37,6 +37,9 @@
 #include <sys/timeb.h>
 #include <time.h>
 #include <unistd.h>
+#ifdef MARTII
+#include <system/set_threadname.h>
+#endif
 
 
 SHTDCNT::SHTDCNT()
@@ -66,6 +69,9 @@ SHTDCNT* SHTDCNT::getInstance()
 
 void* SHTDCNT::TimeThread(void *)
 {
+#ifdef MARTII
+	set_threadname("SHTDCNT::TimeThread");
+#endif
 	while(1)
 	{
 		sleep(1);

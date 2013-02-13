@@ -42,6 +42,7 @@
 #include <gui/widget/hintbox.h>
 #include <eitd/sectionsd.h>
 #include <driver/screen_max.h>
+#include <system/set_threadname.h>
 
 #define ZAPBACK_ALERT_PERIOD 15	// seconds. Keep this in sync with the locales.
 
@@ -98,6 +99,7 @@ void
 
 void *CAdZapMenu::Run(void *)
 {
+    set_threadname("CAdZapMenu::Run");
     while (azm->running) {
 	CChannelList *channelList = NULL;
 	t_channel_id curChannelId = -1;
