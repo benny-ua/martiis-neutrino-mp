@@ -1336,7 +1336,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("filebrowser_sortmethod", g_settings.filebrowser_sortmethod);
 	configfile.setBool("filebrowser_denydirectoryleave", g_settings.filebrowser_denydirectoryleave);
 #ifdef MARTII
-	configfile.setBool("filebrowser_usefilter", g_settings.filebrowser_usefilter);
+	configfile.setBool("filebrowser_usefilter", g_settings.filebrowser_use_filter);
 #endif
 
 	//zapit setup
