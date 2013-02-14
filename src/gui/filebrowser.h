@@ -175,7 +175,9 @@ class CFileBrowser
 		std::string		m_baseurl;
 		int 			width;
 		int 			height;
+#ifndef MARTII
 		bool			use_filter;
+#endif
 		bool			bCancel;
 
 		int 			x;

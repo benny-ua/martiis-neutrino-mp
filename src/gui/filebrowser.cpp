@@ -367,7 +367,11 @@ void CFileBrowser::commonInit()
 	sc_init_dir = "/legacy/genrelist?k="  + g_settings.shoutcast_dev_id;
 
 	Filter = NULL;
+#ifdef MARTII
+#define use_filter g_settings.filebrowser_use_filter
+#else
 	use_filter = true;
+#endif
 	Multi_Select = false;
 	Dirs_Selectable = false;
 	Dir_Mode = false;

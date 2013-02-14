@@ -656,6 +656,9 @@ struct SNeutrinoSettings
 	int filebrowser_showrights;
 	int filebrowser_sortmethod;
 	int filebrowser_denydirectoryleave;
+#ifdef MARTII
+	int filebrowser_use_filter;
+#endif
 
 	//zapit setup
 	std::string StartChannelTV;
