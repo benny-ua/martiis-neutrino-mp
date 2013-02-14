@@ -583,7 +583,7 @@ const char *CUserMenu::getUserMenuButtonName(int button)
 		return g_settings.usermenu_text[button].c_str();
 	if (return_title)
 		return g_Locale->getText(usermenu[button].def_name);
-	return NULL;
+	return "";
 }
 #endif
 /**************************************************************************************
