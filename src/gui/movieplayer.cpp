@@ -57,6 +57,7 @@
 #include <driver/volume.h>
 #include <driver/nglcd.h>
 #include <gui/widget/stringinput_ext.h>
+#include <gui/screensetup.h>
 #endif
 
 //extern CPlugins *g_PluginList;
@@ -555,7 +556,17 @@ void CMoviePlayerGui::PlayFile(void)
 		duration = p_movie_info->length * 60 * 1000;
 		int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
 		CZapit::getInstance()->SetVolumePercent(percent);
+#ifdef MARTII
+		CScreenSetup cSS;
+		cSS.showBorder(p_movie_info->epgId);
+#endif
 	}
+#ifdef MARTII
+	else {
+		CScreenSetup cSS;
+		cSS.showBorder(p_movie_info->epgId);
+	}
+#endif
 
 	file_prozent = 0;
 #ifdef MARTII
@@ -930,6 +941,8 @@ void CMoviePlayerGui::PlayFile(void)
 #ifdef MARTII
 	delete playback;
 	playback = NULL;
+	CScreenSetup cSS;
+	cSS.showBorder(CZapit::getInstance()->GetCurrentChannelID());
 #endif
 
 	CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, false);
