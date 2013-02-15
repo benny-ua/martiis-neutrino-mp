@@ -331,7 +331,7 @@ void CZapit::LoadSettings()
 	diseqcType				= (diseqc_t)configfile.getInt32("diseqcType", NO_DISEQC);
 	config.motorRotationSpeed		= configfile.getInt32("motorRotationSpeed", 18); // default: 1.8 degrees per second
 #ifdef MARTII
-	feOffset				= configfile.getInt32("feOffset", 0);
+	feOffset				= configfile.getInt32("feOffset", get_hwcaps()->fe_offset);
 	if (feOffset < 0 || get_hwcaps()->fe_offset_max < feOffset)
 		feOffset = 0;
 #endif
