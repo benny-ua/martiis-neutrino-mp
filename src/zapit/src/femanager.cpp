@@ -57,7 +57,12 @@ bool CFEManager::Init()
 	unsigned short fekey;
 	int type = -1;
 
+#ifdef MARTII
+	extern int feOffset;
+	for(int i = feOffset; i < MAX_ADAPTERS; i++) {
+#else
 	for(int i = 0; i < MAX_ADAPTERS; i++) {
+#endif
 		for(int j = 0; j < MAX_FE; j++) {
 			fe = new CFrontend(j, i);
 			if(fe->Open()) {

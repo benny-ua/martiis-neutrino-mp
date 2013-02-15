@@ -332,7 +332,7 @@ void CZapit::LoadSettings()
 	config.motorRotationSpeed		= configfile.getInt32("motorRotationSpeed", 18); // default: 1.8 degrees per second
 #ifdef MARTII
 	feOffset				= configfile.getInt32("feOffset", get_hwcaps()->fe_offset);
-	if (feOffset < 0 || get_hwcaps()->fe_offset_max < feOffset)
+	if (feOffset < 0 || get_hwcaps()->fe_offset_max <= feOffset)
 		feOffset = 0;
 #endif
 
