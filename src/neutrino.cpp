@@ -2692,7 +2692,13 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 #endif
 			{
 				CTimerList Timerlist;
+#ifdef MARTII
+				StopSubtitles();
+#endif
 				Timerlist.exec(NULL, "");
+#ifdef MARTII
+				StartSubtitles();
+#endif
 			}
 #ifdef MARTII
 			else if( msg == CRCInput::RC_red ) {
