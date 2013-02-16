@@ -500,7 +500,7 @@ void CScanSetup::addScanMenuFrontendSetup(CMenuWidget * setupMenu)
 
 	int count = CFEManager::getInstance()->getFrontendCount();
 
-#ifdef MARTII
+#ifdef MARTII_DISABLED
 	extern int feOffset;
 	CMenuOptionNumberChooser * lc = new CMenuOptionNumberChooser(LOCALE_EXTRA_ZAPIT_FE_OFFSET, (int *)&feOffset,
 		g_info.hw_caps->fe_offset_max > 0, 0, g_info.hw_caps->fe_offset_max);

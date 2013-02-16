@@ -38,7 +38,7 @@
 #include <zapit/client/zapittools.h>
 #include <zapit/femanager.h>
 #include <dmx_cs.h>
-#ifdef MARTII
+#ifdef MARTII_DISABLED
 #include <hardware_caps.h>
 #endif
 
@@ -61,7 +61,7 @@ bool CFEManager::Init()
 	int type = -1;
 
 	for(int i = 0; i < MAX_ADAPTERS; i++) {
-#ifdef MARTII
+#ifdef MARTII_DISABLED
 		extern int feOffset;
 		hw_caps_t *caps = get_hwcaps();
 		for(int j = feOffset; j <= caps->fe_offset_max; j++) {

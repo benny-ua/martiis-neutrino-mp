@@ -174,7 +174,7 @@ CFrontend::CFrontend(int Number, int Adapter)
 	locked		= false;
 	usecount	= 0;
 
-#ifdef MARTII
+#ifdef MARTII_DISABLED
 	extern int feOffset;
 	if (feOffset > 0) {
 		fenumber += feOffset;

@@ -511,7 +511,7 @@ int CDataResetNotifier::exec(CMenuTarget* /*parent*/, const std::string& actionK
 		my_system("/bin/sh", "-c", "rm -f /var/tuxbox/config/zapit/*.conf");
 		CServiceManager::getInstance()->SatelliteList().clear();
 		CZapit::getInstance()->LoadSettings();
-#ifdef MARTII
+#ifdef MARTII_DISABLED
 		CFEManager::getInstance()->loadSettings();
 #endif
 		CZapit::getInstance()->GetConfig(zapitCfg);
