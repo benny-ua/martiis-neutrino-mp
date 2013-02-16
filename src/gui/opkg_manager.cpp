@@ -103,26 +103,23 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		if(actionKey == v_pkg_list[i]) 
 		{
 			int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
-			if(r)
-			{
+			if(r) {
+				char rs[80];
+				snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+				DisplayInfoMessage(rs);
+			} else {
 				std::string action_name = "opkg-cl install " + getBlankPkgName(v_pkg_list[i]);
 				r = execCmd(action_name.c_str(), true);
-				if(!r)
+				if(r)
 				{
+					char rs[80];
+					snprintf(rs, sizeof(rs), "Install failed (%d)", r);
+					DisplayInfoMessage(rs);
+				} else {
 					DisplayInfoMessage("Install successful, restart of Neutrino required...");
 					//CNeutrinoApp::getInstance()->exec(NULL, "restart");
 					return res;
 				}
-				else {
-					char rs[80];
-					snprintf(rs, sizeof(rs), "Install failed (%d)", r);
-					DisplayInfoMessage(rs);
-				}
-			}
-			else {
-				char rs[80];
-				snprintf(rs, sizeof(rs), "Update failed (%d)", r);
-				DisplayInfoMessage(rs);
 			}
 			
 			return res;
