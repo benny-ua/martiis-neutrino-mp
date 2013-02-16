@@ -511,6 +511,9 @@ int CDataResetNotifier::exec(CMenuTarget* /*parent*/, const std::string& actionK
 		my_system("/bin/sh", "-c", "rm -f /var/tuxbox/config/zapit/*.conf");
 		CServiceManager::getInstance()->SatelliteList().clear();
 		CZapit::getInstance()->LoadSettings();
+#ifdef MARTII
+		CFEManager::getInstance()->loadSettings();
+#endif
 		CZapit::getInstance()->GetConfig(zapitCfg);
 		g_RCInput->postMsg( NeutrinoMessages::REBOOT, 0);
 		ret = menu_return::RETURN_EXIT_ALL;

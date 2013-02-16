@@ -338,7 +338,9 @@ void CZapit::LoadSettings()
 
 	printf("[zapit.cpp] diseqc type = %d\n", diseqcType);
 
+#ifndef MARTII
 	CFEManager::getInstance()->loadSettings();
+#endif
 	/**/
 
 	LoadAudioMap();
@@ -2156,6 +2158,9 @@ bool CZapit::Start(Z_start_arg *ZapStart_arg)
 {
 	if(started)
 		return false;
+#ifdef MARTII
+	LoadSettings();
+#endif
 
 	CFEManager::getInstance()->Init();
 	live_fe = CFEManager::getInstance()->getFE(0);
@@ -2201,7 +2206,11 @@ bool CZapit::Start(Z_start_arg *ZapStart_arg)
 
 	/* FIXME to transit from old satconfig.conf to new frontend.conf,
 	 * ConfigFrontend called after PrepareChannels, as it copy satellitePositions to every fe */ 
+#ifdef MARTII
+	CFEManager::getInstance()->loadSettings();
+#else
 	LoadSettings();
+#endif
 	ConfigFrontend();
 
 	if(!CFEManager::getInstance()->configExist())
