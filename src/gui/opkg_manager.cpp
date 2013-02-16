@@ -48,18 +48,20 @@
 
 #include <gui/widget/icons.h>
 #include <gui/widget/messagebox.h>
-#include "gui/widget/progresswindow.h"
+#include <gui/widget/shellwindow.h>
 #include <driver/screen_max.h>
 
 #include <system/debug.h>
 
 #include <stdio.h>
-
+#include <poll.h>
+#include <fcntl.h>
 
 COPKGManager::COPKGManager()
 {
 	width = w_max (40, 10); //%
 	v_pkg_installed.clear();
+	frameBuffer = CFrameBuffer::getInstance();
 }
 
 
@@ -83,23 +85,45 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	if (parent)
 		parent->hide();
+
+	if(actionKey == pkg_types[OM_UPGRADE].cmdstr) {
+		int r = execCmd(actionKey.c_str(), true);
+		if (r) {
+			char rs[80];
+			snprintf(rs, sizeof(rs), "Upgrade failed (%d)", r);
+			DisplayInfoMessage(rs);
+		} else {
+			DisplayInfoMessage("Upgrade successful");
+		}
+		return res;
+	}
 	
 	for(uint i = 0; i < v_pkg_list.size(); i++)
 	{
 		if(actionKey == v_pkg_list[i]) 
 		{
-			if(execCmd(pkg_types[OM_UPDATE].cmdstr))
+			int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
+			if(r)
 			{
 				std::string action_name = "opkg-cl install " + getBlankPkgName(v_pkg_list[i]);
-				if(execCmd(action_name.c_str()))
+				r = execCmd(action_name.c_str(), true);
+				if(!r)
 				{
-					DisplayInfoMessage("Update successful, restart of Neutrino required...");
+					DisplayInfoMessage("Install successful, restart of Neutrino required...");
 					//CNeutrinoApp::getInstance()->exec(NULL, "restart");
 					return res;
 				}
+				else {
+					char rs[80];
+					snprintf(rs, sizeof(rs), "Install failed (%d)", r);
+					DisplayInfoMessage(rs);
+				}
 			}
-			else
-				DisplayInfoMessage("Update failed");
+			else {
+				char rs[80];
+				snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+				DisplayInfoMessage(rs);
+			}
 			
 			return res;
 		}
@@ -115,12 +139,18 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 //show items
 int COPKGManager::showMenu()
 {
-	if(!execCmd(pkg_types[OM_UPDATE].cmdstr))
-		DisplayInfoMessage("Update failed");
-		
+	int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
+	if (r) {
+		char rs[80];
+		snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+		DisplayInfoMessage(rs);
+	}
+
 	CMenuWidget *menu = new CMenuWidget("OPKG-Manager", NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
 	
 	menu->addIntroItems();
+	menu->addItem(new CMenuForwarderNonLocalized("Upgrade", true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+	menu->addItem(GenericMenuSeparatorLine);
 	getPkgData(OM_LIST);
 	for(uint i = 0; i < v_pkg_list.size(); i++)
 	{
@@ -168,7 +198,6 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 	if (!f) //failed
 	{
 		DisplayInfoMessage("Command failed");
-		sleep(2);
 		return;
 	}
 	
@@ -233,25 +262,19 @@ std::string COPKGManager::getBlankPkgName(const std::string& line)
 	return name;
 }
 
-bool COPKGManager::execCmd(const char* cmdstr)
+int COPKGManager::execCmd(const char *cmdstr, bool verbose)
 {
-	char cmd[100];
-	FILE * f;
-	snprintf(cmd, sizeof(cmd), cmdstr);
-	
-	printf("COPKGManager: executing %s\n", cmd);
-	
-	f = popen(cmd, "r");
-	
-	if (!f) //failed
-	{
-		DisplayInfoMessage("Command failed");
-		sleep(2);
-		return false;
+	std::string cmd = std::string(cmdstr);
+	if (!verbose) {
+		cmd += " 2>/dev/null >&2";
+		int r = system(cmd.c_str());
+		if (r == -1)
+			return r;
+		return WEXITSTATUS(r);
 	}
-	
 
- 	pclose(f);
-
-	return true;
+	cmd += " 2>&1";
+	int res;
+	CShellWindow(cmd, true, &res);
+	return res;
 }

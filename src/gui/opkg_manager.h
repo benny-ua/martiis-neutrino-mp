@@ -39,6 +39,7 @@
 #define __OPKG_MANAGER__
 
 #include <gui/widget/menue.h>
+#include <driver/framebuffer.h>
 
 #include <string>
 
@@ -68,8 +69,10 @@ class COPKGManager : public CMenuTarget
 		std::vector<std::string> v_pkg_list;
 		std::vector<std::string> v_pkg_installed;
 		std::vector<std::string> v_pkg_upgradable;
+
+		CFrameBuffer *frameBuffer;
 		
-		bool execCmd(const char* cmdstr);
+		int execCmd(const char* cmdstr, bool verbose = false);
 		void getPkgData(const int pkg_content_id);
 		std::string getBlankPkgName(const std::string& line);
 		int showMenu();
