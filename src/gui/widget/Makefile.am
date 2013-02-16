@@ -44,4 +44,5 @@ libneutrino_gui_widget_a_SOURCES = \
 	textbox.cpp
 
 libneutrino_gui_widget2_a_SOURCES = \
-	progresswindow.cpp
+	progresswindow.cpp \
+	shellwindow.cpp
