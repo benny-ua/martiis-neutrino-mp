@@ -60,14 +60,14 @@ bool CFEManager::Init()
 	unsigned short fekey;
 	int type = -1;
 
-#ifdef MARTII
-	extern int feOffset;
-	hw_caps_t *caps = get_hwcaps();
-	for(int i = feOffset; i <= caps->fe_offset_max; i++) {
-#else
 	for(int i = 0; i < MAX_ADAPTERS; i++) {
-#endif
+#ifdef MARTII
+		extern int feOffset;
+		hw_caps_t *caps = get_hwcaps();
+		for(int j = feOffset; j <= caps->fe_offset_max; j++) {
+#else
 		for(int j = 0; j < MAX_FE; j++) {
+#endif
 			fe = new CFrontend(j, i);
 			if(fe->Open()) {
 				if (type == -1)
