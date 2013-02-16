@@ -421,7 +421,8 @@ void CNeutrinoApp::InitMenuService()
 #ifdef MARTII
 	//firmware update via opkg
 	if (COPKGManager::hasOpkgSupport()) {
-		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager(), NULL, CRCInput::RC_nokey, "nosuchicon"), &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager()), &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+
  		//separator
 		personalize.addSeparator(MENU_SERVICE);
 	}
