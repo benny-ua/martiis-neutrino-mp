@@ -10,6 +10,8 @@
 	Copyright (C) 2012 T. Graf 'dbt'
 	Homepage: http://www.dbox2-tuning.net/
 
+	Copyright (C) 2013 martii
+
         License: GPL
 
         This library is free software; you can redistribute it and/or
@@ -60,8 +62,10 @@
 COPKGManager::COPKGManager()
 {
 	width = w_max (40, 10); //%
-	v_pkg_installed.clear();
 	frameBuffer = CFrameBuffer::getInstance();
+	pkg_map.clear();
+	list_installed_done = false;
+	list_upgradeable_done = false;
 }
 
 
@@ -86,56 +90,72 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 	if (parent)
 		parent->hide();
 
+	if (actionKey == "")
+		return showMenu(); 
+
 	if(actionKey == pkg_types[OM_UPGRADE].cmdstr) {
-		int r = execCmd(actionKey.c_str(), true);
+		int r = execCmd(actionKey.c_str(), true, true);
 		if (r) {
 			char rs[80];
 			snprintf(rs, sizeof(rs), "Upgrade failed (%d)", r);
 			DisplayInfoMessage(rs);
-		} else {
-			DisplayInfoMessage("Upgrade successful");
-		}
+		} else
+			installed = true;
+		refreshMenu();
 		return res;
 	}
-	
-	for(uint i = 0; i < v_pkg_list.size(); i++)
-	{
-		if(actionKey == v_pkg_list[i]) 
-		{
-			int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
-			if(r) {
+	std::map<string, struct pkg>::iterator it = pkg_map.find(actionKey);
+	if (it != pkg_map.end()) {
+		int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
+		if(r) {
+			char rs[80];
+			snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+			DisplayInfoMessage(rs);
+		} else {
+			std::string action_name = "opkg-cl install " + it->second.name;
+			r = execCmd(action_name.c_str(), true, true);
+			if(r)
+			{
 				char rs[80];
-				snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+				snprintf(rs, sizeof(rs), "Install failed (%d)", r);
 				DisplayInfoMessage(rs);
-			} else {
-				std::string action_name = "opkg-cl install " + getBlankPkgName(v_pkg_list[i]);
-				r = execCmd(action_name.c_str(), true);
-				if(r)
-				{
-					char rs[80];
-					snprintf(rs, sizeof(rs), "Install failed (%d)", r);
-					DisplayInfoMessage(rs);
-				} else {
-					DisplayInfoMessage("Install successful, restart of Neutrino required...");
-					//CNeutrinoApp::getInstance()->exec(NULL, "restart");
-					return res;
-				}
-			}
-			
-			return res;
+			} else
+				installed = true;
 		}
+		refreshMenu();
 	}
-	
-	res = showMenu(); 
-	
 	return res;
 }
 
+void COPKGManager::updateMenu()
+{
+	bool upgradesAvailable = false;
+	getPkgData(OM_LIST_INSTALLED);
+	getPkgData(OM_LIST_UPGRADEABLE);
+	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++) {
+		it->second.forwarder->iconName_Info_right = "";
+		it->second.forwarder->setActive(true);
+		if (it->second.upgradable) {
+			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_IMPORTANT;
+			upgradesAvailable = true;
+		} else if (it->second.installed)
+			it->second.forwarder->setActive(false);
+	}
 
+	upgrade_forwarder->setActive(upgradesAvailable);
+}
+
+void COPKGManager::refreshMenu() {
+	list_installed_done = false,
+	list_upgradeable_done = false;
+	updateMenu();
+}
 
 //show items
 int COPKGManager::showMenu()
 {
+	installed = false;
+
 	int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
 	if (r) {
 		char rs[80];
@@ -143,21 +163,22 @@ int COPKGManager::showMenu()
 		DisplayInfoMessage(rs);
 	}
 
-	CMenuWidget *menu = new CMenuWidget("OPKG-Manager", NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
-	
-	menu->addIntroItems();
-	menu->addItem(new CMenuForwarderNonLocalized("Upgrade", true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-	menu->addItem(GenericMenuSeparatorLine);
 	getPkgData(OM_LIST);
-	for(uint i = 0; i < v_pkg_list.size(); i++)
-	{
-		printf("Update to %s\n", v_pkg_list[i].c_str());
-		//std::string action_name = getBlankPkgName(v_pkg_list[i]);
-		menu->addItem( new CMenuForwarderNonLocalized(v_pkg_list[i].c_str(), true, NULL , this, v_pkg_list[i].c_str()));
-	}
+	getPkgData(OM_LIST_UPGRADEABLE);
 
+	CMenuWidget *menu = new CMenuWidget("OPKG-Manager", NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
+	menu->addIntroItems();
+	upgrade_forwarder = new CMenuForwarderNonLocalized("Upgrade", true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	menu->addItem(upgrade_forwarder);
+	menu->addItem(GenericMenuSeparatorLine);
+	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+		menu->addItem(it->second.forwarder);
+
+	updateMenu();
 
 	int res = menu->exec (NULL, "");
+	if (installed)
+		DisplayInfoMessage("Install successful, restart of Neutrino required...");
 	menu->hide ();
 	delete menu;
 	return res;
@@ -202,7 +223,28 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 	setbuf(f, NULL);
 	int in, pos;
 	pos = 0;
-	v_pkg_installed.clear();
+
+	switch (pkg_content_id) {
+		case OM_LIST:
+			pkg_map.clear();
+			list_installed_done = false;
+			list_upgradeable_done = false;
+			break;
+		case OM_LIST_INSTALLED:
+			if (list_installed_done)
+				return;
+			list_installed_done = true;
+			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+				it->second.installed = false;
+			break;
+		case OM_LIST_UPGRADEABLE:
+			if (list_upgradeable_done)
+				return;
+			list_upgradeable_done = true;
+			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+				it->second.upgradable = false;
+			break;
+	}
 
 	while (true)
 	{
@@ -230,14 +272,30 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 				{
 					case OM_LIST: //list of pkgs
 					{
-						v_pkg_list.push_back(line);
-						//printf("%s\n", buf);
+						struct pkg p;
+						p.description = line;
+						p.name = getBlankPkgName(line);
+						p.installed = false;
+						p.upgradable = false;
+						pkg_map[p.name] = p;
+						std::map<string, struct pkg>::iterator it = pkg_map.find(p.name); // don't use variables defined in local scope only
+						it->second.forwarder = new CMenuForwarderNonLocalized(it->second.description.c_str(), true, NULL , this, it->second.name.c_str());
 						break;
 					}
 					case OM_LIST_INSTALLED: //installed pkgs
 					{
-						v_pkg_installed.push_back(line);
-						//printf("%s\n", buf);
+						std::string name = getBlankPkgName(line);
+						std::map<string, struct pkg>::iterator it = pkg_map.find(name);
+						if (it != pkg_map.end())
+							it->second.installed = true;
+						break;
+					}
+					case OM_LIST_UPGRADEABLE: //upgradable pkgs
+					{
+						std::string name = getBlankPkgName(line);
+						std::map<string, struct pkg>::iterator it = pkg_map.find(name);
+						if (it != pkg_map.end())
+							it->second.upgradable = true;
 						break;
 					}
 					default:
@@ -259,19 +317,19 @@ std::string COPKGManager::getBlankPkgName(const std::string& line)
 	return name;
 }
 
-int COPKGManager::execCmd(const char *cmdstr, bool verbose)
+int COPKGManager::execCmd(const char *cmdstr, bool verbose, bool acknowledge)
 {
 	std::string cmd = std::string(cmdstr);
-	if (!verbose) {
+	if (verbose) {
+		cmd += " 2>&1";
+		int res;
+		CShellWindow(cmd, (verbose ? CShellWindow::VERBOSE : 0) | (acknowledge ? CShellWindow::ACKNOWLEDGE : 0), &res);
+		return res;
+	} else {
 		cmd += " 2>/dev/null >&2";
 		int r = system(cmd.c_str());
 		if (r == -1)
 			return r;
 		return WEXITSTATUS(r);
 	}
-
-	cmd += " 2>&1";
-	int res;
-	CShellWindow(cmd, true, &res);
-	return res;
 }

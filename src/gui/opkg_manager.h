@@ -10,6 +10,8 @@
 	Copyright (C) 2012 T. Graf 'dbt'
 	Homepage: http://www.dbox2-tuning.net/
 
+	Copyright (C) 2013 martii
+
         License: GPL
 
         This library is free software; you can redistribute it and/or
@@ -66,25 +68,34 @@ class COPKGManager : public CMenuTarget
 	private:
 		int width;
 		
-		std::vector<std::string> v_pkg_list;
-		std::vector<std::string> v_pkg_installed;
-		std::vector<std::string> v_pkg_upgradable;
-
 		CFrameBuffer *frameBuffer;
-		
-		int execCmd(const char* cmdstr, bool verbose = false);
+
+		struct pkg {
+			std::string name;
+			std::string description;
+			bool installed;
+			bool upgradable;
+			CMenuForwarderNonLocalized *forwarder;
+		};
+		std::map<std::string,struct pkg> pkg_map;
+
+		CMenuForwarderNonLocalized *upgrade_forwarder;
+		bool list_installed_done;
+		bool list_upgradeable_done;
+		bool installed;
+
+		int execCmd(const char* cmdstr, bool verbose = false, bool acknowledge = false);
 		void getPkgData(const int pkg_content_id);
 		std::string getBlankPkgName(const std::string& line);
 		int showMenu();
+		void updateMenu();
+		void refreshMenu();
 
 	public:	
-
 		COPKGManager();
 		~COPKGManager();
 		
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 		static bool hasOpkgSupport();
 };
-
-
 #endif
