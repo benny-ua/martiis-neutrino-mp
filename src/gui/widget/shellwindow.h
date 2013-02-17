@@ -30,11 +30,14 @@
 
 class CShellWindow
 {
-	private:
-		CTextBox *textBox;
 	public:
-		CShellWindow(const std::string cmd, bool verbose, int *res);
+		enum shellwindow_modes { VERBOSE = 1, ACKNOWLEDGE = 2 };
+		CShellWindow(const std::string cmd, const int mode = 0, int *res = NULL);
 		~CShellWindow();
+	private:
+		int mode;
+		CFrameBuffer *frameBuffer;
+		CTextBox *textBox;
 };
 
 #endif

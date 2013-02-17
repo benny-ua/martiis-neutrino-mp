@@ -380,34 +380,8 @@ void CPlugins::startScriptPlugin(int number)
 	// workaround for manually messed up permissions
 	if (access(script, X_OK))
 		chmod(script, 0755);
-	int res;
-	CShellWindow *w = new CShellWindow(script, true, &res);
-	int iw, ih;
-	frameBuffer->getIconSize(NEUTRINO_ICON_BUTTON_OKAY, &iw, &ih);
-	int b_width = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MESSAGEBOX_OK), true) + 36 + ih + (RADIUS_LARGE / 2);
-
-	int fh = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight();
-	int b_height = std::max(fh, ih) + 8 + (RADIUS_LARGE / 2);
-	Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
-        unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
-        int h = lines_max * font->getHeight();
-	int xpos = frameBuffer->getScreenWidth() - b_width;
-	int ypos = h - b_height;
-	frameBuffer->paintBoxRel(xpos, ypos, b_width, b_height, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE);
-	frameBuffer->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos + ((b_height - ih) / 2), ypos + ((b_height - ih) / 2), ih);
-	g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(xpos + iw + 17, ypos + fh + ((b_height - fh) / 2), b_width - (iw + 21), g_Locale->getText(LOCALE_MESSAGEBOX_OK), COL_MENUCONTENT, 0, true);
-	frameBuffer->blit();
-
-	neutrino_msg_t msg;
-	neutrino_msg_data_t data;
-	do
-		g_RCInput->getMsg(&msg, &data, 100);
-	while (msg != CRCInput::RC_ok && msg != CRCInput::RC_home);
-
+	CShellWindow(script, CShellWindow::VERBOSE | CShellWindow::ACKNOWLEDGE);
 	scriptOutput = "";
-	delete w;
-	frameBuffer->Clear();
-	frameBuffer->blit();
 #else
 	pid_t pid = 0;
 	FILE *f = my_popen(pid,script,"r");

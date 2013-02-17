@@ -34,10 +34,11 @@
 #include <poll.h>
 #include <fcntl.h>
 
-CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
+CShellWindow::CShellWindow(const std::string command, const int _mode, int *res) {
 	textBox = NULL;
 	std::string cmd = command;
-	if (!verbose) {
+	mode = _mode;
+	if (!(mode & VERBOSE)){
 		cmd += " 2>/dev/null >&2";
 		int r = system(cmd.c_str());
 		if (res) {
@@ -57,12 +58,12 @@ CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
 		return;
 	}
 	Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
-	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
+	frameBuffer = CFrameBuffer::getInstance();
 	unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
 	int h = lines_max * font->getHeight();
 	list<std::string> lines;
 	CBox textBoxPosition(frameBuffer->getScreenX(), frameBuffer->getScreenY(), frameBuffer->getScreenWidth(), h);
-	textBox = new CTextBox(cmd.c_str(), font, 0, &textBoxPosition);
+	textBox = new CTextBox(cmd.c_str(), font, CTextBox::BOTTOM, &textBoxPosition);
 	struct pollfd fds;
 	fds.fd = fileno(f);
 	fds.events = POLLIN | POLLHUP | POLLERR;
@@ -91,7 +92,7 @@ CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
 					char *outputp = output + off;
 					dirty = true;
 
-					for (int i = off; output[i]; i++)
+					for (int i = off; output[i] && !nlseen; i++)
 						switch (output[i]) {
 							case '\b':
 								if (outputp > output)
@@ -102,8 +103,10 @@ CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
 								outputp = output;
 								break;
 							case '\n':
-								nlseen = true;
 								lines_read++;
+								nlseen = true;
+								*outputp = 0;
+								break;
 							default:
 								*outputp++ = output[i];
 								break;
@@ -125,8 +128,14 @@ CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
 					if (lines.size() > lines_max)
 						lines.pop_front();
 					txt = "";
-					for (std::list<std::string>::const_iterator it = lines.begin(), end = lines.end(); it != end; ++it)
+					bool first = true;
+					for (std::list<std::string>::const_iterator it = lines.begin(), end = lines.end(); it != end; ++it) {
+						if (first)
+							first = false;
+						else
+							txt += '\n';
 						txt += *it;
+					}
 					if (((lines_read == lines_max) && (lastPaint + 100000 < now)) || (lastPaint + 250000 < now)) {
 						textBox->setText(&txt);
 						textBox->paint();
@@ -158,11 +167,36 @@ CShellWindow::CShellWindow(const std::string command, bool verbose, int *res) {
 		else
 			*res = WEXITSTATUS(r);
 	}
-	return;
 }
 
 CShellWindow::~CShellWindow()
 {
+	if (textBox && (mode & ACKNOWLEDGE)) {
+		int iw, ih;
+		frameBuffer->getIconSize(NEUTRINO_ICON_BUTTON_OKAY, &iw, &ih);
+		int b_width = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MESSAGEBOX_OK), true) + 36 + ih + (RADIUS_LARGE / 2);
+
+		int fh = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight();
+		int b_height = std::max(fh, ih) + 8 + (RADIUS_LARGE / 2);
+		Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
+		unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
+		int h = lines_max * font->getHeight();
+		int xpos = frameBuffer->getScreenWidth() - b_width;
+		int ypos = h - b_height;
+		frameBuffer->paintBoxRel(xpos, ypos, b_width, b_height, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE);
+		frameBuffer->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos + ((b_height - ih) / 2), ypos + ((b_height - ih) / 2), ih);
+		g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(xpos + iw + 17, ypos + fh + ((b_height - fh) / 2), b_width - (iw + 21), g_Locale->getText(LOCALE_MESSAGEBOX_OK), COL_MENUCONTENT, 0, true);
+		frameBuffer->blit();
+
+		neutrino_msg_t msg;
+		neutrino_msg_data_t data;
+		do
+			g_RCInput->getMsg(&msg, &data, 100);
+		while (msg != CRCInput::RC_ok && msg != CRCInput::RC_home);
+
+		frameBuffer->Clear();
+		frameBuffer->blit();
+	}
 	if (textBox) {
 		textBox->hide();
 		delete textBox;
