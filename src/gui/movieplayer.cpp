@@ -564,7 +564,7 @@ void CMoviePlayerGui::PlayFile(void)
 #ifdef MARTII
 	else {
 		CScreenSetup cSS;
-		cSS.showBorder(p_movie_info->epgId);
+		cSS.showBorder(0);
 	}
 #endif
 
