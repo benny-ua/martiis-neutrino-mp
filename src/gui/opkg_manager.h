@@ -79,7 +79,7 @@ class COPKGManager : public CMenuTarget
 		};
 		std::map<std::string,struct pkg> pkg_map;
 
-		CMenuForwarderNonLocalized *upgrade_forwarder;
+		CMenuForwarder *upgrade_forwarder;
 		bool list_installed_done;
 		bool list_upgradeable_done;
 		bool installed;

@@ -1483,6 +1483,12 @@ nvod.starting (Beginn in %d min)
 nvodselector.directormode Bildregie-Modus
 nvodselector.head Anfangszeit auswählen
 nvodselector.subservice Perspektiven
+opkg.failure.install Installation fehlgeschlagen (%d)
+opkg.failure.update Update fehlgeschlagen (%d)
+opkg.failure.upgrade Upgrade fehlgeschlagen (%d)
+opkg.success.install Installation erfolgreich, Neustart von Neutrino kann erforderlich sein.
+opkg.title OPKG-Manager
+opkg.upgrade Upgrade
 options.default Voreinstellungen benutzen
 options.fb framebuffer
 options.ntp_off DVB

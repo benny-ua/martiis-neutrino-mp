@@ -80,7 +80,7 @@ const opkg_cmd_struct_t pkg_types[OM_MAX] =
 	{OM_LIST_INSTALLED, 	"opkg-cl list-installed"},
 	{OM_LIST_UPGRADEABLE,	"opkg-cl list-upgradable"},
 	{OM_UPDATE,		"opkg-cl update"},
-	{OM_UPGRADE,		"opkg-cl upgrade"},
+	{OM_UPGRADE,		"opkg-cl upgrade"}
 };
 
 int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
@@ -96,8 +96,9 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 	if(actionKey == pkg_types[OM_UPGRADE].cmdstr) {
 		int r = execCmd(actionKey.c_str(), true, true);
 		if (r) {
-			char rs[80];
-			snprintf(rs, sizeof(rs), "Upgrade failed (%d)", r);
+			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPGRADE);
+			char rs[strlen(loc.c_str()) + 20];
+			snprintf(rs, sizeof(rs), loc.c_str(), r);
 			DisplayInfoMessage(rs);
 		} else
 			installed = true;
@@ -108,16 +109,17 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 	if (it != pkg_map.end()) {
 		int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
 		if(r) {
-			char rs[80];
-			snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
+			char rs[strlen(loc.c_str()) + 20];
+			snprintf(rs, sizeof(rs), loc.c_str(), r);
 			DisplayInfoMessage(rs);
 		} else {
 			std::string action_name = "opkg-cl install " + it->second.name;
 			r = execCmd(action_name.c_str(), true, true);
-			if(r)
-			{
-				char rs[80];
-				snprintf(rs, sizeof(rs), "Install failed (%d)", r);
+			if(r) {
+				std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_INSTALL);
+				char rs[strlen(loc.c_str()) + 20];
+				snprintf(rs, sizeof(rs), loc.c_str(), r);
 				DisplayInfoMessage(rs);
 			} else
 				installed = true;
@@ -158,17 +160,18 @@ int COPKGManager::showMenu()
 
 	int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
 	if (r) {
-		char rs[80];
-		snprintf(rs, sizeof(rs), "Update failed (%d)", r);
+		std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
+		char rs[strlen(loc.c_str()) + 20];
+		snprintf(rs, sizeof(rs), loc.c_str(), r);
 		DisplayInfoMessage(rs);
 	}
 
 	getPkgData(OM_LIST);
 	getPkgData(OM_LIST_UPGRADEABLE);
 
-	CMenuWidget *menu = new CMenuWidget("OPKG-Manager", NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
+	CMenuWidget *menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
 	menu->addIntroItems();
-	upgrade_forwarder = new CMenuForwarderNonLocalized("Upgrade", true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	menu->addItem(upgrade_forwarder);
 	menu->addItem(GenericMenuSeparatorLine);
 	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
@@ -178,7 +181,7 @@ int COPKGManager::showMenu()
 
 	int res = menu->exec (NULL, "");
 	if (installed)
-		DisplayInfoMessage("Install successful, restart of Neutrino required...");
+		DisplayInfoMessage(g_Locale->getText(LOCALE_OPKG_SUCCESS_INSTALL));
 	menu->hide ();
 	delete menu;
 	return res;
@@ -187,19 +190,14 @@ int COPKGManager::showMenu()
 //returns true if opkg support is available
 bool COPKGManager::hasOpkgSupport()
 {
-	std::string deps[] = {"/bin/opkg-cl","/bin/opkg-key", "/etc/opkg/opkg.conf", "/var/lib/opkg"};
-	bool ret = true;
-	
-	for (uint i = 0; i < (sizeof(deps) / sizeof(deps[0])); i++)
-	{
-		if(access(deps[i].c_str(), R_OK) !=0)
-		{
-			printf("[neutrino opkg] %s not found\n", deps[i].c_str());
-			ret = false;
+	const char *deps[] = {"/bin/opkg-cl","/bin/opkg-key", "/etc/opkg/opkg.conf", "/var/lib/opkg", NULL};
+	for (const char **d = deps; *d; d++)
+		if(access(*d, R_OK) !=0) {
+			printf("[neutrino opkg] %s not found\n", *d);
+			return false;
 		}
-	}
 	
-	return ret;
+	return true;
 }
 
 

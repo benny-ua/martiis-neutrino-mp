@@ -1485,6 +1485,12 @@ nvod.starting (starting in %d min)
 nvodselector.directormode Direct-Mode
 nvodselector.head Select starting-time
 nvodselector.subservice Select Subservice
+opkg.failure.install Install failed (%d)
+opkg.failure.update Update failed (%d)
+opkg.failure.upgrade Upgrade failed (%d)
+opkg.success.install Install successful, restart of Neutrino might be required.
+opkg.title OPKG Manager
+opkg.upgrade Upgrade
 options.default Reset to defaults
 options.fb framebuffer
 options.ntp_off DVB
