@@ -68,9 +68,6 @@
 #include <video_td.h>
 #include <audio_td.h>
 #endif
-#ifdef MARTII_DISABLED
-#include <hardware_caps.h>
-#endif
 #ifdef MARTII
 #include <system/set_threadname.h>
 #endif
@@ -156,9 +153,6 @@ void CZapit::SendEvent(const unsigned int eventID, const void* eventbody, const 
 		eventServer->sendEvent(eventID, CEventServer::INITID_ZAPIT, eventbody, eventbodysize);
 }
 
-#ifdef MARTII_DISABLED
-int feOffset = 0;
-#endif
 void CZapit::SaveSettings(bool write)
 {
 	if (current_channel) {
@@ -214,9 +208,6 @@ void CZapit::SaveSettings(bool write)
 		configfile.setInt32("diseqcRepeats", live_fe->getDiseqcRepeats());
 		configfile.setInt32("diseqcType", live_fe->getDiseqcType());
 		configfile.setInt32("motorRotationSpeed", config.motorRotationSpeed);
-#endif
-#ifdef MARTII_DISABLED
-		configfile.setInt32("feOffset", feOffset);
 #endif
 		if (configfile.getModifiedFlag())
 			configfile.saveConfig(CONFIGFILE);
@@ -332,17 +323,10 @@ void CZapit::LoadSettings()
 	/* FIXME FE specific, to be removed */
 	diseqcType				= (diseqc_t)configfile.getInt32("diseqcType", NO_DISEQC);
 	config.motorRotationSpeed		= configfile.getInt32("motorRotationSpeed", 18); // default: 1.8 degrees per second
-#ifdef MARTII_DISABLED
-	feOffset				= configfile.getInt32("feOffset", get_hwcaps()->fe_offset);
-	if (feOffset < 0 || get_hwcaps()->fe_offset_max <= feOffset)
-		feOffset = 0;
-#endif
 
 	printf("[zapit.cpp] diseqc type = %d\n", diseqcType);
 
-#ifndef MARTII_DISABLED
 	CFEManager::getInstance()->loadSettings();
-#endif
 	/**/
 
 	LoadAudioMap();
@@ -2160,9 +2144,6 @@ bool CZapit::Start(Z_start_arg *ZapStart_arg)
 {
 	if(started)
 		return false;
-#ifdef MARTII
-	LoadSettings();
-#endif
 
 	CFEManager::getInstance()->Init();
 	live_fe = CFEManager::getInstance()->getFE(0);
@@ -2208,11 +2189,7 @@ bool CZapit::Start(Z_start_arg *ZapStart_arg)
 
 	/* FIXME to transit from old satconfig.conf to new frontend.conf,
 	 * ConfigFrontend called after PrepareChannels, as it copy satellitePositions to every fe */ 
-#ifdef MARTII_DISABLED
-	CFEManager::getInstance()->loadSettings();
-#else
 	LoadSettings();
-#endif
 	ConfigFrontend();
 
 	if(!CFEManager::getInstance()->configExist())

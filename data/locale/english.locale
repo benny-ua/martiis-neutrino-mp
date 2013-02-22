@@ -439,7 +439,6 @@ extra.west West
 extra.zap_cycle Zap cycle
 extra.zapit_bouquetname_newchannels New channels
 extra.zapit_bouquetname_others Others
-extra.zapit_fe_offset FE-Offset
 extra.zapit_fe_timeout Tune timeout (1 = 10 msec)
 extra.zapit_hvoltage 18V for rotor moving 
 extra.zapit_make_bouquet Make Remaining Channels list

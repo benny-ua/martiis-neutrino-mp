@@ -174,20 +174,12 @@ CFrontend::CFrontend(int Number, int Adapter)
 	locked		= false;
 	usecount	= 0;
 
-#ifdef MARTII_DISABLED
-	extern int feOffset;
-	if (feOffset > 0) {
-		fenumber += feOffset;
-		printf("[fe%d] FE_OFFSET is %d -> use frontend%d\n", Number, feOffset, fenumber);
-	}
-#else
 	/* temporary hack to use frontend1 / frontend2 on Spark7162 */
 	if (getenv("FE_OFFSET")) {
 		int fe_offset = atoi(getenv("FE_OFFSET"));
 		fenumber += fe_offset;
 		printf("[fe%d] FE_OFFSET is %d -> use frontend%d\n", Number, fe_offset, fenumber);
 	}
-#endif
 
 	tuned					= false;
 	uncommitedInput				= 255;

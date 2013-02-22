@@ -38,9 +38,6 @@
 #include <zapit/client/zapittools.h>
 #include <zapit/femanager.h>
 #include <dmx_cs.h>
-#ifdef MARTII_DISABLED
-#include <hardware_caps.h>
-#endif
 
 extern transponder_list_t transponders;
 
@@ -61,13 +58,7 @@ bool CFEManager::Init()
 	int type = -1;
 
 	for(int i = 0; i < MAX_ADAPTERS; i++) {
-#ifdef MARTII_DISABLED
-		extern int feOffset;
-		hw_caps_t *caps = get_hwcaps();
-		for(int j = feOffset; j <= caps->fe_offset_max; j++) {
-#else
 		for(int j = 0; j < MAX_FE; j++) {
-#endif
 			fe = new CFrontend(j, i);
 			if(fe->Open()) {
 				if (type == -1)

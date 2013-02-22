@@ -466,7 +466,6 @@ const char * locale_real_names[] =
 	"extra.zap_cycle",
 	"extra.zapit_bouquetname_newchannels",
 	"extra.zapit_bouquetname_others",
-	"extra.zapit_fe_offset",
 	"extra.zapit_fe_timeout",
 	"extra.zapit_hvoltage",
 	"extra.zapit_make_bouquet",
