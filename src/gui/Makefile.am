@@ -19,7 +19,7 @@ noinst_HEADERS = git_version.h
 .PHONY: makeversion
 
 
-SUBDIRS = widget bedit
+SUBDIRS = bedit components widget
 
 INCLUDES = \
 	-I$(top_builddir) \

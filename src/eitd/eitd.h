@@ -247,6 +247,7 @@ class CCNThread : public CEventsThread
 	private:
 		/* overloaded hooks */
 		void addFilters();
+		bool shouldSleep();
 		void beforeSleep();
 		void beforeWait();
 		void afterWait();
@@ -257,6 +258,7 @@ class CCNThread : public CEventsThread
 		OpenThreads::Mutex update_mutex;
 		bool	updating;
 		cDemux * eitDmx;
+		int eit_retry;
 
 		void sendCNEvent();
 	public:
