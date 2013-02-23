@@ -82,7 +82,7 @@ function do_check(){
 
 	/*programs*/
 /* #ifdef MARTII */
-	{=var-set:fbshot=built-in=}
+	{=var-set:fbshot=true=} /* built-in */
 /* #else */
 /*	{=var-set:DISABLED_fbshot={=if-file-exists:/bin/fbshot~/bin/fbshot~{=if-file-exists:/var/bin/fbshot~/var/bin/fbshot~false=}=}=} */
 /* #endif */

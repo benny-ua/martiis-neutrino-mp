@@ -108,7 +108,6 @@ libneutrino_gui_a_SOURCES = \
 	themes.cpp \
 	timeosd.cpp \
 	update.cpp \
-	update_ext.cpp \
 	update_menue.cpp \
 	update_settings.cpp \
 	user_menue.cpp \
@@ -122,6 +121,11 @@ libneutrino_gui_a_SOURCES = \
 if ENABLE_GRAPHLCD
 libneutrino_gui_a_SOURCES += \
 	glcdsetup.cpp
+endif
+
+if ENABLE_EXTUPDATE
+libneutrino_gui_a_SOURCES += \
+	update_ext.cpp
 endif
 
 libneutrino_gui2_a_SOURCES = \
