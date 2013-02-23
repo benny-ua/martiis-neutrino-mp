@@ -60,7 +60,8 @@ CShellWindow::CShellWindow(const std::string command, const int _mode, int *res)
 	Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
 	frameBuffer = CFrameBuffer::getInstance();
 	unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
-	int h = lines_max * font->getHeight();
+	// int h = lines_max * font->getHeight();
+	int h = frameBuffer->getScreenHeight();
 	list<std::string> lines;
 	CBox textBoxPosition(frameBuffer->getScreenX(), frameBuffer->getScreenY(), frameBuffer->getScreenWidth(), h);
 	textBox = new CTextBox(cmd.c_str(), font, CTextBox::BOTTOM, &textBoxPosition);
