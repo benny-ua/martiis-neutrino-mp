@@ -2615,14 +2615,10 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 		if(!pids.APIDs.empty())
 			apid = pids.APIDs[apid_idx].pid;
 #ifdef MARTII
-		char tmp[20];
-		if (pids.PIDs.vtxtpid) {
-			snprintf(tmp, sizeof(tmp), "0x%04x", pids.PIDs.vtxtpid);
-			xpids += hh->WebserverConfigList["Tuxbox.PidSeparator"] + string(tmp);
-		}
 		CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
 		int curnum = channelList->getActiveChannelNumber();
 		CZapitChannel * cc = channelList->getChannel(curnum);
+		char tmp[20];
 		for (int i = 0 ; i < (int)cc->getSubtitleCount() ; ++i) {
 			CZapitAbsSub* s = cc->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
@@ -2632,6 +2628,10 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 			}
 		}
 		xpids = string_printf("0x%04x%c0x%04x%c0x%04x",pids.PIDs.pmtpid,*(hh->WebserverConfigList["Tuxbox.PidSeparator"].c_str()),pids.PIDs.vpid,*(hh->WebserverConfigList["Tuxbox.PidSeparator"].c_str()),apid);
+		if (pids.PIDs.vtxtpid) {
+			snprintf(tmp, sizeof(tmp), "0x%04x", pids.PIDs.vtxtpid);
+			xpids += hh->WebserverConfigList["Tuxbox.PidSeparator"] + string(tmp);
+		}
 #else
 		xpids = string_printf("0x%04x,0x%04x,0x%04x",pids.PIDs.pmtpid,pids.PIDs.vpid,apid);
 #endif

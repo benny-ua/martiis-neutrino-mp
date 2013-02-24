@@ -195,17 +195,19 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 #ifdef MARTII
 	bool StreamPAT = false;
 #endif
-	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0))
+	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)) {
 #ifdef MARTII
 		StreamPAT = true,
 #endif
 		apids[numpids++] = allpids.PIDs.vtxtpid;
+	}
 
-	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0))
+	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0)) {
 #ifdef MARTII
 		StreamPAT = true,
 #endif
 		apids[numpids++] = allpids.PIDs.pmtpid;
+	}
 
 #ifdef MARTII
 	if (StreamSubtitlePids)

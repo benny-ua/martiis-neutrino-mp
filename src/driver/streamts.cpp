@@ -60,6 +60,7 @@
 #include <system/set_threadname.h>
 #endif
 
+#ifndef MARTII
 /* experimental mode:
  * stream not possible, if record running
  * pids in url ignored, and added from channel, with fake PAT/PMT
@@ -68,6 +69,7 @@
  * TODO: multi-tuner support
  */
 #define ENABLE_MULTI_CHANNEL
+#endif
 
 #define TS_SIZE 188
 #define DMX_BUFFER_SIZE (2048*TS_SIZE)
