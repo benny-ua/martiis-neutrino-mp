@@ -93,20 +93,21 @@ bool CConfigFile::saveConfig(const char * const filename)
 {
 #ifdef MARTII
 	std::string tmpname = std::string(filename) + ".tmp";
-	std::ofstream configFile(tmpname.c_str());
+	std::fstream configFile(tmpname.c_str());
 #else
-	std::ofstream configFile(filename);
+	std::fstream configFile(filename);
 #endif
 
 	if (configFile != NULL)
 	{
+		std::cout << "[ConfigFile] saving " << filename << std::endl;
 		for (ConfigDataMap::const_iterator it = configData.begin(); it != configData.end(); ++it)
 		{
 			configFile << it->first << "=" << it->second << std::endl;
 		}
 
+		configFile.sync();
 		configFile.close();
-		sync();
 
 #ifdef MARTII
 		chmod(tmpname.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
@@ -115,6 +116,7 @@ bool CConfigFile::saveConfig(const char * const filename)
 		chmod(filename, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif
 
+		modifiedFlag = false;
 		return true;
 	}
 	else
@@ -397,6 +399,9 @@ void CConfigFile::setString(const std::string & key, const std::string & val)
 
 void CConfigFile::setInt32Vector(const std::string & key, const std::vector<int32_t> vec)
 {
+	bool tmpUnknownKeyQueryedFlag = unknownKeyQueryedFlag;
+	unknownKeyQueryedFlag = false;
+	std::string oldVal = getString(key);
 	std::stringstream s;
 
 	for (std::vector<int32_t>::const_iterator it = vec.begin(); ; )
@@ -409,21 +414,35 @@ void CConfigFile::setInt32Vector(const std::string & key, const std::vector<int3
 			break;
 		s << delimiter;
 	}
-	s >> configData[key];
+	if (oldVal != s.str() || unknownKeyQueryedFlag)
+	{
+		modifiedFlag = true;
+		configData[key] = s.str();
+	}
+	unknownKeyQueryedFlag = tmpUnknownKeyQueryedFlag;
 }
 
 void CConfigFile::setStringVector(const std::string & key, const std::vector<std::string> vec)
 {
-	configData[key] = "";
+	bool tmpUnknownKeyQueryedFlag = unknownKeyQueryedFlag;
+	unknownKeyQueryedFlag = false;
+	std::string oldVal = getString(key);
+	std::string newVal = "";
 
 	for (std::vector<std::string>::const_iterator it = vec.begin(); ; )
 	{
 		if (it == vec.end())
 			break;
-		configData[key] += *it;
+		newVal += *it;
 		++it;
 		if (it == vec.end())
 			break;
-		configData[key] += delimiter;
+		newVal += delimiter;
 	}
+	if (oldVal != newVal || unknownKeyQueryedFlag)
+	{
+		modifiedFlag = true;
+		configData[key] = newVal;
+	}
+	unknownKeyQueryedFlag = tmpUnknownKeyQueryedFlag;
 }
