@@ -32,6 +32,9 @@
 #endif
 
 #include <ca_cs.h>
+#ifndef HAVE_COOL_HARDWARE
+#include <dmx_td.h>
+#endif
 
 #include <dvbsi++/program_map_section.h>
 #include <dvbsi++/ca_program_map_section.h>
@@ -210,12 +213,15 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 
 	switch(mode) {
 		case PLAY:
-#if HAVE_SPARK_HARDWARE // MARTII
-			source = CFEManager::getInstance()->allocateFE(channel)->getNumber();
-			demux = LIVE_DEMUX + source;
-#else
+#if HAVE_COOL_HARDWARE
 			source = DEMUX_SOURCE_0;
 			demux = LIVE_DEMUX;
+#else
+		/* see the comment in src/driver/streamts.cpp:CStreamInstance::run() */
+		case STREAM:
+			/* this might be SPARK-specific, not tested elsewhere */
+			source = cDemux::GetSource(0); /* demux0 is always the live demux */
+			demux = source;
 #endif
 			break;
 		case RECORD:
@@ -227,6 +233,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 #endif
 			demux = channel->getRecordDemux(); //RECORD_DEMUX;//FIXME
 			break;
+#if HAVE_COOL_HARDWARE
 		case STREAM:
 #if HAVE_SPARK_HARDWARE // MARTII
 			source = CFEManager::getInstance()->allocateFE(channel)->getNumber();			
@@ -235,6 +242,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 #endif
 			demux = STREAM_DEMUX;//FIXME
 			break;
+#endif
 	}
 
 	oldmask = cam->getCaMask();
