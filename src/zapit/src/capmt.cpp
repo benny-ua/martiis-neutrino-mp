@@ -27,9 +27,6 @@
 #include <zapit/settings.h> /* CAMD_UDS_NAME         */
 #include <zapit/getservices.h>
 #include <zapit/debug.h>
-#if HAVE_SPARK_HARDWARE // MARTII
-#include <zapit/femanager.h>
-#endif
 
 #include <ca_cs.h>
 #ifndef HAVE_COOL_HARDWARE
@@ -225,21 +222,12 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 #endif
 			break;
 		case RECORD:
-#if HAVE_SPARK_HARDWARE // MARTII
-			channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber());
-			source = channel->getRecordDemux();
-#else
 			source = channel->getRecordDemux(); //DEMUX_SOURCE_0;//FIXME
-#endif
 			demux = channel->getRecordDemux(); //RECORD_DEMUX;//FIXME
 			break;
 #if HAVE_COOL_HARDWARE
 		case STREAM:
-#if HAVE_SPARK_HARDWARE // MARTII
-			source = CFEManager::getInstance()->allocateFE(channel)->getNumber();			
-#else
 			source = DEMUX_SOURCE_0;
-#endif
 			demux = STREAM_DEMUX;//FIXME
 			break;
 #endif
