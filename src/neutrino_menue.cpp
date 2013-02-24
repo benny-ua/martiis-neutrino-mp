@@ -77,6 +77,7 @@
 #include "driver/record.h"
 #ifdef MARTII
 #include "gui/opkg_manager.h"
+#include <hardware_caps.h>
 #endif
 
 
@@ -429,7 +430,8 @@ void CNeutrinoApp::InitMenuService()
 
 #ifdef HAVE_SPARK_HARDWARE
 	//boot spark now
-	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
+	if (get_hwcaps()->boxtype == 7111)
+		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
 #endif
 
 	//restart neutrino
