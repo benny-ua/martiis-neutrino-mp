@@ -2009,6 +2009,7 @@ const char * locale_real_names[] =
 	"videomenu.hdmi_cec_view_on",
 	"videomenu.hue",
 	"videomenu.letterbox",
+	"videomenu.masksetup",
 	"videomenu.panscan",
 	"videomenu.panscan2",
 	"videomenu.psi",

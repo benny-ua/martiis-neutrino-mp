@@ -376,7 +376,7 @@ int CVideoSettings::showVideoSetup()
 
 	CScreenSetup channelScreenSetup;
 	channelScreenSetup.loadBorder(CZapit::getInstance()->GetCurrentChannelID());
-	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_SCREENSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
+	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_MASKSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
 #endif
 	int res = videosetup->exec(NULL, "");
 	selected = videosetup->getSelected();

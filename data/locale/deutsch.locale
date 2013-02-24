@@ -1751,7 +1751,7 @@ scants.test Empfangstest
 scants.transponders Transponder:
 scrambled_channel Verschlüsselung aktiv
 screensetup.lowerright Bildrand unten rechts
-screensetup.remove Rahmen entfernen
+screensetup.remove Maske entfernen
 screensetup.upperleft Bildrand oben links
 screenshot.backbuffer Sekundärer Buffer (Back Buffer)
 screenshot.count Screenshot Anzahl
@@ -1979,6 +1979,7 @@ videomenu.hdmi_cec_standby_not_timer nicht bei Timer
 videomenu.hdmi_cec_view_on Aktiviere CEC View on
 videomenu.hue Farbton
 videomenu.letterbox Letterbox
+videomenu.masksetup Bildmaske
 videomenu.panscan Pan & Scan
 videomenu.panscan2 14:9 Pan & Scan
 videomenu.psi Farbeinstellungen

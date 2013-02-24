@@ -1754,7 +1754,7 @@ scants.test Test signal
 scants.transponders Transponders:
 scrambled_channel Scrambled channel
 screensetup.lowerright setup lower right
-screensetup.remove remove border
+screensetup.remove remove mask
 screensetup.upperleft setup upper left
 screenshot.backbuffer Secondary buffer (back buffer)
 screenshot.count Screenshot count
@@ -1982,6 +1982,7 @@ videomenu.hdmi_cec_standby_not_timer unless timer-wakeup
 videomenu.hdmi_cec_view_on Enable CEC View on
 videomenu.hue Hue
 videomenu.letterbox Letterbox
+videomenu.masksetup Mask Setup
 videomenu.panscan Pan&Scan
 videomenu.panscan2 14:9 Pan&Scan
 videomenu.psi Color settings
