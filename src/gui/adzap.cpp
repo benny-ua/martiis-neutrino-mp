@@ -56,7 +56,7 @@ CAdZapMenu::CAdZapMenu()
 
     azm = this;
     frameBuffer = CFrameBuffer::getInstance();
-    width = w_max (40, 10);
+    width = w_max(40, 10);
     hheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getHeight();
     mheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
     height = hheight + 13 * mheight + 10;
@@ -209,6 +209,11 @@ int CAdZapMenu::exec(CMenuTarget * parent, const std::string & actionKey)
     }
     if (actionKey.length() == 1) {
 	g_settings.adzap_zapBackPeriod = actionKey[0] - '0';
+	for (int shortcut = 1; shortcut < 10; shortcut++)
+	    forwarders[shortcut - 1]->iconName_Info_right =
+		(shortcut ==
+		 g_settings.
+		 adzap_zapBackPeriod) ? NEUTRINO_ICON_BUTTON_OKAY : "";
 	g_settings.adzap_zapBackPeriod *= 60;
 	if (!monitor)
 	    armed = true;
@@ -227,8 +232,7 @@ void CAdZapMenu::Settings()
 	channelList ? channelList->getActiveChannel_ChannelID() : -1;
     channelName = channelList->getActiveChannelName();
 
-    CMenuWidget *menu =
-	new CMenuWidget(LOCALE_ADZAP, "settings", width);
+    CMenuWidget *menu = new CMenuWidget(LOCALE_ADZAP, "settings", width);
     menu->addItem(new
 		  CMenuSeparator(CMenuSeparator::LINE |
 				 CMenuSeparator::STRING,
@@ -239,17 +243,18 @@ void CAdZapMenu::Settings()
 	actionKey[0] = '0' + shortcut;
 	actionKey[1] = 0;
 	bool selected = g_settings.adzap_zapBackPeriod == 60 * shortcut;
-	menu->addItem(new
-		      CMenuForwarder(minute, true, "", this, actionKey,
-				     CRCInput::convertDigitToKey
-				     (shortcut)), selected);
+	forwarders[shortcut - 1] =
+	    new CMenuForwarder(minute, true, "", this, actionKey,
+			       CRCInput::convertDigitToKey(shortcut));
+	if (selected)
+	    forwarders[shortcut - 1]->iconName_Info_right =
+		NEUTRINO_ICON_BUTTON_OKAY;
+	menu->addItem(forwarders[shortcut - 1], selected);
 	minute = LOCALE_ADZAP_MINUTES;
     }
 
-    menu->addItem(new
-		  CMenuSeparator(CMenuSeparator::LINE |
-				 CMenuSeparator::STRING,
-				 LOCALE_ADZAP_COMMIT));
+    menu->addItem(GenericMenuSeparatorLine);
+
     menu->addItem(new
 		  CMenuForwarder(LOCALE_ADZAP_ENABLE, true, "", this,
 				 "enable", CRCInput::RC_green,
@@ -260,7 +265,10 @@ void CAdZapMenu::Settings()
 				 NEUTRINO_ICON_BUTTON_RED));
 
     CChannelEventList evtlist;
-    CEitManager::getInstance()->getEventsServiceKey(azm->channelId & 0xFFFFFFFFFFFFULL, evtlist);
+    CEitManager::getInstance()->getEventsServiceKey(azm->
+						    channelId &
+						    0xFFFFFFFFFFFFULL,
+						    evtlist);
     azm->monitorLifeTime.tv_sec = 0;
     if (!evtlist.empty()) {
 	sort(evtlist.begin(), evtlist.end(), sortByDateTime);
@@ -268,7 +276,8 @@ void CAdZapMenu::Settings()
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
 	for (eli = evtlist.begin(); eli != evtlist.end(); ++eli) {
-	    if ((u_int) eli->startTime + (u_int) eli->duration > (u_int) ts.tv_sec) {
+	    if ((u_int) eli->startTime + (u_int) eli->duration >
+		(u_int) ts.tv_sec) {
 		azm->monitorLifeTime.tv_sec =
 		    (uint) eli->startTime + eli->duration;
 		azm->Update();

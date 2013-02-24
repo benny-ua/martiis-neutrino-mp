@@ -99,7 +99,6 @@ GENRE.UNKNOWN unknown
 adzap AdZap
 adzap.announce In 15 seconds, the channel will be switched to
 adzap.cancel Timer was cancelled
-adzap.commit (Press (OK) after changing time)
 adzap.disable Deactivate
 adzap.enable Activate once
 adzap.minute minute

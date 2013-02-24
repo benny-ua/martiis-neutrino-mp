@@ -43,6 +43,7 @@ class CAdZapMenu:public CMenuTarget {
     bool alerted;
     struct timespec zapBackTime;
     std::string channelName;
+    CMenuForwarder *forwarders[9];
   public:
     bool monitor;
     struct timespec monitorLifeTime;

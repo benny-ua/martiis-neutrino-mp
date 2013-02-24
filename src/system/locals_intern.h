@@ -126,7 +126,6 @@ const char * locale_real_names[] =
 	"adzap",
 	"adzap.announce",
 	"adzap.cancel",
-	"adzap.commit",
 	"adzap.disable",
 	"adzap.enable",
 	"adzap.minute",
