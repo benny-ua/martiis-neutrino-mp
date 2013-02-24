@@ -446,12 +446,8 @@ void CBouquetManager::makeRemainingChannelsBouquet(void)
 
 	sort(unusedChannels.begin(), unusedChannels.end(), CmpChannelByChName());
 
-#ifdef MARTII
-	remainChannels = addBouquet("extra.zapit_bouquetname_others", true); // UTF-8 encoded
-#else
 	// TODO: use locales
 	remainChannels = addBouquet( Bouquets.empty()  ? "All Channels" : "Other", false); // UTF-8 encoded
-#endif
 	remainChannels->bOther = true;
 
 	for (ZapitChannelList::const_iterator it = unusedChannels.begin(); it != unusedChannels.end(); ++it) {

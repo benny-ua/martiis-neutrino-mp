@@ -441,8 +441,6 @@ extra.volume_digits Lautstärkeanzeige Ziffern
 extra.volume_pos Lautstärkeanzeige
 extra.west Westen
 extra.zap_cycle Zap nur in Bouquet
-extra.zapit_bouquetname_newchannels Neue Kanäle
-extra.zapit_bouquetname_others Andere
 extra.zapit_fe_timeout Tuning Timeout (1=10ms)
 extra.zapit_hvoltage High (13.5/ 18.5) Voltage
 extra.zapit_make_bouquet Kanalliste auffüllen

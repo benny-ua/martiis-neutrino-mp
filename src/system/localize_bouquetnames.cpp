@@ -37,10 +37,10 @@ void localizeBouquetNames (void) {
         for (int i = 0, size = (int) g_bouquetManager->Bouquets.size(); i < size; i++)
 		if (g_bouquetManager->Bouquets[i]->bFav)
 			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME);
-		else  if (g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_others")
-			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_EXTRA_ZAPIT_BOUQUETNAME_OTHERS);
-		else if (g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_newchannels")
-			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_EXTRA_ZAPIT_BOUQUETNAME_NEWCHANNELS);
+		else  if (g_bouquetManager->Bouquets[i]->bOther)
+			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_BOUQUETNAME_OTHER);
+		else if (g_bouquetManager->Bouquets[i]->Name == "bouquetname.new")
+			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_BOUQUETNAME_NEW);
 		else if (g_bouquetManager->Bouquets[i]->Name == "channellist.head")
 			g_bouquetManager->Bouquets[i]->lName = g_Locale->getText(LOCALE_CHANNELLIST_HEAD);
 		else
