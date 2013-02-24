@@ -1,8 +1,4 @@
-SUBDIRS = fonts icons inetradio iso-codes locale scripts themes
-
-if ENABLE_FREESATEPG
-SUBDIRS += freesatepg
-endif
+SUBDIRS = fonts icons inetradio iso-codes locale scripts themes freesatepg
 
 if BOXTYPE_TRIPLE
 SUBDIRS += lcd
