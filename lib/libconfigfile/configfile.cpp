@@ -93,7 +93,7 @@ bool CConfigFile::saveConfig(const char * const filename)
 {
 #ifdef MARTII
 	std::string tmpname = std::string(filename) + ".tmp";
-	std::fstream configFile(tmpname.c_str());
+	std::fstream configFile(tmpname.c_str(), std::ios::out);
 #else
 	std::fstream configFile(filename);
 #endif
