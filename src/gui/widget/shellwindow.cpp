@@ -60,10 +60,8 @@ CShellWindow::CShellWindow(const std::string command, const int _mode, int *res)
 	Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
 	frameBuffer = CFrameBuffer::getInstance();
 	unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
-	// int h = lines_max * font->getHeight();
-	int h = frameBuffer->getScreenHeight();
 	list<std::string> lines;
-	CBox textBoxPosition(frameBuffer->getScreenX(), frameBuffer->getScreenY(), frameBuffer->getScreenWidth(), h);
+	CBox textBoxPosition(frameBuffer->getScreenX(), frameBuffer->getScreenY(), frameBuffer->getScreenWidth(), frameBuffer->getScreenHeight());
 	textBox = new CTextBox(cmd.c_str(), font, CTextBox::BOTTOM, &textBoxPosition);
 	struct pollfd fds;
 	fds.fd = fileno(f);
@@ -175,18 +173,15 @@ CShellWindow::~CShellWindow()
 	if (textBox && (mode & ACKNOWLEDGE)) {
 		int iw, ih;
 		frameBuffer->getIconSize(NEUTRINO_ICON_BUTTON_OKAY, &iw, &ih);
-		int b_width = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MESSAGEBOX_OK), true) + 36 + ih + (RADIUS_LARGE / 2);
-
-		int fh = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight();
+		Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL];
+		int b_width = font->getRenderWidth(g_Locale->getText(LOCALE_MESSAGEBOX_OK), true) + 36 + ih + (RADIUS_LARGE / 2);
+		int fh = font->getHeight();
 		int b_height = std::max(fh, ih) + 8 + (RADIUS_LARGE / 2);
-		Font *font = g_Font[SNeutrinoSettings::FONT_TYPE_GAMELIST_ITEMSMALL];
-		unsigned int lines_max = frameBuffer->getScreenHeight() / font->getHeight();
-		int h = lines_max * font->getHeight();
 		int xpos = frameBuffer->getScreenWidth() - b_width;
-		int ypos = h - b_height;
+		int ypos = frameBuffer->getScreenHeight() - b_height;
 		frameBuffer->paintBoxRel(xpos, ypos, b_width, b_height, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE);
 		frameBuffer->paintIcon(NEUTRINO_ICON_BUTTON_OKAY, xpos + ((b_height - ih) / 2), ypos + ((b_height - ih) / 2), ih);
-		g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(xpos + iw + 17, ypos + fh + ((b_height - fh) / 2), b_width - (iw + 21), g_Locale->getText(LOCALE_MESSAGEBOX_OK), COL_MENUCONTENT, 0, true);
+		font->RenderString(xpos + iw + 17, ypos + fh + ((b_height - fh) / 2), b_width - (iw + 21), g_Locale->getText(LOCALE_MESSAGEBOX_OK), COL_MENUCONTENT, 0, true);
 		frameBuffer->blit();
 
 		neutrino_msg_t msg;
