@@ -1113,17 +1113,13 @@ int tuxtxt_start_thread(int source)
 
 	tuxtxt_cache.thread_starting = 1;
 #ifdef MARTII
-	if (isTtxEplayer) {
+	if (isTtxEplayer)
 		eplayer_fd = open("/tmp/.eplayer3_teletext", O_RDONLY | O_NONBLOCK);
-	} else {
 #endif
 	tuxtxt_init_demuxer(source);
 
 	dmx->pesFilter(tuxtxt_cache.vtxtpid);
 	dmx->Start();
-#ifdef MARTII
-	}
-#endif
 	stop_cache = 0;
 
 	/* create decode-thread */
