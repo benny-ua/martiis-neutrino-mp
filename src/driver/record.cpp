@@ -190,45 +190,46 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		apids[numpids++] = recMovieInfo->audioPids[i].epgAudioPid;
 		psi.addPid(recMovieInfo->audioPids[i].epgAudioPid, EN_TYPE_AUDIO, recMovieInfo->audioPids[i].atype);
 	}
-#ifndef MARTII
-	psi.genpsi(fd);
-#endif
-
 #ifdef MARTII
 	bool StreamPAT = false;
-#endif
 	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)) {
-#ifdef MARTII
-		StreamPAT = true,
-#endif
+		StreamPmtPid = true;
 		apids[numpids++] = allpids.PIDs.vtxtpid;
 	}
 
-	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0)) {
-#ifdef MARTII
-		StreamPAT = true,
-#endif
-		apids[numpids++] = allpids.PIDs.pmtpid;
-	} else
-		psi.genpsi(fd);
-
-#ifdef MARTII
 	if (StreamSubtitlePids)
 		for (int i = 0 ; i < (int)channel->getSubtitleCount() ; ++i) {
 			CZapitAbsSub* s = channel->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
-				StreamPAT = true;
+				StreamPmtPid = true;
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				apids[numpids++] = sd->pId;
 			}
 		}
+
+	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0)) {
+		StreamPAT = true,
+		apids[numpids++] = allpids.PIDs.pmtpid;
+	}
+
 	if (StreamPAT)
 		apids[numpids++] = 0;
+	else
+		psi.genpsi(fd);
+
 	if(record == NULL) {
 		record = new cRecord(RECORD_DEMUX, g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);
 		record->setFailureCallback(&recordingFailureHelper, this);
 	}
 #else
+	psi.genpsi(fd);
+
+	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0))
+		apids[numpids++] = allpids.PIDs.vtxtpid;
+
+	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0))
+		apids[numpids++] = allpids.PIDs.pmtpid;
+
 	if(record == NULL)
 		record = new cRecord(channel->getRecordDemux() /*RECORD_DEMUX*/);
 #endif
