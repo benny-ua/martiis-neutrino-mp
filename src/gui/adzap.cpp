@@ -168,12 +168,9 @@ void *CAdZapMenu::Run(void *)
     return NULL;
 }
 
-int CAdZapMenu::exec(CMenuTarget * parent, const std::string & actionKey)
+int CAdZapMenu::exec(CMenuTarget *, const std::string & actionKey)
 {
     int res = menu_return::RETURN_EXIT_ALL;
-
-    if (parent)
-	parent->hide();
 
     if (actionKey == "enable") {
 	if (!monitor)
