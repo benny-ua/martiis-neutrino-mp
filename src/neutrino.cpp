@@ -1216,6 +1216,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool  ("recordingmenu.stream_pmt_pid"       , g_settings.recording_stream_pmt_pid      );
 #ifdef MARTII
 	configfile.setBool  ("recordingmenu.stream_subtitle_pids"       , g_settings.recording_stream_subtitle_pids);
+	configfile.setInt32 ("recording_bufsize", g_settings.recording_bufsize);
+	configfile.setInt32 ("recording_bufsize_dmx", g_settings.recording_bufsize_dmx);
 #endif
 	configfile.setInt32 ("recording_choose_direct_rec_dir"    , g_settings.recording_choose_direct_rec_dir);
 	configfile.setBool  ("recording_epg_for_filename"         , g_settings.recording_epg_for_filename     );
