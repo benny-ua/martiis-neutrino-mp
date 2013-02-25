@@ -190,7 +190,9 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		apids[numpids++] = recMovieInfo->audioPids[i].epgAudioPid;
 		psi.addPid(recMovieInfo->audioPids[i].epgAudioPid, EN_TYPE_AUDIO, recMovieInfo->audioPids[i].atype);
 	}
+#ifndef MARTII
 	psi.genpsi(fd);
+#endif
 
 #ifdef MARTII
 	bool StreamPAT = false;
@@ -207,7 +209,8 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		StreamPAT = true,
 #endif
 		apids[numpids++] = allpids.PIDs.pmtpid;
-	}
+	} else
+		psi.genpsi(fd);
 
 #ifdef MARTII
 	if (StreamSubtitlePids)
