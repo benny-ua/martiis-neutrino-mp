@@ -956,7 +956,11 @@ bool CRecordManager::Record(const CTimerd::RecordingInfo * const eventinfo, cons
 			else
 				newdir = Directory;
 
+#ifdef MARTII
+			inst = new CRecordInstance(eventinfo, newdir, timeshift, StreamVTxtPid, StreamPmtPid, StreamSubtitlePids);
+#else
 			inst = new CRecordInstance(eventinfo, newdir, timeshift, StreamVTxtPid, StreamPmtPid);
+#endif
 
 			inst->frontend = frontend;
 			error_msg = inst->Record();
