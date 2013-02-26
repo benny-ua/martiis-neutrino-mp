@@ -679,6 +679,10 @@ void CMoviePlayerGui::PlayFile(void)
 				else
 					eof = 0;
 			}
+#ifdef MARTII
+			else if (++eof > 10)
+				g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
+#endif
 			handleMovieBrowser(0, position);
 			FileTime.update(position, duration);
 		}
@@ -1086,7 +1090,8 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	std::string apidtitles[numpida];
 	if (!numpids) {
 		playback->FindAllSubtitlePids(spids, &numpids, slanguage);
-	} else if (!numpidd) {
+	}
+	if (!numpids && !numpidd) {
 		// take pids from stream, for both movieplayer and fileplayer
 		playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
 	}
@@ -1181,7 +1186,6 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		APIDSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
 	if (numpidd > 0 || numpids > 0)
 		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
-
 #endif
 	APIDSelector.exec(NULL, "");
 	delete selector;
