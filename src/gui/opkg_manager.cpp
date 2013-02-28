@@ -103,6 +103,7 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		} else
 			installed = true;
 		refreshMenu();
+		g_RCInput->postMsg((neutrino_msg_t) CRCInput::RC_up, 0);
 		return res;
 	}
 	std::map<string, struct pkg>::iterator it = pkg_map.find(actionKey);
