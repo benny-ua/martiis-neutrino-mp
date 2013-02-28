@@ -888,7 +888,11 @@ bool CFileBrowser::exec(const char * const dirname)
 			}
 		}
 
+#ifdef MARTII
+		if ((msg == CRCInput::RC_red) || msg == g_settings.key_channelList_pageup)
+#else
 		if ((msg == CRCInput::RC_red) || msg == CRCInput::RC_page_down)
+#endif
 		{
 			selected += listmaxshow;
 			if (selected >= filelist.size()) {
@@ -900,7 +904,11 @@ bool CFileBrowser::exec(const char * const dirname)
 			liststart = (selected / listmaxshow) * listmaxshow;
 			paint();
 		}
+#ifdef MARTII
+		else if (msg == CRCInput::RC_green || msg == g_settings.key_channelList_pagedown)
+#else
 		else if ((msg == CRCInput::RC_green) || (msg == CRCInput::RC_page_up) )
+#endif
 		{
 			if ((int(selected)-int(listmaxshow))<0)
 				selected=filelist.size()-1;
