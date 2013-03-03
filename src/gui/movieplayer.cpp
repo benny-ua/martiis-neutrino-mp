@@ -653,9 +653,10 @@ void CMoviePlayerGui::PlayFile(void)
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
 #ifdef MARTII
-			if (!isWebTV)
-#endif
+			if (!isWebTV && playback->GetPosition(position, duration)) {
+#else
 			if(playback->GetPosition(position, duration)) {
+#endif
 				if(duration > 100)
 					file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
