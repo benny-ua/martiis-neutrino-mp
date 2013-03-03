@@ -889,7 +889,7 @@ bool CFileBrowser::exec(const char * const dirname)
 		}
 
 #ifdef MARTII
-		if ((msg == CRCInput::RC_red) || msg == g_settings.key_channelList_pageup)
+		if ((msg == CRCInput::RC_red) || msg == g_settings.key_channelList_pagedown)
 #else
 		if ((msg == CRCInput::RC_red) || msg == CRCInput::RC_page_down)
 #endif
@@ -905,7 +905,7 @@ bool CFileBrowser::exec(const char * const dirname)
 			paint();
 		}
 #ifdef MARTII
-		else if (msg == CRCInput::RC_green || msg == g_settings.key_channelList_pagedown)
+		else if (msg == CRCInput::RC_green || msg == g_settings.key_channelList_pageup)
 #else
 		else if ((msg == CRCInput::RC_green) || (msg == CRCInput::RC_page_up) )
 #endif
