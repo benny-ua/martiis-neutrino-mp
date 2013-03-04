@@ -677,7 +677,7 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	if (access(plugin_list[number].pluginfile.c_str(), X_OK))
 		chmod(plugin_list[number].pluginfile.c_str(), 0755);
 #endif
-	my_system(plugin_list[number].pluginfile.c_str(), NULL, NULL);
+	my_system(2, plugin_list[number].pluginfile.c_str(), NULL);
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	frameBuffer->Unlock();
 #ifdef MARTII

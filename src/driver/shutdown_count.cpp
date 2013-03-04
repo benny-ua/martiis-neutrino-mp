@@ -45,6 +45,7 @@
 SHTDCNT::SHTDCNT()
 	: configfile('\t')
 {
+	thread_running = false;
 }
 
 SHTDCNT::~SHTDCNT()
