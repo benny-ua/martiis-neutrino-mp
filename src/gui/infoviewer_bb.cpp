@@ -824,7 +824,7 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 					break;
 			}
 #ifdef MARTII
-			if(g_settings.casystem_display) {
+			if(g_settings.casystem_display == 0) {
 				if ((caids[i] & 0xFF00) == (acaid & 0xFF00) || (caids[i] == 0x1700 && (acaid & 0xFF00) == 0x0600))
 					paint_ca_icons(caids[i], (char *) green, icon_space_offset);
 				else
