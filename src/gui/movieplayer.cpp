@@ -680,10 +680,6 @@ void CMoviePlayerGui::PlayFile(void)
 				else
 					eof = 0;
 			}
-#ifdef MARTII
-			else if (++eof > 10)
-				g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
-#endif
 			handleMovieBrowser(0, position);
 			FileTime.update(position, duration);
 		}
