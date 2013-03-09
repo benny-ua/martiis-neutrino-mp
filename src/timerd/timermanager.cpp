@@ -789,7 +789,9 @@ void CTimerManager::shutdownOnWakeup(int currEventID)
 	if(wakeup == 0)
 		return;
 
+#ifndef MARTII
 	wakeup = 0;
+#endif
 	pthread_mutex_lock(&tm_eventsMutex);
 
 	CTimerEventMap::iterator pos = events.begin();
@@ -813,6 +815,9 @@ void CTimerManager::shutdownOnWakeup(int currEventID)
 	time_t now = time(NULL);
 	if((nextAnnounceTime-now) > 600 || nextAnnounceTime==0)
 	{ // in den naechsten 10 min steht nix an
+#ifdef MARTII
+		wakeup = 0;
+#endif
 		dprintf("Programming shutdown event\n");
 		CTimerEvent_Shutdown* event = new CTimerEvent_Shutdown(now+120, now+180);
 		addEvent(event);
