@@ -323,6 +323,9 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 	}
 
 #ifndef ENABLE_MULTI_CHANNEL
+#ifdef MARTII
+	char *obp;
+#endif
 	/* parse stdin / url path, start dmx filters */
 	do {
 		int pid;
@@ -331,6 +334,9 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 			printf("New pid: 0x%x\n", pid);
 			pids.insert(pid);
 		}
+#ifdef MARTII
+		obp = bp;
+#endif
 	}
 #ifdef MARTII
 	while (((bp = strchr(obp, ',')) || (bp = strchr(obp, ':'))) && (bp++));
