@@ -459,7 +459,16 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.infobar_cn = configfile.getInt32("infobar_cn", 0 );
 	g_settings.menu_numbers_as_icons = configfile.getBool("menu_numbers_as_icons", true);
 #endif
-	g_settings.progressbar_color = configfile.getBool("progressbar_color", true );
+	/* progressbar_color was bool before, so migrate old true/false setting over */
+	std::string tmp = configfile.getString("progressbar_color", "1");
+	if (tmp.compare("false") == 0) {
+		/* setString works around libconfigfile "feature" that it does not change "false" to "0" */
+		configfile.setString("progressbar_color", "0");
+		g_settings.progressbar_color = 0;
+	} else if (tmp.compare("true") == 0)
+		g_settings.progressbar_color = 1;
+	else	/* the config file already contains an int or nothing at all */
+		g_settings.progressbar_color = configfile.getInt32("progressbar_color", 1);
 	g_settings.infobar_show  = configfile.getInt32("infobar_show", 1);
 	g_settings.infobar_show_channellogo   = configfile.getInt32("infobar_show_channellogo"  , 3 );
 	g_settings.infobar_progressbar   = configfile.getInt32("infobar_progressbar"  , 0 );
@@ -1026,7 +1035,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("infobar_cn"  , g_settings.infobar_cn);
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
 #endif
-	configfile.setBool("progressbar_color"  , g_settings.progressbar_color  );
+	configfile.setInt32("progressbar_color", g_settings.progressbar_color);
 	configfile.setInt32("infobar_show", g_settings.infobar_show);
 	configfile.setInt32("infobar_show_channellogo"  , g_settings.infobar_show_channellogo  );
 	configfile.setInt32("infobar_progressbar"  , g_settings.infobar_progressbar  );
@@ -2456,25 +2465,39 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					g_InfoViewer->showSubchan();
 				} 
 				else if ( msg == CRCInput::RC_left || msg == CRCInput::RC_right) {
-					if (g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME) {
-						g_volume->setVolume(msg, true);
-					} 
-					else if((g_settings.mode_left_right_key_tv == SNeutrinoSettings::VZAP)
-							|| (g_settings.mode_left_right_key_tv == SNeutrinoSettings::INFOBAR)) {
-						if(channelList->getSize()) {
-							showInfo();
-						}
-					} 
+					switch (g_settings.mode_left_right_key_tv)
+					{
+						case SNeutrinoSettings::INFOBAR:
+						case SNeutrinoSettings::VZAP:
+							if (channelList->getSize())
+								showInfo();
+							break;
+						case SNeutrinoSettings::VOLUME:
+							g_volume->setVolume(msg, true);
+							break;
+						default: /* SNeutrinoSettings::ZAP */
+							quickZap(msg);
+							break;
+					}
 				} 
 				else
 					quickZap( msg );
 			}
 			/* in case key_subchannel_up/down redefined */
 			else if( msg == CRCInput::RC_left || msg == CRCInput::RC_right) {
-			    if(g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME) {
-					g_volume->setVolume(msg, true);
-				} else if(channelList->getSize()) {
-					showInfo();
+				switch (g_settings.mode_left_right_key_tv)
+				{
+					case SNeutrinoSettings::INFOBAR:
+					case SNeutrinoSettings::VZAP:
+						if (channelList->getSize())
+							showInfo();
+						break;
+					case SNeutrinoSettings::VOLUME:
+						g_volume->setVolume(msg, true);
+						break;
+					default: /* SNeutrinoSettings::ZAP */
+						quickZap(msg);
+						break;
 				}
 			}
 			else if( msg == (neutrino_msg_t) g_settings.key_zaphistory ) {
@@ -3543,9 +3566,9 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			//CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_MAINMENU_SHUTDOWN));
 
 #if HAVE_COOL_HARDWARE
-			system("/etc/init.d/rcK");
-			system("/bin/sync");
-			system("/bin/umount -a");
+			my_system(2,"/etc/init.d/rcK");
+			sync();
+			my_system(2,"/bin/umount", "-a");
 			sleep(1);
 			{
 				standby_data_t standby;

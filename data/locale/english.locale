@@ -1019,7 +1019,7 @@ menu.hint_plugins_hdd_dir Select directory to load\nplugins from
 menu.hint_power_leds Configure power-button LEDs behavior
 menu.hint_pref_lang Select preferred audio and EPG language\nselect 'none' to disable
 menu.hint_pref_subs Select preferred subtitle language\nselect 'none' to disable
-menu.hint_progressbar_color Show colored progress bars
+menu.hint_progressbar_color Change appearance of progress bars
 menu.hint_protection Protect content by PIN code\nDefault PIN 0000
 menu.hint_radiomode Switch box to radio mode
 menu.hint_reboot Reboot box\nNo confirmation
@@ -1613,7 +1613,12 @@ plugintype.disabled Disabled
 plugintype.game Game
 plugintype.script Script
 plugintype.tool Tool
-progressbar.color Progressbar Color
+progressbar.color Progressbar Design
+progressbar.color.full colored
+progressbar.color.horizontal colored horizontal lines
+progressbar.color.matrix colored dots
+progressbar.color.mono monochrome
+progressbar.color.vertical colored vertical lines
 rclock.lockmsg Your box remote control will be locked.\n To unlock it, press <RED> \n and <MENU> on your remote control.
 rclock.menueadd Lock RC
 rclock.title Lock Remote Control
@@ -1756,16 +1761,16 @@ screensetup.upperleft setup upper left
 screenshot.backbuffer Secondary buffer (back buffer)
 screenshot.count Screenshot count
 screenshot.cover Create Moviecover for Moviebrowser
-screenshot.defdir Screenshot directory
-screenshot.format Screenshot format
+screenshot.defdir Destination directory
+screenshot.format Format
 screenshot.info Screenshot key is unused
 screenshot.menu Screenshot
 screenshot.osd OSD resolution
 screenshot.png_compression PNG compression level
-screenshot.res Screenshot resolution
-screenshot.scale Screenshot scale
+screenshot.res Resolution
+screenshot.scale Scale
 screenshot.tv TV resolution
-screenshot.video Screenshot with video background
+screenshot.video Video in the background
 servicemenu.boot_params_ask Do you really want to boot SPARK?
 servicemenu.boot_params_head Changing boot parameters
 servicemenu.boot_params_hint Do not switch off your set-top box!
@@ -1839,7 +1844,7 @@ three.d.settings.general Variant
 three.d.sideside Side-by-Side
 three.d.tile Tile
 three.d.topbottom Top-and-Bottom
-timer.eventrecord.msg   ... TO be DONE, or not to be done
+timer.eventrecord.msg The event is scheduled for recording.\nTo edit the schedule open the timer list.
 timer.eventrecord.title Schedule Record
 timer.eventremoved.msg The recording event was removed.
 timer.eventremoved.title Cancel Event

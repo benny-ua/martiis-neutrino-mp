@@ -1,5 +1,6 @@
 /*
  * (C) 2008 by dbt <info@dbox2-tuning.de>
+ * (C) 2009-2010, 2012-2013 Stefan Seyfried
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -190,19 +191,38 @@ void CProgressBar::realpaint(const int pos_x, const int pos_y,
 	}
 	else
 	{
+		int itemw = ITEMW, itemh = ITEMW, pointx = POINT, pointy = POINT;
+		int hcnt = height / itemh;		/* how many POINTs is the bar high */
+		switch ((pb_color_t)g_settings.progressbar_color)
+		{
+			default:
+			case PB_MATRIX: /* matrix */
+				break;
+			case PB_LINES_V: /* vert. lines */
+				itemh = height;
+				pointy = height;
+				hcnt = 0;
+				break;
+			case PB_LINES_H: /* horiz. lines */
+				itemw = POINT;
+				break;
+			case PB_COLOR: /* filled color */
+				itemw = POINT;
+				itemh = height;
+				pointy = height;
+				hcnt = 0;
+				break;
+		}
 		/* red, yellow, green are given in percent */
-		int rd = red * width / (100 * ITEMW);		/* how many POINTs red */
-		int yw = yellow * width / (100 * ITEMW);	/* how many POINTs yellow */
-		int gn = green * width / (100 * ITEMW);		/* how many POINTs green */
+		int rd = red * width / (100 * itemw);		/* how many POINTs red */
+		int yw = yellow * width / (100 * itemw);	/* how many POINTs yellow */
+		int gn = green * width / (100 * itemw);		/* how many POINTs green */
 
-		int hcnt = height / ITEMW;		/* how many POINTs is the bar high */
-		int maxi = active_pb_width / ITEMW;	/* how many POINTs is the active bar */
-		int total = width / ITEMW;		/* total number of POINTs */
+		int maxi = active_pb_width / itemw;	/* how many POINTs is the active bar */
+		int total = width / itemw;		/* total number of POINTs */
 
-		int i, j;
 		uint32_t rgb;
 		fb_pixel_t color;
-		int b = 0;
 
 		if (last_width == -1 && backgroundbar_col != 0) /* first paint */
 		{
@@ -214,6 +234,8 @@ void CProgressBar::realpaint(const int pos_x, const int pos_y,
 
 		if (active_pb_width != last_width) {
 			int step;
+			int i, j;
+			int b = 0;
 			if (active_pb_width > last_width) {
 				for (i = 0; (i < rd) && (i < maxi); i++) {
 					step = 255 / rd;
@@ -223,8 +245,8 @@ void CProgressBar::realpaint(const int pos_x, const int pos_y,
 						rgb = RED + ((unsigned char)(step * i) << 8); // adding green
 					color = make16color(rgb);
 					for(j = 0; j <= hcnt; j++)
-						frameBuffer->paintBoxRel(pos_x + i * ITEMW, pos_y + j * ITEMW,
-									 POINT, POINT, color);
+						frameBuffer->paintBoxRel(pos_x + i * itemw, pos_y + j * itemh,
+									 pointx, pointy, color);
 				}
 				for (; (i < yw) && (i < maxi); i++) {
 					step = 255 / yw / 2;
@@ -234,8 +256,8 @@ void CProgressBar::realpaint(const int pos_x, const int pos_y,
 						rgb = YELLOW - ((unsigned char)(step * (b++)) << 16); // removing red
 					color = make16color(rgb);
 					for(j = 0; j <= hcnt; j++)
-						frameBuffer->paintBoxRel(pos_x + i * ITEMW, pos_y + j * ITEMW,
-									 POINT, POINT, color);
+						frameBuffer->paintBoxRel(pos_x + i * itemw, pos_y + j * itemh,
+									 pointx, pointy, color);
 				}
 				for (; (i < gn) && (i < maxi); i++) {
 					step = 255 / gn;
@@ -245,14 +267,14 @@ void CProgressBar::realpaint(const int pos_x, const int pos_y,
 						rgb = YELLOW - ((unsigned char) (step * (b++)) << 16); // removing red
 					color = make16color(rgb);
 					for(j = 0; j <= hcnt; j++)
-						frameBuffer->paintBoxRel(pos_x + i * ITEMW, pos_y + j * ITEMW,
-									 POINT, POINT, color);
+						frameBuffer->paintBoxRel(pos_x + i * itemw, pos_y + j * itemh,
+									 pointx, pointy, color);
 				}
 			}
 			for(i = maxi; i < total; i++) {
 				for(j = 0; j <= hcnt; j++)
-					frameBuffer->paintBoxRel(pos_x + i * ITEMW, pos_y + j * ITEMW,
-								 POINT, POINT, COL_INFOBAR_PLUS_3);//fill passive
+					frameBuffer->paintBoxRel(pos_x + i * itemw, pos_y + j * itemh,
+								 pointx, pointy, COL_INFOBAR_PLUS_3);//fill passive
 			}
 			last_width = active_pb_width;
 		}
