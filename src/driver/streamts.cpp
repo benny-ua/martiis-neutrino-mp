@@ -332,7 +332,11 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 			pids.insert(pid);
 		}
 	}
+#ifdef MARTII
+	while (((bp = strchr(obp, ',')) || (bp = strchr(obp, ':'))) && (bp++));
+#else
 	while ((bp = strchr(bp, ',')) && (bp++));
+#endif
 #endif
 
 	chid = CZapit::getInstance()->GetCurrentChannelID();
