@@ -849,6 +849,9 @@ bool CFileBrowser::exec(const char * const dirname)
 	std::replace(name.begin(), name.end(), '\\', '/');
 
 	paintHead();
+#ifdef MARTII
+	if (name != Path)
+#endif
 	ChangeDir(name);
 	paint();
 	paintFoot();
@@ -889,7 +892,7 @@ bool CFileBrowser::exec(const char * const dirname)
 		}
 
 #ifdef MARTII
-		if ((msg == CRCInput::RC_red) || msg == g_settings.key_channelList_pagedown)
+		if ((msg == CRCInput::RC_red) || msg == (neutrino_msg_t) g_settings.key_channelList_pagedown)
 #else
 		if ((msg == CRCInput::RC_red) || msg == CRCInput::RC_page_down)
 #endif
@@ -905,7 +908,7 @@ bool CFileBrowser::exec(const char * const dirname)
 			paint();
 		}
 #ifdef MARTII
-		else if (msg == CRCInput::RC_green || msg == g_settings.key_channelList_pageup)
+		else if (msg == CRCInput::RC_green || msg == (neutrino_msg_t) g_settings.key_channelList_pageup)
 #else
 		else if ((msg == CRCInput::RC_green) || (msg == CRCInput::RC_page_up) )
 #endif
