@@ -29,6 +29,7 @@
 #include <config.h>
 #endif
 
+#define __NFILE__ 1
 #define NEUTRINO_CPP
 
 #include <stdio.h>
@@ -1562,14 +1563,17 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 	/* Favorites and providers TV bouquets */
 	bnum = 0;
 	for (i = 0; i < g_bouquetManager->Bouquets.size(); i++) {
-		if (!g_bouquetManager->Bouquets[i]->bHidden && !g_bouquetManager->Bouquets[i]->tvChannels.empty())
+		CZapitBouquet *b = g_bouquetManager->Bouquets[i];
+		/* allow empty user bouquets to be added, otherwise they are not
+		 * available from the channellist->add_favorite context menus */
+		if (!b->bHidden && (!b->tvChannels.empty() || b->bUser))
 		{
-			if(g_bouquetManager->Bouquets[i]->bUser)
-				tmp = TVfavList->addBouquet(g_bouquetManager->Bouquets[i]);
+			if (b->bUser)
+				tmp = TVfavList->addBouquet(b);
 			else
-				tmp = TVbouquetList->addBouquet(g_bouquetManager->Bouquets[i]);
+				tmp = TVbouquetList->addBouquet(b);
 
-			ZapitChannelList* channels = &(g_bouquetManager->Bouquets[i]->tvChannels);
+			ZapitChannelList* channels = &(b->tvChannels);
 			tmp->channelList->SetChannelList(channels);
 			bnum++;
 		}
@@ -2945,7 +2949,9 @@ _repeat:
 			//else if(nNewChannel == -4)
 			if(g_channel_list_changed)
 			{
-				SetChannelMode(old_mode);
+				/* don't change bouquet after adding a channel to favorites */
+				if (nNewChannel != -5)
+					SetChannelMode(old_mode);
 				g_channel_list_changed = 0;
 				if(old_b_id < 0) old_b_id = old_b;
 				//g_Zapit->saveBouquets();

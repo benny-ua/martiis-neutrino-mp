@@ -1736,7 +1736,7 @@ void CEitThread::beforeSleep()
 	unlockMessaging();
 #ifndef MARTII
 	if(notify_complete)
-		system("/var/tuxbox/config/epgdone.sh");
+		system(CONFIGDIR "/epgdone.sh");
 #endif
 }
 

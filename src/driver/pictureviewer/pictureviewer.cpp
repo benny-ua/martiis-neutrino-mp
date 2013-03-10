@@ -501,7 +501,7 @@ void CPictureViewer::getSize(const char* name, int* width, int *height)
 	}
 }
 
-#define LOGO_DIR1 "/share/tuxbox/neutrino/icons/logo"
+#define LOGO_DIR1 DATADIR "/neutrino/icons/logo"
 #define LOGO_FMT ".jpg"
 
 #ifdef MARTII
