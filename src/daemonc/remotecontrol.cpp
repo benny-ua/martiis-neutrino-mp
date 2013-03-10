@@ -710,7 +710,7 @@ void CRemoteControl::stopvideo()
 	if ( is_video_started )
 	{
 		is_video_started= false;
-#if HAVE_TRIPLEDRAGON
+#if HAVE_TRIPLEDRAGON || HAVE_SPARK_HARDWARE
 		/* we need stopPlayback to blank video,
 		   lockPlayback prevents it from being inadvertently starting */
 		g_Zapit->stopPlayBack(false);
