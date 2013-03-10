@@ -58,6 +58,7 @@
 #include <driver/nglcd.h>
 #include <gui/widget/stringinput_ext.h>
 #include <gui/screensetup.h>
+#include <system/set_threadname.h>
 #endif
 
 //extern CPlugins *g_PluginList;
@@ -519,6 +520,24 @@ bool CMoviePlayerGui::SelectFile()
 }
 
 #ifdef MARTII
+void *CMoviePlayerGui::ShowWebTVHint(void *arg) {
+	set_threadname(__func__);
+	CMoviePlayerGui *caller = (CMoviePlayerGui *)arg;
+	CHintBox hintbox(LOCALE_WEBTV_HEAD, g_settings.streaming_server_name.c_str());
+	hintbox.paint();
+	while (caller->showWebTVHint) {
+		neutrino_msg_t msg;
+		neutrino_msg_data_t data;
+		g_RCInput->getMsg(&msg, &data, 1);
+		if (msg == (neutrino_msg_t) CRCInput::RC_home) {
+			if(caller->playback)
+				caller->playback->RequestAbort();
+		}
+	}
+	hintbox.hide();
+	return NULL;
+}
+
 void CMoviePlayerGui::PlayFile(bool doCutNeutrino)
 #else
 void CMoviePlayerGui::PlayFile(void)
@@ -577,7 +596,21 @@ void CMoviePlayerGui::PlayFile(void)
 	if (p_movie_info)
 		nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
 #endif
+#ifdef MARTII
+	pthread_t thrWebTVHint = 0;
+	if (isWebTV) {
+		showWebTVHint = true;
+		pthread_create(&thrWebTVHint, NULL, CMoviePlayerGui::ShowWebTVHint, this);
+	}
+	bool res = playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
+	if (thrWebTVHint) {
+		showWebTVHint = false;
+		pthread_join(thrWebTVHint, NULL);
+	}
+	if (!res) {
+#else
 	if(!playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration)) {
+#endif
 		playback->Close();
 	} else {
 #ifdef MARTII

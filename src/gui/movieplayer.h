@@ -95,6 +95,7 @@ class CMoviePlayerGui : public CMenuTarget
 	unsigned short currentdpid;
 
 	bool isWebTV;
+	bool showWebTVHint;
 #endif
 
 	/* playback from MB */
@@ -140,6 +141,8 @@ class CMoviePlayerGui : public CMenuTarget
 #ifdef MARTII
 	void StopSubtitles(bool b);
 	void StartSubtitles(bool show = true);
+
+	static void *ShowWebTVHint(void *arg);
 #endif
 
 	CMoviePlayerGui(const CMoviePlayerGui&) {};
