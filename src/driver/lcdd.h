@@ -178,6 +178,7 @@ class CLCD
 		static void	*TimeThread(void *);
 		pthread_t	thrTime;
 #ifdef MARTII
+		std::string	lastOutput;
 		int		fd;
 		int		time_notify_reader;
 		int		time_notify_writer;

@@ -433,6 +433,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 
         printf("CLCD::ShowText: [%s]\n", str);
 
+	waitSec = 0;
 	if (str) {
 		std::string s = std::string(str);
 
@@ -441,17 +442,16 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			size_t end = s.find_last_not_of (" \t\n");
 			s = s.substr(start, end - start + 1);
 		}
-		if (s.length() < 1)
-			waitSec = 0;
-		else if (write(fd , s.c_str(), s.length()) < 0)
-			perror("write to vfd failed");
-		waitSec = 8;
-	} else
-		waitSec = 0;
-
-	if (rescheduleTime && (time_notify_writer > -1)) {
-		write(time_notify_writer, "", 1);
+		if (s.length() > 0 && (vfd_version == 4 || lastOutput != s)) {
+			lastOutput = s;
+			if (write(fd , s.c_str(), s.length()) < 0)
+				perror("write to vfd failed");
+			waitSec = 8;
+		}
 	}
+
+	if (rescheduleTime && (time_notify_writer > -1))
+		write(time_notify_writer, "", 1);
 }
 
 void CLCD::init(const char *, const char *, const char *, const char *, const char *, const char *)
