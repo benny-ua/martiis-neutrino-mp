@@ -686,10 +686,12 @@ void CMoviePlayerGui::PlayFile(void)
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
 #ifdef MARTII
-			if (!isWebTV && playback->GetPosition(position, duration)) {
-#else
-			if(playback->GetPosition(position, duration)) {
+			if (isWebTV) {
+				if (!playback->GetPosition(position, duration))
+					g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
+			} else {
 #endif
+			if(playback->GetPosition(position, duration)) {
 				if(duration > 100)
 					file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
@@ -701,7 +703,6 @@ void CMoviePlayerGui::PlayFile(void)
 #ifdef DEBUG
 				printf("CMoviePlayerGui::PlayFile: speed %d position %d duration %d (%d, %d%%)\n", speed, position, duration, duration-position, file_prozent);
 #endif
-#endif
 				/* in case ffmpeg report incorrect values */
 				int posdiff = duration - position;
 				if ((posdiff > 0) && (posdiff < 1000) && !timeshift)
@@ -712,7 +713,13 @@ void CMoviePlayerGui::PlayFile(void)
 				}
 				else
 					eof = 0;
+#endif
 			}
+#ifdef MARTII
+				else
+					g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
+			}
+#endif
 			handleMovieBrowser(0, position);
 			FileTime.update(position, duration);
 		}
