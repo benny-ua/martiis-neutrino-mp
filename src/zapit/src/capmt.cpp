@@ -27,6 +27,11 @@
 #include <zapit/settings.h> /* CAMD_UDS_NAME         */
 #include <zapit/getservices.h>
 #include <zapit/debug.h>
+#ifdef MARTII
+#include <zapit/femanager.h>
+#include <dmx.h>
+#include <hardware_caps.h>
+#endif
 
 #include <ca_cs.h>
 #ifndef HAVE_COOL_HARDWARE
@@ -209,6 +214,29 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 	}
 
 	switch(mode) {
+#ifdef MARTII // HAVE_SPARK_HARDWARE, really
+		case PLAY:
+			if(get_hwcaps()->boxtype == 7111) {
+				source = CFEManager::getInstance()->allocateFE(channel)->getNumber();
+				demux = LIVE_DEMUX + source;
+			} else {
+				source = cDemux::GetSource(0); /* demux0 is always the live demux */
+				demux = source;
+			}
+			break;
+		case RECORD:
+			if(get_hwcaps()->boxtype == 7111)
+				channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber());
+			else
+				channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber() + 1);
+			source = channel->getRecordDemux();
+			demux = source;
+			break;
+		case STREAM:
+			source = CFEManager::getInstance()->allocateFE(channel)->getNumber();			
+			demux = STREAM_DEMUX;//FIXME
+			break;
+#else
 		case PLAY:
 #if HAVE_COOL_HARDWARE
 			source = DEMUX_SOURCE_0;
@@ -230,6 +258,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 			source = DEMUX_SOURCE_0;
 			demux = STREAM_DEMUX;//FIXME
 			break;
+#endif
 #endif
 	}
 
