@@ -602,7 +602,7 @@ void CMoviePlayerGui::PlayFile(void)
 		showWebTVHint = true;
 		pthread_create(&thrWebTVHint, NULL, CMoviePlayerGui::ShowWebTVHint, this);
 	}
-	bool res = playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
+	bool res = playback->Start((char *) full_name.c_str(), vpid, vtype, currentapid, currentac3, duration, !isMovieBrowser || !moviebrowser || !moviebrowser->doProbe());
 	if (thrWebTVHint) {
 		showWebTVHint = false;
 		pthread_join(thrWebTVHint, NULL);

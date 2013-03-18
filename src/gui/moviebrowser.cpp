@@ -596,6 +596,7 @@ void CMovieBrowser::initGlobalSettings(void)
 
 #ifdef MARTII
 	m_settings.ts_only = 0;
+	m_settings.ts_probe = 0;
 #endif
 }
 
@@ -725,7 +726,8 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->browser_serie_mode = configfile.getInt32("mb_browser_serie_mode", 0);
 	settings->serie_auto_create = configfile.getInt32("mb_serie_auto_create", 0);
 #ifdef MARTII
-        	settings->ts_only = configfile.getInt32("mb_ts_only", 0);
+	settings->ts_only = configfile.getInt32("mb_ts_only", 0);
+	settings->ts_probe = configfile.getInt32("mb_ts_probe", 0);
 #endif
 
 	settings->sorting.item = (MB_INFO_ITEM)configfile.getInt32("mb_sorting_item", MB_INFO_RECORDDATE);
@@ -776,6 +778,7 @@ bool CMovieBrowser::saveSettings(MB_SETTINGS* settings)
 	configfile.setInt32("mb_serie_auto_create", settings->serie_auto_create);
 #ifdef MARTII
 	configfile.setInt32("mb_ts_only", settings->ts_only);
+	configfile.setInt32("mb_ts_probe", settings->ts_probe);
 #endif
 
 	configfile.setInt32("mb_gui", settings->gui);
@@ -3139,6 +3142,7 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* /*movie_info*/)
     optionsMenu.addItem(GenericMenuSeparatorLine);
     int ts_only = m_settings.ts_only;
     optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_TS_ONLY,           (int*)(&m_settings.ts_only), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
+    optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_TS_PROBE,          (int*)(&m_settings.ts_probe), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
 #endif
 
 /********************************************************************/
@@ -4529,3 +4533,9 @@ ret_err:
 		g_RCInput->postMsg(CRCInput::RC_home, 0);
 	return retval;
 }
+#ifdef MARTII
+bool CMovieBrowser::doProbe()
+{
+	return m_settings.ts_probe;
+}
+#endif

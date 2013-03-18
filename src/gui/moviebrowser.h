@@ -202,6 +202,7 @@ typedef struct
 	int remount;
 #ifdef MARTII
 	int ts_only;
+	int ts_probe;
 #endif
 
 	int browser_serie_mode;
@@ -327,6 +328,9 @@ class CMovieBrowser : public CMenuTarget
 		bool delFile_vlc(CFile& file);
 		bool delFile_std(CFile& file);
 		int  getMenuRet() { return menu_ret; }
+#ifdef MARTII
+		bool doProbe(void);
+#endif
 
 	private: //Functions
 		///// MovieBrowser init ///////////////
