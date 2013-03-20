@@ -207,13 +207,11 @@ void CLCD::showTime(bool)
 	localtime_r(&now, &tm);
 	now += tm.tm_gmtoff;
 
-	if (ioctl(fd, VFDSETTIME2, &now) < 0) {
+	if (ioctl(fd, VFDSETTIME2, &now) < 0 && vfd_version == 4) {
 		char buf[10];
 		strftime(buf, sizeof(buf), "%H%M", &tm);
 		ShowText(buf, false);
 	}
-	if (vfd_version != 4 && m != LCD_DISPLAYMODE_OFF)
-		ShowText(NULL);
 	waitSec = 60 - tm.tm_sec;
 	if (waitSec <= 0)
 		waitSec = 60;
