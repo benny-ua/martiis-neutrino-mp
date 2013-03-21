@@ -230,9 +230,17 @@ void CMoviePlayerGui::restoreNeutrino()
 	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::CHANGEMODE, m_LastMode);
 }
 
+#ifdef MARTII
+static bool running = false;
+#endif
 int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 {
 	printf("[movieplayer] actionKey=%s\n", actionKey.c_str());
+#ifdef MARTII
+	if (running)
+		return menu_return::RETURN_EXIT_ALL;
+	running = true;
+#endif
 
 	if (parent)
 		parent->hide();
@@ -285,6 +293,9 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	}
 #endif
 	else {
+#ifdef MARTII
+		running = false;
+#endif
 		return menu_return::RETURN_REPAINT;
 	}
 
@@ -314,6 +325,9 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 
+#ifdef MARTII
+	running = false;
+#endif
 	if (timeshift){
 		timeshift = 0;
 		return menu_return::RETURN_EXIT_ALL;
