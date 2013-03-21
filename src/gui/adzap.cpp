@@ -251,13 +251,13 @@ void CAdZapMenu::Settings()
     menu->addItem(GenericMenuSeparatorLine);
 
     menu->addItem(new
-		  CMenuForwarder(LOCALE_ADZAP_ENABLE, true, "", this,
-				 "enable", CRCInput::RC_green,
-				 NEUTRINO_ICON_BUTTON_GREEN));
-    menu->addItem(new
 		  CMenuForwarder(LOCALE_ADZAP_DISABLE, true, "", this,
 				 "disable", CRCInput::RC_red,
 				 NEUTRINO_ICON_BUTTON_RED));
+    menu->addItem(new
+		  CMenuForwarder(LOCALE_ADZAP_ENABLE, true, "", this,
+				 "enable", CRCInput::RC_green,
+				 NEUTRINO_ICON_BUTTON_GREEN));
 
     CChannelEventList evtlist;
     CEitManager::getInstance()->getEventsServiceKey(azm->
