@@ -1,7 +1,7 @@
 /*
  * adzap.cpp
  * 
- * (C)2012 by martii
+ * (C)2012-2013 by martii
  * 
  * License: GPL
  * 
@@ -212,8 +212,6 @@ int CAdZapMenu::exec(CMenuTarget *, const std::string & actionKey)
 		 g_settings.
 		 adzap_zapBackPeriod) ? NEUTRINO_ICON_BUTTON_OKAY : "";
 	g_settings.adzap_zapBackPeriod *= 60;
-	if (!monitor)
-	    armed = true;
 	return menu_return::RETURN_REPAINT;
     }
 
