@@ -170,7 +170,15 @@ void CImageInfo::paint_pig(int px, int py, int w, int h)
 {
 	//frameBuffer->paintBoxRel(px,py,w,h, COL_BACKGROUND);
 	frameBuffer->paintBackgroundBoxRel(px,py,w,h);
+#ifdef MARTII
+	videoDecoder->Pig(px, py, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true),
+				g_settings.screen_StartX_int,
+				g_settings.screen_StartY_int,
+				g_settings.screen_EndX_int,
+				g_settings.screen_EndY_int);
+#else
 	videoDecoder->Pig(px, py, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));
+#endif
 }
 
 void CImageInfo::paintLine(int xpos, int font, const char* text)

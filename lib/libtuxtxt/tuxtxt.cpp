@@ -4339,9 +4339,16 @@ void SwitchScreenMode(int newscreenmode)
 		CFrameBuffer *f = CFrameBuffer::getInstance();
 #ifdef MARTII
 		if (!boxed && (f->get3DMode() == CFrameBuffer::Mode3D_off))
-#endif
+			videoDecoder->Pig(tx, ty, tw, th,
+				f->getScreenWidth(true), f->getScreenHeight(true),
+				g_settings.screen_StartX_int,
+				g_settings.screen_StartY_int,
+				g_settings.screen_EndX_int,
+				g_settings.screen_EndY_int);
+#else
 		videoDecoder->Pig(tx, ty, tw, th,
 				  f->getScreenWidth(true), f->getScreenHeight(true));
+#endif
 #if 0
 		int sm = 0;
 		ioctl(pig, VIDIOC_OVERLAY, &sm);

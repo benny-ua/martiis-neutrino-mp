@@ -261,7 +261,15 @@ void CStreamInfo2::paint_pig (int px, int py, int w, int h)
 	frameBuffer->paintBackgroundBoxRel (px,py, w, h);
 	frameBuffer->blit();
 	printf("CStreamInfo2::paint_pig x %d y %d w %d h %d\n", px, py, w, h);
+#ifdef MARTII
+	videoDecoder->Pig(px, py, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true),
+				g_settings.screen_StartX_int,
+				g_settings.screen_StartY_int,
+				g_settings.screen_EndX_int,
+				g_settings.screen_EndY_int);
+#else
 	videoDecoder->Pig(px, py, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));
+#endif
 }
 
 void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
