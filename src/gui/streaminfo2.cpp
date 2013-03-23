@@ -316,7 +316,11 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	if (paint_mode == 0)
 		maxmin_x = sig_text_ber_x-(fontW*4);
 	else
+#ifdef MARTII
+		maxmin_x = _x + 40 + xd * 3 + (fontW*8);
+#else
 		maxmin_x = _x + 40 + xd * 3 + (fontW*4);
+#endif
 
 	g_Font[font_small]->RenderString(maxmin_x, y1 + sheight + 5, fw*3, "max", COL_INFOBAR, 0, true);
 	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 2) +5, fw*3, "now", COL_INFOBAR, 0, true);
