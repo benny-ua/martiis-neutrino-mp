@@ -845,6 +845,11 @@ bool CFileBrowser::exec(const char * const dirname)
 	}
 #endif
 
+#ifdef MARTII
+	if (!*dirname)
+		name = "/";
+	else
+#endif
 	name = dirname;
 	std::replace(name.begin(), name.end(), '\\', '/');
 
