@@ -466,6 +466,8 @@ struct SNeutrinoSettings
 	int key_tsplayback;
 	int key_fileplayback;
 	int key_audioplayback;
+	int key_volumeup;
+	int key_volumedown;
 #endif
 
 	int mpkey_rewind;

@@ -720,6 +720,9 @@ keybindingmenu.subchanneldown Unterkanal zurück
 keybindingmenu.subchannelup Unterkanal weiter
 keybindingmenu.tvradiomode Fernseh-/Radio-Modus
 keybindingmenu.video Video
+keybindingmenu.volume Lautstärke
+keybindingmenu.volumedown Leiser
+keybindingmenu.volumeup Lauter
 keybindingmenu.zaphistory Zapping-History Bouquet
 keychooser.head Neue Taste einstellen
 keychooser.text1 Bitte Taste drücken
@@ -942,6 +945,8 @@ menu.hint_key_subchannelup Weisen Sie eine Taste für das Weiterschalten in den 
 menu.hint_key_transponder Weisen Sie eine Taste für das Anzeigen der Transponder in der Kanalliste zu
 menu.hint_key_tvradiomode Wählen Sie eine Taste für das Umschalten zwischen TV- und Radio-Modus
 menu.hint_key_unlock Weisen Sie eine Taste zum Entriegeln zu, \nbetätigen Sie die Taste 'Rot' für 5 Sekunden
+menu.hint_key_volumedown Weisen Sie eine Taste für die Reduzierung der Lautstärke zu
+menu.hint_key_volumeup Weisen Sie eine Taste für die Erhöhung der Lautstärke zu
 menu.hint_keys Tastenbelegungen und Fernbedienungs-Abstimmung bearbeiten
 menu.hint_lang_pref Wählen Sie ihre bevorzugten Tonspuren und Untertitel-Sprachen
 menu.hint_language Menü-Sprache, Zeitzone, bevorzugte Tonspuren, Untertitel-Sprachen und mehr

@@ -4397,6 +4397,8 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_tsplayback = tconfig.getInt32( "key_tsplayback", CRCInput::RC_play );
 	g_settings.key_fileplayback = tconfig.getInt32( "key_fileplayback", CRCInput::RC_archive );
 	g_settings.key_audioplayback = tconfig.getInt32( "key_audioplayback", CRCInput::RC_audio );
+	g_settings.key_volumeup = tconfig.getInt32( "key_volumeup",  CRCInput::RC_plus );
+	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
 #else
 	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", CRCInput::RC_nokey );
 #endif
@@ -4488,6 +4490,8 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_tsplayback", g_settings.key_tsplayback );
 	tconfig.setInt32( "key_fileplayback", g_settings.key_fileplayback );
 	tconfig.setInt32( "key_audioplayback", g_settings.key_audioplayback );
+	tconfig.setInt32( "key_volumeup", g_settings.key_volumeup );
+	tconfig.setInt32( "key_volumedown", g_settings.key_volumedown );
 #endif
 	tconfig.setInt32( "key_tvradio_mode", g_settings.key_tvradio_mode );
 	tconfig.setInt32( "key_power_off", g_settings.key_power_off );

@@ -48,6 +48,10 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			KEY_POWER_OFF,
 			KEY_PAGE_UP,
 			KEY_PAGE_DOWN,
+#ifdef MARTII
+			KEY_VOLUME_UP,
+			KEY_VOLUME_DOWN,
+#endif
 			KEY_LIST_START,
 			KEY_LIST_END,
 			KEY_CANCEL_ACTION,

@@ -691,12 +691,12 @@ start-block~remote_spark
   <area shape="rect" coords="84,109,109,123" href="javascript:rcsim('KEY_F1')" />
   <area shape="rect" coords="113,109,138,123" href="javascript:rcsim('KEY_AUX')" />
   <area shape="circle" coords="34,323,10" href="javascript:rcsim('KEY_FIND')" />
-  <area shape="circle" coords="64,323,10" href="javascript:rcsim('KEY_VOLUMEDOWN')" />
-  <area shape="circle" coords="99,323,10" href="javascript:rcsim('KEY_PAGEDOWN')" />
+  <area shape="circle" coords="64,323,10" href="javascript:rcsim('KEY_VOLUMEUP')" />
+  <area shape="circle" coords="99,323,10" href="javascript:rcsim('KEY_PAGEUP')" />
   <area shape="circle" coords="130,323,10" href="javascript:rcsim('KEY_SAT')" />
   <area shape="circle" coords="34,363,10" href="javascript:rcsim('KEY_RECORD')" />
-  <area shape="circle" coords="64,367,10" href="javascript:rcsim('KEY_VOLUMEUP')" />
-  <area shape="circle" coords="99,367,10" href="javascript:rcsim('KEY_PAGEUP')" />
+  <area shape="circle" coords="64,367,10" href="javascript:rcsim('KEY_VOLUMEDOWN')" />
+  <area shape="circle" coords="99,367,10" href="javascript:rcsim('KEY_PAGEDOWN')" />
   <area shape="circle" coords="130,363,10" href="javascript:rcsim('KEY_FAVORITES')" />
   <area shape="circle" coords="34,404,10" href="javascript:rcsim('KEY_MENU')" />
   <area shape="circle" coords="130,404,10" href="javascript:rcsim('KEY_INFO')" />

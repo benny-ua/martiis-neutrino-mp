@@ -1708,12 +1708,20 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 		else
 			result = false;
 	}
+#ifdef MARTII
+	else if (msg == (neutrino_msg_t)g_settings.key_volumedown)
+#else
 	else if (msg == CRCInput::RC_minus)
+#endif
 	{
 		onSetGUIWindowPrev();
 		//refreshMovieInfo();
 	}
+#ifdef MARTII
+	else if (msg == (neutrino_msg_t)g_settings.key_volumeup)
+#else
 	else if (msg == CRCInput::RC_plus)
+#endif
 	{
 		onSetGUIWindowNext();
 		//refreshMovieInfo();

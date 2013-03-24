@@ -290,7 +290,11 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 			if (g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME && g_RemoteControl && g_RemoteControl->subChannels.size() < 1)
  			     sub_chan_keybind = 1;
 			
+#ifdef MARTII
+			if ((msg == (neutrino_msg_t)g_settings.key_volumeup) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_right))) {
+#else
 			if ((msg == CRCInput::RC_plus) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_right))) {
+#endif
 				if(CNeutrinoApp::getInstance()->isMuted()) {
 					if ((bDoPaint) && (pixbuf!= NULL)) {
 						frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
@@ -312,7 +316,11 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 #endif
 				}				
 			}
+#ifdef MARTII
+			else if ((msg == (neutrino_msg_t)g_settings.key_volumedown) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_left))) {
+#else
 			else if ((msg == CRCInput::RC_minus) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_left))) {
+#endif
 				if(CNeutrinoApp::getInstance()->isMuted() && g_settings.current_volume > 0) {
 					if ((bDoPaint) && (pixbuf!= NULL)) {
 						frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);

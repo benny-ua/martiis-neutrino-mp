@@ -166,6 +166,10 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_KEYBINDINGMENU_POWEROFF,      	&g_settings.key_power_off,		LOCALE_MENU_HINT_KEY_POWEROFF },
 	{LOCALE_KEYBINDINGMENU_PAGEUP, 		&g_settings.key_channelList_pageup,	LOCALE_MENU_HINT_KEY_PAGEUP },
 	{LOCALE_KEYBINDINGMENU_PAGEDOWN, 	&g_settings.key_channelList_pagedown, 	LOCALE_MENU_HINT_KEY_PAGEDOWN },
+#ifdef MARTII
+	{LOCALE_KEYBINDINGMENU_VOLUMEUP, 	&g_settings.key_volumeup,		LOCALE_MENU_HINT_KEY_VOLUMEUP },
+	{LOCALE_KEYBINDINGMENU_VOLUMEDOWN,	&g_settings.key_volumedown, 		LOCALE_MENU_HINT_KEY_VOLUMEDOWN },
+#endif
 	{LOCALE_EXTRA_KEY_LIST_START, 		&g_settings.key_list_start, 		LOCALE_MENU_HINT_KEY_LIST_START },
 	{LOCALE_EXTRA_KEY_LIST_END,	 	&g_settings.key_list_end,		LOCALE_MENU_HINT_KEY_LIST_END },
 	{LOCALE_KEYBINDINGMENU_CANCEL,		&g_settings.key_channelList_cancel,	LOCALE_MENU_HINT_KEY_CANCEL },
@@ -342,20 +346,35 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 #ifdef MARTII
 	//video
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VIDEO));
-	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++)
-		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
+	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++) {
+		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
+		mf->setHint("", key_settings[i].hint);
+		bindSettings->addItem(mf);
+	}
 
 	//multimedia
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MULTIMEDIA));
-	for (int i = KEY_MOVIEPLAYER; i <= KEY_AUDIOPLAYER; i++)
-		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
+	for (int i = KEY_MOVIEPLAYER; i <= KEY_AUDIOPLAYER; i++) {
+		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
+		mf->setHint("", key_settings[i].hint);
+		bindSettings->addItem(mf);
+	}
 
 	//navigation
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_NAVIGATION));
-	for (int i = KEY_PAGE_UP; i <= KEY_PAGE_DOWN; i++)
+	for (int i = KEY_PAGE_UP; i <= KEY_PAGE_DOWN; i++) {
+		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
+		mf->setHint("", key_settings[i].hint);
+		bindSettings->addItem(mf);
+	}
+	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_KEY_LEFT_EXIT);
+	bindSettings->addItem(mc);
+
+	//volume
+	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VOLUME));
+	for (int i = KEY_VOLUME_UP; i <= KEY_VOLUME_DOWN; i++)
 		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
-	bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	bindSettings->addItem(new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV, &g_settings.mode_left_right_key_tv, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_OPTIONS, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_COUNT, true));
 #endif
 	//misc
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MISC));
@@ -375,13 +394,14 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_SHOWCLOCK].keydescription, true, keychooser[KEY_SHOWCLOCK]->getKeyName(), keychooser[KEY_SHOWCLOCK]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_HDDMENU].keydescription, true, keychooser[KEY_HDDMENU]->getKeyName(), keychooser[KEY_HDDMENU]));
-#endif
+#else
 
 	//bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_ZAP_CYCLE, &g_settings.zap_cycle, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 	// left-exit, FIXME is this option really change anything ??
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_KEY_LEFT_EXIT);
 	bindSettings->addItem(mc);
+#endif
 
 	// audio for audio player
 	mc = new CMenuOptionChooser(LOCALE_EXTRA_AUDIO_RUN_PLAYER, &g_settings.audio_run_player, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);

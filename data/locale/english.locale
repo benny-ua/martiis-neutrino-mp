@@ -721,6 +721,9 @@ keybindingmenu.subchanneldown subchannel down
 keybindingmenu.subchannelup subchannel up
 keybindingmenu.tvradiomode TV/Radio-mode
 keybindingmenu.video Video
+keybindingmenu.volume Volume
+keybindingmenu.volumedown Decrease
+keybindingmenu.volumeup Increase
 keybindingmenu.zaphistory Zapping History Bouquet
 keychooser.head Setup new Key
 keychooser.text1 Please press the new key
@@ -943,6 +946,8 @@ menu.hint_key_subchannelup Assign button for fast switch\n to next subchannel
 menu.hint_key_transponder Assign button to show channel list\nfor current transponder
 menu.hint_key_tvradiomode Assign button to switch TV <> Radio mode
 menu.hint_key_unlock Assign button to unlock box if locked\nTo unlock press 'red', then in next 5 seconds this key
+menu.hint_key_volumedown Assign button to decrease volume
+menu.hint_key_volumeup Assign button to increase volume
 menu.hint_keys Remote control repeat rate\nEdit key bindings
 menu.hint_lang_pref Configure preferred audio, EPG\nand subtitle languages
 menu.hint_language OSD language, timezone\nPreffered audio and subtitles languages

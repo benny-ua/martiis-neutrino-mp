@@ -206,6 +206,12 @@ int CMotorControl::exec(CMenuTarget* parent, const std::string &)
 			} else
 				wasgrow = 0;
 
+#ifdef MARTII
+			if (msg == (neutrino_msg_t)g_settings.key_volumeup)
+				msg = CRCInput::RC_plus;
+			else if (msg == (neutrino_msg_t)g_settings.key_volumedown)
+				msg = CRCInput::RC_minus;
+#endif
 			if (installerMenue)
 			{
 				switch(msg)
