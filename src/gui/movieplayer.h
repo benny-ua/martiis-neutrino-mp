@@ -96,6 +96,8 @@ class CMoviePlayerGui : public CMenuTarget
 
 	bool isWebTV;
 	bool showWebTVHint;
+
+	bool probePids;
 #endif
 
 	/* playback from MB */

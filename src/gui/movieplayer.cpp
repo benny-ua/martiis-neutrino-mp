@@ -375,8 +375,16 @@ void CMoviePlayerGui::updateLcd()
 
 void CMoviePlayerGui::fillPids()
 {
+#ifdef MARTII
+	if(p_movie_info == NULL) {
+		probePids = true;
+		return;
+	}
+	probePids = false;
+#else
 	if(p_movie_info == NULL)
 		return;
+#endif
 
 	numpida = 0; currentapid = 0;
 #ifdef MARTII
@@ -565,7 +573,9 @@ void CMoviePlayerGui::PlayFile(void)
 	bool first_start_timeshift = false;
 	bool time_forced = false;
 	bool update_lcd = true;
+#ifndef MARTII
 	int eof = 0;
+#endif
 
 	CTimeOSD FileTime;
 
@@ -628,7 +638,7 @@ void CMoviePlayerGui::PlayFile(void)
 		playback->Close();
 	} else {
 #ifdef MARTII
-		if(!numpida){
+		if(probePids){
 			playback->FindAllPids(apids, ac3flags, &numpida, language);
 			if (p_movie_info)
 				for (int i = 0; i < numpida; i++) {
@@ -1090,7 +1100,11 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool fil
 
 void CMoviePlayerGui::getCurrentAudioName( bool file_player, std::string &audioname)
 {
+#ifdef MARTII
+  	if(file_player && probePids){
+#else
   	if(file_player && !numpida){
+#endif
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
 		if(numpida)
 			currentapid = apids[0];
@@ -1133,19 +1147,15 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
 #ifdef MARTII
-	if(!numpida){
+	if(probePids){
+		// these may change in-stream
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
+		playback->FindAllSubtitlePids(spids, &numpids, slanguage);
+		playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
 		if(numpida)
 			currentapid = apids[0];
 	}
 	std::string apidtitles[numpida];
-	if (!numpids) {
-		playback->FindAllSubtitlePids(spids, &numpids, slanguage);
-	}
-	if (!numpids && !numpidd) {
-		// take pids from stream, for both movieplayer and fileplayer
-		playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
-	}
 #else
 	if(file_player && !numpida){
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
