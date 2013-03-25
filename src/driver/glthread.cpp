@@ -204,10 +204,6 @@ void GLThreadObj::run()
 	{
 		g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
 	}
-	else
-	{ /* yeah, whatever... */
-		::kill(getpid(), SIGKILL);
-	}
 	std::cout << "GL thread stopping" << std::endl;
 }
 

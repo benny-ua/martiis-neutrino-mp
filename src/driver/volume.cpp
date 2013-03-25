@@ -37,6 +37,7 @@
 /* compat header from zapit/include */
 #include <audio.h>
 #include <system/settings.h>
+#include <system/helpers.h>
 #include <daemonc/remotecontrol.h>
 #include <driver/volume.h>
 #include <zapit/zapit.h>
@@ -47,6 +48,8 @@
 #if HAVE_COOL_HARDWARE
 #include <gui/widget/progressbar.h>
 #endif
+
+#define VOLUME_SCRIPT	CONFIGDIR "/volume.sh"
 
 extern CRemoteControl * g_RemoteControl;
 extern cAudio * audioDecoder;
@@ -241,6 +244,7 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 	if (!g_RCInput) /* don't die... */
 		return;
 	neutrino_msg_t msg	= key;
+	static bool do_vol = true; /* false if volume is handled by external script */
 	int mode = CNeutrinoApp::getInstance()->getMode();
 	
 	if (msg <= CRCInput::RC_MaxRC) {
@@ -260,7 +264,7 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 	if (g_settings.volume_pos == 6)
 		bDoPaint = false;
 #endif
-	if(bDoPaint) {
+	if (bDoPaint && do_vol) {
 		pixbuf = new fb_pixel_t[(vbar_w+ShadowOffset) * (vbar_h+ShadowOffset)];
 		if(pixbuf!= NULL)
 			frameBuffer->SaveScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
@@ -286,76 +290,67 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 	do {
 		if (msg <= CRCInput::RC_MaxRC) 
 		{
-			int sub_chan_keybind = 0;
-			if (g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME && g_RemoteControl && g_RemoteControl->subChannels.size() < 1)
- 			     sub_chan_keybind = 1;
-			
+			bool sub_chan_keybind = g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME
+						&& g_RemoteControl && g_RemoteControl->subChannels.size() < 1;
 #ifdef MARTII
-			if ((msg == (neutrino_msg_t)g_settings.key_volumeup) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_right))) {
+			if ((msg == g_settings.key_volumeup || msg == g_settings.key_volumedown) ||
+			    (sub_chan_keybind && (msg == CRCInput::RC_right || msg == CRCInput::RC_left))) {
+				int dir = (msg == g_settings.key_volumeup || msg == CRCInput::RC_right) ? 1 : -1;
 #else
-			if ((msg == CRCInput::RC_plus) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_right))) {
+			if ((msg == CRCInput::RC_plus || msg == CRCInput::RC_minus) ||
+			    (sub_chan_keybind && (msg == CRCInput::RC_right || msg == CRCInput::RC_left))) {
+				int dir = (msg == CRCInput::RC_plus || msg == CRCInput::RC_right) ? 1 : -1;
 #endif
-				if(CNeutrinoApp::getInstance()->isMuted()) {
-					if ((bDoPaint) && (pixbuf!= NULL)) {
+				if (my_system(2, VOLUME_SCRIPT, dir > 0 ? "up" : "down") == 0)
+				{
+					do_vol = false;
+					/* clear all repeated events */
+					neutrino_msg_t tmp = msg;
+					while (msg == tmp)
+						g_RCInput->getMsg(&tmp, &data, 0);
+					if (tmp != CRCInput::RC_timeout)
+						g_RCInput->postMsg(tmp, data);
+				} else
+					do_vol = true;
+				if (CNeutrinoApp::getInstance()->isMuted() && (dir > 0 || g_settings.current_volume > 0)) {
+					if (pixbuf != NULL) {
 						frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 						delete [] pixbuf;
 					}
-					AudioMute(false, true);
-					Init();
-					setVolume(msg);
-					return;
-				}
-				
-				if(!CNeutrinoApp::getInstance()->isMuted()) {
-					if (g_settings.current_volume < 100 - g_settings.current_volume_step)
-						g_settings.current_volume += g_settings.current_volume_step;
-					else
-						g_settings.current_volume = 100;
-#ifdef ENABLE_GRAPHLCD // MARTII
-				nGLCD::ShowVolume(true);
-#endif
-				}				
-			}
-#ifdef MARTII
-			else if ((msg == (neutrino_msg_t)g_settings.key_volumedown) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_left))) {
-#else
-			else if ((msg == CRCInput::RC_minus) || (sub_chan_keybind == 1 && (msg == CRCInput::RC_left))) {
-#endif
-				if(CNeutrinoApp::getInstance()->isMuted() && g_settings.current_volume > 0) {
-					if ((bDoPaint) && (pixbuf!= NULL)) {
-						frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
-						delete [] pixbuf;
-					}
-					AudioMute(false, true);
-					Init();
-					setVolume(msg);
-					return;
-				}
-				
-				if(!CNeutrinoApp::getInstance()->isMuted()) {
-					if (g_settings.current_volume > g_settings.current_volume_step)
-						g_settings.current_volume -= g_settings.current_volume_step;
-						
-					else if  (g_settings.show_mute_icon == 1) {
-						if ((bDoPaint) && (pixbuf!= NULL)) {
-							frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
-							delete [] pixbuf;
-						}
-						g_settings.current_volume = 0;
-						AudioMute( true, true);
+					if (do_vol) {
+						AudioMute(false, true);
 						Init();
 						setVolume(msg);
-						return;						
+						return;
 					}
-					
-					else if (g_settings.show_mute_icon == 0)
+				}
+				
+				if (do_vol && !CNeutrinoApp::getInstance()->isMuted()) {
+					/* current_volume is char, we need signed to catch v < 0 */
+					int v = g_settings.current_volume;
+					v += dir * g_settings.current_volume_step;
+					if (v > 100)
+						v = 100;
+					else if (v < 1) {
+						v = 0;
 						g_settings.current_volume = 0;
+						if (g_settings.show_mute_icon) {
+							if (pixbuf != NULL) {
+								frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
+								delete []pixbuf;
+							}
+							AudioMute(true, true);
+							Init();
+							setVolume(msg);
+							return;
+						}
+					}
+					g_settings.current_volume = v;
 #ifdef ENABLE_GRAPHLCD // MARTII
-				nGLCD::ShowVolume(true);
+					nGLCD::ShowVolume(false);
 #endif
-				}				
+				}
 			}
-
 			else if (msg == CRCInput::RC_home)
 				break;
 			else {
@@ -363,7 +358,8 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 				break;
 			}
 
-			setvol(g_settings.current_volume);
+			if (do_vol)
+				setvol(g_settings.current_volume);
 			timeoutEnd = CRCInput::calcTimeoutEnd(nowait ? 1 : 3);
 		}
 		else if (msg == NeutrinoMessages::EVT_VOLCHANGED) {
@@ -374,15 +370,13 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 			break;
 		}
 
-		if (bDoPaint) {
+		if (pixbuf) {
 			if(vol != g_settings.current_volume) {
 				vol = g_settings.current_volume;
 				refreshVolumebar(g_settings.current_volume);
+				frameBuffer->blit();
 			}
 		}
-
-		if (bDoPaint)
-			frameBuffer->blit();
 
 		CVFD::getInstance()->showVolume(g_settings.current_volume);
 		if (msg != CRCInput::RC_timeout) {
@@ -393,12 +387,10 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 #ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::ShowVolume(false);
 #endif
-	if( (bDoPaint) && (pixbuf!= NULL) ) {
+	if (pixbuf != NULL) {
 		frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 		delete [] pixbuf;
 	}
-	if (bDoPaint)
-		frameBuffer->blit();
 }
 
 void CVolume::refreshVolumebar(int current_volume)
