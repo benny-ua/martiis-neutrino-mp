@@ -187,6 +187,9 @@ void CLCD::showTime(bool)
 	switch (m) {
 		case LCD_DISPLAYMODE_TIMEONLY:
 			break;
+		case LCD_DISPLAYMODE_ON:
+			if (vfd_version == 4)
+				break;
 		case LCD_DISPLAYMODE_TIMEOFF:
 			ShowText(NULL);
 			waitSec = -1;
@@ -197,8 +200,6 @@ void CLCD::showTime(bool)
 			Clear();
 			if (vfd_version == 4) // return for simple 4-digit LED display
 				return;
-			break;
-		default:
 			break;
 	}
 
@@ -418,6 +419,9 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			if (!rescheduleTime)
 				break;
 			return;
+		case LCD_DISPLAYMODE_ON:
+			if (vfd_version == 4)
+				break;
 		case LCD_DISPLAYMODE_TIMEOFF:
 			if (rescheduleTime)
 				break;
@@ -425,8 +429,6 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 		case LCD_DISPLAYMODE_OFF:
 			Clear();
 			return;
-		default:
-			break;
 	}
 
         printf("CLCD::ShowText: [%s]\n", str);
