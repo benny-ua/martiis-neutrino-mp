@@ -44,6 +44,9 @@ class CRecordSetup : public CMenuTarget, public CChangeObserver
 		int showRecordSetup();
 		void showRecordTimerSetup(CMenuWidget *menu_timersettings);
 		void showRecordAudioSetup(CMenuWidget *menu_audiosettings);
+#ifdef MARTII // from pu/cc
+		void showRecordDataSetup(CMenuWidget *menu_datasettings);
+#endif
 		void showRecordTimeShiftSetup(CMenuWidget *menu_ts);
 
 	public:	

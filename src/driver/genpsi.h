@@ -28,21 +28,40 @@
 #define EN_TYPE_TELTEX          0x02
 #define EN_TYPE_PCR             0x03
 #define EN_TYPE_AVC           0x04
+#ifdef MARTII // pu/cc
+#define EN_TYPE_DVBSUB          0x06
+#endif
 
 class CGenPsi
 {
 	private:
+#ifdef MARTII // pu/cc
+		short  nba, nsub;
+#else
 		short  nba;
+#endif
 		uint16_t       vpid;
 		uint8_t        vtype;
+#ifdef MARTII // pu/cc
+		uint16_t       vtxtpid;
+		char           vtxtlang[3];
+#endif
 		uint16_t       apid[10];
 		short          atypes[10];
+#ifdef MARTII // pu/cc
+		uint16_t       dvbsubpid[10];
+		char           dvbsublang[10][3];
+#endif
 		static int copy_template(uint8_t *dst, uint8_t *src, int len);
 		uint32_t calc_crc32psi(uint8_t *dst, const uint8_t *src, uint32_t len);
 
 	public:
 		CGenPsi();
+#ifdef MARTII // pu/cc
+		void addPid(uint16_t pid,uint16_t pidtype, short isAC3, const char *data = NULL);
+#else
 		void addPid(uint16_t pid,uint16_t pidtype, short isAC3);
+#endif
 		int genpsi(int fd);
 };
 #endif

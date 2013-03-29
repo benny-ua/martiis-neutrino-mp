@@ -195,15 +195,25 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)) {
 		StreamPmtPid = true;
 		apids[numpids++] = allpids.PIDs.vtxtpid;
+#ifdef MARTII // pu/cc
+		psi.addPid(allpids.PIDs.vtxtpid, EN_TYPE_TELTEX, 0, channel->getTeletextLang());
+#endif
 	}
 
 	if (StreamSubtitlePids)
 		for (int i = 0 ; i < (int)channel->getSubtitleCount() ; ++i) {
 			CZapitAbsSub* s = channel->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
+#ifdef MARTII // pu/cc
+				if(i>9)//max sub pids
+					break;
+#endif
 				StreamPmtPid = true;
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				apids[numpids++] = sd->pId;
+#ifdef MARTII // pu/cc
+				psi.addPid( sd->pId, EN_TYPE_DVBSUB, 0, sd->ISO639_language_code.c_str() );
+#endif
 			}
 		}
 
@@ -214,8 +224,7 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 
 	if (StreamPAT)
 		apids[numpids++] = 0;
-	else
-		psi.genpsi(fd);
+	psi.genpsi(fd);
 
 	if(record == NULL) {
 		record = new cRecord(RECORD_DEMUX, g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);

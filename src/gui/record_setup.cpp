@@ -233,12 +233,6 @@ int CRecordSetup::showRecordSetup()
 	mf->setHint("", LOCALE_MENU_HINT_RECORD_APIDS);
 	recordingSettings->addItem(mf);
 
-#ifdef MARTII
-	recordingSettings->addItem(GenericMenuSeparatorLine);
-	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_pmt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_DVBSUB_PIDS, &g_settings.recording_stream_subtitle_pids, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	recordingSettings->addItem(new CMenuOptionChooser(LOCALE_RECORDINGMENU_VTXT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-#endif
 	int res = recordingSettings->exec(NULL, "");
 	delete recordingSettings;
 #ifdef MARTII
@@ -303,6 +297,33 @@ void CRecordSetup::showRecordAudioSetup(CMenuWidget *menu_audiosettings)
 	menu_audiosettings->addItem(aoj2);
 	menu_audiosettings->addItem(aoj3);
 }
+#ifdef MARTII // from pu/cc
+void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
+{
+	//recording data pids
+#ifdef MARTII
+	// PAT/PMT
+	CMenuOptionChooser* doj0 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+#endif
+
+	//teletext pids
+	CMenuOptionChooser* doj1 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_VTXT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+	CMenuOptionChooser* doj2 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_DVBSUB_PIDS, &g_settings.recording_stream_subtitle_pids, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+
+#ifdef MARTII
+	doj0->setHint("", LOCALE_MENU_HINT_RECORD_DATA_PMT);
+#endif
+	doj1->setHint("", LOCALE_MENU_HINT_RECORD_DATA_VTXT);
+	doj2->setHint("", LOCALE_MENU_HINT_RECORD_DATA_DVBSUB);
+
+	menu_datasettings->addIntroItems(LOCALE_RECORDINGMENU_DATA_PIDS);
+#ifdef MARTII
+	menu_datasettings->addItem(doj0);
+#endif
+	menu_datasettings->addItem(doj1);
+	menu_datasettings->addItem(doj2);
+}
+#endif
 
 void CRecordSetup::showRecordTimeShiftSetup(CMenuWidget *menu_ts)
 {
