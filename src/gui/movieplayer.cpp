@@ -1247,7 +1247,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	}
 	if (numpidd > 0)
 		APIDSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
-	if (numpidd > 0 || numpids > 0)
+	if (numpidd > 0 || numpids > 0 || numpidt > 0)
 		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
 #endif
 	if (p_movie_info) {
