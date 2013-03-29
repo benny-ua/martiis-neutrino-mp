@@ -177,6 +177,7 @@ class CLCD
 		void setled(int red, int green);
 		static void	*TimeThread(void *);
 		pthread_t	thrTime;
+		bool		thread_running;
 #ifdef MARTII
 		std::string	lastOutput;
 		int		fd;
@@ -186,11 +187,12 @@ class CLCD
 		bool		showclock;
 		bool		timeThreadRunning;
 		unsigned int	timeout_cnt;
-		int		vfd_version;
 #endif
-		bool		thread_running;
 #endif
 	public:
+#ifdef MARTII
+		int  vfd_version;
+#endif
 		bool has_lcd;
 		void wake_up();
 		void setled(void) { return; };

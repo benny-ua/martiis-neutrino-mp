@@ -316,6 +316,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 					if (pixbuf != NULL) {
 						frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 						delete [] pixbuf;
+#ifdef MARTII
+						frameBuffer->blit();
+#endif
 					}
 					if (do_vol) {
 						AudioMute(false, true);
@@ -338,6 +341,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 							if (pixbuf != NULL) {
 								frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 								delete []pixbuf;
+#ifdef MARTII
+								frameBuffer->blit();
+#endif
 							}
 							AudioMute(true, true);
 							Init();
@@ -390,6 +396,9 @@ void CVolume::setVolume(const neutrino_msg_t key, const bool bDoPaint, bool nowa
 	if (pixbuf != NULL) {
 		frameBuffer->RestoreScreen(x, y, vbar_w+ShadowOffset, vbar_h+ShadowOffset, pixbuf);
 		delete [] pixbuf;
+#ifdef MARTII
+		frameBuffer->blit();
+#endif
 	}
 }
 

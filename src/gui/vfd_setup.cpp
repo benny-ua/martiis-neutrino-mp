@@ -127,9 +127,16 @@ int CVfdSetup::showSetup()
 	vfds->addIntroItems(LOCALE_LCDMENU_HEAD);
 
 #ifdef MARTII
+	int displaymode_option_count = OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT;
+#if HAVE_SPARK_HARDWARE
+	if (CVFD::getInstance()->vfd_version != 4) {
+		displaymode_option_count = 2;
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_DISPLAYMODE] &= 1;
+	}
+#endif
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_RUNNING,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_DISPLAYMODE],
-		OPTIONS_LCD_DISPLAYMODE_OPTIONS, OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT, true, this));
+		OPTIONS_LCD_DISPLAYMODE_OPTIONS, displaymode_option_count, true, this));
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_STANDBY,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE],
 		OPTIONS_LCD_DISPLAYMODE_OPTIONS, 2, true));
