@@ -375,16 +375,8 @@ void CMoviePlayerGui::updateLcd()
 
 void CMoviePlayerGui::fillPids()
 {
-#ifdef MARTII
-	if(p_movie_info == NULL) {
-		probePids = true;
-		return;
-	}
-	probePids = false;
-#else
 	if(p_movie_info == NULL)
 		return;
-#endif
 
 	numpida = 0; currentapid = 0;
 #ifdef MARTII
@@ -638,18 +630,16 @@ void CMoviePlayerGui::PlayFile(void)
 		playback->Close();
 	} else {
 #ifdef MARTII
-		if(probePids){
-			playback->FindAllPids(apids, ac3flags, &numpida, language);
-			if (p_movie_info)
-				for (int i = 0; i < numpida; i++) {
-					EPG_AUDIO_PIDS pids;
-					pids.epgAudioPid = apids[i];
-					pids.selected = 0;
-					pids.atype = ac3flags[i];
-					pids.epgAudioPidName = language[i];
-					p_movie_info->audioPids.push_back(pids);
-				}
-		}
+		playback->FindAllPids(apids, ac3flags, &numpida, language);
+		if (p_movie_info)
+			for (int i = 0; i < numpida; i++) {
+				EPG_AUDIO_PIDS pids;
+				pids.epgAudioPid = apids[i];
+				pids.selected = 0;
+				pids.atype = ac3flags[i];
+				pids.epgAudioPidName = language[i];
+				p_movie_info->audioPids.push_back(pids);
+			}
 #endif
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, true);
@@ -1073,7 +1063,7 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool fil
 			break;
 		case 3: /*MP2*/
 #ifdef MARTII
-				apidtitle.append(" (MP2)");
+			apidtitle.append(" (MP2)");
 #else
 			apidtitle.append("( MP2)");
 #endif
@@ -1101,7 +1091,7 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool fil
 void CMoviePlayerGui::getCurrentAudioName( bool file_player, std::string &audioname)
 {
 #ifdef MARTII
-  	if(file_player && probePids){
+  	if(true){
 #else
   	if(file_player && !numpida){
 #endif
@@ -1147,14 +1137,13 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
 #ifdef MARTII
-	if(probePids){
-		// these may change in-stream
-		playback->FindAllPids(apids, ac3flags, &numpida, language);
-		playback->FindAllSubtitlePids(spids, &numpids, slanguage);
-		playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
-		if(numpida)
-			currentapid = apids[0];
-	}
+	// these may change in-stream
+	playback->FindAllPids(apids, ac3flags, &numpida, language);
+	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
+	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
+	if(numpida)
+		currentapid = apids[0];
+
 	std::string apidtitles[numpida];
 #else
 	if(file_player && !numpida){
