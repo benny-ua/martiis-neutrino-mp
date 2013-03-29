@@ -296,8 +296,8 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 		ptr++;
 printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
 		tuxtx_stop_subtitle();
-		tuxtx_set_pid(pid, page, ptr);
 		dvbsub_stop();
+		tuxtx_set_pid(pid, page, ptr);
 		tuxtx_main(g_RCInput->getFileHandle(), pid, page);
 	}
         return menu_return::RETURN_EXIT;
@@ -336,8 +336,9 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & Act
 printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
 		tuxtx_stop_subtitle();
 		tuxtx_set_pid(pid, page, ptr);
+		playback->SetTeletextPid(pid);
 		dvbsub_stop();
-		tuxtx_main(g_RCInput->getFileHandle(), pid, page, true);
+		tuxtx_main(0, pid, page, 0, true);
 	}
         return menu_return::RETURN_EXIT;
 }

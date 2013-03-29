@@ -383,7 +383,7 @@ void CMoviePlayerGui::fillPids()
 #ifdef MARTII
 	numpidd = 0; currentdpid = 0xffff;
 	numpids = 0; currentspid = 0xffff;
-	numpidt = 0; currenttxsub = "";
+	numpidt = 0; currentttxsub = "";
 #endif
 	if(!p_movie_info->audioPids.empty()) {
 		currentapid = p_movie_info->audioPids[0].epgAudioPid;
@@ -432,7 +432,7 @@ bool CMoviePlayerGui::SelectFile()
 		tpids[i] = 0;
 		tlanguage[i].clear();
 	}
-	numpidt = 0; currenttxsub = "";
+	numpidt = 0; currentttxsub = "";
 #endif
 
 	is_file_player = false;
@@ -1222,11 +1222,11 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		if (!magazine)
 			magazine = 8;
 		page |= magazine << 8;
-		char spid[20];
+		char spid[40];
 		snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", pid, page, lang);
 		char item[64];
-		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, page);
-		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, tlanguage[count] != currenttxsub, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, pid, page);
+		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, spid != currentttxsub, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
 		shortcut_num++;
 	}
 	for (unsigned int count = 0; count < numpidd; count++) {
@@ -1275,9 +1275,9 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 #endif
 #ifdef MARTII
 	if(SubtitleChanger.actionKey.substr(0, 3) == "TTX")
-		currenttxsub = SubtitleChanger.actionKey;
-	else if(SubtitleChanger.actionKey.substr(0, 3) == "off")
-		currenttxsub = "";
+		currentttxsub = SubtitleChanger.actionKey;
+	else if(SubtitleChanger.actionKey == "off")
+		currentttxsub = "";
 	if((select >= 0) && (select <= numpida) && (currentapid != apids[select])) {
 #else
 	if((select >= 0) && (currentapid != apids[select])) {
@@ -1576,7 +1576,6 @@ void CMoviePlayerGui::StopSubtitles(bool b)
 		tuxtx_pause_subtitle(true);
 		frameBuffer->paintBackground();
 	}
-	currenttxsub = "";
 #ifdef ENABLE_GRAPHLCD // MARTII
 	if (b)
 		nGLCD::MirrorOSD();
@@ -1591,8 +1590,8 @@ void CMoviePlayerGui::StartSubtitles(bool show)
 #endif
 	if(!show)
 		return;
-	dvbsub_start(0, true);
-//	tuxtx_pause_subtitle(false);
 	playback->SuspendSubtitle(false);
+	dvbsub_start(0, true);
+	tuxtx_pause_subtitle(false);
 }
 #endif

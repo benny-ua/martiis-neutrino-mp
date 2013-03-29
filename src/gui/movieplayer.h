@@ -98,7 +98,7 @@ class CMoviePlayerGui : public CMenuTarget
 #define REC_MAX_TPIDS 50 // not pids, actually. A pid may over multiple subtitle pages
 	std::string    tlanguage[REC_MAX_TPIDS];
 	unsigned short tpids[REC_MAX_TPIDS];
-	std::string currenttxsub;
+	std::string currentttxsub;
 
 	bool isWebTV;
 	bool showWebTVHint;

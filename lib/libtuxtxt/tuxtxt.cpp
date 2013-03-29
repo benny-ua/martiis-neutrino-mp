@@ -1634,7 +1634,11 @@ static void* reader_thread(void * /*arg*/)
 void tuxtx_pause_subtitle(bool pause)
 {
 	if(!pause) {
+#ifdef MARTII
+		printf("TuxTxt subtitle unpause, running %d pid %d page %x\n", reader_running, sub_pid, sub_page);
+#else
 		printf("TuxTxt subtitle unpause, running %d pid %d page %d\n", reader_running, sub_pid, sub_page);
+#endif
 		ttx_paused = 0;
 		if(!reader_running && sub_pid && sub_page)
 #ifdef MARTII
