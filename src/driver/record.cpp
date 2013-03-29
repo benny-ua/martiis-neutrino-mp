@@ -195,6 +195,7 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)) {
 		StreamPmtPid = true;
 		apids[numpids++] = allpids.PIDs.vtxtpid;
+		// FIXME. This doesn't add TTX subtitles.
 #ifdef MARTII // pu/cc
 		psi.addPid(allpids.PIDs.vtxtpid, EN_TYPE_TELTEX, 0, channel->getTeletextLang());
 #endif
@@ -205,7 +206,7 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 			CZapitAbsSub* s = channel->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
 #ifdef MARTII // pu/cc
-				if(i>9)//max sub pids
+				if(i>REC_MAX_DPIDS - 1)//max sub pids
 					break;
 #endif
 				StreamPmtPid = true;

@@ -178,8 +178,9 @@ public:
 class CMPSubtitleChangeExec : public CMenuTarget
 {
 	public:
-		int exec(CMenuTarget* parent, const std::string & actionKey);
+		int exec(CMenuTarget* parent, const std::string & ActionKey);
 		cPlayback *playback;
+		std::string actionKey;
 };
 #endif
 #endif

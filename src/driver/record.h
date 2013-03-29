@@ -47,9 +47,13 @@
 
 #include <OpenThreads/Mutex>
 
-#define REC_MAX_APIDS 10
 #ifdef MARTII
-#define REC_MAX_DPIDS 10
+#define REC_MAX_APIDS 20
+#else
+#define REC_MAX_APIDS 10
+#endif
+#ifdef MARTII
+#define REC_MAX_DPIDS 20
 #endif
 #define FILENAMEBUFFERSIZE 1024
 #if HAVE_TRIPLEDRAGON

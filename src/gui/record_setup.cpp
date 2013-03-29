@@ -233,6 +233,14 @@ int CRecordSetup::showRecordSetup()
 	mf->setHint("", LOCALE_MENU_HINT_RECORD_APIDS);
 	recordingSettings->addItem(mf);
 
+#ifdef MARTII //from pu/cc
+	//datasettings
+	CMenuWidget recordingaDataSettings(LOCALE_MAINSETTINGS_RECORDING, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_RECORDSETUP_DATASETTINGS);
+	showRecordDataSetup(&recordingaDataSettings);
+	mf = new CMenuForwarder(LOCALE_RECORDINGMENU_DATA_PIDS, true, NULL, &recordingaDataSettings, NULL,  CRCInput::RC_1);
+	mf->setHint("", LOCALE_MENU_HINT_RECORD_DATA);
+	recordingSettings->addItem(mf);
+#endif
 	int res = recordingSettings->exec(NULL, "");
 	delete recordingSettings;
 #ifdef MARTII

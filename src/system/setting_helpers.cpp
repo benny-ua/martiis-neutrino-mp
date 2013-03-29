@@ -303,9 +303,12 @@ printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, pt
         return menu_return::RETURN_EXIT;
 }
 #ifdef MARTII
-int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
+int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & ActionKey)
 {
+	actionKey = ActionKey;
+
 	if(actionKey == "off") {
+		tuxtx_stop_subtitle();
 		playback->SetDvbsubtitlePid(0xffff);
 		playback->SetSubtitlePid(0xffff);
 		dvbsub_stop();
@@ -321,6 +324,20 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & act
 		int pid = atoi(pidptr+1);
 		dvbsub_pause();
 		playback->SetSubtitlePid(pid);
+	} else {
+		char const * ptr = strchr(actionKey.c_str(), ':');
+		ptr++;
+		int pid = atoi(ptr);
+		ptr = strchr(ptr, ':');
+		ptr++;
+		int page = strtol(ptr, NULL, 16);
+		ptr = strchr(ptr, ':');
+		ptr++;
+printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
+		tuxtx_stop_subtitle();
+		tuxtx_set_pid(pid, page, ptr);
+		dvbsub_stop();
+		tuxtx_main(g_RCInput->getFileHandle(), pid, page, true);
 	}
         return menu_return::RETURN_EXIT;
 }

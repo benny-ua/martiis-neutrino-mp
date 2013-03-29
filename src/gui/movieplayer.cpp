@@ -189,6 +189,7 @@ void CMoviePlayerGui::Init(void)
 #ifdef MARTII
 	numpidd = 0;
 	numpids = 0;
+	numpidt = 0;
 #endif
 }
 
@@ -382,6 +383,7 @@ void CMoviePlayerGui::fillPids()
 #ifdef MARTII
 	numpidd = 0; currentdpid = 0xffff;
 	numpids = 0; currentspid = 0xffff;
+	numpidt = 0; currenttxsub = "";
 #endif
 	if(!p_movie_info->audioPids.empty()) {
 		currentapid = p_movie_info->audioPids[0].epgAudioPid;
@@ -425,6 +427,12 @@ bool CMoviePlayerGui::SelectFile()
 		dlanguage[i].clear();
 	}
 	numpidd = 0; currentdpid = 0xffff;
+	// clear dvbsubtitlepids
+	for (int i = 0; i < numpidt; i++) {
+		tpids[i] = 0;
+		tlanguage[i].clear();
+	}
+	numpidt = 0; currenttxsub = "";
 #endif
 
 	is_file_player = false;
@@ -1143,6 +1151,8 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	playback->FindAllPids(apids, ac3flags, &numpida, language);
 	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
 	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
+	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
+
 	if(numpida)
 		currentapid = apids[0];
 
@@ -1193,31 +1203,32 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		APIDSelector.addItem(item, defpid);
 	}
 
-	if (p_movie_info) {
-		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-
-		CVolume::getInstance()->SetCurrentChannel(p_movie_info->epgId);
-		CVolume::getInstance()->SetCurrentPid(currentapid);
-		int percent[numpida];
-		for (uint i=0; i < numpida; i++) {
-			percent[i] = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, apids[i], ac3flags[i]);
-			APIDSelector.addItem(new CMenuOptionNumberChooser(NONEXISTANT_LOCALE, &percent[i],
-						currentapid == apids[i],
-						0, 999, CVolume::getInstance(), 0, 0, NONEXISTANT_LOCALE,
-						p_movie_info->audioPids[i].epgAudioPidName.c_str()));
-		}
-	}
-
 #ifdef MARTII
 	unsigned int shortcut_num = numpida + 1;
 	currentdpid = playback->GetDvbsubtitlePid();
 	currentspid = playback->GetSubtitlePid();
-	if (numpidd > 0 || numpids > 0)
+	if (numpidd > 0 || numpids > 0 || numpidt > 0)
 		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
 
 	CMPSubtitleChangeExec SubtitleChanger;
 	SubtitleChanger.playback = playback;
 
+	for (unsigned int count = 0; count < numpidt; count++) {
+		char lang[10];
+		unsigned int type, magazine, page;
+		int pid;
+		if (5 != sscanf(tlanguage[count].c_str(), "%d %s %u %u %u", &pid, lang, &type, &magazine, &page))
+			continue;
+		if (!magazine)
+			magazine = 8;
+		page |= magazine << 8;
+		char spid[20];
+		snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", pid, page, lang);
+		char item[64];
+		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, page);
+		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, tlanguage[count] != currenttxsub, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		shortcut_num++;
+	}
 	for (unsigned int count = 0; count < numpidd; count++) {
 		char spid[10];
 		snprintf(spid,sizeof(spid), "DVB:%d", dpids[count]);
@@ -1239,6 +1250,21 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	if (numpidd > 0 || numpids > 0)
 		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
 #endif
+	if (p_movie_info) {
+		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
+
+		CVolume::getInstance()->SetCurrentChannel(p_movie_info->epgId);
+		CVolume::getInstance()->SetCurrentPid(currentapid);
+		int percent[numpida];
+		for (uint i=0; i < numpida; i++) {
+			percent[i] = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, apids[i], ac3flags[i]);
+			APIDSelector.addItem(new CMenuOptionNumberChooser(NONEXISTANT_LOCALE, &percent[i],
+						currentapid == apids[i],
+						0, 999, CVolume::getInstance(), 0, 0, NONEXISTANT_LOCALE,
+						p_movie_info->audioPids[i].epgAudioPidName.c_str()));
+		}
+	}
+
 	APIDSelector.exec(NULL, "");
 	delete selector;
 #ifdef MARTII
@@ -1248,6 +1274,10 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	printf("CMoviePlayerGui::selectAudioPid: selected %d (%x) current %x\n", select, (select >= 0) ? apids[select] : -1, currentapid);
 #endif
 #ifdef MARTII
+	if(SubtitleChanger.actionKey.substr(0, 3) == "TTX")
+		currenttxsub = SubtitleChanger.actionKey;
+	else if(SubtitleChanger.actionKey.substr(0, 3) == "off")
+		currenttxsub = "";
 	if((select >= 0) && (select <= numpida) && (currentapid != apids[select])) {
 #else
 	if((select >= 0) && (currentapid != apids[select])) {
@@ -1534,18 +1564,19 @@ void CMoviePlayerGui::showHelpTS()
 void CMoviePlayerGui::StopSubtitles(bool b)
 {
 	printf("[neutrino] %s\n", __FUNCTION__);
-	//int ttx, ttxpid, ttxpage;
+	int ttx, ttxpid, ttxpage;
 	int dvbpid;
 
 	dvbpid = dvbsub_getpid();
-	//tuxtx_subtitle_running(&ttxpid, &ttxpage, &ttx);
+	tuxtx_subtitle_running(&ttxpid, &ttxpage, &ttx);
 	if(dvbpid)
 		dvbsub_pause();
 	playback->SuspendSubtitle(true);
-//	if(ttx) {
-//		tuxtx_pause_subtitle(true);
-//		frameBuffer->paintBackground();
-//	}
+	if(ttx) {
+		tuxtx_pause_subtitle(true);
+		frameBuffer->paintBackground();
+	}
+	currenttxsub = "";
 #ifdef ENABLE_GRAPHLCD // MARTII
 	if (b)
 		nGLCD::MirrorOSD();

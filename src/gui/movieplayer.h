@@ -93,6 +93,12 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string    dlanguage[REC_MAX_DPIDS];
 	unsigned short dpids[REC_MAX_DPIDS];
 	unsigned short currentdpid;
+	// teletext subtitle data
+	unsigned short numpidt;
+#define REC_MAX_TPIDS 50 // not pids, actually. A pid may over multiple subtitle pages
+	std::string    tlanguage[REC_MAX_TPIDS];
+	unsigned short tpids[REC_MAX_TPIDS];
+	std::string currenttxsub;
 
 	bool isWebTV;
 	bool showWebTVHint;
