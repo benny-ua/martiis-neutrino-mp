@@ -882,7 +882,7 @@ void CMoviePlayerGui::PlayFile(void)
 			update_lcd = true;
 			//showHelpTS();
 #ifdef MARTII
-		} else if(timeshift && (((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt) && (!p_movie_info || !p_movie_info->epgVTXPID)) || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
+		} else if(timeshift && ((((msg == CRCInput::RC_text && !g_settings.recording_stream_vtxt_pid) || msg == (neutrino_msg_t) g_settings.mpkey_vtxt) && (!p_movie_info || !p_movie_info->epgVTXPID)) || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 #else
 		} else if(timeshift && (msg == CRCInput::RC_text || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 #endif
