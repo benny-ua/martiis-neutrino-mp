@@ -954,10 +954,13 @@ void CMoviePlayerGui::PlayFile(void)
 			playback->SetTeletextPid(p_movie_info->epgVTXPID);
 			StopSubtitles(true);
 			tuxtx_stop_subtitle();
-			currentttxsub = "";
 			tuxtx_main(g_RCInput->getFileHandle(), p_movie_info->epgVTXPID, 0, 2, true);
+			if (currentttxsub != "") {
+				CMPSubtitleChangeExec SubtitleChanger;
+				SubtitleChanger.playback = playback;
+				SubtitleChanger.exec(NULL, currentttxsub);
+			}
 			StartSubtitles();
-			playback->SetTeletextPid(0);
 			frameBuffer->paintBackground();
 			//purge input queue
 			do
