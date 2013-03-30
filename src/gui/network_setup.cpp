@@ -390,7 +390,7 @@ int CNetworkSetup::showNetworkSetup()
 
 	delete networkSettings;
 	delete sectionsdConfigNotifier;
-#ifdef MARTII
+#if 0 //#ifdef MARTII
 	// Width may have changed.
 	CFrameBuffer::getInstance()->Clear();
 	CFrameBuffer::getInstance()->blit();
@@ -668,7 +668,7 @@ bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void * Data)
 		network_netmask = networkConfig->netmask;
 
 	} else if(locale == LOCALE_NETWORKMENU_SELECT_IF) {
-#ifdef MARTII
+#if 0 //#ifdef MARTII
 		// Width may change. Clear framebuffer, caller will redraw anyway.
 		CFrameBuffer::getInstance()->Clear();
 		CFrameBuffer::getInstance()->blit();
