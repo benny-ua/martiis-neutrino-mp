@@ -897,6 +897,10 @@ void CMoviePlayerGui::PlayFile(void)
 			else if(msg == NeutrinoMessages::SHOW_EPG)
 				g_EpgData->show(CNeutrinoApp::getInstance()->channelList->getActiveChannel_ChannelID());
 			else {
+#ifdef MARTII
+				tuxtx_stop_subtitle();
+				currentttxsub = "";
+#endif
 				if(g_settings.cacheTXT)
 					tuxtxt_stop();
 				tuxtx_main(g_RCInput->getFileHandle(), g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
@@ -949,6 +953,8 @@ void CMoviePlayerGui::PlayFile(void)
 				tuxtxt_stop();
 			playback->SetTeletextPid(p_movie_info->epgVTXPID);
 			StopSubtitles(true);
+			tuxtx_stop_subtitle();
+			currentttxsub = "";
 			tuxtx_main(g_RCInput->getFileHandle(), p_movie_info->epgVTXPID, 0, 2, true);
 			StartSubtitles();
 			playback->SetTeletextPid(0);
@@ -994,6 +1000,9 @@ void CMoviePlayerGui::PlayFile(void)
 		}
 	}
 #ifdef MARTII
+	tuxtx_stop_subtitle();
+	dvbsub_stop();
+
 	frameBuffer->set3DMode(old3dmode);
 	if (p_movie_info)
 		nGLCD::unlockChannel();

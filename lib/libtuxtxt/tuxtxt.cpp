@@ -1715,6 +1715,7 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 #ifdef MARTII
 	if (isTtxEplayer != isEplayer) {
 		tuxtxt_stop();
+		tuxtxt_clear_cache();
 		isTtxEplayer = isEplayer;
 	}
 #endif
