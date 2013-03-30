@@ -334,10 +334,10 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & Act
 		ptr = strchr(ptr, ':');
 		ptr++;
 printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
-		tuxtx_stop_subtitle();
-		tuxtx_set_pid(pid, page, ptr);
-		playback->SetTeletextPid(pid);
 		dvbsub_stop();
+		tuxtx_stop_subtitle();
+		playback->SetTeletextPid(pid);
+		tuxtx_set_pid(pid, page, ptr);
 		tuxtx_main(0, pid, page, 0, true);
 	}
         return menu_return::RETURN_EXIT;

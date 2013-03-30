@@ -1713,7 +1713,10 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 	char cvs_revision[] = "$Revision: 1.95 $";
 
 #ifdef MARTII
-	isTtxEplayer = isEplayer;
+	if (isTtxEplayer != isEplayer) {
+		tuxtxt_stop();
+		isTtxEplayer = isEplayer;
+	}
 #endif
 	use_gui = 1;
 	boxed = 0;
