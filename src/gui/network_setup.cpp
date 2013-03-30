@@ -390,7 +390,7 @@ int CNetworkSetup::showNetworkSetup()
 
 	delete networkSettings;
 	delete sectionsdConfigNotifier;
-#if 0 //#ifdef MARTII
+#ifdef MARTII
 	// Width may have changed.
 	CFrameBuffer::getInstance()->Clear();
 	CFrameBuffer::getInstance()->blit();
@@ -668,7 +668,7 @@ bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void * Data)
 		network_netmask = networkConfig->netmask;
 
 	} else if(locale == LOCALE_NETWORKMENU_SELECT_IF) {
-#if 0 //#ifdef MARTII
+#ifdef MARTII
 		// Width may change. Clear framebuffer, caller will redraw anyway.
 		CFrameBuffer::getInstance()->Clear();
 		CFrameBuffer::getInstance()->blit();
@@ -694,7 +694,11 @@ bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void * Data)
 		for(int i = 0; i < ecnt; i++)
 			dhcpDisable[i]->setActive(CNetworkConfig::getInstance()->inet_static);
 	}
+#ifdef MARTII
+	return true; // repaint
+#else
 	return false;
+#endif
 }
 
 //sets menu mode to "wizard" or "default"
