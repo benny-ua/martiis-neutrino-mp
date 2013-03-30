@@ -91,6 +91,7 @@
 #ifdef MARTII
 #include "gui/batchepg.h"
 #include "gui/screensetup.h"
+#include "gui/webtv.h"
 #include <system/set_threadname.h>
 #endif
 #if HAVE_COOL_HARDWARE
@@ -4161,6 +4162,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		}
 	}
 # endif 
+	else if(actionKey=="webtv") {
+		CWebTV w;
+		w.exec(this, "");
+	}
 #endif
 	else if(actionKey=="restart") {
 		if (recordingstatus)

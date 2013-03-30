@@ -442,6 +442,14 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, "3dmode", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
+		case SNeutrinoSettings::ITEM_WEBTV:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_WEBTV;
+			keyhelper.get(&key,&icon);
+			//keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, CNeutrinoApp::getInstance(), "webtv", key, icon);
+			menu->addItem(menu_item, 0);
+			break;
 #endif
 		default:
 			printf("[neutrino] WARNING! menu wrong item!!\n");

@@ -727,6 +727,7 @@ struct SNeutrinoSettings
                 ITEM_EMU_RESTART,
                 ITEM_TUNER_RESTART,
                 ITEM_THREE_D_MODE,
+                ITEM_WEBTV,
 #endif
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
