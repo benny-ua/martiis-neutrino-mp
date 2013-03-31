@@ -85,17 +85,25 @@ class CMoviePlayerGui : public CMenuTarget
 #ifdef MARTII
 	// subtitle data
 	unsigned short numpids;
-	std::string    slanguage[REC_MAX_DPIDS];
-	unsigned short spids[REC_MAX_DPIDS];
+#ifndef REC_MAX_SPIDS
+#define REC_MAX_SPIDS 20 // whatever
+#endif
+	std::string    slanguage[REC_MAX_SPIDS];
+	unsigned short spids[REC_MAX_SPIDS];
 	unsigned short currentspid;
 	// dvb subtitle data
 	unsigned short numpidd;
+#ifndef REC_MAX_DPIDS
+#define REC_MAX_DPIDS 20 // whatever
+#endif
 	std::string    dlanguage[REC_MAX_DPIDS];
 	unsigned short dpids[REC_MAX_DPIDS];
 	unsigned short currentdpid;
 	// teletext subtitle data
 	unsigned short numpidt;
-#define REC_MAX_TPIDS 50 // not pids, actually. A pid may over multiple subtitle pages
+#ifndef REC_MAX_TPIDS
+#define REC_MAX_TPIDS 50 // not pids, actually -- a pid may cover multiple subtitle pages
+#endif
 	std::string    tlanguage[REC_MAX_TPIDS];
 	unsigned short tpids[REC_MAX_TPIDS];
 	std::string currentttxsub;

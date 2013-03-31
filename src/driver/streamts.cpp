@@ -130,9 +130,11 @@ bool CStreamInstance::Send(ssize_t r)
 #endif
 		} while ((ret != r) && (i-- > 0));
 		if (ret != r) {
+#ifndef MARTII
 			if (r < 0)
 				perror("send");
 			printf("send err, fd %d: (%d from %d)\n", *it, ret, (int)r);
+#endif
 		}
 	}
 	mutex.unlock();

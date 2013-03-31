@@ -1170,7 +1170,7 @@ int tuxtxt_stop_thread()
 		dmx = NULL;
 	}
 #ifdef MARTII
-	if (isTtxEplayer && eplayer_fd > -1) {
+	if (eplayer_fd > -1) {
 		close(eplayer_fd);
 		eplayer_fd = -1;
 	}

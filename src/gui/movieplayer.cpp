@@ -381,8 +381,8 @@ void CMoviePlayerGui::fillPids()
 
 	numpida = 0; currentapid = 0;
 #ifdef MARTII
-	numpidd = 0; currentdpid = 0xffff;
-	numpids = 0; currentspid = 0xffff;
+	numpidd = 0; currentdpid = 0;
+	numpids = 0; currentspid = 0;
 	numpidt = 0; currentttxsub = "";
 #endif
 	if(!p_movie_info->audioPids.empty()) {
@@ -397,6 +397,10 @@ void CMoviePlayerGui::fillPids()
 			currentapid = p_movie_info->audioPids[i].epgAudioPid;
 			currentac3 = p_movie_info->audioPids[i].atype;
 		}
+#ifdef MARTII
+		if (numpida == REC_MAX_APIDS)
+			break;
+#endif
 	}
 	vpid = p_movie_info->epgVideoPid;
 	vtype = p_movie_info->VideoType;
@@ -420,7 +424,7 @@ bool CMoviePlayerGui::SelectFile()
 		spids[i] = 0;
 		slanguage[i].clear();
 	}
-	numpids = 0; currentspid = 0xffff;
+	numpids = 0; currentspid = 0;
 	// clear dvbsubtitlepids
 	for (int i = 0; i < numpidd; i++) {
 		dpids[i] = 0;
@@ -589,7 +593,8 @@ void CMoviePlayerGui::PlayFile(void)
 	cutNeutrino();
 #ifdef MARTII
 	playback = new cPlayback(3, &framebuffer_callback);
-	playback->SetTeletextPid(0);
+	CMPSubtitleChangeExec SubtitleChanger(playback);
+	playback->SetTeletextPid(0xffff);
 #endif
 	playback->Open(is_file_player ? PLAYMODE_FILE : PLAYMODE_TS);
 
@@ -638,6 +643,7 @@ void CMoviePlayerGui::PlayFile(void)
 		playback->Close();
 	} else {
 #ifdef MARTII
+		numpida = REC_MAX_APIDS;
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
 		if (p_movie_info)
 			for (int i = 0; i < numpida; i++) {
@@ -764,7 +770,7 @@ void CMoviePlayerGui::PlayFile(void)
 		} else if (msg == (neutrino_msg_t) CRCInput::RC_setup) {
 			StopSubtitles(true);
 			CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::SHOW_MAINSETTINGS, 0);
-			StartSubtitles();
+			StartSubtitles(true);
 #endif
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_play) {
 			if (playstate > CMoviePlayerGui::PLAY) {
@@ -803,7 +809,7 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 			selectAudioPid(is_file_player);
 #ifdef MARTII
-			StartSubtitles();
+			StartSubtitles(true);
 #endif
 			update_lcd = true;
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_time) {
@@ -882,7 +888,38 @@ void CMoviePlayerGui::PlayFile(void)
 			update_lcd = true;
 			//showHelpTS();
 #ifdef MARTII
-		} else if(timeshift && ((((msg == CRCInput::RC_text && !g_settings.recording_stream_vtxt_pid) || msg == (neutrino_msg_t) g_settings.mpkey_vtxt) && (!p_movie_info || !p_movie_info->epgVTXPID)) || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
+		} else if((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
+			uint16_t pid = playback->GetTeletextPid();
+			if (pid) {
+				playback->SetTeletextPid(0xffff);
+				StopSubtitles(true);
+				if(g_settings.cacheTXT)
+					tuxtxt_stop();
+				playback->SetTeletextPid(pid);
+				tuxtx_stop_subtitle();
+				tuxtx_main(g_RCInput->getFileHandle(), pid, 0, 2, true);
+				tuxtxt_stop();
+				playback->SetTeletextPid(0xffff);
+				if (currentttxsub != "")
+					SubtitleChanger.exec(NULL, currentttxsub);
+				StartSubtitles(true);
+				frameBuffer->paintBackground();
+				//purge input queue
+				do
+					g_RCInput->getMsg(&msg, &data, 1);
+				while (msg != CRCInput::RC_timeout);
+			} else if (g_RemoteControl->current_PIDs.PIDs.vtxtpid) {
+				StopSubtitles(true);
+				// The playback stream doesn't come with teletext.
+				tuxtx_main(g_RCInput->getFileHandle(), g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
+				frameBuffer->paintBackground();
+				StartSubtitles(true);
+				//purge input queue
+				do
+					g_RCInput->getMsg(&msg, &data, 1);
+				while (msg != CRCInput::RC_timeout);
+			}
+		} else if(timeshift && (msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 #else
 		} else if(timeshift && (msg == CRCInput::RC_text || msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 #endif
@@ -896,24 +933,16 @@ void CMoviePlayerGui::PlayFile(void)
 				g_EventList->exec(CNeutrinoApp::getInstance()->channelList->getActiveChannel_ChannelID(), CNeutrinoApp::getInstance()->channelList->getActiveChannelName());
 			else if(msg == NeutrinoMessages::SHOW_EPG)
 				g_EpgData->show(CNeutrinoApp::getInstance()->channelList->getActiveChannel_ChannelID());
+#ifndef MARTII
 			else {
-#ifdef MARTII
-				tuxtx_stop_subtitle();
-				currentttxsub = "";
-#endif
 				if(g_settings.cacheTXT)
 					tuxtxt_stop();
 				tuxtx_main(g_RCInput->getFileHandle(), g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
 				frameBuffer->paintBackground();
-#ifdef MARTII
-				//purge input queue
-				do
-					g_RCInput->getMsg(&msg, &data, 1);
-				while (msg != CRCInput::RC_timeout);
-#endif
 			}
+#endif
 #ifdef MARTII
-			StartSubtitles();
+			StartSubtitles(true);
 #endif
 			if(restore)
 				FileTime.show(position);
@@ -946,26 +975,6 @@ void CMoviePlayerGui::PlayFile(void)
 			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
 				sc->EnableVideo(true);
 			sc->Start();
-#endif
-#ifdef MARTII
-		} else if (p_movie_info && p_movie_info->epgVTXPID && (msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
-			if(g_settings.cacheTXT)
-				tuxtxt_stop();
-			playback->SetTeletextPid(p_movie_info->epgVTXPID);
-			StopSubtitles(true);
-			tuxtx_stop_subtitle();
-			tuxtx_main(g_RCInput->getFileHandle(), p_movie_info->epgVTXPID, 0, 2, true);
-			if (currentttxsub != "") {
-				CMPSubtitleChangeExec SubtitleChanger;
-				SubtitleChanger.playback = playback;
-				SubtitleChanger.exec(NULL, currentttxsub);
-			}
-			StartSubtitles();
-			frameBuffer->paintBackground();
-			//purge input queue
-			do
-				g_RCInput->getMsg(&msg, &data, 1);
-			while (msg != CRCInput::RC_timeout);
 #endif
 
 		} else if ( msg == NeutrinoMessages::ANNOUNCE_RECORD ||
@@ -1003,6 +1012,7 @@ void CMoviePlayerGui::PlayFile(void)
 		}
 	}
 #ifdef MARTII
+	playback->SetTeletextPid(0xffff);    
 	tuxtx_stop_subtitle();
 	dvbsub_stop();
 
@@ -1016,6 +1026,7 @@ void CMoviePlayerGui::PlayFile(void)
 	playback->SetSpeed(1);
 	playback->Close();
 #ifdef MARTII
+	SubtitleChanger.exec(NULL, "off");
 	delete playback;
 	playback = NULL;
 	CScreenSetup cSS;
@@ -1114,6 +1125,7 @@ void CMoviePlayerGui::getCurrentAudioName( bool file_player, std::string &audion
 {
 #ifdef MARTII
   	if(true){
+		numpida = REC_MAX_APIDS;
 #else
   	if(file_player && !numpida){
 #endif
@@ -1160,9 +1172,13 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 
 #ifdef MARTII
 	// these may change in-stream
+	numpida = REC_MAX_APIDS;
 	playback->FindAllPids(apids, ac3flags, &numpida, language);
+	numpids = REC_MAX_SPIDS;
 	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
+	numpidd = REC_MAX_DPIDS;
 	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
+	numpidt = REC_MAX_TPIDS;
 	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
 
 	if(numpida)
@@ -1222,8 +1238,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	if (numpidd > 0 || numpids > 0 || numpidt > 0)
 		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
 
-	CMPSubtitleChangeExec SubtitleChanger;
-	SubtitleChanger.playback = playback;
+	CMPSubtitleChangeExec SubtitleChanger(playback);
 
 	for (unsigned int count = 0; count < numpidt; count++) {
 		char lang[10];
@@ -1238,7 +1253,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", pid, page, lang);
 		char item[64];
 		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, pid, page);
-		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, spid != currentttxsub, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, strcmp(spid, currentttxsub.c_str()), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
 		shortcut_num++;
 	}
 	for (unsigned int count = 0; count < numpidd; count++) {
@@ -1260,7 +1275,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	if (numpidd > 0)
 		APIDSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
 	if (numpidd > 0 || numpids > 0 || numpidt > 0)
-		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid != 0xffff /*|| currentspid != 0xffff*/, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
+		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid || currentspid /* FIXME -- stoppable? */|| currentttxsub.length(), NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
 #endif
 	if (p_movie_info) {
 		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));

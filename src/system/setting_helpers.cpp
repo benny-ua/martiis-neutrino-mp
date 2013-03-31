@@ -311,6 +311,7 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & Act
 		tuxtx_stop_subtitle();
 		playback->SetDvbsubtitlePid(0xffff);
 		playback->SetSubtitlePid(0xffff);
+		playback->SetTeletextPid(0xffff);
 		dvbsub_stop();
 	} else if(!strncmp(actionKey.c_str(), "DVB", 3)) {
 		char const * pidptr = strchr(actionKey.c_str(), ':');

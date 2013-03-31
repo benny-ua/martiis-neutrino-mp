@@ -1777,7 +1777,11 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 	if(tuxtxt_cache.vtxtpid == 0)
 		printf("[tuxtxt] No PID given, so scanning for PIDs ...\n\n");
 	else
+#ifdef MARTII
+		printf("[tuxtxt] using PID %x page %x\n", tuxtxt_cache.vtxtpid, tuxtxt_cache.page);
+#else
 		printf("[tuxtxt] using PID %x page %d\n", tuxtxt_cache.vtxtpid, tuxtxt_cache.page);
+#endif
 
 	fcntl(rc, F_SETFL, fcntl(rc, F_GETFL) | O_EXCL | O_NONBLOCK);
 
