@@ -424,7 +424,7 @@ bool CMoviePlayerGui::SelectFile()
 		spids[i] = 0;
 		slanguage[i].clear();
 	}
-	numpids = 0; currentspid = 0;
+	numpids = 0; currentspid = 0xffff;
 	// clear dvbsubtitlepids
 	for (int i = 0; i < numpidd; i++) {
 		dpids[i] = 0;

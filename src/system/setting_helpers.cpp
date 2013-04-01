@@ -307,25 +307,21 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & Act
 {
 	actionKey = ActionKey;
 
-	if(actionKey == "off") {
-		tuxtx_stop_subtitle();
-		playback->SetDvbsubtitlePid(0xffff);
-		playback->SetSubtitlePid(0xffff);
-		playback->SetTeletextPid(0xffff);
-		dvbsub_stop();
-	} else if(!strncmp(actionKey.c_str(), "DVB", 3)) {
+	tuxtx_stop_subtitle();
+	playback->SetDvbsubtitlePid(0xffff);
+	playback->SetSubtitlePid(0xffff);
+	playback->SetTeletextPid(0xffff);
+	dvbsub_stop();
+	if(!strncmp(actionKey.c_str(), "DVB", 3)) {
 		char const * pidptr = strchr(actionKey.c_str(), ':');
 		int pid = atoi(pidptr+1);
-		dvbsub_pause();
-		playback->SetSubtitlePid(0xffff);
 		playback->SetDvbsubtitlePid(pid);
 		dvbsub_start(pid, true);
 	} else if(!strncmp(actionKey.c_str(), "SUB", 3)) {
 		char const * pidptr = strchr(actionKey.c_str(), ':');
 		int pid = atoi(pidptr+1);
-		dvbsub_pause();
 		playback->SetSubtitlePid(pid);
-	} else {
+	} else if(!strncmp(actionKey.c_str(), "TTX", 3)) {
 		char const * ptr = strchr(actionKey.c_str(), ':');
 		ptr++;
 		int pid = atoi(ptr);
@@ -335,8 +331,6 @@ int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & Act
 		ptr = strchr(ptr, ':');
 		ptr++;
 printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
-		dvbsub_stop();
-		tuxtx_stop_subtitle();
 		playback->SetTeletextPid(pid);
 		tuxtx_set_pid(pid, page, ptr);
 		tuxtx_main(0, pid, page, 0, true);
