@@ -3034,6 +3034,10 @@ int CMovieBrowser::showMovieInfoMenu(MI_MOVIE_INFO* movie_info)
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_PREVPLAYDATE,   false, dateUserDateInput.getValue()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_RECORDDATE,     false, recUserDateInput.getValue()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_SIZE,           false, size,     NULL));
+#ifdef MARTII
+    movieInfoMenu.addItem(GenericMenuSeparatorLine);
+    movieInfoMenu.addItem(GenericMenuBack);
+#endif
 
     int res = movieInfoMenu.exec(NULL,"");
 
