@@ -75,11 +75,7 @@ extern "C" {
 }
 
 //-------------------------------------------------------------------------
-#ifdef MARTII
-CRecordInstance::CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift, bool stream_vtxt_pid, bool stream_pmt_pid, bool stream_subtitle_pids)
-#else
-CRecordInstance::CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift, bool stream_vtxt_pid, bool stream_pmt_pid)
-#endif
+CRecordInstance::CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift, bool stream_vtxt_pid, bool stream_pmt_pid, bool stream_subtitle_pids )
 {
 	channel_id = eventinfo->channel_id;
 	epgid = eventinfo->epgID;
@@ -93,9 +89,8 @@ CRecordInstance::CRecordInstance(const CTimerd::RecordingInfo * const eventinfo,
 
 	StreamVTxtPid = stream_vtxt_pid;
 	StreamPmtPid = stream_pmt_pid;
-#ifdef MARTII
 	StreamSubtitlePids = stream_subtitle_pids;
-#endif
+
 	Directory = dir;
 	autoshift = timeshift;
 	numpids = 0;
@@ -192,54 +187,57 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 	}
 #ifdef MARTII
 	bool StreamPAT = false;
-	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)) {
-		StreamPmtPid = true;
-		apids[numpids++] = allpids.PIDs.vtxtpid;
-		// FIXME. This doesn't add TTX subtitles.
-#ifdef MARTII // pu/cc
-		psi.addPid(allpids.PIDs.vtxtpid, EN_TYPE_TELTEX, 0, channel->getTeletextLang());
 #endif
+	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)){
+#ifdef MARTII
+		StreamPmtPid = true;
+#endif
+		apids[numpids++] = allpids.PIDs.vtxtpid;
+		psi.addPid(allpids.PIDs.vtxtpid, EN_TYPE_TELTEX, 0, channel->getTeletextLang());
 	}
-
-	if (StreamSubtitlePids)
+	if (StreamSubtitlePids){
 		for (int i = 0 ; i < (int)channel->getSubtitleCount() ; ++i) {
 			CZapitAbsSub* s = channel->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
-#ifdef MARTII // pu/cc
+#ifdef MARTII
 				if(i>REC_MAX_DPIDS - 1)//max sub pids
-					break;
+#else
+				if(i>9)//max sub pids
 #endif
+					break;
+
+#ifdef MARTII
 				StreamPmtPid = true;
+#endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				apids[numpids++] = sd->pId;
-#ifdef MARTII // pu/cc
 				psi.addPid( sd->pId, EN_TYPE_DVBSUB, 0, sd->ISO639_language_code.c_str() );
-#endif
 			}
 		}
 
-	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0)) {
-		StreamPAT = true,
-		apids[numpids++] = allpids.PIDs.pmtpid;
 	}
+#ifndef MARTII
+	psi.genpsi(fd);
+#endif
 
+
+	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0))
+#ifdef MARTII
+		StreamPAT = true,
+#endif
+		apids[numpids++] = allpids.PIDs.pmtpid;
+#ifdef MARTII
 	if (StreamPAT)
 		apids[numpids++] = 0;
 	psi.genpsi(fd);
+#endif
 
+#ifdef MARTII
 	if(record == NULL) {
 		record = new cRecord(RECORD_DEMUX, g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);
 		record->setFailureCallback(&recordingFailureHelper, this);
 	}
 #else
-	psi.genpsi(fd);
-
-	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0))
-		apids[numpids++] = allpids.PIDs.vtxtpid;
-
-	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0))
-		apids[numpids++] = allpids.PIDs.pmtpid;
-
 	if(record == NULL)
 		record = new cRecord(channel->getRecordDemux() /*RECORD_DEMUX*/);
 #endif
@@ -750,9 +748,7 @@ CRecordManager::CRecordManager()
 {
 	StreamVTxtPid = false;
 	StreamPmtPid = false;
-#ifdef MARTII
 	StreamSubtitlePids = false;
-#endif
 	StopSectionsd = false;
 	//recordingstatus = 0;
 	recmap.clear();
@@ -966,11 +962,7 @@ bool CRecordManager::Record(const CTimerd::RecordingInfo * const eventinfo, cons
 			else
 				newdir = Directory;
 
-#ifdef MARTII
 			inst = new CRecordInstance(eventinfo, newdir, timeshift, StreamVTxtPid, StreamPmtPid, StreamSubtitlePids);
-#else
-			inst = new CRecordInstance(eventinfo, newdir, timeshift, StreamVTxtPid, StreamPmtPid);
-#endif
 
 			inst->frontend = frontend;
 			error_msg = inst->Record();

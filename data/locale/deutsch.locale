@@ -645,6 +645,7 @@ imageinfo.forum Forum:
 imageinfo.head Image Info:
 imageinfo.homepage Homepage:
 imageinfo.image Image:
+imageinfo.kernel Kernel:
 imageinfo.license Lizenz:
 imageinfo.version Version:
 inetradio.name Internetradio
@@ -824,7 +825,7 @@ menu.hint_auto_subs Automatische Anzeige der Untertitel in Ihrer bevorzugten Spr
 menu.hint_back Zurück zum vorherigen Menü.\nDie Taste 'Menü' schließt alle Menüs
 menu.hint_backup Sichern von Konfigurationen und Kanallisten
 menu.hint_bedit Bearbeiten ihrer Favoriten und der Bouquets
-menu.hint_bigwindows EPG-Informationen werden immer im großen Fenster angezeigt. Dies erreichen Sie auch mit der Taste 'Info'
+menu.hint_bigwindows Kanalliste, EPG-Infos, Audioplayer und einige andere Fenster werden bildschirmfüllend angezeigt
 menu.hint_cache_txt Startet das Zwischenspeichern des Teletextes nach einem Kanalwechsel
 menu.hint_cec_mode CEC-Modus
 menu.hint_cec_standby CEC-Standby
@@ -1247,6 +1248,20 @@ miscsettings.infobar_show_res Auflösung anzeigen
 miscsettings.infobar_show_res_simple einfach
 miscsettings.infobar_show_sysfs_hdd Füllstandanzeige (sysFS & hdd)
 miscsettings.infobar_show_tuner Aktiven Tuner anzeigen
+miscsettings.progressbar Fortschrittsbalken
+miscsettings.progressbar_color Farbe
+miscsettings.progressbar_design Design
+miscsettings.progressbar_design_0 farbige Punkte
+miscsettings.progressbar_design_1 farbige vertikale Linien
+miscsettings.progressbar_design_2 farbige horizontale Linien
+miscsettings.progressbar_design_3 Farbverlauf
+miscsettings.progressbar_design_4 monochrom
+miscsettings.progressbar_design_long Progressbardesign
+miscsettings.progressbar_infobar_position Position
+miscsettings.progressbar_infobar_position_0 Standard
+miscsettings.progressbar_infobar_position_1 unterhalb Kanalname
+miscsettings.progressbar_infobar_position_2 unterhalb Kanalname (schmal)
+miscsettings.progressbar_infobar_position_3 zwischen EPG-Events (schmal)
 miscsettings.radiotext Radiotext
 miscsettings.restart Die Änderung wird bei Neustart aktiv.
 miscsettings.shutdown_count Komplett ausschalten nach

@@ -646,6 +646,7 @@ imageinfo.forum Forum:
 imageinfo.head Image info:
 imageinfo.homepage Home page:
 imageinfo.image Image:
+imageinfo.kernel Kernel:
 imageinfo.license License:
 imageinfo.version Version:
 inetradio.name Internetradio
@@ -825,7 +826,7 @@ menu.hint_auto_subs Auto-start subtitles for preferred language
 menu.hint_back Return to previous menu\nPress menu key to close all menus
 menu.hint_backup Backup configs and channels to selected dir
 menu.hint_bedit Edit favorites and bouquets
-menu.hint_bigwindows Always show big epg detail window\nelse 'info' button switch big font + window size
+menu.hint_bigwindows Channellist, EPG-infos, audioplayer and some other windows are displayed full screen
 menu.hint_cache_txt Start teletext caching after channel switch
 menu.hint_cec_mode CEC mode
 menu.hint_cec_standby CEC standby
@@ -1248,6 +1249,20 @@ miscsettings.infobar_show_res show resolution on infobar
 miscsettings.infobar_show_res_simple simple
 miscsettings.infobar_show_sysfs_hdd Fill level (sysFS & hdd)
 miscsettings.infobar_show_tuner Display active tuner
+miscsettings.progressbar Progressbar
+miscsettings.progressbar_color Color
+miscsettings.progressbar_design Design
+miscsettings.progressbar_design_0 colored points
+miscsettings.progressbar_design_1 colored vertical lines
+miscsettings.progressbar_design_2 colored horizontal lines
+miscsettings.progressbar_design_3 colored bar
+miscsettings.progressbar_design_4 monochrome
+miscsettings.progressbar_design_long Progressbardesign
+miscsettings.progressbar_infobar_position Position
+miscsettings.progressbar_infobar_position_0 standard
+miscsettings.progressbar_infobar_position_1 below channel name
+miscsettings.progressbar_infobar_position_2 small below channel name
+miscsettings.progressbar_infobar_position_3 narrow between EPG-Events
 miscsettings.radiotext Radiotext
 miscsettings.restart The change will be active after restart.
 miscsettings.shutdown_count In standby, switch off after

@@ -30,6 +30,9 @@
 #endif
 
 #include <driver/framebuffer.h>
+#ifdef USE_OPENGL
+#include "glthread.h"
+#endif
 #ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
 #endif
@@ -968,6 +971,10 @@ void CFbAccel::blit()
 /* not azbox and not spark -> no blit() needed */
 void CFbAccel::blit()
 {
+#ifdef USE_OPENGL
+	if (fb->mpGLThreadObj)
+		fb->mpGLThreadObj->blit();
+#endif
 }
 #endif
 

@@ -95,6 +95,7 @@ class CRecordInstance
 		time_t		epg_time;
 		time_t		start_time;
 		bool		StreamVTxtPid;
+		bool		StreamSubtitlePids;
 		bool		StreamPmtPid;
 #ifdef MARTII
 		bool		StreamSubtitlePids;
@@ -126,11 +127,7 @@ class CRecordInstance
 		record_error_msg_t Start(CZapitChannel * channel);
 		void WaitRecMsg(time_t StartTime, time_t WaitTime);
 	public:		
-#ifdef MARTII
 		CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift = false, bool stream_vtxt_pid = false, bool stream_pmt_pid = false, bool stream_subtitle_pids = false);
-#else
-		CRecordInstance(const CTimerd::RecordingInfo * const eventinfo, std::string &dir, bool timeshift = false, bool stream_vtxt_pid = false, bool stream_pmt_pid = false);
-#endif
 		~CRecordInstance();
 
 		record_error_msg_t Record();
@@ -169,6 +166,7 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		std::string	Directory;
 		std::string	TimeshiftDirectory;
 		bool		StreamVTxtPid;
+		bool		StreamSubtitlePids;
 		bool		StreamPmtPid;
 #ifdef MARTII
 		bool		StreamSubtitlePids;
@@ -227,18 +225,12 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		bool RunStartScript(void);
 		bool RunStopScript(void);
 
-#ifdef MARTII
-		void Config(const bool stopsectionsd, const bool stream_vtxt_pid, const bool stream_pmt_pid, const bool stream_subtitle_pids)
-#else
-		void Config(const bool stopsectionsd, const bool stream_vtxt_pid, const bool stream_pmt_pid)
-#endif
+		void Config(const bool stopsectionsd, const bool stream_vtxt_pid, const bool stream_pmt_pid, bool stream_subtitle_pids )
 		{
-			StopSectionsd	= stopsectionsd;
-			StreamVTxtPid	= stream_vtxt_pid;
-			StreamPmtPid	= stream_pmt_pid;
-#ifdef MARTII
+			StopSectionsd		= stopsectionsd;
+			StreamVTxtPid		= stream_vtxt_pid;
 			StreamSubtitlePids	= stream_subtitle_pids;
-#endif
+			StreamPmtPid		= stream_pmt_pid;
 		};
 		void SetDirectory(const char * const directory) { Directory	= directory; };
 		void SetTimeshiftDirectory(const char * const directory) { TimeshiftDirectory	= directory; };

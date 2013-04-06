@@ -1,9 +1,7 @@
 /*
  Copyright (c) 2004 gmo18t, Germany. All rights reserved.
  Copyright (C) 2012 CoolStream International Ltd
-#ifdef MARTII // pu/cc
  Copyright (C) 2013 Jacek Jendrzej
-#endif
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published
@@ -127,18 +125,15 @@ CGenPsi::CGenPsi()
 	nba = 0;
 	vpid = 0;
 	vtype = 0;
-#ifdef MARTII // pu/cc
+
 	vtxtpid = 0;
 	vtxtlang[0] = 'g';
 	vtxtlang[1] = 'e';
 	vtxtlang[2] = 'r';
-#endif
 	memset(apid, 0, sizeof(apid));
 	memset(atypes, 0, sizeof(atypes));
-#ifdef MARTII // pu/cc
 	nsub = 0;
 	memset(dvbsubpid, 0, sizeof(dvbsubpid));
-#endif
 }
 
 uint32_t CGenPsi::calc_crc32psi(uint8_t *dst, const uint8_t *src, uint32_t len)
@@ -160,11 +155,7 @@ uint32_t CGenPsi::calc_crc32psi(uint8_t *dst, const uint8_t *src, uint32_t len)
 	return crc;
 }
 
-#ifdef MARTII // pu/cc
 void CGenPsi::addPid(uint16_t pid, uint16_t pidtype, short isAC3, const char *data)
-#else
-void CGenPsi::addPid(uint16_t pid, uint16_t pidtype, short isAC3)
-#endif
 {
 	switch(pidtype)
 	{
@@ -182,7 +173,6 @@ void CGenPsi::addPid(uint16_t pid, uint16_t pidtype, short isAC3)
 			nba++;
 			break;
 		case EN_TYPE_TELTEX:
-#ifdef MARTII // pu/cc
 			vtxtpid = pid;
 			if(data != NULL){
 				vtxtlang[0] = data[0];
@@ -198,9 +188,7 @@ void CGenPsi::addPid(uint16_t pid, uint16_t pidtype, short isAC3)
 				dvbsublang[nsub][2] = data[2];
 			}
 			nsub++;
-#endif
 			break;
-
 		default:
 			break;
 	}
@@ -266,6 +254,8 @@ int CGenPsi::genpsi(int fd)
 
 	//-- (II) build PAT --
 	data_len = COPY_TEMPLATE(pkt, pkt_pat);
+// 	pkt[0xf]= 0xE0 | (pmtpid>>8);
+// 	pkt[0x10] = pmtpid & 0xFF;
 	//-- calculate CRC --
 	calc_crc32psi(&pkt[data_len], &pkt[OFS_HDR_2], data_len-OFS_HDR_2 );
 	//-- write TS packet --
@@ -275,14 +265,12 @@ int CGenPsi::genpsi(int fd)
 	data_len = COPY_TEMPLATE(pkt, pkt_pmt);
 	//-- adjust len dependent to count of audio streams --
 	data_len += (SIZE_STREAM_TAB_ROW * (nba-1));
-#ifdef MARTII // pu/cc
 	if(vtxtpid){
 		data_len += (SIZE_STREAM_TAB_ROW * (1))+10;//add teletext row length
 	}
 	if(nsub){
 		data_len += ((SIZE_STREAM_TAB_ROW+10) * nsub);//add dvbsub row length
 	}
-#endif
 	patch_len = data_len - OFS_HDR_2 + 1;
 	pkt[OFS_HDR_2+1] |= (patch_len>>8);
 	pkt[OFS_HDR_2+2]  = (patch_len & 0xFF);
@@ -308,7 +296,7 @@ int CGenPsi::genpsi(int fd)
 		pkt[ofs+3] = 0xF0;
 		pkt[ofs+4] = 0x00;
 	}
-#ifdef MARTII // pu/cc
+
 	//teletext
 	if(vtxtpid){
 		ofs += SIZE_STREAM_TAB_ROW;
@@ -352,18 +340,17 @@ int CGenPsi::genpsi(int fd)
 		pkt[ofs+13] = 0x01>>8; 		//ancillary_page_id
 		pkt[ofs+14] = 0x01&0xff;	//ancillary_page_id
 	}
-#endif
+
 	//-- calculate CRC --
 	calc_crc32psi(&pkt[data_len], &pkt[OFS_HDR_2], data_len-OFS_HDR_2 );
 	//-- write TS packet --
 	write(fd, pkt, SIZE_TS_PKT);
+
 	//-- finish --
 	vpid=0;
 	nba=0;
-#ifdef MARTII // pu/cc
 	nsub = 0;
 	vtxtpid = 0;
-#endif
 	fdatasync(fd);
 	return 1;
 }
