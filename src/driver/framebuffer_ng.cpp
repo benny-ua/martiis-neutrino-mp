@@ -307,6 +307,17 @@ unsigned int CFrameBuffer::getScreenHeight(bool)
 	return DEFAULT_YRES;
 }
 
+unsigned int CFrameBuffer::getScreenWidthRel()
+{
+	// always reduce a possible detailline
+	return (DEFAULT_XRES - 2*ConnectLineBox_Width) * (g_settings.big_windows ? 100 : NON_BIG_WINDOWS) / 100;
+}
+
+unsigned int CFrameBuffer::getScreenHeightRel()
+{
+	return (DEFAULT_YRES) * (g_settings.big_windows ? 100 : NON_BIG_WINDOWS) / 100;
+}
+
 unsigned int CFrameBuffer::getScreenX()
 {
 	return 0;

@@ -98,9 +98,6 @@ class CRecordInstance
 		bool		StreamSubtitlePids;
 		bool		StreamPmtPid;
 #ifdef MARTII
-		bool		StreamSubtitlePids;
-#endif
-#ifdef MARTII
 		unsigned short	apids[REC_MAX_APIDS + REC_MAX_DPIDS];
 #else
 		unsigned short	apids[REC_MAX_APIDS];
@@ -168,9 +165,6 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		bool		StreamVTxtPid;
 		bool		StreamSubtitlePids;
 		bool		StreamPmtPid;
-#ifdef MARTII
-		bool		StreamSubtitlePids;
-#endif
 		bool		StopSectionsd;
 		int		last_mode;
 		bool		autoshift;

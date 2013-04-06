@@ -304,7 +304,7 @@ void CRecordSetup::showRecordAudioSetup(CMenuWidget *menu_audiosettings)
 	menu_audiosettings->addItem(aoj2);
 	menu_audiosettings->addItem(aoj3);
 }
-#ifdef MARTII // from pu/cc
+
 void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
 {
 	//recording data pids
@@ -327,23 +327,6 @@ void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
 #ifdef MARTII
 	menu_datasettings->addItem(doj0);
 #endif
-	menu_datasettings->addItem(doj1);
-	menu_datasettings->addItem(doj2);
-}
-#endif
-
-void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
-{
-	//recording data pids
-
-	//teletext pids
-	CMenuOptionChooser* doj1 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_VTXT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
-	CMenuOptionChooser* doj2 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_DVBSUB_PIDS, &g_settings.recording_stream_subtitle_pids, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
-
-	doj1->setHint("", LOCALE_MENU_HINT_RECORD_DATA_VTXT);
-	doj2->setHint("", LOCALE_MENU_HINT_RECORD_DATA_DVBSUB);
-
-	menu_datasettings->addIntroItems(LOCALE_RECORDINGMENU_DATA_PIDS);
 	menu_datasettings->addItem(doj1);
 	menu_datasettings->addItem(doj2);
 }

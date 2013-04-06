@@ -23,8 +23,8 @@
 #define __psisetup__
 
 
-#include "widget/menue.h"
-#include "widget/progressbar.h"
+#include <gui/widget/menue.h>
+#include <gui/components/cc_item_progressbar.h>
 
 #include <driver/framebuffer.h>
 #include <system/localize.h>
