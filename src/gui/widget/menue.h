@@ -449,6 +449,10 @@ class CMenuWidget : public CMenuTarget
 		CFrameBuffer		*frameBuffer;
 		std::vector<CMenuItem*>	items;
 		std::vector<unsigned int> page_start;
+#ifdef MARTII
+		struct keyAction { std::string action; CMenuTarget *menue; };
+		std::map<neutrino_msg_t, keyAction> keyActionMap;
+#endif
 		std::string		iconfile;
 
 		int			min_width;
@@ -528,6 +532,9 @@ class CMenuWidget : public CMenuTarget
 			MENU_POS_BOTTOM_LEFT	,
 			MENU_POS_BOTTOM_RIGHT
 		};
+#ifdef MARTII
+		void addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string &action);
+#endif
 };
 
 class CPINProtection
