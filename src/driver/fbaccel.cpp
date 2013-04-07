@@ -623,6 +623,10 @@ void CFbAccel::blit2FB(void *fbbuff, uint32_t width, uint32_t height, uint32_t x
 	if (ioctl(fb->fd, STMFBIO_BLT_EXTERN, &blt_data) < 0)
 		perror("CFbAccel blit2FB STMFBIO_BLT_EXTERN");
 	//update_dirty(x, y, blt_data.dst_right, blt_data.dst_bottom);
+#ifdef MARTII
+	if(ioctl(fb->fd, STMFBIO_SYNC_BLITTER) < 0)
+		perror("CFrameBuffer::blit2FB ioctl STMFBIO_SYNC_BLITTER 2");
+#endif
 	return;
 #else
 	fb_pixel_t *data = (fb_pixel_t *) fbbuff;
