@@ -1,7 +1,7 @@
 /*
 	WebTV
 
-	(c) 2012 by martii
+	(c) 2012-2013 by martii
 
 
 	License: GPL
@@ -22,21 +22,23 @@
 */
 
 #define __USE_FILE_OFFSET64 1
-#include "filebrowser.h"
+#include <gui/filebrowser.h>
 #include <stdio.h>
 #include <global.h>
 #include <libgen.h>
 #include <neutrino.h>
 #include <driver/screen_max.h>
 #include <ctype.h>
-#include "movieplayer.h"
-#include "webtv.h"
+#include <gui/movieplayer.h>
+#include <gui/webtv.h>
+#include <gui/widget/hintbox.h>
 
 CWebTV::CWebTV()
 {
 	width = w_max (40, 10);
 	selected = -1;
 	parser = NULL;
+	m = NULL;
 }
 
 CWebTV::~CWebTV()
@@ -49,15 +51,23 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	int res = menu_return::RETURN_REPAINT;
 
+	if (actionKey == "rc_setup") {
+		selected = m->getSelected() - 3;
+		if (selected < 0)
+			return menu_return::RETURN_NONE;
+		ShowHintUTF(channels[selected].name.c_str(), channels[selected].url);
+		return res;
+	}
+
 	if(!actionKey.empty()) {
 		if(parent)
 			parent->hide();
 		std::string streaming_server_url = actionKey;
 		std::string streaming_server_name;
 
-		for (std::vector<std::pair<std::string, char*> >::iterator i = channels.begin(); i != channels.end(); i++) {
-			if (i->second == streaming_server_url) {
-				streaming_server_name = i->first;
+		for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++) {
+			if (i->url == streaming_server_url) {
+				streaming_server_name = i->name;
 				break;
 			}
 		}
@@ -86,6 +96,8 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 		CMoviePlayerGui::getInstance().exec(NULL, "webtv");
 		return res;
 	}
+	if (m)
+		return res;
 
 	if (parent)
 		parent->hide();
@@ -98,18 +110,20 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 
 void CWebTV::Show()
 {
-	CMenuWidget* m = new CMenuWidget(LOCALE_WEBTV_HEAD, NEUTRINO_ICON_SETTINGS, width);
+	m = new CMenuWidget(LOCALE_WEBTV_HEAD, NEUTRINO_ICON_SETTINGS, width);
 	m->addItem(GenericMenuSeparator);
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);
+	m->addKey(CRCInput::RC_setup, this, "rc_setup");
 
-	for (std::vector<std::pair<std::string, char*> >::iterator i = channels.begin(); i != channels.end(); i++)
-		m->addItem(new CMenuForwarderNonLocalized(i->first.c_str(), true, NULL, this, i->second),
-			!strcmp(i->second, g_settings.streaming_server_url.c_str()));
+	for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++)
+		m->addItem(new CMenuForwarderNonLocalized(i->name.c_str(), true, NULL, this, i->url),
+			!strcmp(i->url, g_settings.streaming_server_url.c_str()));
 
 	m->exec(NULL, "");
 	m->hide();
 	delete m;
+	m = NULL;
 }
 
 bool CWebTV::readXml()
@@ -133,7 +147,10 @@ bool CWebTV::readXml()
 					std::string t = string(title);
 					if (desc && strlen(desc))
 						t += " (" + string(desc) + ")";
-					channels.push_back(std::make_pair(t, url));
+					web_channel w;
+					w.url = url;
+					w.name = t;
+					channels.push_back(w);
 				}
 
 				l1 = l1->xmlNextNode;

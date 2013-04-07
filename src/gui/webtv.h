@@ -35,7 +35,12 @@ class CWebTV : public CMenuTarget
 		int selected;
 		xmlDocPtr parser;
 		bool readXml();
-		std::vector<std::pair<std::string, char*> > channels;
+		struct web_channel {
+			char *url;
+			std::string name;
+		};
+		std::vector<web_channel> channels;
+		CMenuWidget* m;
 	public:
 		CWebTV();
 		~CWebTV();
