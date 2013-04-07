@@ -71,6 +71,10 @@ CVolume::CVolume()
 	m_mode 		= CNeutrinoApp::getInstance()->getMode();
 	channel_id	= 0;
 	apid		= 0;
+#ifdef MARTII // pu/cc
+	digit_h 	= 0;
+	digit_offset	= 0;
+#endif
 
 	Init();
 }
@@ -100,18 +104,32 @@ void CVolume::Init()
 	y = sy		= frameBuffer->getScreenY() + spacer / 2;
 	sw		= g_settings.screen_EndX - spacer;
 	sh		= frameBuffer->getScreenHeight();
+#ifdef MARTII // pu/cc
+	icon_w = icon_h = 0;
+#endif
 
 	frameBuffer->getIconSize(NEUTRINO_ICON_VOLUME, &icon_w, &icon_h);
+#ifdef MARTII // pu/cc
+	digit_offset	= g_Font[VolumeFont]->getDigitOffset();
+	digit_h		= g_Font[VolumeFont]->getDigitHeight();
+#endif
 	progress_h	= icon_h - 2*pB;
 	progress_w	= 200;
 	vbar_w		= spacer + icon_w + spacer + progress_w + spacer;
+#ifndef MARTII // pu/cc
 	digit_h		= 0;
 	digit_offset	= 0;
+#endif
+#ifdef MARTII
+	progress_h	= std::max(icon_h, digit_h);
+#endif
 	if (paintDigits) {
 		digit_w		= g_Font[VolumeFont]->getRenderWidth("100");
+#ifndef MARTII // pu/cc
 		digit_offset	= g_Font[VolumeFont]->getDigitOffset();
 		digit_h		= g_Font[VolumeFont]->getDigitHeight();
 		progress_h	= std::max(icon_h, digit_h);
+#endif
 		vbar_w 		+= digit_w;
 	}
 	vbar_h		= std::max((icon_h * faktor_h) / 10, digit_h+digit_offset);
@@ -196,6 +214,13 @@ void CVolume::Init()
 		digit_b_x	= digit_x - spacer/4;
 		digit_b_w	= vbar_w - (digit_b_x - x);
 	}
+#ifdef MARTII
+	if (volscale)
+		delete volscale;
+	volscale = new CProgressBar(progress_x, progress_y, progress_w, progress_h, colFrame, colBar, colShadow, COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1, true);
+	volscale->setInvert();
+	volscale->setFrameThickness(2);
+#endif
 }
 
 CVolume* CVolume::getInstance()
