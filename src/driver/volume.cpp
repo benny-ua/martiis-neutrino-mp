@@ -133,11 +133,13 @@ void CVolume::Init()
 		vbar_w 		+= digit_w;
 	}
 	vbar_h		= std::max((icon_h * faktor_h) / 10, digit_h+digit_offset);
+#ifndef MARTII
 	if (volscale)
 		delete volscale;
 	volscale = new CProgressBar(progress_x, progress_y, progress_w, progress_h, colFrame, colBar, colShadow, COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1, true);
 	volscale->setInvert();
 	volscale->setFrameThickness(2);
+#endif
 
 	// mute icon
 	mute_icon_dx 	= 0;
