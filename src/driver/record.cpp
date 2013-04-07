@@ -234,7 +234,7 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 
 #ifdef MARTII
 	if(record == NULL) {
-		record = new cRecord(RECORD_DEMUX, g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);
+		record = new cRecord(channel->getRecordDemux(), g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);
 		record->setFailureCallback(&recordingFailureHelper, this);
 	}
 #else

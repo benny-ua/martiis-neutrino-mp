@@ -2382,7 +2382,11 @@ void CRadioText::run()
 	uint current_pid = 0;
 
 	printf("CRadioText::run: ###################### Starting thread ######################\n");
+#ifdef MARTII
+	audioDemux = new cDemux(0); // live demux
+#else
 	audioDemux = new cDemux(1);
+#endif
 	audioDemux->Open(DMX_PES_CHANNEL,0,128*1024);
 
 #ifdef MARTII

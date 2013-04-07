@@ -513,12 +513,17 @@ CFrontend * CFEManager::allocateFE(CZapitChannel * channel)
 	}
 	//FIXME for testing only
 	if(frontend) {
+#ifdef HAVE_SPARK_HARDWARE // MARTII
+		channel->setRecordDemux(frontend->fenumber);
+		cDemux::SetSource(frontend->fenumber, frontend->fenumber);
+#else
 		channel->setRecordDemux(frontend->fenumber+1);
 #if HAVE_COOL_HARDWARE
 		/* I don't know if this check is necessary on cs, but it hurts on other hardware */
 		if(femap.size() > 1)
 #endif
 			cDemux::SetSource(frontend->fenumber+1, frontend->fenumber);
+#endif
 	}
 	mutex.unlock();
 	return frontend;

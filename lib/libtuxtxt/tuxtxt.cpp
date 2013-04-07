@@ -2549,7 +2549,11 @@ int GetTeletextPIDs()
         unsigned char mask[DMX_FILTER_SIZE];
 	int res;
 
+#ifdef MARTII
+        cDemux * dmx = new cDemux(0); // live demux
+#else
         cDemux * dmx = new cDemux(1);
+#endif
 	dmx->Open(DMX_PSI_CHANNEL);
 
         memset(filter, 0x00, DMX_FILTER_SIZE);
