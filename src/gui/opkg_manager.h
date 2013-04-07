@@ -52,6 +52,7 @@ typedef enum
 	OM_LIST_UPGRADEABLE,
 	OM_UPDATE,
 	OM_UPGRADE,
+	OM_REMOVE,
 	
 	OM_MAX
 } pkg_info_t;
@@ -75,10 +76,12 @@ class COPKGManager : public CMenuTarget
 			std::string description;
 			bool installed;
 			bool upgradable;
+			int index;
 			CMenuForwarderNonLocalized *forwarder;
 		};
 		std::map<std::string,struct pkg> pkg_map;
 
+		CMenuWidget *menu;
 		CMenuForwarder *upgrade_forwarder;
 		bool list_installed_done;
 		bool list_upgradeable_done;

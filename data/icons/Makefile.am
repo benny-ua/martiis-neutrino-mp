@@ -56,6 +56,7 @@ install_DATA += \
 	ca.png \
 	ca2.png \
 	ca2_gray.png \
+	checkmark.png \
 	colors.png \
 	conax_green.png \
 	conax_white.png \
@@ -252,6 +253,7 @@ install_DATA += \
 	volumeslider2red.png \
 	vtxt.png \
 	vtxt_gray.png \
+	warning.png \
 	x_green.png \
 	x_white.png \
 	x_yellow.png \

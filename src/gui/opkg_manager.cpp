@@ -80,20 +80,45 @@ const opkg_cmd_struct_t pkg_types[OM_MAX] =
 	{OM_LIST_INSTALLED, 	"opkg-cl list-installed"},
 	{OM_LIST_UPGRADEABLE,	"opkg-cl list-upgradable"},
 	{OM_UPDATE,		"opkg-cl update"},
-	{OM_UPGRADE,		"opkg-cl upgrade"}
+	{OM_UPGRADE,		"opkg-cl upgrade"},
+	{OM_REMOVE,		"opkg-cl remove"}
 };
 
 int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 {
-	int   res = menu_return::RETURN_REPAINT;
+	int res = menu_return::RETURN_REPAINT;
 
-	if (parent)
-		parent->hide();
-
-	if (actionKey == "")
+	if (actionKey == "") {
+		if (parent)
+			parent->hide();
 		return showMenu(); 
+	}
+	if (actionKey == "rc_spkr") {
+		int selected = menu->getSelected() - 5;
+		if (selected < 0)
+			return menu_return::RETURN_NONE;
+		std::map<string, struct pkg>::iterator it;
+		for (it = pkg_map.begin(); it != pkg_map.end(); it++) {
+			if (it->second.index == selected) {
+				char loc[200];
+				snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), it->second.name.c_str());
+				if (ShowMsgUTF (LOCALE_OPKG_TITLE, loc, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
+					if (parent)
+						parent->hide();
+					std::string action_name = "opkg-cl remove " + it->second.name;
+					execCmd(action_name.c_str(), true, true);
+					refreshMenu();
+					return res;
+				}
+				return res;
+			}
+		}
+		return menu_return::RETURN_NONE;
+	}
 
 	if(actionKey == pkg_types[OM_UPGRADE].cmdstr) {
+		if (parent)
+			parent->hide();
 		int r = execCmd(actionKey.c_str(), true, true);
 		if (r) {
 			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPGRADE);
@@ -106,8 +131,13 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		g_RCInput->postMsg((neutrino_msg_t) CRCInput::RC_up, 0);
 		return res;
 	}
+
 	std::map<string, struct pkg>::iterator it = pkg_map.find(actionKey);
 	if (it != pkg_map.end()) {
+		if (it->second.installed)
+			return menu_return::RETURN_NONE;
+		if (parent)
+			parent->hide();
 		int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
 		if(r) {
 			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
@@ -139,10 +169,11 @@ void COPKGManager::updateMenu()
 		it->second.forwarder->iconName_Info_right = "";
 		it->second.forwarder->setActive(true);
 		if (it->second.upgradable) {
-			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_IMPORTANT;
+			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_WARNING;
 			upgradesAvailable = true;
-		} else if (it->second.installed)
-			it->second.forwarder->setActive(false);
+		} else if (it->second.installed) {
+			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_CHECKMARK;
+		}
 	}
 
 	upgrade_forwarder->setActive(upgradesAvailable);
@@ -170,13 +201,17 @@ int COPKGManager::showMenu()
 	getPkgData(OM_LIST);
 	getPkgData(OM_LIST_UPGRADEABLE);
 
-	CMenuWidget *menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
+	menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
 	menu->addIntroItems();
 	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	menu->addItem(upgrade_forwarder);
 	menu->addItem(GenericMenuSeparatorLine);
-	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+	menu->addKey(CRCInput::RC_spkr, this, "rc_spkr");
+	int i = 0;
+	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++, i++) {
+		it->second.index = i;
 		menu->addItem(it->second.forwarder);
+	}
 
 	updateMenu();
 
