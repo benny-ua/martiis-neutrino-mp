@@ -32,7 +32,6 @@ class CWebTV : public CMenuTarget
 {
 	private:
 		int width;
-		int selected;
 		xmlDocPtr parser;
 		bool readXml();
 		struct web_channel {
@@ -41,6 +40,7 @@ class CWebTV : public CMenuTarget
 		};
 		std::vector<web_channel> channels;
 		CMenuWidget* m;
+		int menu_offset;
 	public:
 		CWebTV();
 		~CWebTV();

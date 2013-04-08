@@ -36,9 +36,9 @@
 CWebTV::CWebTV()
 {
 	width = w_max (40, 10);
-	selected = -1;
 	parser = NULL;
 	m = NULL;
+	menu_offset = 0;
 }
 
 CWebTV::~CWebTV()
@@ -52,7 +52,7 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 	int res = menu_return::RETURN_REPAINT;
 
 	if (actionKey == "rc_setup") {
-		selected = m->getSelected() - 3;
+		int selected = m->getSelected() - menu_offset;
 		if (selected < 0)
 			return menu_return::RETURN_NONE;
 		ShowHintUTF(channels[selected].name.c_str(), channels[selected].url);
@@ -115,6 +115,7 @@ void CWebTV::Show()
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);
 	m->addKey(CRCInput::RC_setup, this, "rc_setup");
+	menu_offset = m->getItemsCount();
 
 	for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++)
 		m->addItem(new CMenuForwarderNonLocalized(i->name.c_str(), true, NULL, this, i->url),
