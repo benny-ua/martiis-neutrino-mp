@@ -41,8 +41,7 @@
 #include <config.h>
 #endif
 
-
-#include "gui/opkg_manager.h"
+#include <gui/opkg_manager.h>
 
 #include <global.h>
 #include <neutrino.h>
@@ -58,6 +57,32 @@
 #include <stdio.h>
 #include <poll.h>
 #include <fcntl.h>
+#include <alloca.h>
+
+enum 
+{
+	OM_LIST,
+	OM_LIST_INSTALLED,
+	OM_LIST_UPGRADEABLE,
+	OM_UPDATE,
+	OM_UPGRADE,
+	OM_REMOVE,
+	OM_INFO,
+	OM_INSTALL,
+	OM_MAX
+};
+
+static const std::string pkg_types[OM_MAX] =
+{
+	"opkg-cl list",
+	"opkg-cl list-installed",
+	"opkg-cl list-upgradable",
+	"opkg-cl update",
+	"opkg-cl upgrade ",
+	"opkg-cl remove ",
+	"opkg-cl info ",
+	"opkg-cl install "
+};
 
 COPKGManager::COPKGManager()
 {
@@ -66,23 +91,12 @@ COPKGManager::COPKGManager()
 	pkg_map.clear();
 	list_installed_done = false;
 	list_upgradeable_done = false;
+	expert_mode = false;
 }
-
 
 COPKGManager::~COPKGManager()
 {
-	
 }
-
-const opkg_cmd_struct_t pkg_types[OM_MAX] =
-{
-	{OM_LIST, 		"opkg-cl list"},
-	{OM_LIST_INSTALLED, 	"opkg-cl list-installed"},
-	{OM_LIST_UPGRADEABLE,	"opkg-cl list-upgradable"},
-	{OM_UPDATE,		"opkg-cl update"},
-	{OM_UPGRADE,		"opkg-cl upgrade"},
-	{OM_REMOVE,		"opkg-cl remove"}
-};
 
 int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 {
@@ -94,32 +108,37 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		return showMenu(); 
 	}
 	if (actionKey == "rc_spkr") {
-		int selected = menu->getSelected() - 5;
-		if (selected < 0)
+		int selected = menu->getSelected() - menu_offset;
+		if (selected < 0 || !pkg_arr[selected]->installed)
 			return menu_return::RETURN_NONE;
-		std::map<string, struct pkg>::iterator it;
-		for (it = pkg_map.begin(); it != pkg_map.end(); it++) {
-			if (it->second.index == selected) {
-				char loc[200];
-				snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), it->second.name.c_str());
-				if (ShowMsgUTF (LOCALE_OPKG_TITLE, loc, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
-					if (parent)
-						parent->hide();
-					std::string action_name = "opkg-cl remove " + it->second.name;
-					execCmd(action_name.c_str(), true, true);
-					refreshMenu();
-					return res;
-				}
-				return res;
-			}
+		char loc[200];
+		snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), pkg_arr[selected]->name.c_str());
+		if (ShowMsgUTF(LOCALE_OPKG_TITLE, loc, CMessageBox::mbrCancel, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
+			if (parent)
+				parent->hide();
+			execCmd(pkg_types[OM_REMOVE] + pkg_arr[selected]->name, true, true);
+			refreshMenu();
 		}
-		return menu_return::RETURN_NONE;
+		return res;
 	}
-
-	if(actionKey == pkg_types[OM_UPGRADE].cmdstr) {
+	if (actionKey == "rc_info") {
 		if (parent)
 			parent->hide();
-		int r = execCmd(actionKey.c_str(), true, true);
+		int selected = menu->getSelected() - menu_offset;
+		if (selected < 0)
+			return menu_return::RETURN_NONE;
+		execCmd(pkg_types[OM_INFO] + pkg_arr[selected]->name, true, true);
+		return res;
+	}
+	if (actionKey == "rc_setup") {
+		expert_mode = !expert_mode;
+		updateMenu();
+		return res;
+	}
+	if(actionKey == pkg_types[OM_UPGRADE]) {
+		if (parent)
+			parent->hide();
+		int r = execCmd(actionKey, true, true);
 		if (r) {
 			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPGRADE);
 			char rs[strlen(loc.c_str()) + 20];
@@ -138,15 +157,14 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 			return menu_return::RETURN_NONE;
 		if (parent)
 			parent->hide();
-		int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
+		int r = execCmd(pkg_types[OM_UPDATE]);
 		if(r) {
 			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
 			char rs[strlen(loc.c_str()) + 20];
 			snprintf(rs, sizeof(rs), loc.c_str(), r);
 			DisplayInfoMessage(rs);
 		} else {
-			std::string action_name = "opkg-cl install " + it->second.name;
-			r = execCmd(action_name.c_str(), true, true);
+			r = execCmd(pkg_types[OM_INSTALL] + it->second.name, true, true);
 			if(r) {
 				std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_INSTALL);
 				char rs[strlen(loc.c_str()) + 20];
@@ -173,6 +191,7 @@ void COPKGManager::updateMenu()
 			upgradesAvailable = true;
 		} else if (it->second.installed) {
 			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_CHECKMARK;
+			it->second.forwarder->setActive(expert_mode);
 		}
 	}
 
@@ -190,7 +209,7 @@ int COPKGManager::showMenu()
 {
 	installed = false;
 
-	int r = execCmd(pkg_types[OM_UPDATE].cmdstr);
+	int r = execCmd(pkg_types[OM_UPDATE]);
 	if (r) {
 		std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
 		char rs[strlen(loc.c_str()) + 20];
@@ -203,22 +222,30 @@ int COPKGManager::showMenu()
 
 	menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
 	menu->addIntroItems();
-	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].cmdstr, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	menu->addItem(upgrade_forwarder);
 	menu->addItem(GenericMenuSeparatorLine);
+
+	menu_offset = menu->getItemsCount();
+
+	menu->addKey(CRCInput::RC_info, this, "rc_info");
 	menu->addKey(CRCInput::RC_spkr, this, "rc_spkr");
+	menu->addKey(CRCInput::RC_setup, this, "rc_setup");
+
+	pkg_arr = (struct pkg **) alloca(pkg_map.size() * sizeof(struct pkg *));
 	int i = 0;
 	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++, i++) {
-		it->second.index = i;
 		menu->addItem(it->second.forwarder);
+		pkg_arr[i] = &it->second;
 	}
 
 	updateMenu();
 
 	int res = menu->exec (NULL, "");
+
+	menu->hide ();
 	if (installed)
 		DisplayInfoMessage(g_Locale->getText(LOCALE_OPKG_SUCCESS_INSTALL));
-	menu->hide ();
 	delete menu;
 	return res;
 }
@@ -236,19 +263,13 @@ bool COPKGManager::hasOpkgSupport()
 	return true;
 }
 
-
 void COPKGManager::getPkgData(const int pkg_content_id)
 {
-	char cmd[100];
-	FILE * f;
-	snprintf(cmd, sizeof(cmd), pkg_types[pkg_content_id].cmdstr);
 	
-	printf("COPKGManager: executing %s\n", cmd);
+	printf("COPKGManager: executing %s\n", pkg_types[pkg_content_id].c_str());
 	
-	f = popen(cmd, "r");
-	
-	if (!f) //failed
-	{
+	FILE *f = popen(pkg_types[pkg_content_id].c_str(), "r");
+	if (!f) {
 		DisplayInfoMessage("Command failed");
 		return;
 	}
@@ -353,6 +374,7 @@ std::string COPKGManager::getBlankPkgName(const std::string& line)
 
 int COPKGManager::execCmd(const char *cmdstr, bool verbose, bool acknowledge)
 {
+fprintf(stderr, "execCmd(%s)\n", cmdstr);
 	std::string cmd = std::string(cmdstr);
 	if (verbose) {
 		cmd += " 2>&1";

@@ -45,25 +45,6 @@
 
 #include <string>
 
-typedef enum 
-{
-	OM_LIST,
-	OM_LIST_INSTALLED,
-	OM_LIST_UPGRADEABLE,
-	OM_UPDATE,
-	OM_UPGRADE,
-	OM_REMOVE,
-	
-	OM_MAX
-} pkg_info_t;
-
-typedef struct opkg_cmd_t
-{
-	const pkg_info_t info;
-	const char* cmdstr;
-
-} opkg_cmd_struct_t;
-
 class COPKGManager : public CMenuTarget
 {
 	private:
@@ -80,14 +61,20 @@ class COPKGManager : public CMenuTarget
 			CMenuForwarderNonLocalized *forwarder;
 		};
 		std::map<std::string,struct pkg> pkg_map;
+		struct pkg **pkg_arr;
 
 		CMenuWidget *menu;
 		CMenuForwarder *upgrade_forwarder;
 		bool list_installed_done;
 		bool list_upgradeable_done;
 		bool installed;
+		bool expert_mode;
+		int menu_offset;
 
 		int execCmd(const char* cmdstr, bool verbose = false, bool acknowledge = false);
+		int execCmd(std::string cmdstr, bool verbose = false, bool acknowledge = false) {
+			return execCmd(cmdstr.c_str(), verbose, acknowledge);
+		};
 		void getPkgData(const int pkg_content_id);
 		std::string getBlankPkgName(const std::string& line);
 		int showMenu();
