@@ -625,7 +625,7 @@ void CFbAccel::blit2FB(void *fbbuff, uint32_t width, uint32_t height, uint32_t x
 	//update_dirty(x, y, blt_data.dst_right, blt_data.dst_bottom);
 #ifdef MARTII
 	if(ioctl(fb->fd, STMFBIO_SYNC_BLITTER) < 0)
-		perror("CFrameBuffer::blit2FB ioctl STMFBIO_SYNC_BLITTER 2");
+		perror("CFrameBuffer::blit2FB ioctl STMFBIO_SYNC_BLITTER");
 #endif
 	return;
 #else
@@ -788,6 +788,7 @@ void CFbAccel::blitBoxFB(int x0, int y0, int x1, int y1, fb_pixel_t color)
 	}
 }
 
+#ifdef MARTII
 void CFbAccel::blit()
 {
 #ifdef ENABLE_GRAPHLCD // MARTII
@@ -852,7 +853,6 @@ void CFbAccel::blit()
 		perror("CFrameBuffer::blit ioctl STMFBIO_SYNC_BLITTER 2");
 		
 }
-#ifdef MARTII
 #else
 void CFbAccel::blit()
 {
