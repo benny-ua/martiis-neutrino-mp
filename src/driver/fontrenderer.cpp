@@ -367,11 +367,7 @@ int UTF8ToUnicode(const char * &text, const bool utf8_encoded) // returns -1 on 
 	return unicode_value;
 }
 
-#ifdef MARTII
-void Font::RenderString(int x, int y, const int width, const char *text, const unsigned char color, const int boxheight, const bool utf8_encoded, uint32_t _fgcol, uint32_t _bgcol)
-#else
 void Font::RenderString(int x, int y, const int width, const char *text, const unsigned char color, const int boxheight, const bool utf8_encoded)
-#endif
 {
 	if (!frameBuffer->getActive())
 		return;
@@ -436,29 +432,6 @@ void Font::RenderString(int x, int y, const int width, const char *text, const u
 	static fb_pixel_t oldbgcolor = 0, oldfgcolor = 0;
 	static fb_pixel_t colors[256]={0};
 
-#ifdef MARTII
-	fb_pixel_t bgcolor;
-	fb_pixel_t fgcolor;
-
-	if (_bgcol)
-		bgcolor = _bgcol;
-	else {
-		frameBuffer->waitForIdle();
-		int yoff = y - height/2;
-		if (yoff < 0)
-			yoff  = 0;
-		bgcolor = *(frameBuffer->getFrameBufferPointer() + yoff * frameBuffer->getStride()/sizeof(fb_pixel_t) + x);
-	}
-
-	if (_fgcol)
-		fgcolor = _fgcol;
-	else {
-		uint8_t fgindex = color;		/* index of font color in the palette */
-		if (color > COL_BLACK0 && color < 254)	/* bigger than 254 would result in  > 255 */
-			fgindex = ((((int)color) + 2) | 7) - 2; /* no idea what this does exactly... */
-		fgcolor = frameBuffer->realcolor[fgindex];
-	}
-#else
 	// fb_pixel_t bgcolor = frameBuffer->realcolor[color];
 	uint8_t fgindex = color;		/* index of font color in the palette */
 	if (color > COL_BLACK0 && color < 254)	/* bigger than 254 would result in  > 255 */
@@ -470,6 +443,13 @@ void Font::RenderString(int x, int y, const int width, const char *text, const u
 	   background color or bgcolor will be wrong */
 	frameBuffer->waitForIdle();
 #endif
+#ifdef MARTII
+	int yoff = y - height/2;
+	if (yoff < 0)
+		yoff  = 0;
+	fb_pixel_t bgcolor = *(frameBuffer->getFrameBufferPointer() + x +
+			       yoff * frameBuffer->getStride()/sizeof(fb_pixel_t));
+#else
 	/* fetch bgcolor from framebuffer, using lower left edge of the font... */
 	fb_pixel_t bgcolor = *(frameBuffer->getFrameBufferPointer() + x +
 			       y * frameBuffer->getStride() / sizeof(fb_pixel_t));
@@ -682,17 +662,10 @@ void Font::RenderString(int x, int y, const int width, const char *text, const u
 	frameBuffer->mark(left, y + lower - height, x, y + lower);
 }
 
-#ifdef MARTII
-void Font::RenderString(int x, int y, const int width, const std::string & text, const unsigned char color, const int boxheight, const bool utf8_encoded, uint32_t _fgcol, uint32_t _bgcol)
-{
-	RenderString(x, y, width, text.c_str(), color, boxheight, utf8_encoded, _fgcol, _bgcol);
-}
-#else
 void Font::RenderString(int x, int y, const int width, const std::string & text, const unsigned char color, const int boxheight, const bool utf8_encoded)
 {
 	RenderString(x, y, width, text.c_str(), color, boxheight, utf8_encoded);
 }
-#endif
 
 int Font::getRenderWidth(const char *text, const bool utf8_encoded)
 {
