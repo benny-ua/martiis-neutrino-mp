@@ -181,7 +181,7 @@ CPSISetup::exec (CMenuTarget * parent, const std::string &)
 	case CRCInput::RC_up:
 		direction = -1;
 	case CRCInput::RC_down:
-	  if (selected > 0 && selected < PSI_RESET)
+	  if (selected + direction > -1 && selected + direction < PSI_SCALE_COUNT)
 	    {
 	      psi_list[selected].selected = false;
 	      paintSlider (selected);
@@ -224,9 +224,9 @@ CPSISetup::exec (CMenuTarget * parent, const std::string &)
 		  videoDecoder->SetControl(psi_list[selected].control, psi_list[selected].value);
 		}
 	case CRCInput::RC_ok:
-          loop = false;
 	  if (selected != PSI_RESET)
 	    {
+	      loop = false;
 	      g_settings.psi_contrast = psi_list[PSI_CONTRAST].value;
 	      g_settings.psi_saturation = psi_list[PSI_SATURATION].value;
 	      g_settings.psi_brightness = psi_list[PSI_BRIGHTNESS].value;
