@@ -55,6 +55,7 @@
 #include <system/helpers.h>
 #ifdef MARTII
 #include <map>
+#include <ctype.h>
 #endif
 
 static const int FSHIFT = 16;              /* nr of bits of precision */
@@ -201,7 +202,11 @@ void CDBoxInfoWidget::paint()
 	int offsetw = nameOffset+ (sizeOffset+10)*3 +10+percOffset+10;
 	offsetw += 20;
 	width = offsetw + 10 + 120;
+#ifdef MARTII
+	height = hheight + 9 * mheight;
+#else
 	height = hheight + 6 * mheight;
+#endif
 
 	struct statfs s;
 	FILE *          mountFile;
@@ -260,7 +265,9 @@ void CDBoxInfoWidget::paint()
 	x = getScreenStartX(width);
 	y = getScreenStartY(height);
 
+#ifndef MARTII
 	fprintf(stderr, "CDBoxInfoWidget::CDBoxInfoWidget() x = %d, y = %d, width = %d height = %d\n", x, y, width, height);
+#endif
 	int ypos=y;
 	int i = 0;
 	frameBuffer->paintBoxRel(x, ypos, width, hheight, COL_MENUHEAD_PLUS_0, RADIUS_LARGE, CORNER_TOP);
@@ -317,6 +324,9 @@ void CDBoxInfoWidget::paint()
 				continue;
 			if (read > 0 && buffer[read-1] == '\n')
 				buffer[read-1] = '\0';
+#ifdef MARTII
+			buffer[0] = toupper(buffer[0]);
+#endif
 			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, buffer, COL_MENUCONTENT);
 			ypos+= mheight;
 		}
@@ -369,6 +379,97 @@ void CDBoxInfoWidget::paint()
 		int headOffset=0;
 		int mpOffset=0;
 		bool rec_mp=false, memory_flag = false;
+#ifdef MARTII
+		const int headSize_mem = 5;
+		const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use%"};
+		// paint mount head
+		for (int j = 0; j < headSize_mem; j++) {
+			switch (j)
+			{
+				case 0:
+				headOffset = 10;
+				break;
+				case 1:
+				headOffset = nameOffset + 20;
+				break;
+				case 2:
+				headOffset = nameOffset + sizeOffset+10 +20;
+				break;
+				case 3:
+				headOffset = nameOffset + (sizeOffset+10)*2+15;
+				break;
+				case 4:
+				headOffset = nameOffset + (sizeOffset+10)*3+15;
+				break;
+			}
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE);
+		}
+		ypos+= mheight;
+		int m[2][4] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
+		const char *n[2] = { "RAM", "Swap" };
+		FILE *procmeminfo = fopen("/proc/meminfo", "r");
+		if (procmeminfo) {
+			char buf[80], a[80];
+			int v;
+			while (fgets(buf, sizeof(buf), procmeminfo))
+				if (2 == sscanf(buf, "%[^:]: %d", a, &v)) {
+					if (!strcasecmp(a, "MemTotal"))
+						m[0][0] = v;
+					else if (!strcasecmp(a, "MemFree"))
+						m[0][2] += v;
+					else if (!strcasecmp(a, "Buffers"))
+						m[0][2] += v;
+					else if (!strcasecmp(a, "Cached"))
+						m[0][2] = v;
+					else if (!strcasecmp(a, "SwapTotal"))
+						m[1][0] = v;
+					else if (!strcasecmp(a, "SwapFree"))
+						m[1][2] = v;
+					else if (!strcasecmp(a, "SwapCached"))
+						m[1][2] = v;
+				}
+			fclose(procmeminfo);
+		}
+		for (int k = 0; k < 2; k++) {
+			m[k][1] = m[k][0] - m[k][2];
+			for (int j = 0; j < headSize_mem; j++) {
+				switch (j) {
+					case 0:
+						mpOffset = 10;
+						snprintf(ubuf,buf_size,"%-20.20s", n[k]);
+						break;
+					case 1:
+						mpOffset = nameOffset + 10;
+						bytes2string(1024 * m[k][0], ubuf, buf_size);
+						break;
+					case 2:
+						mpOffset = nameOffset+ (sizeOffset+10)*1+10;
+						bytes2string(1024 * m[k][1], ubuf, buf_size);
+						break;
+					case 3:
+						mpOffset = nameOffset+ (sizeOffset+10)*2+10;
+						bytes2string(1024 * m[k][2], ubuf, buf_size);
+						break;
+					case 4:
+						mpOffset = nameOffset+ (sizeOffset+10)*3+10;
+						snprintf(ubuf, buf_size, "%4d%%", m[k][0] ? (m[k][1] * 100) / m[k][0] : 0);
+						break;
+				}
+				g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT);
+			}
+			int pbw = width - offsetw - 10;
+			if (pbw > 8) /* smaller progressbar is not useful ;) */
+			{
+				CProgressBar pb(x+offsetw, ypos+3, pbw, mheight-10);
+				pb.setBlink();
+				pb.setInvert();
+				pb.setValues(m[k][0] ? (m[k][1] * 100) / m[k][0] : 0, 100);
+				pb.paint(false);
+			}
+			ypos+= mheight;
+		}
+		ypos+= mheight;
+#endif
 		
 		// paint mount head
 		for (int j = 0; j < headSize; j++) {
