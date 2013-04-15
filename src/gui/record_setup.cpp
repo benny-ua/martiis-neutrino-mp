@@ -310,7 +310,7 @@ void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
 	//recording data pids
 #ifdef MARTII
 	// PAT/PMT
-	CMenuOptionChooser* doj0 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+	CMenuOptionChooser* doj0 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_pmt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 #endif
 
 	//teletext pids
