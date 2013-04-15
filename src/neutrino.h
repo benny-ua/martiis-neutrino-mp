@@ -129,6 +129,7 @@ private:
 	bool 				skipSleepTimer;
 	bool                            lockStandbyCall;
 	bool 				pbBlinkChange;
+	bool				g_channel_list_changed;
 	int tvsort[LIST_MODE_LAST];
 	int radiosort[LIST_MODE_LAST];
 
@@ -232,6 +233,7 @@ public:
 		return lastChannelMode;
 	};
 	void SetChannelMode(int mode);
+	void MarkChannelListChanged(void) { g_channel_list_changed = true; };
 	void quickZap(int msg);
 	void numericZap(int msg);
 # ifdef ENABLE_GRAPHLCD // MARTII
@@ -244,7 +246,6 @@ public:
 	void showInfo(void);
 	CConfigFile* getConfigFile() {return &configfile;};
 	bool 		SDTreloadChannels;
-	bool 		g_channel_list_changed;
 #ifdef MARTII
 	CMenuTarget			*batchEPGSettings;
 #endif
