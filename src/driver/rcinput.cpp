@@ -1255,7 +1255,7 @@ printf("[neutrino] CSectionsdClient::EVT_GOT_CN_EPG\n");
 #endif
 #ifdef MARTII
 					if (firstKey) {
-						extern bool timer_wakeup; // timermanager.cpp
+						extern long timer_wakeup; // timermanager.cpp
 						if (timer_wakeup) {
 							timer_wakeup = false;
 							CCECSetup cecsetup;

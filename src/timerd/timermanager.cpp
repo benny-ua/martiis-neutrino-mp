@@ -787,7 +787,7 @@ void CTimerManager::shutdownOnWakeup(int currEventID)
 {
 	time_t nextAnnounceTime=0;
 #ifdef MARTII
-	extern int timer_wakeup;
+	extern long timer_wakeup;
 	if (timer_wakeup == 0)
 #else
 	if(wakeup == 0)
