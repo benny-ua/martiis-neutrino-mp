@@ -531,9 +531,15 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 	int retval = menu_return::RETURN_REPAINT;
 	uint64_t timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_MENU]);
 		
+#ifdef MARTII
+	bool bAllowRepeatLR_override = keyActionMap.find(CRCInput::RC_left) != keyActionMap.end() || keyActionMap.find(CRCInput::RC_right) != keyActionMap.end();
+#endif
 	do {
 		if(hasItem() && selected >= 0 && (int)items.size() > selected )
 			bAllowRepeatLR = items[selected]->isMenueOptionChooser();
+#ifdef MARTII
+		bAllowRepeatLR |= bAllowRepeatLR_override;
+#endif
 
 		g_RCInput->getMsgAbsoluteTimeout(&msg, &data, &timeoutEnd, bAllowRepeatLR);
 

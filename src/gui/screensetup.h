@@ -47,6 +47,7 @@ class CScreenSetup : public CMenuTarget
 {
  private:
     CFrameBuffer * frameBuffer;
+    CMenuWidget *m;
     int	selected;
     int x_box;
     int y_box;
@@ -55,20 +56,26 @@ class CScreenSetup : public CMenuTarget
     int x_coord[2];
     int y_coord[2];
 #ifdef MARTII
-    fb_pixel_t color_bak;
+    char coord[2][20];
     int x_coord_bak[2];
     int y_coord_bak[2];
-    t_channel_id channel_id;
     int startX;
     int startY;
     int endX;
     int endY;
+    int screenwidth;
+    int screenheight;
+    bool coord_abs;
+    fb_pixel_t color_bak;
+    t_channel_id channel_id;
 #endif
 
     void paint();
     void paintBorderUL();
     void paintBorderLR();
-#ifndef MARTII
+#ifdef MARTII
+    void updateCoords();
+#else
     void paintCoords();
 #endif
     void paintBorder(int selected);
