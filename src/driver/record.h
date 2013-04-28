@@ -228,6 +228,9 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		};
 		void SetDirectory(const char * const directory) { Directory	= directory; };
 		void SetTimeshiftDirectory(const char * const directory) { TimeshiftDirectory	= directory; };
+#ifdef MARTII
+		std::string GetTimeshiftDirectory(void) { return TimeshiftDirectory; };
+#endif
 		bool RecordingStatus(const t_channel_id channel_id = 0);
 		bool TimeshiftOnly();
 		bool Timeshift() { return (autoshift || shift_timer); };
