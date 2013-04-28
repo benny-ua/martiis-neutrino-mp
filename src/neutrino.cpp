@@ -2021,6 +2021,29 @@ void wake_up(long &wakeup)
 }
 
 #ifdef MARTII
+static void *autodelete_thread(void *arg) {
+	set_threadname(__func__);
+	std::string timeshiftDir = std::string((char *)arg);
+
+	DIR *d = opendir(timeshiftDir.c_str());
+	if(d){
+		std::list<std::string> l;
+		while (struct dirent *e = readdir(d))
+		{
+			std::string filename = e->d_name;
+			if ((filename.find("_temp.ts") == filename.size() - 8) || (filename.find("_temp.xml") == filename.size() - 9))
+			{
+				std::string timeshiftDir_filename = timeshiftDir + "/" + filename;
+				l.push_back(timeshiftDir_filename);
+			}
+		}
+		closedir(d);
+		for (std::list<std::string>::iterator it = l.begin(); it != l.end(); ++it)
+			remove((*it).c_str());
+	}
+	return NULL;
+}
+
 long timer_wakeup = 0;
 #endif
 int CNeutrinoApp::run(int argc, char **argv)
@@ -2198,24 +2221,10 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	safe_mkdir(g_settings.network_nfs_recordingdir);
 	safe_mkdir(g_settings.epg_dir.c_str());
 
-	if(g_settings.auto_delete) {
-		const char *timeshiftDir = CRecordManager::getInstance()->GetTimeshiftDirectory().c_str();
-		if(strcmp(g_settings.timeshiftdir, g_settings.network_nfs_recordingdir)) {
-			DIR *d = opendir(timeshiftDir);
-			if(d){
-				while (struct dirent *e = readdir(d))
-				{
-					std::string filename = e->d_name;
-					if ((filename.find("_temp.ts") == filename.size() - 8) || (filename.find("_temp.xml") == filename.size() - 9))
-					{
-						std::string timeshiftDir_filename= timeshiftDir;
-						timeshiftDir_filename+= "/" + filename;
-						remove(timeshiftDir_filename.c_str());
-					}
-				}
-				closedir(d);
-			}
-		}
+	if(g_settings.auto_delete && strcmp(g_settings.timeshiftdir, g_settings.network_nfs_recordingdir)) {
+		pthread_t thr;
+		pthread_create (&thr, NULL, autodelete_thread, NULL);
+		pthread_detach(thr);
 	}
 #endif
 #ifndef DISABLE_SECTIONSD
