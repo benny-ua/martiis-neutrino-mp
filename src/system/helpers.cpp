@@ -178,9 +178,9 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 	return(fp);
 }
 
-int safe_mkdir(char * path)
-{
 #ifdef MARTII
+int safe_mkdir(const char * path)
+{
 	struct statfs s;
 	size_t l = strlen(path);
 	char d[l + 3];
@@ -201,7 +201,10 @@ int safe_mkdir(char * path)
 	if(statfs(d, &s) || (s.f_type == 0x72b6 /* JFFS2 */) || (s.f_type == 0x5941ff53 /* YAFFS2 */))
 		return -1;
 	return mkdir(path, 0755);
+}
 #else
+int safe_mkdir(char * path)
+{
 	struct statfs s;
 	int ret = 0;
 	if(!strncmp(path, "/hdd", 4)) {
@@ -213,8 +216,8 @@ int safe_mkdir(char * path)
 	} else
 		mkdir(path, 0755);
 	return ret;
-#endif
 }
+#endif
 
 /* function used to check is this dir writable, i.e. not flash, for record etc */
 int check_dir(const char * dir)

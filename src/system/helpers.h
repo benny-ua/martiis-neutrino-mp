@@ -26,7 +26,11 @@ int my_system(const char * cmd);
 int my_system(int argc, const char *arg, ...); /* argc is number of arguments including command */
 
 FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type);
+#ifdef MARTII
+int safe_mkdir(const char * path);
+#else
 int safe_mkdir(char * path);
+#endif
 bool file_exists(const char *filename);
 void wakeup_hdd(const char *hdd_dir);
 int check_dir(const char * dir);
