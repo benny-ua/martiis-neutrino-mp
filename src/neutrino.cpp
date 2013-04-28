@@ -2021,9 +2021,9 @@ void wake_up(long &wakeup)
 }
 
 #ifdef MARTII
-static void *autodelete_thread(void *arg) {
+static void *autodelete_thread(void *) {
 	set_threadname(__func__);
-	std::string timeshiftDir = std::string((char *)arg);
+	std::string timeshiftDir = CRecordManager::getInstance()->GetTimeshiftDirectory();
 
 	DIR *d = opendir(timeshiftDir.c_str());
 	if(d){
