@@ -495,7 +495,9 @@ int timerd_main_thread(void *data)
 
 	// Start timer thread
 	CTimerManager::getInstance();
+#ifndef MARTII
 	CTimerManager::getInstance()->wakeup = !!(*(long *)data);
+#endif
 
 	*(long *)data = -1; /* signal we're up and running */
 

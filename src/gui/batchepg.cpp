@@ -54,7 +54,7 @@
 #include <driver/rcinput.h>
 #include <driver/volume.h>
 
-extern bool timer_wakeup; // timermanager.cpp
+extern long timer_wakeup; // neutrino.cpp
 
 CBatchEPG_Menu::CBatchEPG_Menu()
 {

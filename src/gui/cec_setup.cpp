@@ -139,7 +139,7 @@ int CCECSetup::showMenu()
 }
 
 #ifdef MARTII
-extern bool timer_wakeup; // timermanager.cpp
+extern long timer_wakeup; // neutrino.cpp
 
 void CCECSetup::setCECSettings(bool b)
 {	

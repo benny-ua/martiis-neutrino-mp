@@ -64,7 +64,11 @@ void CTimerManager::Init(void)
 	eventServer = new CEventServer;
 	m_saveEvents = false;
 	m_isTimeSet = false;
+#ifdef MARTII
+	shutdown_eventID = -1;
+#else
 	wakeup = 0;
+#endif
 	loadRecordingSafety();
 
 	//thread starten
@@ -820,15 +824,24 @@ void CTimerManager::shutdownOnWakeup(int currEventID)
 	time_t now = time(NULL);
 	if((nextAnnounceTime-now) > 600 || nextAnnounceTime==0)
 	{ // in den naechsten 10 min steht nix an
-#ifdef MARTII
-		wakeup = 0;
-#endif
 		dprintf("Programming shutdown event\n");
 		CTimerEvent_Shutdown* event = new CTimerEvent_Shutdown(now+120, now+180);
+#ifdef MARTII
+		shutdown_eventID =
+#endif
 		addEvent(event);
 	}
 	pthread_mutex_unlock(&tm_eventsMutex);
 }
+#ifdef MARTII
+void CTimerManager::cancelShutdownOnWakeup()
+{
+	if (shutdown_eventID > -1) {
+		removeEvent(shutdown_eventID);
+		shutdown_eventID = -1;
+	}
+}
+#endif
 void CTimerManager::setRecordingSafety(int pre, int post)
 {
 	m_extraTimeStart=pre;

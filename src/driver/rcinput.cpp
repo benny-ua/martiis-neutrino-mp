@@ -57,6 +57,7 @@
 
 #ifdef MARTII
 #include <gui/cec_setup.h> // FIXME
+#include <timerd/timermanager.h> // FIXME
 #endif
 
 //#define RCDEBUG
@@ -1255,11 +1256,13 @@ printf("[neutrino] CSectionsdClient::EVT_GOT_CN_EPG\n");
 #endif
 #ifdef MARTII
 					if (firstKey) {
-						extern long timer_wakeup; // timermanager.cpp
+						extern long timer_wakeup; // neutrino.cpp
 						if (timer_wakeup) {
+							unlink("/tmp/.timer_wakeup");
 							timer_wakeup = false;
 							CCECSetup cecsetup;
 							cecsetup.setCECSettings(true);
+							CTimerManager::getInstance()->cancelShutdownOnWakeup();
 						}
 					}
 #endif

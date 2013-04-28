@@ -2010,7 +2010,9 @@ void wake_up(long &wakeup)
 	/* not platform specific - this is created by the init process */
 	if (access("/tmp/.timer_wakeup", F_OK) == 0) {
 		wakeup = 1;
+#ifndef MARTII
 		unlink("/tmp/.timer_wakeup");
+#endif
 	}
 
 	if(!wakeup){
