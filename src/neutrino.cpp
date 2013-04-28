@@ -659,12 +659,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	strcpy( g_settings.network_nfs_picturedir, configfile.getString( "network_nfs_picturedir", "/media/sda1/pictures" ).c_str() );
 	strcpy( g_settings.network_nfs_moviedir, configfile.getString( "network_nfs_moviedir", "/media/sda1/movies" ).c_str() );
 	strcpy( g_settings.network_nfs_recordingdir, configfile.getString( "network_nfs_recordingdir", "/media/sda1/movies" ).c_str() );
-#ifdef MARTII
-	safe_mkdir(g_settings.network_nfs_audioplayerdir);
-	safe_mkdir(g_settings.network_nfs_picturedir);
-	safe_mkdir(g_settings.network_nfs_moviedir);
-	safe_mkdir(g_settings.network_nfs_recordingdir);
-#endif
 	strcpy( g_settings.timeshiftdir, configfile.getString( "timeshiftdir", "" ).c_str() );
 
 	g_settings.temp_timeshift = configfile.getInt32( "temp_timeshift", 0 );
@@ -683,9 +677,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		else
 			sprintf(timeshiftDir, "%s/.timeshift", g_settings.network_nfs_recordingdir);
 	}
-#ifdef MARTII
-	safe_mkdir(timeshiftDir);
-#endif
 #ifndef MARTII
 	printf("***************************** rec dir %s timeshift dir %s\n", g_settings.network_nfs_recordingdir, timeshiftDir);
 #endif
@@ -1099,7 +1090,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString("epg_max_events"           ,g_settings.epg_max_events );
 	configfile.setString("epg_dir"                  ,g_settings.epg_dir);
 #ifdef MARTII
-	safe_mkdir((char *)g_settings.epg_dir.c_str());
         configfile.setBool("epg_enable_freesat"		,g_settings.epg_enable_freesat);
         configfile.setBool("epg_enable_viasat"		,g_settings.epg_enable_viasat);
         configfile.setBool("batchepg_run_at_shutdown"	,g_settings.batchepg_run_at_shutdown);
@@ -2199,6 +2189,12 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 #ifdef MARTII
 	CFSMounter::automount_async_stop();
+	safe_mkdir(CRecordManager::getInstance()->GetTimeshiftDirectory().c_str());
+	safe_mkdir(g_settings.network_nfs_audioplayerdir);
+	safe_mkdir(g_settings.network_nfs_picturedir);
+	safe_mkdir(g_settings.network_nfs_moviedir);
+	safe_mkdir(g_settings.network_nfs_recordingdir);
+	safe_mkdir(g_settings.epg_dir.c_str());
 #endif
 #ifndef DISABLE_SECTIONSD
 	CSectionsdClient::epg_config config;
