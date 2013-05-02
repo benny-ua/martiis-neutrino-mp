@@ -308,6 +308,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 #endif
 	while(SelectFile()) {
 #ifdef MARTII
+		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		CVFD::getInstance()->showServicename(full_name.c_str());
 #endif
 		PlayFile();
@@ -338,6 +339,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 void CMoviePlayerGui::updateLcd()
 {
+#ifndef MARTII
 	char tmp[20];
 	std::string lcd;
 	std::string name;
@@ -372,6 +374,7 @@ void CMoviePlayerGui::updateLcd()
 	lcd += name;
 	CVFD::getInstance()->setMode(LCD_MODE);
 	CVFD::getInstance()->showMenuText(0, lcd.c_str(), -1, true);
+#endif
 }
 
 void CMoviePlayerGui::fillPids()
