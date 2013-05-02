@@ -33,6 +33,7 @@
 #include <driver/nglcd.h>
 #include <driver/screen_max.h>
 #include "glcdsetup.h"
+#include <mymenu.h>
 
 #define KEY_GLCD_BLACK			0
 #define KEY_GLCD_WHITE			1
@@ -55,48 +56,28 @@ static const CMenuOptionChooser::keyval GLCD_COLOR_OPTIONS[GLCD_COLOR_OPTION_COU
 	, { KEY_GLCD_YELLOW,	LOCALE_GLCD_COLOR_YELLOW }
 };
 
+static const uint32_t colormap[GLCD_COLOR_OPTION_COUNT] =
+{
+	  GLCD::cColor::Black
+	, GLCD::cColor::White
+	, GLCD::cColor::Red
+	, GLCD::cColor::Green
+	, GLCD::cColor::Blue
+	, GLCD::cColor::Magenta
+	, GLCD::cColor::Cyan
+	, GLCD::cColor::Yellow
+};
+
 int GLCD_Menu::color2index(uint32_t color) {
-	if (color == GLCD::cColor::Black)
-		return KEY_GLCD_BLACK;
-	if (color == GLCD::cColor::White)
-		return KEY_GLCD_WHITE;
-	if (color == GLCD::cColor::Red)
-		return KEY_GLCD_RED;
-	if (color == GLCD::cColor::Green)
-		return KEY_GLCD_GREEN;
-	if (color == GLCD::cColor::Blue)
-		return KEY_GLCD_BLUE;
-	if (color == GLCD::cColor::Magenta)
-		return KEY_GLCD_MAGENTA;
-	if (color == GLCD::cColor::Cyan)
-		return KEY_GLCD_CYAN;
-	if (color == GLCD::cColor::Yellow)
-		return KEY_GLCD_YELLOW;
+	for (int i = 0; i < GLCD_COLOR_OPTION_COUNT; i++)
+		if (colormap[i] == color)
+			return i;
 	return KEY_GLCD_BLACK;
 }
 
 uint32_t GLCD_Menu::index2color(int i) {
-	switch(i) {
-	case KEY_GLCD_BLACK:
-		return GLCD::cColor::Black;
-	case KEY_GLCD_WHITE:
-		return GLCD::cColor::White;
-	case KEY_GLCD_RED:
-		return GLCD::cColor::Red;
-	case KEY_GLCD_GREEN:
-		return GLCD::cColor::Green;
-	case KEY_GLCD_BLUE:
-		return GLCD::cColor::Blue;
-	case KEY_GLCD_MAGENTA:
-		return GLCD::cColor::Magenta;
-	case KEY_GLCD_CYAN:
-		return GLCD::cColor::Cyan;
-	case KEY_GLCD_YELLOW:
-		return GLCD::cColor::Yellow;
-	}
-	return GLCD::cColor::ERRCOL;
+	return (i < GLCD_COLOR_OPTION_COUNT) ? colormap[i] : GLCD::cColor::ERRCOL;
 }
-
 
 GLCD_Menu::GLCD_Menu()
 {
@@ -105,7 +86,6 @@ GLCD_Menu::GLCD_Menu()
 
 	notifier = new GLCD_Menu_Notifier();
 }
-
 
 int GLCD_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 {
@@ -167,7 +147,6 @@ GLCD_Menu_Notifier::changeNotify (const neutrino_locale_t OptionName, void *Data
 		else
 			nglcd->Suspend();
 		return true;
-		break;
 	case LOCALE_GLCD_MIRROR_OSD:
 		nglcd->doMirrorOSD = g_settings.glcd_mirror_osd;
 		break;
@@ -195,75 +174,68 @@ GLCD_Menu_Notifier::changeNotify (const neutrino_locale_t OptionName, void *Data
 	return true;
 }
 
-#define ONOFF_OPTION_COUNT 2
-static const CMenuOptionChooser::keyval ONOFF_OPTIONS[ONOFF_OPTION_COUNT] = {
-	{ 0, LOCALE_OPTIONS_OFF },
-	{ 1, LOCALE_OPTIONS_ON }
-};
-
 void GLCD_Menu::GLCD_Menu_Settings()
 {
 	int color_bg = color2index(g_settings.glcd_color_bg);
 	int color_fg = color2index(g_settings.glcd_color_fg);
 	int color_bar = color2index(g_settings.glcd_color_bar);
 
-	CMenuWidget* m = new CMenuWidget(LOCALE_GLCD_HEAD, NEUTRINO_ICON_SETTINGS, width);
-	m->setSelected(selected);
-	m->addItem(GenericMenuSeparator);
-	m->addItem(GenericMenuBack);
-	m->addItem(GenericMenuSeparatorLine);
+	CMenuWidget m(LOCALE_GLCD_HEAD, NEUTRINO_ICON_SETTINGS, width);
+	m.setSelected(selected);
+	m.addItem(GenericMenuSeparator);
+	m.addItem(GenericMenuBack);
+	m.addItem(GenericMenuSeparatorLine);
 
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_ENABLE, &g_settings.glcd_enable,
-				ONOFF_OPTIONS, ONOFF_OPTION_COUNT, true, notifier));
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_ENABLE, &g_settings.glcd_enable,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier));
 	int shortcut = 1;
-	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_FG, &color_fg,
+	m.addItem(GenericMenuSeparatorLine);
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_FG, &color_fg,
 				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BG, &color_bg,
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BG, &color_bg,
 				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BAR, &color_bar,
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BAR, &color_bar,
 				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuForwarder(LOCALE_GLCD_FONT, true, g_settings.glcd_font, this, "select_font",
+	m.addItem(new CMenuForwarder(LOCALE_GLCD_FONT, true, g_settings.glcd_font, this, "select_font",
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_CHANNEL,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_CHANNEL,
 				&g_settings.glcd_percent_channel, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_EPG,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_EPG,
 				&g_settings.glcd_percent_epg, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_BAR,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_BAR,
 				&g_settings.glcd_percent_bar, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME,
 				&g_settings.glcd_percent_time, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_SHOW_LOGO, &g_settings.glcd_show_logo,
-				ONOFF_OPTIONS, ONOFF_OPTION_COUNT, true, notifier,
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SHOW_LOGO, &g_settings.glcd_show_logo,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_LOGO,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_LOGO,
 				&g_settings.glcd_percent_logo, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS,
 				&g_settings.glcd_brightness, true, 0, 100, notifier));
-	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_TIME_IN_STANDBY, &g_settings.glcd_time_in_standby,
-				ONOFF_OPTIONS, ONOFF_OPTION_COUNT, true, notifier,
+	m.addItem(GenericMenuSeparatorLine);
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_TIME_IN_STANDBY, &g_settings.glcd_time_in_standby,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME_STANDBY,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME_STANDBY,
 				&g_settings.glcd_percent_time_standby, true, 0, 100, notifier));
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS_STANDBY,
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS_STANDBY,
 				&g_settings.glcd_brightness_standby, true, 0, 100, notifier));
-	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SCROLL_SPEED,
+	m.addItem(GenericMenuSeparatorLine);
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SCROLL_SPEED,
 				&g_settings.glcd_scroll_speed, true, 1, 63, notifier));
-	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_OSD, &g_settings.glcd_mirror_osd,
-				ONOFF_OPTIONS, ONOFF_OPTION_COUNT, true, notifier,
+	m.addItem(GenericMenuSeparatorLine);
+	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_OSD, &g_settings.glcd_mirror_osd,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
 				CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
-	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, "", this, "rescan",
+	m.addItem(GenericMenuSeparatorLine);
+	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, "", this, "rescan",
 				CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-	m->exec(NULL, "");
+	m.exec(NULL, "");
 	nGLCD::getInstance()->StandbyMode(false);
-	m->hide();
-	delete m;
+	m.hide();
 }
 // vim:ts=4
