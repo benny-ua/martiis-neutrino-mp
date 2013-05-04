@@ -73,6 +73,9 @@ const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis
  * TODO: what if another input device is present? */
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
 #endif
+#elif HAVE_GENERIC_HARDWARE
+/* the FIFO created by libstb-hal */
+const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/tmp/neutrino.input"};
 #else
 //const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
@@ -171,12 +174,8 @@ void CRCInput::open(int dev)
 			if (i != dev || fd_rc[i] != -1)
 				continue;
 		}
-		if ((fd_rc[i] = ::open(RC_EVENT_DEVICE[i], O_RDWR)) == -1)
+		if ((fd_rc[i] = ::open(RC_EVENT_DEVICE[i], O_RDWR|O_NONBLOCK|O_CLOEXEC)) == -1)
 			perror(RC_EVENT_DEVICE[i]);
-		else
-		{
-			fcntl(fd_rc[i], F_SETFL, O_NONBLOCK);
-		}
 		printf("CRCInput::open: %s fd %d\n", RC_EVENT_DEVICE[i], fd_rc[i]);
 	}
 

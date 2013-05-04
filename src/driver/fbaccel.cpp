@@ -30,9 +30,6 @@
 #endif
 
 #include <driver/framebuffer.h>
-#ifdef USE_OPENGL
-#include "glthread.h"
-#endif
 #ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
 #endif
@@ -56,6 +53,10 @@
 #if HAVE_SPARK_HARDWARE
 #include <linux/stmfb.h>
 #include <bpamem.h>
+#endif
+#ifdef USE_OPENGL
+#include <glfb.h>
+extern GLFramebuffer *glfb;
 #endif
 
 //#undef USE_NEVIS_GXA //FIXME
@@ -976,8 +977,8 @@ void CFbAccel::blit()
 void CFbAccel::blit()
 {
 #ifdef USE_OPENGL
-	if (fb->mpGLThreadObj)
-		fb->mpGLThreadObj->blit();
+	if (glfb)
+		glfb->blit();
 #endif
 }
 #endif
