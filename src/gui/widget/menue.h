@@ -45,6 +45,13 @@
 
 #include <string>
 #include <vector>
+#ifdef MARTII
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
+#endif
 
 #define NO_WIDGET_ID -1
 
@@ -66,10 +73,16 @@ class CChangeObserver
 {
 	public:
 		virtual ~CChangeObserver(){}
-		virtual bool changeNotify(const neutrino_locale_t /*OptionName*/, void */*Data*/)
+		virtual bool changeNotify(const neutrino_locale_t /*OptionName*/, void * /*Data*/)
 		{
 			return false;
 		}
+#ifdef MARTII
+		virtual bool changeNotify(lua_State * /*L*/, const std::string & /*luaAction*/, void * /*Data*/)
+		{
+			return false;
+		}
+#endif
 };
 
 class CMenuTarget
@@ -101,6 +114,10 @@ class CMenuItem
 		std::string    	selected_iconName;
 		std::string    	iconName_Info_right;
 		std::string	hintIcon;
+#ifdef MARTII
+		lua_State	*luaState;
+		std::string	luaAction;
+#endif
 		neutrino_locale_t hint;
 
 		CMenuItem();

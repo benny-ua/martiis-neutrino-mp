@@ -39,6 +39,13 @@
 #include <system/localize.h>
 
 #include <string>
+#ifdef MARTII
+extern "C" {
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
+#endif
 
 class CStringInput : public CMenuTarget
 {
@@ -98,6 +105,10 @@ class CStringInput : public CMenuTarget
 
 		void hide();
 		int exec( CMenuTarget* parent, const std::string & actionKey );
+#ifdef MARTII
+		lua_State	*luaState;
+		std::string	luaAction;
+#endif
 
 };
 
