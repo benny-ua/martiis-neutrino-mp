@@ -39,7 +39,6 @@ libneutrino_driver_a_SOURCES = \
 	streamts.cpp \
 	volume.cpp
 
-<<<<<<< HEAD
 if ENABLE_GRAPHLCD
 libneutrino_driver_a_SOURCES += \
 	nglcd.cpp
@@ -49,8 +48,7 @@ if BOXTYPE_GENERIC
 libneutrino_driver_a_SOURCES += \
 	glthread.cpp
 endif
-=======
->>>>>>> seife/master
+
 if BOXTYPE_COOL
 libneutrino_driver_a_SOURCES += \
 	vfd.cpp
