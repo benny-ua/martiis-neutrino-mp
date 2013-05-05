@@ -682,9 +682,16 @@ CStringInputSMS::CStringInputSMS(const neutrino_locale_t Name, std::string* Valu
 
 CStringInputSMS::CStringInputSMS(const neutrino_locale_t Name, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
    		: CStringInput(Name, Value, Size, Hint_1, Hint_2, Valid_Chars, Observ, Icon)
-   {
+{
 	initSMS(Valid_Chars);
 }
+#ifdef MARTII
+CStringInputSMS::CStringInputSMS(char *Head, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
+   		: CStringInput(Head, Value, Size, Hint_1, Hint_2, Valid_Chars, Observ, Icon)
+{
+	initSMS(Valid_Chars);
+}
+#endif
 
 void CStringInputSMS::initSMS(const char * const Valid_Chars)
 {
