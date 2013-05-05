@@ -43,7 +43,11 @@
 
 #include <iostream>
 
+#ifdef MARTII
+CHintBoxExt::CHintBoxExt(const neutrino_locale_t Caption, const char *_Caption, const char * const Text, const int Width, const char * const Icon)
+#else
 CHintBoxExt::CHintBoxExt(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon)
+#endif
 {
 	m_message = strdup(Text);
 
@@ -60,16 +64,27 @@ CHintBoxExt::CHintBoxExt(const neutrino_locale_t Caption, const char * const Tex
 		begin = strtok(NULL, "\n");
 	}
 	m_bbheight = 0;
+#ifdef MARTII
+	init(Caption, _Caption, Width, Icon);
+#else
 	init(Caption, Width, Icon);
+#endif
 }
 
-
+#ifdef MARTII
+CHintBoxExt::CHintBoxExt(const neutrino_locale_t Caption, const char *_Caption, ContentLines& lines, const int Width, const char * const Icon)
+#else
 CHintBoxExt::CHintBoxExt(const neutrino_locale_t Caption, ContentLines& lines, const int Width, const char * const Icon)
+#endif
 {
 	m_message = NULL;
 	m_lines = lines;
 	m_bbheight = 0;
+#ifdef MARTII
+	init(Caption, _Caption, Width, Icon);
+#else
 	init(Caption, Width, Icon);
+#endif
 }
 
 CHintBoxExt::~CHintBoxExt(void)
@@ -97,7 +112,11 @@ CHintBoxExt::~CHintBoxExt(void)
 	}
 }
 
+#ifdef MARTII
+void CHintBoxExt::init(const neutrino_locale_t Caption, const char *_Caption, const int Width, const char * const Icon)
+#else
 void CHintBoxExt::init(const neutrino_locale_t Caption, const int Width, const char * const Icon)
+#endif
 {
 	m_width   = Width;
 	int nw = 0;
@@ -111,6 +130,10 @@ void CHintBoxExt::init(const neutrino_locale_t Caption, const int Width, const c
 	bgPainted = false;
 
 	m_caption = Caption;
+#ifdef MARTII
+	if (_Caption)
+		m_Caption = _Caption;
+#endif
 
 	int page = 0;
 	int line = 0;
@@ -195,6 +218,11 @@ void CHintBoxExt::init(const neutrino_locale_t Caption, const int Width, const c
 	else
 		m_iconfile = "";
 
+#ifdef MARTII
+	if (!m_Caption.empty())
+		nw = additional_width + g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(m_Caption.c_str());
+	else
+#endif
 	nw = additional_width + g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(m_caption), true); // UTF-8
 
 	if (nw > m_width)
@@ -251,7 +279,11 @@ void CHintBoxExt::refresh(bool toround)
 	
 	// icon
 	int x_offset = 6, icon_space = x_offset, x_text;
+#ifdef MARTII
+	std::string title_text = m_Caption.empty() ? g_Locale->getText(m_caption) : m_Caption;
+#else
 	std::string title_text = g_Locale->getText(m_caption);
+#endif
 	if (!m_iconfile.empty())
 	{
 		int w, h;

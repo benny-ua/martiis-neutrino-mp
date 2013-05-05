@@ -40,6 +40,27 @@
 #include <global.h>
 #include <neutrino.h>
 
+#ifdef MARTII
+CMessageBox::CMessageBox(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, NULL, Text, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
+
+CMessageBox::CMessageBox(const neutrino_locale_t Caption, ContentLines& Lines, const int Width, const char * const Icon, const CMessageBox::result_ Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, NULL, Lines, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
+
+CMessageBox::CMessageBox(const char* Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ Default, const uint32_t ShowButtons) : CHintBoxExt(NONEXISTANT_LOCALE, Caption, Text, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
+
+CMessageBox::CMessageBox(const char* Caption, ContentLines& Lines, const int Width, const char * const Icon, const CMessageBox::result_ Default, const uint32_t ShowButtons) : CHintBoxExt(NONEXISTANT_LOCALE, Caption, Lines, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
+#else
 CMessageBox::CMessageBox(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, Text, Width, Icon)
 {
 	Init(Default, ShowButtons);
@@ -49,6 +70,7 @@ CMessageBox::CMessageBox(const neutrino_locale_t Caption, ContentLines& Lines, c
 {
 	Init(Default, ShowButtons);
 }
+#endif
 
 void CMessageBox::Init(const CMessageBox::result_ Default, const uint32_t ShowButtons)
 {
@@ -106,7 +128,11 @@ void CMessageBox::Init(const CMessageBox::result_ Default, const uint32_t ShowBu
 			ButtonDistance = (m_width - b_width * ButtonCount) / (ButtonCount + 1);
 
 	/* this is ugly: re-init (CHintBoxExt) to recalculate the number of lines and pages */
+#ifdef MARTII
+	init(m_caption, m_Caption.c_str(), m_width, m_iconfile == "" ? NULL : m_iconfile.c_str());
+#else
 	init(m_caption, m_width, m_iconfile == "" ? NULL : m_iconfile.c_str());
+#endif
 	m_height += m_bbheight;
 }
 
@@ -287,6 +313,18 @@ int ShowMsgUTF(const neutrino_locale_t Caption, const char * const Text, const C
 
 	return res;
 }
+#ifdef MARTII
+int ShowMsgUTF(const char *Caption, const char * const Text, const CMessageBox::result_ Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+{
+   	CMessageBox* messageBox = new CMessageBox(Caption, Text, Width, Icon, Default, ShowButtons);
+	messageBox->returnDefaultValueOnTimeout(returnDefaultOnTimeout);
+	messageBox->exec(timeout);
+	int res = messageBox->result;
+	delete messageBox;
+
+	return res;
+}
+#endif
 
 int ShowLocalizedMessage(const neutrino_locale_t Caption, const neutrino_locale_t Text, const CMessageBox::result_ Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
