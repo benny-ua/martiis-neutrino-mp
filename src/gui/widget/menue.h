@@ -168,9 +168,14 @@ class CMenuItem
 class CMenuSeparator : public CMenuItem
 {
 		int               type;
+#ifndef MARTII
 		std::string	  separator_text;
+#endif
 
 	public:
+#ifdef MARTII
+		std::string	  separator_text;
+#endif
 		neutrino_locale_t text;
 
 		enum
@@ -202,17 +207,27 @@ class CMenuSeparator : public CMenuItem
 
 class CNonLocalizedMenuSeparator : public CMenuSeparator
 {
+#ifndef MARTII
 	const char * the_text;
+#endif
 
 public:
 	CNonLocalizedMenuSeparator(const char * ptext, const neutrino_locale_t Text1) : CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, Text1)
 	{
+#ifdef MARTII
+		separator_text = ptext;
+#else
 		the_text = ptext;
+#endif
 	}
 
 	virtual const char * getString(void)
 	{
+#ifdef MARTII
+		return separator_text.c_str();
+#else
 		return the_text;
+#endif
 	}
 };
 
