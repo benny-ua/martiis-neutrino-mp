@@ -1447,6 +1447,9 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 {
 	bool wantsRepaint = false;
 	int ret = menu_return::RETURN_NONE;
+#ifdef MARTII
+	char *optionValname = NULL;
+#endif
 
 	if((msg == CRCInput::RC_ok) && pulldown) {
 		int select = -1;
@@ -1478,6 +1481,9 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 		if(select >= 0) 
 		{
 			*optionValue = options[select].key;
+#ifdef MARTII
+			optionValname = (char *) options[select].valname;
+#endif
 		}
 		delete menu;
 		delete selector;
@@ -1486,10 +1492,19 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 			if (options[count].key == (*optionValue)) {
 				if(msg == CRCInput::RC_left) {
 					if(count > 0)
+#ifdef MARTII
+						optionValname = (char *) options[(count-1) % number_of_options].valname,
+#endif
 						*optionValue = options[(count-1) % number_of_options].key;
 					else
+#ifdef MARTII
+						optionValname = (char *) options[number_of_options-1].valname,
+#endif
 						*optionValue = options[number_of_options-1].key;
 				} else
+#ifdef MARTII
+					optionValname = (char *) options[(count+1) % number_of_options].valname,
+#endif
 					*optionValue = options[(count+1) % number_of_options].key;
 				break;
 			}
@@ -1498,10 +1513,8 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 	paint(true);
 #ifdef MARTII
 	if(observ && !luaAction.empty()) {
-		// optionValue is int*
-		char tmp[80];
-		snprintf(tmp, sizeof(tmp), "%d", *optionValue);
-		wantsRepaint = observ->changeNotify(luaState, luaAction, tmp);
+		if (optionValname)
+			wantsRepaint = observ->changeNotify(luaState, luaAction, optionValname);
 	} else
 #endif
 	if(observ)
