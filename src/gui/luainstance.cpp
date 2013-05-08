@@ -1224,7 +1224,7 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 		{ "ok",		CMessageBox::mbrOk },
 		{ NULL,		0 }
 	};
-	if (tableLookup(L, "default", tmp))
+	if (tableLookup(L, "default", tmp)) {
 		lua_pushvalue(L, -2);
 		const char *val = lua_tostring(L, -2);
 		for (int i = 0; mbr[i].name; i++)
@@ -1232,6 +1232,7 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 				default_button = mbr[i].code;
 				break;
 			}
+	}
 
 	int res = ShowMsgUTF(name.c_str(), text.c_str(), (CMessageBox::result_) default_button, (CMessageBox::buttons_) show_buttons, icon.empty() ? NULL : icon.c_str(), width, timeout, return_default_on_timeout);
 
