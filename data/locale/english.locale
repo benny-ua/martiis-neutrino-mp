@@ -1643,6 +1643,7 @@ plugins.hdd_dir Plugin HDD dir.
 plugins.result plugin output
 plugintype.disabled Disabled
 plugintype.game Game
+plugintype.lua LUA
 plugintype.script Script
 plugintype.tool Tool
 progressbar.color Progressbar Design

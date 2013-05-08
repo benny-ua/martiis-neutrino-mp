@@ -121,6 +121,7 @@ class CPlugins
 		inline     neutrino_msg_t  getKey              (const int number) const { return (neutrino_msg_t)plugin_list[number].key; }
 #ifdef MARTII
 		void setType (const int number, int t) { plugin_list[number].type = (CPlugins::p_type_t) t ; }
+		bool overrideType(plugin *plugin_data, std::string &setting, p_type type);
 #endif
 
 		void startPlugin(int number,int param);

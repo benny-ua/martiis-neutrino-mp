@@ -1670,6 +1670,7 @@ const char * locale_real_names[] =
 	"plugins.result",
 	"plugintype.disabled",
 	"plugintype.game",
+	"plugintype.lua",
 	"plugintype.script",
 	"plugintype.tool",
 	"progressbar.color",

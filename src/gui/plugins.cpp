@@ -181,6 +181,22 @@ CPlugins::~CPlugins()
 	plugin_list.clear();
 }
 
+#ifdef MARTII
+bool CPlugins::overrideType(plugin *plugin_data, std::string &setting, p_type type)
+{
+	if (!setting.empty()) {
+		char s[setting.length() + 1];
+		strncpy(s, setting.c_str(), setting.length() + 1);
+		char *t, *p = s;
+		while ((t = strsep(&p, ",")))
+			if (!strcmp(t, plugin_data->filename.c_str())) {
+				plugin_data->type = type;
+				return true;
+			}
+	}
+	return false;
+}
+#endif
 bool CPlugins::parseCfg(plugin *plugin_data)
 {
 //	FILE *fd;
@@ -276,52 +292,11 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 
 	inFile.close();
 #ifdef MARTII
-	//plugin_data->filename in g_settings.plugins_disabled/game/tool/script?!? => set type accordingly
-	bool found = false;
-	if (g_settings.plugins_disabled != "") {
-		char *s = strdup(g_settings.plugins_disabled.c_str());
-		char *t, *p = s;
-		while ((t = strsep(&p, ",")))
-			if (!strcmp(t, plugin_data->filename.c_str())) {
-				plugin_data->type = P_TYPE_DISABLED;
-				found = true;
-				break;
-			}
-		free(s);
-	}
-	if (!found && (g_settings.plugins_game != "")) {
-		char *s = strdup(g_settings.plugins_game.c_str());
-		char *t, *p = s;
-		while ((t = strsep(&p, ",")))
-			if (!strcmp(t, plugin_data->filename.c_str())) {
-				plugin_data->type = P_TYPE_GAME;
-				found = true;
-				break;
-			}
-		free(s);
-	}
-	if (!found && (g_settings.plugins_tool != "")) {
-		char *s = strdup(g_settings.plugins_tool.c_str());
-		char *t, *p = s;
-		while ((t = strsep(&p, ",")))
-			if (!strcmp(t, plugin_data->filename.c_str())) {
-				plugin_data->type = P_TYPE_TOOL;
-				found = true;
-				break;
-			}
-		free(s);
-	}
-	if (!found && (g_settings.plugins_script != "")) {
-		char *s = strdup(g_settings.plugins_script.c_str());
-		char *t, *p = s;
-		while ((t = strsep(&p, ",")))
-			if (!strcmp(t, plugin_data->filename.c_str())) {
-				plugin_data->type = P_TYPE_SCRIPT;
-				found = true;
-				break;
-			}
-		free(s);
-	}
+	overrideType(plugin_data, g_settings.plugins_disabled, P_TYPE_DISABLED) ||
+	overrideType(plugin_data, g_settings.plugins_game, P_TYPE_GAME) ||
+	overrideType(plugin_data, g_settings.plugins_tool, P_TYPE_TOOL) ||
+	overrideType(plugin_data, g_settings.plugins_script, P_TYPE_SCRIPT) ||
+	overrideType(plugin_data, g_settings.plugins_lua, P_TYPE_LUA);
 #endif
 	return !reject;
 }
@@ -704,11 +679,9 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	frameBuffer->Unlock();
 #ifdef MARTII
 	frameBuffer->ClearFB();
-#endif
-	frameBuffer->paintBackground();
-#ifdef MARTII
 	videoDecoder->Pig(-1, -1, -1, -1);
 #endif
+	frameBuffer->paintBackground();
 	g_RCInput->restartInput();
 	g_RCInput->clearRCMsg();
 #endif

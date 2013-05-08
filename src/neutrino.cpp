@@ -735,11 +735,12 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.plugins_game = configfile.getString( "plugins_game", "" );
 	g_settings.plugins_tool = configfile.getString( "plugins_tool", "" );
 	g_settings.plugins_script = configfile.getString( "plugins_script", "" );
+	g_settings.plugins_lua = configfile.getString( "plugins_lua", "" );
 #endif
 	g_settings.logo_hdd_dir = configfile.getString( "logo_hdd_dir", "/var/share/icons/logo" );
 #ifdef MARTII
 	g_settings.logo_hdd_dir_2 = configfile.getString( "logo_hdd_dir_2", "/share/tuxbox/neutrino/icons/logo");
-	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "http://podfiles.zdf.de/podcast/zdf_podcasts/110924_hjo_p.mp4?2011-09-24+21-25");
+	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "");
 	g_settings.webtv_xml = configfile.getString("webtv_xml", CONFIGDIR "/webtv_usr.xml");
 #endif
 
@@ -1092,8 +1093,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString("epg_max_events"           ,g_settings.epg_max_events );
 	configfile.setString("epg_dir"                  ,g_settings.epg_dir);
 #ifdef MARTII
-        configfile.setBool("epg_enable_freesat"		,g_settings.epg_enable_freesat);
-        configfile.setBool("epg_enable_viasat"		,g_settings.epg_enable_viasat);
         configfile.setBool("batchepg_run_at_shutdown"	,g_settings.batchepg_run_at_shutdown);
         configfile.setInt32("batchepg_standard_waittime",g_settings.batchepg_standard_waittime);
 #endif
@@ -1251,6 +1250,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString ( "plugins_game", g_settings.plugins_game );
 	configfile.setString ( "plugins_tool", g_settings.plugins_tool );
 	configfile.setString ( "plugins_script", g_settings.plugins_script );
+	configfile.setString ( "plugins_lua", g_settings.plugins_lua );
 #endif
 	configfile.setString ( "logo_hdd_dir", g_settings.logo_hdd_dir );
 #ifdef MARTII

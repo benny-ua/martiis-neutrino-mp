@@ -353,6 +353,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		g_settings.plugins_game = "";
 		g_settings.plugins_tool = "";
 		g_settings.plugins_script = "";
+		g_settings.plugins_lua = "";
 		for (int i = 0; i < pcount; i++) {
 			if (pltype[i] & CPlugins::P_TYPE_DISABLED) {
 				if (g_settings.plugins_disabled != "")
@@ -374,6 +375,11 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 					g_settings.plugins_script += ",";
 				g_settings.plugins_script +=  g_PluginList->getFileName(i);
 				g_PluginList->setType(i, CPlugins::P_TYPE_SCRIPT);
+			} else if (pltype[i] & CPlugins::P_TYPE_LUA) {
+				if (g_settings.plugins_lua != "")
+					g_settings.plugins_lua += ",";
+				g_settings.plugins_lua +=  g_PluginList->getFileName(i);
+				g_PluginList->setType(i, CPlugins::P_TYPE_LUA);
 			}
 		}
 		g_PluginList->loadPlugins();
@@ -481,13 +487,14 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 }
 
 #ifdef MARTII
-#define PERSONALIZE_PLUGINTYPE_MAX 4
+#define PERSONALIZE_PLUGINTYPE_MAX 5
 const CMenuOptionChooser::keyval PERSONALIZE_PLUGINTYPE_OPTIONS[PERSONALIZE_PLUGINTYPE_MAX] =
 {
 	{ CPlugins::P_TYPE_DISABLED, LOCALE_PLUGINTYPE_DISABLED },
 	{ CPlugins::P_TYPE_GAME, LOCALE_PLUGINTYPE_GAME },
 	{ CPlugins::P_TYPE_TOOL, LOCALE_PLUGINTYPE_TOOL },
-	{ CPlugins::P_TYPE_SCRIPT, LOCALE_PLUGINTYPE_SCRIPT }
+	{ CPlugins::P_TYPE_SCRIPT, LOCALE_PLUGINTYPE_SCRIPT },
+	{ CPlugins::P_TYPE_LUA, LOCALE_PLUGINTYPE_LUA }
 };
 #endif
 
@@ -507,6 +514,8 @@ void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget)
 	{
 		ia[i] = g_PluginList->getType(i);
 		da[i] = g_PluginList->getName(i);
+		if (da[i].empty())
+			continue;
 		std::string pluginDesc = g_PluginList->getDescription(i);
 		if (!pluginDesc.empty())
 			da[i] += " (" + pluginDesc + ")";

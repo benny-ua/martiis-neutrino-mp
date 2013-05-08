@@ -426,6 +426,7 @@ struct SNeutrinoSettings
 	std::string plugins_game;
 	std::string plugins_tool;
 	std::string plugins_script;
+	std::string plugins_lua;
 #endif
 
 	//key configuration

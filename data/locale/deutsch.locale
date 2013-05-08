@@ -1641,6 +1641,7 @@ plugins.hdd_dir Externes Plugin-Verz.
 plugins.result Pluginausgabe
 plugintype.disabled Deaktiviert
 plugintype.game Spiel
+plugintype.lua LUA
 plugintype.script Skript
 plugintype.tool Werkzeug
 progressbar.color Fortschrittsbalken-Design
