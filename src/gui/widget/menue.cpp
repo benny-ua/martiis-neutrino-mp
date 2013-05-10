@@ -1306,7 +1306,7 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 		// optionValue is int*
 		char tmp[80];
 		snprintf(tmp, sizeof(tmp), "%d", *optionValue);
-		observ->changeNotify(luaState, luaAction, tmp);
+		observ->changeNotify(luaState, luaAction, luaId, tmp);
 	} else
 #endif
 	if(observ)
@@ -1514,7 +1514,7 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 #ifdef MARTII
 	if(observ && !luaAction.empty()) {
 		if (optionValname)
-			wantsRepaint = observ->changeNotify(luaState, luaAction, optionValname);
+			wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, optionValname);
 	} else
 #endif
 	if(observ)
@@ -1687,7 +1687,7 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 	}
 #ifdef MARTII
 	if(observ && !luaAction.empty())
-		wantsRepaint = observ->changeNotify(luaState, luaAction, optionValue);
+		wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, optionValue);
 	else
 #endif
 	if(observ) {

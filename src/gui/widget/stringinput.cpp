@@ -571,11 +571,6 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 
         if ( (observ) && (msg==CRCInput::RC_ok) )
         {
-#ifdef MARTII
-		if (!luaAction.empty())
-			observ->changeNotify(luaState, luaAction, value);
-		else
-#endif
                 observ->changeNotify(name, value);
         }
 	delete[] dispval;
@@ -924,11 +919,6 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 
 	if ( (observ) && (msg==CRCInput::RC_ok) )
 	{
-#ifdef MARTII
-		if (!luaAction.empty())
-			observ->changeNotify(luaState, luaAction, value);
-		else
-#endif
 		observ->changeNotify(name, value);
 	}
 

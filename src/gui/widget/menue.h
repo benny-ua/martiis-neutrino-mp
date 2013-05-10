@@ -78,7 +78,7 @@ class CChangeObserver
 			return false;
 		}
 #ifdef MARTII
-		virtual bool changeNotify(lua_State * /*L*/, const std::string & /*luaAction*/, void * /*Data*/)
+		virtual bool changeNotify(lua_State * /*L*/, const std::string & /*luaId*/, const std::string & /*luaAction*/, void * /*Data*/)
 		{
 			return false;
 		}
@@ -102,6 +102,11 @@ class CMenuItem
 		fb_pixel_t item_color, item_bgcolor;
 		
 		void initItemColors(const bool select_mode);
+#ifdef MARTII
+		lua_State	*luaState;
+		std::string	luaAction;
+		std::string	luaId;
+#endif
 			
 	public:
 		bool           	active;
@@ -115,8 +120,7 @@ class CMenuItem
 		std::string    	iconName_Info_right;
 		std::string	hintIcon;
 #ifdef MARTII
-		lua_State	*luaState;
-		std::string	luaAction;
+		void setLua(lua_State *_luaState, std::string &_luaAction, std::string &_luaId) { luaState = _luaState; luaAction = _luaAction; luaId = _luaId; };
 #endif
 		neutrino_locale_t hint;
 
