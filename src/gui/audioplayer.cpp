@@ -578,6 +578,20 @@ int CAudioPlayerGui::show()
 					play(m_selected);
 			}
 		}
+#ifdef MARTII
+		else if (msg == CRCInput::RC_forward && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			ff();
+		else if (msg == CRCInput::RC_rewind && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			rev();
+		else if (msg == CRCInput::RC_stop && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			stop();
+		else if (msg == CRCInput::RC_pause && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			pause();
+		else if (msg == CRCInput::RC_next && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			playNext();
+		else if (msg == CRCInput::RC_prev && m_key_level == 1 && m_curr_audiofile.FileType != CFile::STREAM_AUDIO)
+			playPrev();
+#endif
 		else if (msg == CRCInput::RC_red)
 		{
 			if (m_key_level == 0)
