@@ -398,6 +398,11 @@ void CPlugins::startLuaPlugin(int number)
 	CLuaInstance *lua = new CLuaInstance();
 	lua->runScript(script);
 	delete lua;
+#ifdef MARTII
+	frameBuffer->ClearFB();
+	videoDecoder->Pig(-1, -1, -1, -1);
+	frameBuffer->paintBackground();
+#endif
 }
 
 void CPlugins::startPlugin(int number,int /*param*/)
