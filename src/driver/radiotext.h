@@ -117,6 +117,9 @@ private:
 #endif
 
 	uint pid;
+#ifdef MARTII
+	uint lastRassPid;
+#endif
 	//pthread_t threadRT;
 	//int dmxfd;
 

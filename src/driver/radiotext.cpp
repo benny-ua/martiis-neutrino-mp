@@ -1240,6 +1240,7 @@ void CRadioText::RassShow(char *filename)
 
 	extern cVideo *videoDecoder;
 	videoDecoder->ShowPicture(filename, true);
+	lastRassPid = pid;
 }
 #endif
 
@@ -2325,6 +2326,9 @@ eOSState cRTplusList::ProcessKey(eKeys Key)
 CRadioText::CRadioText(void)
 {
 	pid = 0;
+#ifdef MARTII
+	lastRassPid = 0;
+#endif
 	audioDemux = NULL;
 	init();
 
@@ -2443,6 +2447,13 @@ void CRadioText::run()
 				pid = 0;
 				printf("CRadioText::run: ###################### failed to start PES filter ######################\n");
 			}
+#ifdef MARTII
+			if (lastRassPid) {
+				extern cVideo *videoDecoder;
+				videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+				lastRassPid = 0;
+			}
+#endif
 		}
 		mutex.unlock();
 		if (pid) {
