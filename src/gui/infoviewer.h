@@ -174,9 +174,6 @@ class CInfoViewer
 	bool    SDT_freq_update;
 	void	setUpdateTimer(uint64_t interval);
 	uint32_t getUpdateTimer(void) { return lcdUpdateTimer; }
-#ifdef MARTII
-	void	rassUpdate(char *rassfile);
-#endif
 };
 #if 0
 class CInfoViewerHandler : public CMenuTarget
