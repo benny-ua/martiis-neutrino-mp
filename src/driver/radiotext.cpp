@@ -83,6 +83,7 @@
 #include <gui/color.h>
 #ifdef MARTII
 #include <system/set_threadname.h>
+#include <video.h>
 #endif
 
 extern "C" {
@@ -110,7 +111,11 @@ int Rass_GalStart, Rass_GalEnd, Rass_GalCount, Rass_SlideFoto;
 #endif
 
 #define floor
+#ifdef MARTII
+#define DataDir g_settings.radiotext_rass_dir.c_str()
+#else
 const char *DataDir = "./";
+#endif
 //cRadioAudio *RadioAudio;
 //cRadioTextOsd *RadioTextOsd;
 //cRDSReceiver *RDSReceiver;
@@ -354,6 +359,10 @@ if (i < 0) { fprintf(stderr, "RT %s: i < 0 (%d)\n", __FUNCTION__, i); break; }
 									RDS_PsPtynDecode(false, mtext, index);	// PS
 									break;
 								case 0xda:
+#ifdef MARTII
+									if (S_Verbose >= 2)
+										printf("(RDS-RASS '%02x') -> RassDecode - %d\n", mec, index);
+#endif
 #if ENABLE_RASS
 									RassDecode(mtext, index);		// Rass
 #endif
@@ -826,6 +835,9 @@ void CRadioText::RassDecode(unsigned char *mtext, int len)
 							fwrite(daten, 1, filemax, fd);
 							//fflush(fd);		// for test in replaymode
 							fclose(fd);
+#ifdef MARTII
+							RassShow(filepath);
+#endif
 							Rass_Show = 1;
 							if (S_Verbose >= 2)
 								printf("Rass-File: ready for displaying :-)\n");
@@ -848,6 +860,10 @@ void CRadioText::RassDecode(unsigned char *mtext, int len)
 					if ((fd = fopen(filepath, "wb")) != NULL) {
 						fwrite(daten, 1, filemax, fd);
 						fclose(fd);
+#ifdef MARTII
+						if (filetype == 1)
+							RassShow(filepath);
+#endif
 						if (S_Verbose >= 1)
 							printf("Rass-File: saving '%s'\n", filepath);
 						// archivemarker mpeg-stills
@@ -1206,9 +1222,24 @@ int CRadioText::RassImage(int QArchiv, int QKey, bool DirUp)
 //	frameBuffer->useBackground(frameBuffer->loadBackground(image));// set useBackground true or false
 //	frameBuffer->paintBackground();
 //	RadioAudio->SetBackgroundImage(image);
+#ifdef MARTII
+	RassShow(image);
+#endif
 	free(image);
 
 	return QArchiv;
+}
+#endif
+
+#ifdef MARTII
+void CRadioText::RassShow(char *filename)
+{
+	char *lastSlash = strrchr(filename, '/');
+	if (lastSlash && !strcmp(lastSlash, "/Rass_0.mpg")) // HACK: don't display index
+		return;
+
+	extern cVideo *videoDecoder;
+	videoDecoder->ShowPicture(filename, true);
 }
 #endif
 

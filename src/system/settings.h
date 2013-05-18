@@ -147,6 +147,9 @@ struct SNeutrinoSettings
 	int ci_standby_reset;
 	int ci_clock;
 	int radiotext_enable;
+#ifdef MARTII
+	std::string radiotext_rass_dir;
+#endif
 	
 	//vcr
 	int vcr_AutoSwitch;

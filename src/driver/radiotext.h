@@ -62,7 +62,7 @@
 #include <OpenThreads/Thread>
 #include <OpenThreads/Condition>
 
-//#define ENABLE_RASS
+#define ENABLE_RASS 1
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
@@ -112,6 +112,9 @@ private:
 	void RadioStatusMsg(void);
 	void RassDecode(uchar *Data, int Length);
 	bool DividePes(unsigned char *data, int length, int *substart, int *subend);
+#ifdef MARTII
+	void RassShow(char *filename);
+#endif
 
 	uint pid;
 	//pthread_t threadRT;
