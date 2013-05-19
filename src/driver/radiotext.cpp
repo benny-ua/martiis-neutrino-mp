@@ -414,7 +414,9 @@ void CRadioText::RadiotextDecode(unsigned char *mtext, int len)
 		}
 		// byte 9 = RT-Status bitcodet (0=AB-flagcontrol, 1-4=Transmission-Number, 5+6=Buffer-Config,
 		//				    ingnored, always 0x01 ?)
+#ifndef MARTII
 fprintf(stderr, "MEC=0x%02x DSN=0x%02x PSN=0x%02x MEL=%02d STATUS=0x%02x MFL=%02d\n", mtext[5], mtext[6], mtext[7], mtext[8], mtext[9], mtext[4]);
+#endif
 		char temptext[RT_MEL];
 		memset(temptext, 0x20, RT_MEL-1);
 		temptext[RT_MEL - 1] = '\0';
