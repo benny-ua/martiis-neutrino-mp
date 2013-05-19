@@ -2724,10 +2724,9 @@ void CRadioText::RASS_interactive_mode(void)
 	Rass_interactive_mode = true;
 	RassShow(Rass_first_slide);
 	Rass_current_slide = Rass_first_slide;
-	bool loop = true;
 	int seq[] = { 1000, 1100, 1110, 1111 };
 	neutrino_msg_t msg_old = CRCInput::RC_nokey;
-	while (loop) {
+	while (Rass_interactive_mode) {
 		RassPaint();
 
 		neutrino_msg_t msg;
@@ -2775,7 +2774,7 @@ void CRadioText::RASS_interactive_mode(void)
 				}
 				break;
 			case CRCInput::RC_home:
-				loop = false;
+				Rass_interactive_mode = false;
 				break;
 			case CRCInput::RC_plus:
 			case CRCInput::RC_minus:
@@ -2786,6 +2785,8 @@ void CRadioText::RASS_interactive_mode(void)
 		}
 		msg_old = msg;
 	}
+	if (Rass_current_slide == 0)
+		RassShow_next();
 	framebuffer->Clear();
 	framebuffer->blit();
 }
