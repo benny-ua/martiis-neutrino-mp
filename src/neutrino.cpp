@@ -3952,13 +3952,13 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		CSectionsdClient::CurrentNextInfo dummy;
 		g_InfoViewer->getEPG(0, dummy);
 
+#ifdef ENABLE_GRAPHLCD // MARTII
+		nGLCD::StandbyMode(false);
+#endif
 #ifdef MARTII
 		if (timer_wakeup) {
 			CCECSetup cecsetup;
 			cecsetup.setCECSettings(true);
-#ifdef ENABLE_GRAPHLCD // MARTII
-			nGLCD::StandbyMode(false);
-#endif
 		}
 #else
 		if(init_cec_setting){
