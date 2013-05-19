@@ -61,6 +61,9 @@
 #include <dmx.h>
 #include <OpenThreads/Thread>
 #include <OpenThreads/Condition>
+#ifdef MARTII
+#include <map>
+#endif
 
 #define ENABLE_RASS 1
 
@@ -114,11 +117,40 @@ private:
 	bool DividePes(unsigned char *data, int length, int *substart, int *subend);
 #ifdef MARTII
 	void RassShow(char *filename);
+	void RassShow(int slidenumber);
+	void RassShow_prev(void);
+	void RassShow_next(void);
+	void RassShow_left(void);
+	void RassShow_right(void);
+	void RassUpdate(char *filename, int slidenumber = -1);
+	void RassPaint(void);
 #endif
 
 	uint pid;
 #ifdef MARTII
 	uint lastRassPid;
+
+	CFrameBuffer *framebuffer;
+	int iconWidth;
+	int iconHeight;
+
+	bool Rass_interactive_mode;
+
+	struct md5struct { unsigned char sum[16]; };
+
+	class RASS_slides
+	{
+		private:
+			std::map<int, md5struct> md5s;
+		public:
+			bool set(int, md5struct);
+			bool exists(int);
+			void clear(void);
+			RASS_slides();
+	};
+	RASS_slides slides;
+	int Rass_current_slide;
+	int Rass_first_slide;
 #endif
 	//pthread_t threadRT;
 	//int dmxfd;
@@ -148,6 +180,10 @@ public:
 
 	void radiotext_stop(void);
 	bool haveRadiotext(void) {return have_radiotext; }
+#ifdef MARTII
+	bool haveRASS(void) { return lastRassPid; }
+	void RASS_interactive_mode(void);
+#endif
 
 	cDemux *audioDemux;
 

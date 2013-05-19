@@ -1652,6 +1652,7 @@ progressbar.color.horizontal colored horizontal lines
 progressbar.color.matrix colored dots
 progressbar.color.mono monochrome
 progressbar.color.vertical colored vertical lines
+rass.head Radio Screen Show
 rclock.lockmsg Your box remote control will be locked.\n To unlock it, press <RED> \n and <MENU> on your remote control.
 rclock.menueadd Lock RC
 rclock.title Lock Remote Control

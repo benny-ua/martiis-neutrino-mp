@@ -1679,6 +1679,7 @@ const char * locale_real_names[] =
 	"progressbar.color.matrix",
 	"progressbar.color.mono",
 	"progressbar.color.vertical",
+	"rass.head",
 	"rclock.lockmsg",
 	"rclock.menueadd",
 	"rclock.title",

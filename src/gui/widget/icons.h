@@ -241,6 +241,29 @@
 /* opkg manager */
 #define NEUTRINO_ICON_CHECKMARK		"checkmark"
 #define NEUTRINO_ICON_WARNING		"warning"
+
+/* RASS */
+#define NEUTRINO_ICON_RED_0		"0-red"
+#define NEUTRINO_ICON_RED_1		"1-red"
+#define NEUTRINO_ICON_RED_2		"2-red"
+#define NEUTRINO_ICON_RED_3		"3-red"
+#define NEUTRINO_ICON_RED_4		"4-red"
+#define NEUTRINO_ICON_RED_5		"5-red"
+#define NEUTRINO_ICON_RED_6		"6-red"
+#define NEUTRINO_ICON_RED_7		"7-red"
+#define NEUTRINO_ICON_RED_8		"8-red"
+#define NEUTRINO_ICON_RED_9		"9-red"
+
+#define NEUTRINO_ICON_GREEN_0		"0-green"
+#define NEUTRINO_ICON_GREEN_1		"1-green"
+#define NEUTRINO_ICON_GREEN_2		"2-green"
+#define NEUTRINO_ICON_GREEN_3		"3-green"
+#define NEUTRINO_ICON_GREEN_4		"4-green"
+#define NEUTRINO_ICON_GREEN_5		"5-green"
+#define NEUTRINO_ICON_GREEN_6		"6-green"
+#define NEUTRINO_ICON_GREEN_7		"7-green"
+#define NEUTRINO_ICON_GREEN_8		"8-green"
+#define NEUTRINO_ICON_GREEN_9		"9-green"
 #endif
 /* misc */
 

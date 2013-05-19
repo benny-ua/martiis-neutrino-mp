@@ -95,6 +95,7 @@ const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUN
         , { SNeutrinoSettings::ITEM_TUNER_RESTART,	LOCALE_SERVICEMENU_RESTART_TUNER }
         , { SNeutrinoSettings::ITEM_THREE_D_MODE,	LOCALE_THREE_D_SETTINGS }
         , { SNeutrinoSettings::ITEM_WEBTV,		LOCALE_WEBTV_HEAD }
+        , { SNeutrinoSettings::ITEM_RASS,		LOCALE_RASS_HEAD }
 #endif
 };
 

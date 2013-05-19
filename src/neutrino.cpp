@@ -4212,6 +4212,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		CWebTV w;
 		w.exec(this, "");
 	}
+	else if(actionKey=="rass") {
+		if (g_Radiotext)
+			g_Radiotext->RASS_interactive_mode();
+	}
 #endif
 	else if(actionKey=="restart") {
 		if (recordingstatus)

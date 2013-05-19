@@ -1650,6 +1650,7 @@ progressbar.color.horizontal farbige horizontale Linien
 progressbar.color.matrix farbige Punkte
 progressbar.color.mono monochrom
 progressbar.color.vertical farbige vertikale Linien
+rass.head Radio Screen Show
 rclock.lockmsg Die Fernbedienung wird gesperrt.\n Um die Sperre aufzuheben, bitte\n <ROT> und <MENU> auf der Fernbedienung\n drücken.
 rclock.menueadd FB sperren
 rclock.title Fernbedienung sperren
