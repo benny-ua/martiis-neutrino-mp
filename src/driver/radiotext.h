@@ -123,7 +123,8 @@ private:
 	void RassShow_left(void);
 	void RassShow_right(void);
 	void RassUpdate(char *filename, int slidenumber = -1);
-	void RassPaint(void);
+	void RassPaint(int slidenumber = -1, bool blit = true);
+	void RassChangeSelection(int slidenumber);
 #endif
 
 	uint pid;

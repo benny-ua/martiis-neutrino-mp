@@ -221,6 +221,7 @@ install_DATA += \
 	radiotextget.png \
 	radiotextoff.png \
 	radiotextwait.png \
+	rass.png \
 	rec.png \
 	rec_event_marker.png \
 	rec_gray.png \

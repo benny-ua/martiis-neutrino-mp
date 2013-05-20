@@ -4211,10 +4211,12 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey=="webtv") {
 		CWebTV w;
 		w.exec(this, "");
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
 		if (g_Radiotext)
 			g_Radiotext->RASS_interactive_mode();
+		return menu_return::RETURN_EXIT_ALL;
 	}
 #endif
 	else if(actionKey=="restart") {

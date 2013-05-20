@@ -95,6 +95,7 @@
 #include <video.h>
 #include <libmd5sum/libmd5sum.h>
 #include <driver/rcinput.h>
+#include <driver/pictureviewer/pictureviewer.h>
 #endif
 
 extern "C" {
@@ -2602,7 +2603,7 @@ void CRadioText::RassUpdate(char *filename, int slidenumber)
 		if ((Rass_current_slide == slidenumber) && updated)
 			RassShow(filename);
 		if (newslide)
-			RassPaint();
+			RassPaint(slidenumber);
 	} else {
 		// slide mode
 		if (slidenumber) // don't display index
@@ -2610,11 +2611,34 @@ void CRadioText::RassUpdate(char *filename, int slidenumber)
 	}
 }
 
-void CRadioText::RassPaint(void)
+void CRadioText::RassChangeSelection(int next) {
+	if (next != Rass_current_slide) {
+		int old = Rass_current_slide;
+		Rass_current_slide = next;
+		RassPaint(old, false);
+		RassPaint(next);
+		RassShow(Rass_current_slide);
+	}
+}
+
+static int seq[] = { 1000, 1100, 1110, 1111 };
+
+void CRadioText::RassPaint(int slide, bool blit)
 {
 	int x_start = framebuffer->getScreenX() + iconWidth;
 	int y = framebuffer->getScreenX() + (framebuffer->getScreenHeight() - 10 * iconHeight - 9 * iconHeight)/2;
-	for (int i = 0; i < 10; i++) {
+
+	if (slide > -1) {
+		char ic[10];
+		snprintf(ic, sizeof(ic), (slide == Rass_current_slide) ? "%d-red" : "%d-green", slide/1000);
+		int j;
+		for (j = 0; seq[j] * (slide/1000) != slide && j < 4; j++);
+		if (j < 4) {
+			int x = x_start + j * 2 * iconWidth;
+			y += (slide/1000) * 2 * iconHeight;
+			framebuffer->paintIcon(ic, x, y, iconHeight, 0, true, false);
+		}
+	} else for (int i = 0; i < 10; i++) {
 		int x = x_start;
 		char icon[10];
 		char icon_red[10];
@@ -2631,19 +2655,27 @@ void CRadioText::RassPaint(void)
 			if (slides.exists(slidenumber))
 				ic = (slidenumber == Rass_current_slide) ? icon_red : icon_green;
 			framebuffer->paintIcon(ic, x, y, iconHeight, 0, true, false);
-			if (i == 0)
+			if (i == 0) {
+				x += 4 * iconWidth;
+				extern CPictureViewer *g_PicViewer;
+				const char *fname = DATADIR "/neutrino/icons/rass.png";
+				int w = 0, h = 0;
+				g_PicViewer->getSize(fname, &w, &h);
+				if (w && h)
+					g_PicViewer->DisplayImage(fname, x, y, 3 * iconWidth, (h * 3 * iconWidth) / w, CFrameBuffer::TM_EMPTY);
 				break;
-			x += iconWidth + iconWidth;
+			}
+			x += 2 * iconWidth;
 			k /= 10;
 		}
-		y += iconHeight + iconHeight;
+		y += 2 * iconHeight;
 	}
-	framebuffer->blit();
+	if (blit)
+		framebuffer->blit();
 }
 
 void CRadioText::RassShow_prev(void)
 {
-	int seq[] = { 1000, 1100, 1110, 1111 };
 	int next = Rass_current_slide;
 
 	for (int i = Rass_current_slide/1000 - 1; next == Rass_current_slide && i > -1; i--)
@@ -2655,15 +2687,11 @@ void CRadioText::RassShow_prev(void)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
 
-	if (next != Rass_current_slide) {
-		Rass_current_slide = next;
-		RassShow(Rass_current_slide);
-	}
+	RassChangeSelection(next);
 }
 
 void CRadioText::RassShow_next(void)
 {
-	int seq[] = { 1000, 1100, 1110, 1111 };
 	int next = Rass_current_slide;
 
 	for (int i = 1 + Rass_current_slide/1000; next == Rass_current_slide && i < 10; i++)
@@ -2675,15 +2703,11 @@ void CRadioText::RassShow_next(void)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
 
-	if (next != Rass_current_slide) {
-		Rass_current_slide = next;
-		RassShow(Rass_current_slide);
-	}
+	RassChangeSelection(next);
 }
 
 void CRadioText::RassShow_left(void)
 {
-	int seq[] = { 1000, 1100, 1110, 1111 };
 	int next = Rass_current_slide;
 
 	for (int i = 3; next == Rass_current_slide && i > -1; i--)
@@ -2693,15 +2717,11 @@ void CRadioText::RassShow_left(void)
 		if (slides.exists(Rass_current_slide/1000 * seq[i]))
 			next = Rass_current_slide/1000 * seq[i];
 
-	if (next != Rass_current_slide) {
-		Rass_current_slide = next;
-		RassShow(Rass_current_slide);
-	}
+	RassChangeSelection(next);
 }
 
 void CRadioText::RassShow_right(void)
 {
-	int seq[] = { 1000, 1100, 1110, 1111 };
 	int next = Rass_current_slide;
 
 	for (int i = 0; next == Rass_current_slide && i < 4; i++)
@@ -2712,10 +2732,7 @@ void CRadioText::RassShow_right(void)
 		if (slides.exists(Rass_current_slide/1000 * seq[i]))
 			next = Rass_current_slide/1000 * seq[i];
 
-	if (next != Rass_current_slide) {
-		Rass_current_slide = next;
-		RassShow(Rass_current_slide);
-	}
+	RassChangeSelection(next);
 }
 
 void CRadioText::RASS_interactive_mode(void)
@@ -2724,10 +2741,10 @@ void CRadioText::RASS_interactive_mode(void)
 	Rass_interactive_mode = true;
 	RassShow(Rass_first_slide);
 	Rass_current_slide = Rass_first_slide;
-	int seq[] = { 1000, 1100, 1110, 1111 };
 	neutrino_msg_t msg_old = CRCInput::RC_nokey;
+	RassPaint();
+
 	while (Rass_interactive_mode) {
-		RassPaint();
 
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
@@ -2767,10 +2784,7 @@ void CRadioText::RASS_interactive_mode(void)
 					for (int i = 0; next == Rass_current_slide && i < 4; i++)
 						if (slides.exists(key * seq[i]))
 							next = key * seq[i];
-					if (next != Rass_current_slide) {
-						Rass_current_slide = next;
-						RassShow(Rass_current_slide);
-					}
+					RassChangeSelection(next);
 				}
 				break;
 			case CRCInput::RC_home:
