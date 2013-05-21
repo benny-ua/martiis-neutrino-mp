@@ -262,7 +262,9 @@ int CRadioText::PES_Receive(unsigned char *data, int len)
 		while (DividePes(&data[0], pesl, &substart, &subend))
 		{
 			int inner_offset = subend + 1;
+#ifndef MARTII
 if (inner_offset < 3) fprintf(stderr, "RT %s: inner_offset < 3 (%d)\n", __FUNCTION__, inner_offset);
+#endif
 			int rdsl = data[subend - 1];	// RDS DataFieldLength
 			// RDS DataSync = 0xfd @ end
 			if (data[subend] == 0xfd && rdsl > 0) {
@@ -274,7 +276,9 @@ if (inner_offset < 3) fprintf(stderr, "RT %s: inner_offset < 3 (%d)\n", __FUNCTI
 					printf("(End)\n\n");
 				}
 
+#ifndef MARTII
 if (subend-2-rdsl < 0) fprintf(stderr, "RT %s: start: %d subend-2-rdsl < 0 (%d-2-%d)\n", __FUNCTION__, substart,subend,rdsl);
+#endif
 				for (int i = subend - 2, val; i > subend - 2 - rdsl; i--) { // <-- data reverse, from end to start
 if (i < 0) { fprintf(stderr, "RT %s: i < 0 (%d)\n", __FUNCTION__, i); break; }
 					val = data[i];
@@ -2377,12 +2381,16 @@ CRadioText::CRadioText(void)
 
 CRadioText::~CRadioText(void)
 {
+#ifndef MARTII
 	printf("CRadioText::~CRadioText\n");
+#endif
 	running = false;
 	radiotext_stop();
 	cond.broadcast();
 	OpenThreads::Thread::join();
+#ifndef MARTII
 	printf("CRadioText::~CRadioText done\n");
+#endif
 }
 
 void CRadioText::init()
@@ -2426,7 +2434,9 @@ void CRadioText::init()
 
 void CRadioText::radiotext_stop(void)
 {
+#ifndef MARTII
 	printf("CRadioText::radiotext_stop: ###################### pid 0x%x ######################\n", getPid());
+#endif
 	if (getPid() != 0) {
 		mutex.lock();
 		pid = 0;
@@ -2438,7 +2448,9 @@ void CRadioText::radiotext_stop(void)
 
 void CRadioText::setPid(uint inPid)
 {
+#ifndef MARTII
 	printf("CRadioText::setPid: ###################### old pid 0x%x new pid 0x%x ######################\n", pid, inPid);
+#endif
 	if (pid != inPid) {
 		mutex.lock();
 		pid = inPid;
@@ -2455,10 +2467,10 @@ void CRadioText::run()
 #endif
 	uint current_pid = 0;
 
-	printf("CRadioText::run: ###################### Starting thread ######################\n");
 #ifdef MARTII
 	audioDemux = new cDemux(0); // live demux
 #else
+	printf("CRadioText::run: ###################### Starting thread ######################\n");
 	audioDemux = new cDemux(1);
 #endif
 	audioDemux->Open(DMX_PES_CHANNEL,0,128*1024);
@@ -2473,18 +2485,24 @@ void CRadioText::run()
 			mutex.unlock();
 			audioDemux->Stop();
 			pidmutex.lock();
+#ifndef MARTII
 			printf("CRadioText::run: ###################### waiting for pid.. ######################\n");
+#endif
 			cond.wait(&pidmutex);
 			pidmutex.unlock();
 			mutex.lock();
 		}
 		if (pid && (current_pid != pid)) {
 			current_pid = pid;
+#ifndef MARTII
 			printf("CRadioText::run: ###################### Setting PID 0x%x ######################\n", getPid());
+#endif
 			audioDemux->Stop();
 			if (!audioDemux->pesFilter(getPid()) || !audioDemux->Start()) {
 				pid = 0;
+#ifndef MARTII
 				printf("CRadioText::run: ###################### failed to start PES filter ######################\n");
+#endif
 			}
 #ifdef MARTII
 			if (lastRassPid) {
@@ -2549,30 +2567,35 @@ void CRadioText::run()
 #endif
 	delete audioDemux;
 	audioDemux = NULL;
+#ifndef MARTII
 	printf("CRadioText::run: ###################### exit ######################\n");
+#endif
 }
 
 #ifdef MARTII
 
 CRadioText::RASS_slides::RASS_slides()
 {
-	md5s.clear();
+	sim.clear();
 }
 
-bool CRadioText::RASS_slides::set(int slide, CRadioText::md5struct md5) {
-	std::map<int, md5struct>::iterator it = md5s.find(slide);
-	if (it != md5s.end() && !memcmp((*it).second.sum, md5.sum, 16))
+bool CRadioText::RASS_slides::set(int slide, CRadioText::slideinfo si)
+{
+	std::map<int, slideinfo>::iterator it = sim.find(slide);
+	if (it != sim.end() && !memcmp((*it).second.md5sum, si.md5sum, 16))
 		return false;
-	md5s[slide] = md5;
+	sim[slide] = si;
 	return true;
 }
 
-bool CRadioText::RASS_slides::exists(int slide) {
-	return md5s.find(slide) != md5s.end();
+bool CRadioText::RASS_slides::exists(int slide)
+{
+	return sim.find(slide) != sim.end();
 }
 
-void CRadioText::RASS_slides::clear(void) {
-	md5s.clear();
+void CRadioText::RASS_slides::clear(void)
+{
+	sim.clear();
 }
 
 void CRadioText::RassShow(char *filename)
@@ -2594,8 +2617,8 @@ void CRadioText::RassUpdate(char *filename, int slidenumber)
 	if (slidenumber > -1 && slidenumber < Rass_first_slide)
 		Rass_first_slide = slidenumber;
 
-        md5struct m;
-        md5_file(filename, 1, m.sum);
+        slideinfo m;
+        md5_file(filename, 1, m.md5sum);
 	bool newslide = !slides.exists(slidenumber);
 	bool updated = slides.set(slidenumber, m);
 
@@ -2611,13 +2634,19 @@ void CRadioText::RassUpdate(char *filename, int slidenumber)
 	}
 }
 
-void CRadioText::RassChangeSelection(int next) {
+neutrino_msg_t CRadioText::RassChangeSelection(int next) {
 	if (next != Rass_current_slide) {
 		int old = Rass_current_slide;
 		Rass_current_slide = next;
 		RassPaint(old, false);
 		RassPaint(next);
 		RassShow(Rass_current_slide);
+	}
+	switch(Rass_current_slide/1000) {
+		case 0:
+			return CRCInput::RC_0;
+		default:
+			return CRCInput::RC_1 + Rass_current_slide/1000 - 1;
 	}
 }
 
@@ -2629,13 +2658,14 @@ void CRadioText::RassPaint(int slide, bool blit)
 	int y = framebuffer->getScreenX() + (framebuffer->getScreenHeight() - 10 * iconHeight - 9 * iconHeight)/2;
 
 	if (slide > -1) {
+		int category = slide/1000;
 		char ic[10];
-		snprintf(ic, sizeof(ic), (slide == Rass_current_slide) ? "%d-red" : "%d-green", slide/1000);
+		snprintf(ic, sizeof(ic), (slide == Rass_current_slide) ? "%d-red" : "%d-green", category);
 		int j;
-		for (j = 0; seq[j] * (slide/1000) != slide && j < 4; j++);
+		for (j = 0; seq[j] * category != slide && j < 4; j++);
 		if (j < 4) {
 			int x = x_start + j * 2 * iconWidth;
-			y += (slide/1000) * 2 * iconHeight;
+			y += category * 2 * iconHeight;
 			framebuffer->paintIcon(ic, x, y, iconHeight, 0, true, false);
 		}
 	} else for (int i = 0; i < 10; i++) {
@@ -2646,14 +2676,10 @@ void CRadioText::RassPaint(int slide, bool blit)
 		snprintf(icon, sizeof(icon), "%d", i);
 		snprintf(icon_red, sizeof(icon_red), "%d-red", i);
 		snprintf(icon_green, sizeof(icon_red), "%d-green", i);
-		int k = 1000;
-		int slidenumber = 0;
 		for (int j = 0; j < 4; j++) {
-			slidenumber += i * k;
-//fprintf(stderr, "%d %s slidenumber=%d current=%d\n", __LINE__, __func__, slidenumber, Rass_current_slide);
 			char *ic = icon;
-			if (slides.exists(slidenumber))
-				ic = (slidenumber == Rass_current_slide) ? icon_red : icon_green;
+			if (slides.exists(i * seq[j]))
+				ic = (i * seq[j] == Rass_current_slide) ? icon_red : icon_green;
 			framebuffer->paintIcon(ic, x, y, iconHeight, 0, true, false);
 			if (i == 0) {
 				x += 4 * iconWidth;
@@ -2666,7 +2692,6 @@ void CRadioText::RassPaint(int slide, bool blit)
 				break;
 			}
 			x += 2 * iconWidth;
-			k /= 10;
 		}
 		y += 2 * iconHeight;
 	}
@@ -2674,65 +2699,79 @@ void CRadioText::RassPaint(int slide, bool blit)
 		framebuffer->blit();
 }
 
-void CRadioText::RassShow_prev(void)
+neutrino_msg_t CRadioText::RassShow_prev(void)
 {
 	int next = Rass_current_slide;
+	int category = Rass_current_slide/1000;
 
-	for (int i = Rass_current_slide/1000 - 1; next == Rass_current_slide && i > -1; i--)
+	for (int i = category - 1; next == Rass_current_slide && i > -1; i--)
 		for (int j = 0; next == Rass_current_slide && j < 4; j++)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
-	for (int i = 9; next == Rass_current_slide && i > Rass_current_slide/1000; i--)
+	for (int i = 9; next == Rass_current_slide && i > category; i--)
 		for (int j = 0; next == Rass_current_slide && j < 4; j++)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
 
-	RassChangeSelection(next);
+	return RassChangeSelection(next);
 }
 
-void CRadioText::RassShow_next(void)
+neutrino_msg_t CRadioText::RassShow_next(void)
 {
 	int next = Rass_current_slide;
+	int category = Rass_current_slide/1000;
 
-	for (int i = 1 + Rass_current_slide/1000; next == Rass_current_slide && i < 10; i++)
+	for (int i = 1 + category; next == Rass_current_slide && i < 10; i++)
 		for (int j = 0; next == Rass_current_slide && j < 4; j++)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
-	for (int i = 0; next == Rass_current_slide && i < Rass_current_slide/1000; i++)
+	for (int i = 0; next == Rass_current_slide && i < category; i++)
 		for (int j = 0; next == Rass_current_slide && j < 4; j++)
 			if (slides.exists(i * seq[j]))
 				next = i * seq[j];
 
-	RassChangeSelection(next);
+	return RassChangeSelection(next);
 }
 
-void CRadioText::RassShow_left(void)
+neutrino_msg_t CRadioText::RassShow_left(void)
 {
 	int next = Rass_current_slide;
+	int category = Rass_current_slide/1000;
 
 	for (int i = 3; next == Rass_current_slide && i > -1; i--)
-		if (Rass_current_slide/1000 * seq[i] < Rass_current_slide && slides.exists(Rass_current_slide/1000 * seq[i]))
-			next = Rass_current_slide/1000 * seq[i];
+		if (category * seq[i] < Rass_current_slide && slides.exists(category * seq[i]))
+			next = category * seq[i];
 	for (int i = 3; next == Rass_current_slide && i > -1; i--)
-		if (slides.exists(Rass_current_slide/1000 * seq[i]))
-			next = Rass_current_slide/1000 * seq[i];
+		if (slides.exists(category * seq[i]))
+			next = category * seq[i];
 
-	RassChangeSelection(next);
+	return RassChangeSelection(next);
 }
 
-void CRadioText::RassShow_right(void)
+neutrino_msg_t CRadioText::RassShow_right(void)
+{
+	int next = Rass_current_slide;
+	int category = Rass_current_slide/1000;
+
+	for (int i = 0; next == Rass_current_slide && i < 4; i++)
+		if (category * seq[i] > Rass_current_slide && slides.exists(category * seq[i]))
+			next = category * seq[i];
+	for (int i = 0; next == Rass_current_slide && i < 4; i++)
+		if (slides.exists(category * seq[i]))
+			next = category * seq[i];
+
+	return RassChangeSelection(next);
+}
+
+neutrino_msg_t CRadioText::RassShow_category(int key)
 {
 	int next = Rass_current_slide;
 
 	for (int i = 0; next == Rass_current_slide && i < 4; i++)
-		if (Rass_current_slide/1000 * seq[i] > Rass_current_slide && slides.exists(Rass_current_slide/1000 * seq[i]))
-			next = Rass_current_slide/1000 * seq[i];
+		if (slides.exists(key * seq[i]))
+			next = key * seq[i];
 
-	for (int i = 0; next == Rass_current_slide && i < 4; i++)
-		if (slides.exists(Rass_current_slide/1000 * seq[i]))
-			next = Rass_current_slide/1000 * seq[i];
-
-	RassChangeSelection(next);
+	return RassChangeSelection(next);
 }
 
 void CRadioText::RASS_interactive_mode(void)
@@ -2754,16 +2793,16 @@ void CRadioText::RASS_interactive_mode(void)
 		int key = msg;
 		switch (msg) {
 			case CRCInput::RC_down:
-				RassShow_next();
+				msg = RassShow_next();
 				break;
 			case CRCInput::RC_up:
-				RassShow_prev();
+				msg = RassShow_prev();
 				break;
 			case CRCInput::RC_right:
-				RassShow_right();
+				msg = RassShow_right();
 				break;
 			case CRCInput::RC_left:
-				RassShow_left();
+				msg = RassShow_left();
 				break;
 			case CRCInput::RC_0:
 				key -= 10;
@@ -2779,13 +2818,8 @@ void CRadioText::RASS_interactive_mode(void)
 				key -= 1;
 				if (msg == msg_old)
 					RassShow_right();
-				else {
-					int next = Rass_current_slide;
-					for (int i = 0; next == Rass_current_slide && i < 4; i++)
-						if (slides.exists(key * seq[i]))
-							next = key * seq[i];
-					RassChangeSelection(next);
-				}
+				else
+					msg = RassShow_category(key);
 				break;
 			case CRCInput::RC_home:
 				Rass_interactive_mode = false;
@@ -2794,6 +2828,7 @@ void CRadioText::RASS_interactive_mode(void)
 			case CRCInput::RC_minus:
 			case CRCInput::RC_mute_on:
 			case CRCInput::RC_mute_off:
+			case CRCInput::RC_spkr:
 				CNeutrinoApp::getInstance()->handleMsg(msg, data);
 				break;
 		}

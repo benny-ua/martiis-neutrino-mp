@@ -118,13 +118,14 @@ private:
 #ifdef MARTII
 	void RassShow(char *filename);
 	void RassShow(int slidenumber);
-	void RassShow_prev(void);
-	void RassShow_next(void);
-	void RassShow_left(void);
-	void RassShow_right(void);
 	void RassUpdate(char *filename, int slidenumber = -1);
 	void RassPaint(int slidenumber = -1, bool blit = true);
-	void RassChangeSelection(int slidenumber);
+	neutrino_msg_t RassShow_prev(void);
+	neutrino_msg_t RassShow_next(void);
+	neutrino_msg_t RassShow_left(void);
+	neutrino_msg_t RassShow_right(void);
+	neutrino_msg_t RassShow_category(int);
+	neutrino_msg_t RassChangeSelection(int slidenumber);
 #endif
 
 	uint pid;
@@ -137,14 +138,14 @@ private:
 
 	bool Rass_interactive_mode;
 
-	struct md5struct { unsigned char sum[16]; };
+	struct slideinfo { unsigned char md5sum[16]; };
 
 	class RASS_slides
 	{
 		private:
-			std::map<int, md5struct> md5s;
+			std::map<int, slideinfo> sim;
 		public:
-			bool set(int, md5struct);
+			bool set(int, slideinfo);
 			bool exists(int);
 			void clear(void);
 			RASS_slides();
