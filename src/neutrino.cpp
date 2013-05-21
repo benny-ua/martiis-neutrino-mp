@@ -4194,17 +4194,19 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	}
 #if HAVE_SPARK_HARDWARE
 	else if(actionKey=="bootspark") {
-		if (ShowLocalizedMessage(LOCALE_SERVICEMENU_BOOT_SPARK,
-			LOCALE_SERVICEMENU_BOOT_PARAMS_ASK, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo,
-			NULL, 450, 30, true) == CMessageBox::mbrYes) {
-			CHintBox * hintBox = new CHintBox(LOCALE_SERVICEMENU_BOOT_PARAMS_HEAD,
-				g_Locale->getText(LOCALE_SERVICEMENU_BOOT_PARAMS_HINT));
-			hintBox->paint();
-			safe_system("(printf \"boot_system spark\nbootcmd bootm  0xa0080000\n\";"
-				" fw_printenv | awk -F_spark= '/_spark=/ { print $1 \" \" $2 }') | fw_setenv -s -");
-				hintBox->hide();
-			delete hintBox;
-			g_RCInput->postMsg(NeutrinoMessages::REBOOT, 0);
+		if (g_info.hw_caps->boxtype == 7111) {
+			if (ShowLocalizedMessage(LOCALE_SERVICEMENU_BOOT_SPARK,
+				LOCALE_SERVICEMENU_BOOT_PARAMS_ASK, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo,
+				NULL, 450, 30, true) == CMessageBox::mbrYes) {
+				CHintBox * hintBox = new CHintBox(LOCALE_SERVICEMENU_BOOT_PARAMS_HEAD,
+					g_Locale->getText(LOCALE_SERVICEMENU_BOOT_PARAMS_HINT));
+				hintBox->paint();
+				safe_system("(printf \"boot_system spark\nbootcmd bootm  0xa0080000\n\";"
+					" fw_printenv | awk -F_spark= '/_spark=/ { print $1 \" \" $2 }') | fw_setenv -s -");
+					hintBox->hide();
+				delete hintBox;
+				g_RCInput->postMsg(NeutrinoMessages::REBOOT, 0);
+			}
 		}
 	}
 # endif 

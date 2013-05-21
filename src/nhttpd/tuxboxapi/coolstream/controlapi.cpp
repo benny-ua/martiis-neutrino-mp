@@ -612,19 +612,17 @@ void CControlAPI::InfoCGI(CyhookHandler *hh)
 
 void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 {
-#ifndef MARTII
+#ifdef MARTII // should be: HAVE_HARDWARE_SPARK
+	std::string boxname = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
+#else
 	unsigned int system_rev = cs_get_revision();
-#endif
 	std::string boxname = "Coolstream ";
+#endif
 	static CNetAdapter netadapter; 
 	std::string eth_id = netadapter.getMacAddr();
 	std::transform(eth_id.begin(), eth_id.end(), eth_id.begin(), ::tolower);
 
-#ifdef MARTII // should be: HAVE_HARDWARE_SPARK
-	hw_caps_t *caps = get_hwcaps();
-	if (caps)
-		boxname = string(caps->boxvendor) + " " + string(caps->boxname);
-#else
+#ifndef MARTII // should be: HAVE_HARDWARE_SPARK
 #if HAVE_TRIPLEDRAGON
 	boxname = "Armas ";
 #endif

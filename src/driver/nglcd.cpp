@@ -42,8 +42,7 @@ extern CPictureViewer * g_PicViewer;
 nGLCD::nGLCD() {
 	lcd = NULL;
 	Channel = "Neutrino";
-	hw_caps_t *caps = get_hwcaps();
-	Epg = string(caps->boxvendor) + " " + string(caps->boxname);
+	Epg = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
 
 	sem_init(&sem, 0, 1);
 

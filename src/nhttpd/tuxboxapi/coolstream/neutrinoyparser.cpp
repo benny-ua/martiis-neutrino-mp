@@ -684,10 +684,7 @@ std::string  CNeutrinoYParser::func_get_partition_list(CyhookHandler *, std::str
 std::string  CNeutrinoYParser::func_get_boxtype(CyhookHandler *, std::string)
 {
 #ifdef MARTII // should be: HAVE_HARDWARE_SPARK
-	std::string  boxname;
-	hw_caps_t *caps = get_hwcaps();
-	if (caps)
-		boxname = string(caps->boxvendor) + " " + string(caps->boxname);
+	std::string boxname = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
 #else
 	unsigned int system_rev = cs_get_revision();
 	std::string boxname = "Coolstream ";
