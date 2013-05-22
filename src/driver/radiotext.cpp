@@ -96,6 +96,7 @@
 #include <libmd5sum/libmd5sum.h>
 #include <driver/rcinput.h>
 #include <driver/pictureviewer/pictureviewer.h>
+#include <OpenThreads/ScopedLock>
 #endif
 
 extern "C" {
@@ -2506,8 +2507,7 @@ void CRadioText::run()
 			}
 #ifdef MARTII
 			if (lastRassPid) {
-				extern cVideo *videoDecoder;
-				videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+				RassShow(DATADIR "/neutrino/icons/radiomode.jpg");
 				lastRassPid = 0;
 				Rass_current_slide = -1;
 				Rass_first_slide = 100000;
@@ -2573,14 +2573,9 @@ void CRadioText::run()
 }
 
 #ifdef MARTII
-
-CRadioText::RASS_slides::RASS_slides()
-{
-	sim.clear();
-}
-
 bool CRadioText::RASS_slides::set(int slide, CRadioText::slideinfo si)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	std::map<int, slideinfo>::iterator it = sim.find(slide);
 	if (it != sim.end() && !memcmp((*it).second.md5sum, si.md5sum, 16))
 		return false;
@@ -2590,11 +2585,13 @@ bool CRadioText::RASS_slides::set(int slide, CRadioText::slideinfo si)
 
 bool CRadioText::RASS_slides::exists(int slide)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	return sim.find(slide) != sim.end();
 }
 
 void CRadioText::RASS_slides::clear(void)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	sim.clear();
 }
 
@@ -2617,10 +2614,10 @@ void CRadioText::RassUpdate(char *filename, int slidenumber)
 	if (slidenumber > -1 && slidenumber < Rass_first_slide)
 		Rass_first_slide = slidenumber;
 
-        slideinfo m;
-        md5_file(filename, 1, m.md5sum);
+	slideinfo si;
+	md5_file(filename, 1, si.md5sum);
 	bool newslide = !slides.exists(slidenumber);
-	bool updated = slides.set(slidenumber, m);
+	bool updated = slides.set(slidenumber, si);
 
 	if (Rass_interactive_mode) {
 		if ((Rass_current_slide == slidenumber) && updated)
@@ -2784,7 +2781,6 @@ void CRadioText::RASS_interactive_mode(void)
 	RassPaint();
 
 	while (Rass_interactive_mode) {
-
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
 

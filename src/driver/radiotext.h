@@ -143,12 +143,12 @@ private:
 	class RASS_slides
 	{
 		private:
+			OpenThreads::Mutex mutex;
 			std::map<int, slideinfo> sim;
 		public:
 			bool set(int, slideinfo);
 			bool exists(int);
 			void clear(void);
-			RASS_slides();
 	};
 	RASS_slides slides;
 	int Rass_current_slide;
