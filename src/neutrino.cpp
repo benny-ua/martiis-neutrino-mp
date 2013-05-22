@@ -4216,6 +4216,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
+		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		if (g_Radiotext)
 			g_Radiotext->RASS_interactive_mode();
 		return menu_return::RETURN_EXIT_ALL;
