@@ -2639,12 +2639,7 @@ neutrino_msg_t CRadioText::RassChangeSelection(int next) {
 		RassPaint(next);
 		RassShow(Rass_current_slide);
 	}
-	switch(Rass_current_slide/1000) {
-		case 0:
-			return CRCInput::RC_0;
-		default:
-			return CRCInput::RC_1 + Rass_current_slide/1000 - 1;
-	}
+	return CRCInput::convertDigitToKey(Rass_current_slide/1000);
 }
 
 static int seq[] = { 1000, 1100, 1110, 1111 };
@@ -2786,7 +2781,6 @@ void CRadioText::RASS_interactive_mode(void)
 
 		g_RCInput->getMsg(&msg, &data, 100000);
 
-		int key = msg;
 		switch (msg) {
 			case CRCInput::RC_down:
 				msg = RassShow_next();
@@ -2801,7 +2795,6 @@ void CRadioText::RASS_interactive_mode(void)
 				msg = RassShow_left();
 				break;
 			case CRCInput::RC_0:
-				key -= 10;
 			case CRCInput::RC_1:
 			case CRCInput::RC_2:
 			case CRCInput::RC_3:
@@ -2811,11 +2804,10 @@ void CRadioText::RASS_interactive_mode(void)
 			case CRCInput::RC_7:
 			case CRCInput::RC_8:
 			case CRCInput::RC_9:
-				key -= 1;
 				if (msg == msg_old)
 					RassShow_right();
 				else
-					msg = RassShow_category(key);
+					msg = RassShow_category(CRCInput::getNumericValue(msg));
 				break;
 			case CRCInput::RC_home:
 				Rass_interactive_mode = false;
