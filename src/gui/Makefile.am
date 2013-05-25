@@ -103,9 +103,6 @@ libneutrino_gui_a_SOURCES = \
 	test_menu.cpp \
 	themes.cpp \
 	timeosd.cpp \
-	update.cpp \
-	update_menue.cpp \
-	update_settings.cpp \
 	user_menue.cpp \
 	user_menue_setup.cpp \
 	vfd_setup.cpp \
@@ -113,6 +110,13 @@ libneutrino_gui_a_SOURCES = \
 	webtv.cpp \
 	webtv_setup.cpp \
 	zapit_setup.cpp
+
+if !BOXTYPE_SPARK
+libneutrino_gui_a_SOURCES += \
+	update.cpp \
+	update_menue.cpp \
+	update_settings.cpp
+endif
 
 if ENABLE_GRAPHLCD
 libneutrino_gui_a_SOURCES += \
