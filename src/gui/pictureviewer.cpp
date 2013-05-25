@@ -123,9 +123,6 @@ CPictureViewerGui::~CPictureViewerGui()
 //------------------------------------------------------------------------
 int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 {
-#ifdef MARTII
-	CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
-#endif
 	audioplayer = false;
 	if (actionKey == "audio")
 		audioplayer = true;
@@ -218,9 +215,6 @@ int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , m_LastMode );
 
 	// always exit all
-#ifdef MARTII
-	CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
-#endif
 	return menu_return::RETURN_REPAINT;
 }
 

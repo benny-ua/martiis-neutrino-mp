@@ -120,7 +120,7 @@ int CUpnpBrowserGui::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 	videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
 #ifdef MARTII
 	else
-		CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+		videoDecoder->setBlank(true);
 #endif
 
 	// tell neutrino we're in audio mode
@@ -621,7 +621,7 @@ void CUpnpBrowserGui::playnext(void)
 #ifdef MARTII
 				if (mime.substr(0,6) != "image/") {
 					m_frameBuffer->Clear();
-					CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+					videoDecoder->setBlank(true);
 				}
 #endif
 #ifdef MARTII
@@ -665,7 +665,7 @@ void CUpnpBrowserGui::playnext(void)
 					timeout = time(NULL) + atoi(g_settings.picviewer_slide_time);
 					g_PicViewer->SetScaling((CPictureViewer::ScalingMode)g_settings.picviewer_scaling);
 					g_PicViewer->SetVisible(g_settings.screen_StartX, g_settings.screen_EndX, g_settings.screen_StartY, g_settings.screen_EndY);
-					CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+					videoDecoder->setBlank(true);
 
 					if (g_settings.video_Format==3)
 						g_PicViewer->SetAspectRatio(16.0/9);
@@ -693,7 +693,6 @@ void CUpnpBrowserGui::playnext(void)
 	}
 #ifdef MARTII
 	m_frameBuffer->Clear();
-	CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
 #endif
 }
 
@@ -917,18 +916,17 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 					else if (mime.substr(0,6) == "video/")
 					{
 						m_frameBuffer->Clear();
-						CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
 						g_settings.streaming_server_url = std::string((*entries)[selected - index].resources[preferred].url); //FIXME
 						CMoviePlayerGui::getInstance().exec(NULL, "netstream");
 						if (g_settings.show_background_picture)
 							videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
 						else
-							CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+							videoDecoder->setBlank(true);
 						changed = true;
 					}
 					else if (mime.substr(0,6) == "image/")
 					{
-						CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+						videoDecoder->setBlank(true);
 						g_PicViewer->SetScaling((CPictureViewer::ScalingMode)g_settings.picviewer_scaling);
 						g_PicViewer->SetVisible(g_settings.screen_StartX, g_settings.screen_EndX, g_settings.screen_StartY, g_settings.screen_EndY);
 
@@ -949,7 +947,6 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 								break;
 							CNeutrinoApp::getInstance()->handleMsg(msg, data);
 						}
-						CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
 						m_frameBuffer->Clear();
 						changed = true;
 					}

@@ -96,13 +96,9 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			audioPlayer = new CAudioPlayerGui();
 #ifdef MARTII
 		if (!g_settings.show_background_picture)
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+			videoDecoder->setBlank(true);
 #endif
 		int res = audioPlayer->exec(NULL, "init");
-#ifdef MARTII
-		if (!g_settings.show_background_picture)
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
-#endif
 		
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
@@ -112,14 +108,10 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			inetPlayer = new CAudioPlayerGui(true);
 #ifdef MARTII
 		if (!g_settings.show_background_picture)
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+			videoDecoder->setBlank(true);
 #endif
 		int res = inetPlayer->exec(NULL, "init");
 		
-#ifdef MARTII
-		if (!g_settings.show_background_picture)
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
-#endif
 		return res; //menu_return::RETURN_REPAINT;
 	}
 	else if (actionKey == "movieplayer")
