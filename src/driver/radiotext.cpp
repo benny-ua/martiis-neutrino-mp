@@ -2507,7 +2507,8 @@ void CRadioText::run()
 			}
 #ifdef MARTII
 			if (lastRassPid) {
-				RassShow(DATADIR "/neutrino/icons/radiomode.jpg");
+				extern cVideo *videoDecoder;
+				videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 				lastRassPid = 0;
 				Rass_current_slide = -1;
 				Rass_first_slide = 100000;
