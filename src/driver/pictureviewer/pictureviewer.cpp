@@ -494,6 +494,9 @@ void CPictureViewer::Cleanup ()
 		free(fh);
 		fh = tmp;
 	}
+#ifdef MARTII
+	fh_root = NULL;
+#endif
 }
 
 void CPictureViewer::getSize(const char* name, int* width, int *height)
