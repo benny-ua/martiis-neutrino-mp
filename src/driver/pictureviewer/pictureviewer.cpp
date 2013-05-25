@@ -488,16 +488,27 @@ void CPictureViewer::Cleanup ()
 		free (m_CurrentPic_Buffer);
 		m_CurrentPic_Buffer = NULL;
 	}
+#ifndef MARTII
 	CFormathandler *fh = fh_root;
 	while (fh) {
 		CFormathandler *tmp = fh->next;
 		free(fh);
 		fh = tmp;
 	}
-#ifdef MARTII
-	fh_root = NULL;
 #endif
 }
+#ifdef MARTII
+CPictureViewer::~CPictureViewer ()
+{
+	Cleanup();
+	CFormathandler *fh = fh_root;
+	while (fh) {
+		CFormathandler *tmp = fh->next;
+		free(fh);
+		fh = tmp;
+	}
+}
+#endif
 
 void CPictureViewer::getSize(const char* name, int* width, int *height)
 {
