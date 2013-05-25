@@ -116,8 +116,8 @@ private:
 	void RassDecode(uchar *Data, int Length);
 	bool DividePes(unsigned char *data, int length, int *substart, int *subend);
 #ifdef MARTII
-	void RassShow(char *filename);
-	void RassShow(int slidenumber);
+	void RassShow(char *filename, unsigned char *md5sum = NULL);
+	void RassShow(int slidenumber, unsigned char *md5sum = NULL);
 	void RassUpdate(char *filename, int slidenumber = -1);
 	void RassPaint(int slidenumber = -1, bool blit = true);
 	neutrino_msg_t RassShow_prev(void);
@@ -131,6 +131,7 @@ private:
 	uint pid;
 #ifdef MARTII
 	uint lastRassPid;
+	unsigned char last_md5sum[16];
 
 	CFrameBuffer *framebuffer;
 	int iconWidth;
@@ -147,7 +148,7 @@ private:
 			std::map<int, slideinfo> sim;
 		public:
 			bool set(int, slideinfo);
-			bool exists(int);
+			unsigned char *exists(int);
 			void clear(void);
 	};
 	RASS_slides slides;
