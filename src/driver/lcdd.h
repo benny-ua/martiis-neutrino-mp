@@ -63,6 +63,9 @@ typedef enum
 	FP_ICON_CAM1       = 0x0B000001,
 	FP_ICON_COL2       = 0x0B000002,
 	FP_ICON_CAM2       = 0x0C000001
+#ifdef MARTII
+	, FP_ICON_RECORD // dummy
+#endif
 } fp_icon;
 #define CVFD CLCD
 
@@ -258,10 +261,10 @@ class CLCD
 		void Lock();
 		void Unlock();
 		void Clear();
+		void ShowIcon(fp_icon icon, bool show);
 #ifdef MARTII
 		void ShowText(const char * str, bool rescheduleTime = true);
 #else
-		void ShowIcon(fp_icon icon, bool show);
 		void ShowText(const char *s) { showServicename(std::string(s), true); };
 #endif
 		~CLCD();

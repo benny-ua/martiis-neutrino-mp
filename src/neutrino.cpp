@@ -2119,8 +2119,8 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	hintBox->paint();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 #ifdef MARTII
-	CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, false);
-	CVFD::getInstance()->ShowIcon(VFD_ICON_RECORD, false);
+	CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, false);
+	CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 #endif
 
 	CVFD::getInstance()->init(font.filename, font.name);
@@ -2938,7 +2938,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		mainMenu->exec(NULL, "");
 		// restore mute symbol
 		if (current_muted)
-			g_volume->AudioMute(current_muted, true);
+			g_audioMute->AudioMute(current_muted, true);
                 if(g_settings.mode_clock)
                 	InfoClock->StartClock();
 		saveSetup(NEUTRINO_SETTINGS_FILE);
@@ -3310,7 +3310,7 @@ _repeat:
 			}
 		}
 #ifdef MARTII
-		CVFD::getInstance()->ShowIcon(VFD_ICON_RECORD, true);
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
 #endif
 		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF) {
 			CRecordManager::getInstance()->Record((CTimerd::RecordingInfo *) data);
@@ -3322,7 +3322,7 @@ _repeat:
 	}
 	else if( msg == NeutrinoMessages::RECORD_STOP) {
 #ifdef MARTII
-		CVFD::getInstance()->ShowIcon(VFD_ICON_RECORD, false);
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 #endif
 		CTimerd::RecordingStopInfo* recinfo = (CTimerd::RecordingStopInfo*)data;
 		printf("NeutrinoMessages::RECORD_STOP: eventID %d channel_id %" PRIx64 "\n", recinfo->eventID, recinfo->channel_id);
@@ -4421,8 +4421,8 @@ void stop_daemons(bool stopall)
 	printf("zapit shutdown done\n");
 	CVFD::getInstance()->Clear();
 #ifdef MARTII
-	CVFD::getInstance()->ShowIcon(VFD_ICON_PLAY, false);
-	CVFD::getInstance()->ShowIcon(VFD_ICON_RECORD, false);
+	CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, false);
+	CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 #endif
 	if(stopall) {
 		if (cpuFreq) {

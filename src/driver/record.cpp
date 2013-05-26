@@ -53,6 +53,7 @@
 #include <driver/record.h>
 #ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
+#include <driver/lcdd.h>
 #endif
 #include <driver/streamts.h>
 #include <zapit/capmt.h>
@@ -267,7 +268,7 @@ printf("CRecordInstance::Start: fe %d demux %d\n", frontend->getNumber(), channe
 #ifdef MARTII
 	led_mutex.lock();
 	if (!led_count)
-		CVFD::getInstance()->ShowIcon(VFD_ICON_CAM1, true);
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
 	led_count++;
 	led_mutex.unlock();
 #endif
@@ -306,7 +307,7 @@ bool CRecordInstance::Stop(bool remove_event)
 		if (led_count > 0)
 			led_count--;
 		if (!led_count)
-			CVFD::getInstance()->ShowIcon(VFD_ICON_CAM1, false);
+			CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 		led_mutex.unlock();
 	}
 #endif

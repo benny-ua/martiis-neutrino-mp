@@ -268,7 +268,7 @@ void CLCD::setMode(const MODES m, const char * const title)
 	MODES lastmode = mode;
 
 	if(mode == MODE_AUDIO)
-		ShowIcon(VFD_ICON_MP3, false);
+		ShowIcon(FP_ICON_MP3, false);
 	if(strlen(title))
 		ShowText((char *) title);
 	mode = m;
@@ -385,16 +385,15 @@ void CLCD::Clear()
 		perror("IOC_VFD_CLEAR_ALL");
 }
 
-void CLCD::ShowIcon(vfd_icon icon, bool show)
+void CLCD::ShowIcon(fp_icon icon, bool show)
 {
 	int which;
 	switch (icon) {
-		case VFD_ICON_PLAY:
-		//case VFD_ICON_TIMESHIFT:
+		case FP_ICON_PLAY:
+		//case FP_ICON_TIMESHIFT:
 			which = LED_GREEN;
 			break;
-		case VFD_ICON_CAM1:
-		case VFD_ICON_RECORD:
+		case FP_ICON_RECORD:
 			which = LED_RED;
 			break;
 		default:

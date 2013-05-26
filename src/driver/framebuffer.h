@@ -126,9 +126,6 @@ class CFrameBuffer
 		bool corner_tl, corner_tr, corner_bl, corner_br;
 
 		void * int_convertRGB2FB(unsigned char *rgbbuff, unsigned long x, unsigned long y, int transp, bool alpha);
-#if HAVE_SPARK_HARDWARE
-		void blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height);
-#endif
 		int m_transparent_default, m_transparent;
 		// Unlocked versions (no mutex)
 		void paintHLineRelInternal(int x, int dx, int y, const fb_pixel_t col);

@@ -617,6 +617,7 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 #else
 	unsigned int system_rev = cs_get_revision();
 	std::string boxname = "CST ";
+#endif
 	static CNetAdapter netadapter; 
 	std::string eth_id = netadapter.getMacAddr();
 	std::transform(eth_id.begin(), eth_id.end(), eth_id.begin(), ::tolower);

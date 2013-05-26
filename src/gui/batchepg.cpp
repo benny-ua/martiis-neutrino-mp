@@ -52,7 +52,7 @@
 #include <gui/widget/hintbox.h>
 
 #include <driver/rcinput.h>
-#include <driver/volume.h>
+#include <gui/audiomute.h>
 
 extern long timer_wakeup; // neutrino.cpp
 
@@ -234,12 +234,12 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (!wakeup)
 			muted = CNeutrinoApp::getInstance()->isMuted();
 
-		CVolume *g_volume = CVolume::getInstance();
+		extern CAudioMute *g_audioMute;
 
 		if (actionKey != "run") {
 			Load();
 			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
-			g_volume->AudioMute(true, false);
+			g_audioMute->AudioMute(true, false);
 		}
 
 		channel_id = live_channel_id;
@@ -260,7 +260,7 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
 			// restore audio
 			if (!muted)
-					g_volume->AudioMute(false, false);
+					g_audioMute->AudioMute(false, false);
 		}
 
 		return menu_return::RETURN_REPAINT;
