@@ -1193,11 +1193,19 @@ void CScanSetup::addScanMenuManualScan(CMenuWidget *manual_Scan)
 	//----------------------------------------------------------------------
 	manual_Scan->addItem(GenericMenuSeparatorLine);
 
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_SCANTS_TEST, allow_start, NULL, this, r_system == DVB_C ? "ctest" : (r_system == DVB_T ? "ttest" : "stest"), CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+#else
 	mf = new CMenuForwarder(LOCALE_SCANTS_TEST, allow_start, NULL, this, r_system == DVB_C ? "ctest" : "stest", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+#endif
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_TEST);
 	manual_Scan->addItem(mf);
 
+#ifdef MARTII
+	mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, r_system == DVB_C ? "cmanual" : (r_system == DVB_T ? "tmanual" : "smanual"), CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+#else
 	mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, r_system == DVB_C ? "cmanual" : "smanual", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+#endif
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_START);
 	manual_Scan->addItem(mf);
 }
