@@ -146,7 +146,7 @@ neutrino_LDADD += \
 endif
 if BOXTYPE_SPARK
 neutrino_LDADD += \
-	-lass
+	-lass -lasound
 endif
 if BOXTYPE_TRIPLE
 neutrino_LDADD += \
