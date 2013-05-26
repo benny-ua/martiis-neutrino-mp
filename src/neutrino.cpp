@@ -178,7 +178,9 @@ void stop_video(void);
 #include "gui/ch_mosaic.h"
 #endif
 
+#ifndef MARTII
 CAudioSetupNotifier	* audioSetupNotifier;
+#endif
 CBouquetList   * bouquetList; // current list
 
 CBouquetList   * TVbouquetList;
@@ -2153,6 +2155,9 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	audioDecoder->SetSpdifDD(g_settings.spdif_dd ? true : false);
 	audioDecoder->EnableAnalogOut(g_settings.analog_out ? true : false);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
+#ifdef MARTII
+	CAudioSetupNotifier *
+#endif
 	audioSetupNotifier        = new CAudioSetupNotifier;
 	// trigger a change
 	if(g_settings.avsync != (AVSYNC_TYPE) AVSYNC_ENABLED)
@@ -2200,6 +2205,8 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG, &g_settings.audio_mixer_volume_analog);
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF, &g_settings.audio_mixer_volume_spdif);
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI, &g_settings.audio_mixer_volume_hdmi);
+	delete audioSetupNotifier;
+	audioSetupNotifier = NULL;
 #endif
 	powerManager = new cPowerManager;
 	powerManager->Open();
@@ -4868,7 +4875,9 @@ void CNeutrinoApp::Cleanup()
 	delete g_Radiotext; g_Radiotext = NULL;
 
 	printf("cleanup 13\n");fflush(stdout);
+#ifndef MARTII
 	delete audioSetupNotifier; audioSetupNotifier = NULL;
+#endif
 	delete MoviePluginChanger; MoviePluginChanger = NULL;
 	printf("cleanup 14\n");fflush(stdout);
 

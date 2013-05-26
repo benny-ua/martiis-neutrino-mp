@@ -48,7 +48,9 @@
 
 #include <system/debug.h>
 
+#ifndef MARTII
 extern CAudioSetupNotifier	* audioSetupNotifier;
+#endif
 extern cAudio *audioDecoder;
 
 CAudioSetup::CAudioSetup(bool wizard_mode)
@@ -126,6 +128,9 @@ const CMenuOptionChooser::keyval AUDIOMENU_HDMI_DD_OPTIONS[AUDIOMENU_HDMI_DD_OPT
 /* audio settings menu */
 int CAudioSetup::showAudioSetup()
 {
+#ifdef MARTII
+	CAudioSetupNotifier *audioSetupNotifier = new CAudioSetupNotifier;
+#endif
 	//menue init
 	CMenuWidget* audioSettings = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width);
 	audioSettings->setSelected(selected);
@@ -237,6 +242,9 @@ int CAudioSetup::showAudioSetup()
 	int res = audioSettings->exec(NULL, "");
 	selected = audioSettings->getSelected();
 	delete audioSettings;
+#ifdef MARTII
+	delete audioSetupNotifier;
+#endif
 	return res;
 }
 
