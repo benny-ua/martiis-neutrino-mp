@@ -58,7 +58,8 @@ static CmodCache mod_cache; // static instance
 
 //-----------------------------------------------------------------------------
 #if defined(CONFIG_SYSTEM_TUXBOX) || defined(CONFIG_SYSTEM_TUXBOX_COOLSTREAM)
-#include <neutrinoapi.h>
+#include "neutrinoapi.h"
+#include <config.h>
 static CNeutrinoAPI *NeutrinoAPI;
 #endif
 
@@ -107,6 +108,17 @@ void yhttpd_reload_config() {
 //-----------------------------------------------------------------------------
 // Main Entry
 //-----------------------------------------------------------------------------
+
+void thread_cleanup (void *p)
+{
+	Cyhttpd *y = (Cyhttpd *)p;
+	if (y) {
+		y->stop_webserver();
+		delete y;
+	}
+	y = NULL;
+}
+
 #ifndef Y_CONFIG_BUILD_AS_DAEMON
 void * nhttpd_main_thread(void *) {
 #ifdef MARTII
@@ -122,6 +134,8 @@ void * nhttpd_main_thread(void *) {
 		aprintf("Error initializing WebServer\n");
 		return (void *) EXIT_FAILURE;
 	}
+	/* we pthread_cancel this thread from the main thread, but still want to clean up */
+	pthread_cleanup_push(thread_cleanup, yhttpd);
 	yhttpd->flag_threading_off = true;
 
 	yhttpd->hooks_attach();
@@ -133,7 +147,9 @@ void * nhttpd_main_thread(void *) {
 
 		yhttpd->run();
 	}
+	pthread_cleanup_pop(0);
 	delete yhttpd;
+	yhttpd = NULL;
 
 	aprintf("Main end\n");
 	return (void *) EXIT_SUCCESS;
@@ -241,6 +257,7 @@ Cyhttpd::Cyhttpd() {
 Cyhttpd::~Cyhttpd() {
 	if (webserver)
 		delete webserver;
+	CLanguage::deleteInstance();
 	webserver = NULL;
 }
 

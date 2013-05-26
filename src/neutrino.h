@@ -87,6 +87,9 @@ typedef struct font_sizes_groups
 	const neutrino_locale_t hint;
 } font_sizes_groups_struct;
 
+extern const unsigned char genre_sub_classes[];            /* epgview.cpp */
+extern const neutrino_locale_t * genre_sub_classes_list[]; /* epgview.cpp */
+
 class CNeutrinoApp : public CMenuTarget, CChangeObserver
 {
 public:
@@ -242,6 +245,7 @@ public:
 	void StopSubtitles();
 # endif
 	void StartSubtitles(bool show = true);
+	bool StartPip(const t_channel_id channel_id);
 	void SelectSubtitles();
 	void showInfo(void);
 	CConfigFile* getConfigFile() {return &configfile;};

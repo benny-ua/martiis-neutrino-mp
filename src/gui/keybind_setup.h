@@ -96,6 +96,9 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			KEY_AUDIOPLAYER,
 #endif
 			KEY_SCREENSHOT,
+			KEY_PIP_CLOSE,
+			KEY_PIP_SETUP,
+			KEY_PIP_SWAP,
 			
 			KEYBINDS_COUNT
 		};

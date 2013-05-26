@@ -35,20 +35,6 @@
 
 #include <unistd.h>
 
-#ifdef HAVE_COOLSTREAM_NEVIS_IR_H
-/* define constants instead of #ifdef'ing the corresponding code.
- * the compiler will optimize it away anyway, but the syntax is
- * still checked */
-#define RC_HW_SELECT true
-#else
-#define RC_HW_SELECT false
-#ifdef HAVE_COOL_HARDWARE
-#warning header coolstream/nevis_ir.h not found
-#warning you probably have an old driver installation
-#warning you´ll be missing the remotecontrol selection feature!
-#endif
-#endif
-
 #include "keybind_setup.h"
 
 #include <global.h>
@@ -73,6 +59,19 @@
 #include <sys/un.h>
 #endif
 
+#ifdef IOC_IR_SET_PRI_PROTOCOL
+/* define constants instead of #ifdef'ing the corresponding code.
+ * the compiler will optimize it away anyway, but the syntax is
+ * still checked */
+#define RC_HW_SELECT true
+#else
+#define RC_HW_SELECT false
+#ifdef HAVE_COOL_HARDWARE
+#warning header coolstream/cs_ir_generic.h not found
+#warning you probably have an old driver installation
+#warning you´ll be missing the remotecontrol selection feature!
+#endif
+#endif
 
 CKeybindSetup::CKeybindSetup()
 {
@@ -214,6 +213,10 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_AUDIOPLAYER_NAME,		&g_settings.key_audioplayback,		NONEXISTANT_LOCALE},
 #endif
 	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT }
+	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT },
+	{LOCALE_EXTRA_KEY_PIP_CLOSE,		&g_settings.key_pip_close,		LOCALE_MENU_HINT_KEY_PIP_CLOSE },
+	{LOCALE_EXTRA_KEY_PIP_SETUP,		&g_settings.key_pip_setup,		LOCALE_MENU_HINT_KEY_PIP_SETUP },
+	{LOCALE_EXTRA_KEY_PIP_SWAP,		&g_settings.key_pip_swap,		LOCALE_MENU_HINT_KEY_PIP_CLOSE }
 };
 
 
@@ -389,13 +392,25 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", key_settings[KEY_SCREENSHOT].hint);
 	bindSettings->addItem(mf);
 #endif
+#ifdef ENABLE_PIP
+	// pip
+	mf = new CMenuDForwarder(key_settings[KEY_PIP_CLOSE].keydescription, true, keychooser[KEY_PIP_CLOSE]->getKeyName(), keychooser[KEY_PIP_CLOSE]);
+	mf->setHint("", key_settings[KEY_PIP_CLOSE].hint);
+	bindSettings->addItem(mf);
+	mf = new CMenuDForwarder(key_settings[KEY_PIP_SETUP].keydescription, true, keychooser[KEY_PIP_SETUP]->getKeyName(), keychooser[KEY_PIP_SETUP]);
+	mf->setHint("", key_settings[KEY_PIP_SETUP].hint);
+	bindSettings->addItem(mf);
+	mf = new CMenuDForwarder(key_settings[KEY_PIP_SWAP].keydescription, true, keychooser[KEY_PIP_SWAP]->getKeyName(), keychooser[KEY_PIP_SWAP]);
+	mf->setHint("", key_settings[KEY_PIP_SWAP].hint);
+	bindSettings->addItem(mf);
+#endif
+
 #ifdef MARTII
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_TIMERLIST].keydescription, true, keychooser[KEY_TIMERLIST]->getKeyName(), keychooser[KEY_TIMERLIST]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_SHOWCLOCK].keydescription, true, keychooser[KEY_SHOWCLOCK]->getKeyName(), keychooser[KEY_SHOWCLOCK]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_HDDMENU].keydescription, true, keychooser[KEY_HDDMENU]->getKeyName(), keychooser[KEY_HDDMENU]));
 #else
-
 	//bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_ZAP_CYCLE, &g_settings.zap_cycle, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 	// left-exit, FIXME is this option really change anything ??
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);

@@ -1624,6 +1624,13 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 			case RC_prog4:
 				return "prog4";
 #endif
+				return "www";
+			case RC_sub:
+				return "sub";
+			case RC_pos:
+				return "pos";
+			case RC_sleep:
+				return "sleep";
 			default:
 				printf("unknown key: %d (0x%x) \n", key, key);
 				return "unknown";
@@ -1707,8 +1714,8 @@ void CRCInput::play_click()
 }
 
 
-#ifdef HAVE_COOLSTREAM_NEVIS_IR_H
-// hint: ir_protocol_t and other useful things are defined in nevis_ir.h
+#ifdef IOC_IR_SET_PRI_PROTOCOL
+// hint: ir_protocol_t and other useful things are defined in cs_ir_generic.h
 void CRCInput::set_rc_hw(ir_protocol_t ir_protocol, unsigned int ir_address)
 {
 	int ioctl_ret = -1;
@@ -1732,7 +1739,7 @@ void CRCInput::set_rc_hw(ir_protocol_t ir_protocol, unsigned int ir_address)
 	}
 }
 
-// hint: ir_protocol_t and other useful things are defined in nevis_ir.h
+// hint: ir_protocol_t and other useful things are defined in cs_ir_generic.h
 void CRCInput::set_rc_hw(void)
 {
 	ir_protocol_t ir_protocol = IR_PROTOCOL_UNKNOWN;

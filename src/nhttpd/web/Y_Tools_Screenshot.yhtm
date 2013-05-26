@@ -63,11 +63,7 @@ function do_snapshot() {
 	else
 		loadSyncURL("/control/screenshot?name="+filename+"&osd="+enableOSD+"&video="+enableVideo);
 
-/* #ifdef MARTII */
 	do_showshot(filename);
-/* #else
-	window.setTimeout("do_showshot('"+filename+"');", (enableVideo == 1) ? 6500 : 3000);
-   #endif */
 }
 function do_showshot(_filename) {
 	if (_filename == "")

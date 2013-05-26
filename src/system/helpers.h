@@ -31,6 +31,7 @@ int safe_mkdir(const char * path);
 #else
 int safe_mkdir(char * path);
 #endif
+off_t file_size(const char *filename);
 bool file_exists(const char *filename);
 void wakeup_hdd(const char *hdd_dir);
 int check_dir(const char * dir);
