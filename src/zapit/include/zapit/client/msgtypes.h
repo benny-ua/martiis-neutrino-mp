@@ -150,6 +150,9 @@ class CZapitMessages
 			CMD_GET_MODE43			   = 109,
 			CMD_SET_MODE43			   = 110,
 			CMD_STOP_PIP			   = 111
+#ifdef MARTII
+			, CMD_LOCKRC			   = 112
+#endif
 
 		};
 

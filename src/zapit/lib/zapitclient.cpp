@@ -573,6 +573,19 @@ void CZapitClient::getVolume(unsigned int *left, unsigned int *right)
 
         close_connection();
 }
+#ifdef MARTII
+void CZapitClient::lockRc(const bool lock)
+{
+	CZapitMessages::commandBoolean msg;
+	VALGRIND_PARANOIA;
+
+	msg.truefalse = lock;
+
+	send(CZapitMessages::CMD_LOCKRC, (char*)&msg, sizeof(msg));
+
+	close_connection();
+}
+#endif
 #if 0 
 //never used
 delivery_system_t CZapitClient::getDeliverySystem(void)

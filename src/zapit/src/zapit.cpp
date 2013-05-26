@@ -70,6 +70,7 @@
 #endif
 #ifdef MARTII
 #include <system/set_threadname.h>
+#include <driver/rcinput.h>
 #endif
 
 #include <driver/abstime.h>
@@ -1776,6 +1777,18 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 			audioDecoder->unmute();
 		break;
 	}
+#ifdef MARTII
+	case CZapitMessages::CMD_LOCKRC: {
+		CZapitMessages::commandBoolean msgBoolean;
+		CBasicServer::receive_data(connfd, &msgBoolean, sizeof(msgBoolean));
+		extern CRCInput *g_RCInput;
+		if (msgBoolean.truefalse)
+			g_RCInput->stopInput();
+		else
+			g_RCInput->restartInput();
+		break;
+	}
+#endif
 
 	case CZapitMessages::CMD_SET_VOLUME: {
 		CZapitMessages::commandVolume msgVolume;
