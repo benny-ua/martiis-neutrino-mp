@@ -1640,8 +1640,13 @@ void CMovieBrowser::refreshFoot(void)
 	}
 
 	const int xoff = 10;
+#ifdef MARTII
+	const int ypos_icon = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY - 4;
+	const int ypos_font = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY + m_cBoxFrameFootRel.iHeight;
+#else
 	const int ypos_icon = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY;
 	const int ypos_font = m_cBoxFrame.iY + m_cBoxFrameFootRel.iY + m_cBoxFrameFootRel.iHeight + 4;
+#endif
 	int xpos = m_cBoxFrame.iX + m_cBoxFrameFootRel.iX + xoff;
 
 	int max_b = 5;
