@@ -247,6 +247,9 @@ void CVolumeBar::repaintVolScale()
 		initVolumeBarDigitValue();
 		paintVolumeBarDigit();
 	}
+#ifdef MARTII
+	frameBuffer->blit();
+#endif
 }
 
 //set current volume value and paint form
@@ -262,6 +265,9 @@ void CVolumeBar::paint(bool do_save_bg)
 {
 	//paint form
 	paintForm(do_save_bg);
+#ifdef MARTII
+	frameBuffer->blit();
+#endif
 }
 
 
