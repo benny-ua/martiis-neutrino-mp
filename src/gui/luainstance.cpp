@@ -26,6 +26,7 @@
 #include <global.h>
 #include <system/settings.h>
 #include <gui/widget/msgbox.h>
+#include <gui/widget/messagebox.h>
 #ifdef MARTII
 #include <gui/filebrowser.h>
 #include <driver/pictureviewer/pictureviewer.h>
@@ -1225,8 +1226,7 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 	tableLookup(L, "name", name) || tableLookup(L, "title", name) || tableLookup(L, "caption", name);
 	tableLookup(L, "text", text);
 	tableLookup(L, "icon", icon);
-	int timeout = -1, width = 450, return_default_on_timeout = 0, default_button = 0;
-	uint32_t show_buttons = 0;
+	int timeout = -1, width = 450, return_default_on_timeout = 0, show_buttons = 0, default_button = 0;
 	tableLookup(L, "timeout", timeout);
 	tableLookup(L, "width", width);
 	tableLookup(L, "return_default_on_timeout", return_default_on_timeout);
@@ -1288,7 +1288,7 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 			}
 	}
 
-	int res = ShowMsg2UTF(name.c_str(), text.c_str(), (CMsgBox::result_) default_button, show_buttons, icon.empty() ? NULL : icon.c_str(), width, timeout, return_default_on_timeout);
+	int res = ShowMsgUTF(name.c_str(), text.c_str(), (CMessageBox::result_) default_button, (CMessageBox::buttons_) show_buttons, icon.empty() ? NULL : icon.c_str(), width, timeout, return_default_on_timeout);
 
 	tmp = "cancel";
 	for (int i = 0; mbr[i].name; i++)

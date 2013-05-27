@@ -314,7 +314,7 @@ int ShowMsgUTF(const neutrino_locale_t Caption, const char * const Text, const C
 	return res;
 }
 #ifdef MARTII
-int ShowMsgUTF(const char *Caption, const char * const Text, const CMessageBox::result_ Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+int ShowMsgUTF(const char *Caption, const char * const Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
    	CMessageBox* messageBox = new CMessageBox(Caption, Text, Width, Icon, Default, ShowButtons);
 	messageBox->returnDefaultValueOnTimeout(returnDefaultOnTimeout);
