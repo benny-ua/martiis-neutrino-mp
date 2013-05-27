@@ -1897,7 +1897,7 @@ stringinput.clear Alles löschen
 subtitles.delay Verzögerung DVB-Untertitel
 subtitles.head Untertitel
 subtitles.stop Untertitel aus
-terrestrialsetup.provider DVB-T Region
+terrestrialsetup.provider DVB-T Versorgungsbereich
 three.d.off Deaktiviert
 three.d.save Für Kanal speichern
 three.d.settings 3D-Einstellung
