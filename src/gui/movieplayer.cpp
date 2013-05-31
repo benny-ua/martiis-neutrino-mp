@@ -715,7 +715,7 @@ void CMoviePlayerGui::PlayFile(void)
 
 	while (playstate >= CMoviePlayerGui::PLAY)
 	{
-#ifdef MARTII
+#ifdef ENABLE_GRAPHLCD // MARTII
 		if (p_movie_info)
 			nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle, duration ? (100 * position / duration) : 0);
 #endif
@@ -1049,8 +1049,10 @@ void CMoviePlayerGui::PlayFile(void)
 	dvbsub_stop();
 
 	frameBuffer->set3DMode(old3dmode);
+#ifdef ENABLE_GRAPHLCD
 	if (p_movie_info)
 		nGLCD::unlockChannel();
+#endif
 #endif
 
 	FileTime.hide();
@@ -1634,7 +1636,11 @@ void CMoviePlayerGui::showHelpTS()
 	helpbox.show(LOCALE_MESSAGEBOX_INFO);
 }
 #ifdef MARTII
+#ifdef ENABLE_GRAPHLCD
 void CMoviePlayerGui::StopSubtitles(bool b)
+#else
+void CMoviePlayerGui::StopSubtitles(bool)
+#endif
 {
 	printf("[neutrino] %s\n", __FUNCTION__);
 	int ttx, ttxpid, ttxpage;

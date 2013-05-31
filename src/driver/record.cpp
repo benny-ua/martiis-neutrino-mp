@@ -53,7 +53,9 @@
 #include <driver/record.h>
 #ifdef ENABLE_GRAPHLCD // MARTII
 #include <driver/nglcd.h>
-#include <driver/lcdd.h>
+#endif
+#ifdef MARTII
+#include <driver/display.h>
 #endif
 #include <driver/streamts.h>
 #include <zapit/capmt.h>

@@ -617,7 +617,7 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 	/* neat for debugging duplicate event issues etc. */
 	char *epgid;
 #ifdef MARTII
-	if (asprintf(&epgid, "EPG ID:%08llX.%02X", epgData.eventID, epgData.table_id) >= 0)
+	if (asprintf(&epgid, "EPG ID:%08llX.%02X", (long long unsigned)epgData.eventID, epgData.table_id) >= 0)
 #else
 	if (asprintf(&epgid, "EPG ID:%04X.%02X", (int)((epgData.eventID)&0x0FFFF), epgData.table_id) >= 0)
 #endif

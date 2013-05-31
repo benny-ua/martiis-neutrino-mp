@@ -200,7 +200,9 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 	t_channel_id channel_id;
 
 	// read EPG from a single channel
-	if (1 == sscanf(actionKey.c_str(), "%llx", &channel_id)) {
+	long long unsigned _channel_id;
+	if (1 == sscanf(actionKey.c_str(), "%llx", &_channel_id)) {
+		channel_id = _channel_id;
 		if (CNeutrinoApp::getInstance()->recordingstatus)
 			return menu_return::RETURN_REPAINT;
 		
@@ -289,7 +291,7 @@ void CBatchEPG_Menu::Load()
         if (cfg) {
           char s[1000];
           while (fgets(s, 1000, cfg)) {
-                t_channel_id chan;
+				long long unsigned chan;
                 int type;
                 if (2 == sscanf(s, "%llx %d", &chan, &type)) {
 					epgChannel e;
@@ -333,7 +335,7 @@ void CBatchEPG_Menu::Save()
 		if (cfg) {
 			for (unsigned int i = 0; i < epgChannels.size(); i++) {
 				if (epgChannels[i].type != BATCHEPG_OFF)
-					fprintf(cfg, "%llx %d\n", epgChannels[i].channel_id, epgChannels[i].type);
+					fprintf(cfg, "%llx %d\n", (long long unsigned) epgChannels[i].channel_id, epgChannels[i].type);
 				epgChannels[i].type_old = epgChannels[i].type;
 			}
 			fclose(cfg);
@@ -381,7 +383,7 @@ void CBatchEPG_Menu::Settings()
 	int shortcut = 0;
 	for (unsigned int i = 0; i < epgChannels.size(); i++) {
 		char actionKey[80];
-		snprintf(actionKey, sizeof(actionKey), "%llx", epgChannels[i].channel_id);
+		snprintf(actionKey, sizeof(actionKey), "%llx", (long long unsigned) epgChannels[i].channel_id);
 		menu->addItem(new CMenuForwarderNonLocalized(epgChannels[i].name.c_str(),
 			true, "", this, actionKey, CRCInput::convertDigitToKey (shortcut++)),
 			epgChannels[i].channel_id == live_channel_id);

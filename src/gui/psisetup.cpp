@@ -49,7 +49,6 @@
 #include <neutrino.h>
 
 #include <video.h>
-#include <linux/stmfb.h>
 
 extern cVideo * videoDecoder;
 
@@ -163,7 +162,7 @@ CPSISetup::exec (CMenuTarget * parent, const std::string &)
 
   paint();
 
-  unsigned long long timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] ? g_settings.timing[SNeutrinoSettings::TIMING_MENU] : 0xffff);
+  uint64_t timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] ? g_settings.timing[SNeutrinoSettings::TIMING_MENU] : 0xffff);
   bool loop = true;
   while (loop)
     {

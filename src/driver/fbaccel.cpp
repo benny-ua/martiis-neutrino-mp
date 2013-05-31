@@ -995,6 +995,7 @@ void CFbAccel::mark(int, int, int, int)
 }
 #endif
 #ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE
 void CFbAccel::blitArea(int src_width, int src_height, int fb_x, int fb_y, int width, int height)
 {
 	if (!src_width || !src_height)
@@ -1027,7 +1028,14 @@ void CFbAccel::blitArea(int src_width, int src_height, int fb_x, int fb_y, int w
 	if(ioctl(fb->fd, STMFBIO_BLT_EXTERN, &blt_data) < 0)
 		perror("blit_icon FBIO_BLIT");
 }
+#else
+void CFbAccel::blitArea(int /*src_width*/, int /*src_height*/, int /*fb_x*/, int /*fb_y*/, int /*width*/, int /*height*/)
+{
+	fprintf(stderr, "%s not implemented\n", __func__);
+}
+#endif
 
+#ifdef HAVE_SPARK_HARDWARE
 void CFbAccel::resChange(void)
 {
 	if (ioctl(fb->fd, FBIOGET_VSCREENINFO, &s) == -1)
@@ -1064,4 +1072,25 @@ void CFbAccel::ClearFB(void)
 {
 	blitBoxFB(0, 0, s.xres - 1, s.yres - 1, 0);
 }
+#else
+void CFbAccel::resChange(void)
+{
+	fprintf(stderr, "%s not implemented\n", __func__);
+}
+
+void CFbAccel::setBorder(int /*sx*/, int /*sy*/, int /*ex*/, int /*ey*/)
+{
+	fprintf(stderr, "%s not implemented\n", __func__);
+}
+
+void CFbAccel::setBorderColor(fb_pixel_t /*col*/)
+{
+	fprintf(stderr, "%s not implemented\n", __func__);
+}
+
+void CFbAccel::ClearFB(void)
+{
+	fprintf(stderr, "%s not implemented\n", __func__);
+}
+#endif
 #endif

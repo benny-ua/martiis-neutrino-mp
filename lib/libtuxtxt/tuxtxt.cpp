@@ -6428,11 +6428,20 @@ void CopyBB2FB()
 		int ch = 24*fontheight;
 		f->blit2FB(lbb, cw, ch, cx, cy, cx, cy, true);
 #else
+#ifdef MARTII
+		fb_pixel_t *topdst = dst;
+#else
 		unsigned char *topdst = dst;
+#endif
 		size_t width = ex * sizeof(fb_pixel_t) - screenwidth;
 
+#ifdef MARTII
+		topsrc += screenwidth/sizeof(fb_pixel_t);
+		topdst += screenwidth/sizeof(fb_pixel_t);
+#else
 		topsrc += screenwidth;
 		topdst += screenwidth;
+#endif
 		for (i=0; i < 24*fontheight; i++)
 		{
 			memmove(topdst, topsrc, width);

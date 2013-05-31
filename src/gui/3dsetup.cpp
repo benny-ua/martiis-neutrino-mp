@@ -143,8 +143,10 @@ void C3DSetup::load()
 		char s[80];
 		while (fgets(s, sizeof(s), f)) {
 			t_channel_id chan;
+			long long unsigned int _chan;
 			int mode;
-			if (2 == sscanf(s, "%llx %d", &chan, &mode)) {
+			if (2 == sscanf(s, "%llx %d", &_chan, &mode)) {
+				chan = _chan;
 				threeDMap[chan] = (CFrameBuffer::Mode3D) mode;
 			}
 		}
@@ -158,7 +160,7 @@ void C3DSetup::save()
 	FILE *f = fopen(THREE_D_CONFIG_FILE, "w");
 	if (f) {
 		for (i = threeDMap.begin(); i != threeDMap.end(); i++) {
-			fprintf(f, "%llx %d\n", (uint64_t) i->first, (int) i->second);
+			fprintf(f, "%llx %d\n", (long long unsigned int) i->first, (int) i->second);
 		}
 		fflush(f);
 		fdatasync(fileno(f));

@@ -44,7 +44,9 @@
 #include <daemonc/remotecontrol.h>
 #include <system/set_threadname.h>
 
+#if HAVE_SPARK_HARDWARE
 #include <aotom_main.h>
+#endif
 
 extern CRemoteControl * g_RemoteControl; /* neutrino.cpp */
 
@@ -71,8 +73,10 @@ CLCD::CLCD()
 	time_notify_reader = fds[0];
 	time_notify_writer = fds[1];
 
+#if HAVE_SPARK_HARDWARE
 	if (0 < ioctl(fd, VFDGETVERSION, &vfd_version))
 		vfd_version = 4; // fallback to 4-digit LED
+#endif
 
 	if (pthread_create (&thrTime, NULL, TimeThread, NULL))
 		perror("[lcdd]: pthread_create(TimeThread)");
@@ -151,11 +155,13 @@ void CLCD::setlcdparameter(int dimm, const int power)
 	if(!power)
 		dimm = 0;
 
+#if HAVE_SPARK_HARDWARE
 	struct aotom_ioctl_data vData;
 	vData.u.brightness.level = dimm;
 	int ret = ioctl(fd, VFDBRIGHTNESS, &vData);
 	if(ret < 0)
 		perror("VFDBRIGHTNESS");
+#endif
 }
 
 void CLCD::setlcdparameter(void)
@@ -208,11 +214,13 @@ void CLCD::showTime(bool)
 	localtime_r(&now, &tm);
 	now += tm.tm_gmtoff;
 
+#if HAVE_SPARK_HARDWARE
 	if (ioctl(fd, VFDSETTIME2, &now) < 0 && vfd_version == 4) {
 		char buf[10];
 		strftime(buf, sizeof(buf), "%H%M", &tm);
 		ShowText(buf, false);
 	}
+#endif
 	waitSec = 60 - tm.tm_sec;
 	if (waitSec <= 0)
 		waitSec = 60;
@@ -375,6 +383,7 @@ void CLCD::Unlock()
 
 void CLCD::Clear()
 {
+#if HAVE_SPARK_HARDWARE
 	if(!has_lcd) return;
         struct vfd_ioctl_data data;
 	data.start_address = 0x01;
@@ -383,10 +392,12 @@ void CLCD::Clear()
 	int ret = ioctl(fd, VFDDISPLAYCLR, &data);
 	if(ret < 0)
 		perror("IOC_VFD_CLEAR_ALL");
+#endif
 }
 
 void CLCD::ShowIcon(fp_icon icon, bool show)
 {
+#if HAVE_SPARK_HARDWARE
 	int which;
 	switch (icon) {
 		case FP_ICON_PLAY:
@@ -403,6 +414,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 	vData.u.led.led_nr = which;
 	vData.u.led.on = show ? LOG_ON : LOG_OFF;
 	ioctl(fd, VFDSETLED, &vData);
+#endif
 }
 
 void CLCD::ShowText(const char * str, bool rescheduleTime)

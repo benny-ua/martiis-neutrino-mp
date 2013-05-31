@@ -301,7 +301,7 @@ class CFrameBuffer
 		void SetTransparentDefault(){ m_transparent = m_transparent_default; }
 #ifdef MARTII
 		bool OSDShot(const std::string &name);
-#if HAVE_SPARK_HARDWARE
+//#if HAVE_SPARK_HARDWARE
 
 		enum Mode3D { Mode3D_off = 0, Mode3D_SideBySide, Mode3D_TopAndBottom, Mode3D_Tile, Mode3D_SIZE };
 		void set3DMode(Mode3D);
@@ -317,7 +317,7 @@ class CFrameBuffer
 		void getBorder(int &sx, int &sy, int &ex, int &ey);
 		void setBorderColor(fb_pixel_t col = 0);
 		fb_pixel_t getBorderColor(void);
-# endif
+//# endif
 #endif
 
 // ## AudioMute / Clock ######################################

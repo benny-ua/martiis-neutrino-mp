@@ -455,8 +455,10 @@ void CScreenSetup::loadBorders()
 			char s[1000];
 			while (fgets(s, sizeof(s), f)) {
 				t_channel_id chan;
+				long long unsigned _chan;
 				borderFrame b;
-				if (5 == sscanf(s, "%llx %d %d %d %d", &chan, &b.sx, &b.sy, &b.ex, &b.ey)) {
+				if (5 == sscanf(s, "%llx %d %d %d %d", &_chan, &b.sx, &b.sy, &b.ex, &b.ey)) {
+					chan = _chan;
 					borderMap[chan] = b;
 				} 
 			}
@@ -474,7 +476,7 @@ void CScreenSetup::saveBorders()
 		  if (f) {
 			std::map<t_channel_id, borderFrame>::iterator it;
 			for (it = borderMap.begin(); it != borderMap.end(); it++)
-				fprintf(f, "%llx %d %d %d %d\n", it->first, it->second.sx, it->second.sy, it->second.ex, it->second.ey);
+				fprintf(f, "%llx %d %d %d %d\n", (long long unsigned) it->first, it->second.sx, it->second.sy, it->second.ex, it->second.ey);
 			fflush(f);
 			fdatasync(fileno(f));
 			fclose(f);

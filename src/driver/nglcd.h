@@ -20,6 +20,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef ENABLE_GRAPHLCD
 #ifndef __glcd_h__
 #define __glcd_h__
 
@@ -118,4 +119,5 @@ class nGLCD
 		static void SetBrightness(unsigned int b);
 		void UpdateBrightness();
 };
+#endif
 #endif

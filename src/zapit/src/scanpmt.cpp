@@ -141,7 +141,9 @@ bool CPmt::Parse(CZapitChannel * const channel)
 			char typespecific[sizeof(buf)];
 			if ((buf[0] == '#') || !buf[0])
 				continue;
-			if (4 == sscanf(buf, "%llx %x %d %[^\n]", &chan, &desc, &ty, typespecific)) {
+			long long unsigned _chan;
+			if (4 == sscanf(buf, "%llx %x %d %[^\n]", &_chan, &desc, &ty, typespecific)) {
+				chan = _chan;
 				if (chan == curChan) {
 					switch(desc) {
 						case 0x56: {
