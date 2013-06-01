@@ -63,10 +63,6 @@ TUXBOX_APPS_LIB_PKGCONFIG(AVCODEC,libavcodec)
 TUXBOX_APPS_LIB_PKGCONFIG(AVUTIL,libavutil)
 TUXBOX_APPS_LIB_PKGCONFIG(AVRESAMPLE,libavresample)
 TUXBOX_APPS_LIB_PKGCONFIG(SWRESAMPLE,libswresample)
-if test x$BOXTYPE = xgeneric; then
-	# needed by libstb-hal's cVideo / GLFramebuffer
-	TUXBOX_APPS_LIB_PKGCONFIG(SWSCALE,libswscale)
-fi
 
 # either use dynamic lualib in package lua (openSUSE)
 # ... or in package lua5.2 (debian-derivates)

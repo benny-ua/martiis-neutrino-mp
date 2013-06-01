@@ -93,11 +93,6 @@ neutrino_LDADD = \
 	@MAD_LIBS@ \
 	@ID3TAG_LIBS@ \
 	@LIBCS_LIBS@ \
-	@AVFORMAT_LIBS@ \
-	@AVUTIL_LIBS@ \
-	@AVCODEC_LIBS@ \
-	@SWRESAMPLE_LIBS@ \
-	@SWSCALE_LIBS@ \
 	$(FLACLIBS) \
 	$(VORBISLIBS) \
 	-ldvbsi++ \
@@ -140,23 +135,14 @@ neutrino_LDADD += \
 neutrino_LDFLAGS = \
 	-L$(STB_HAL_LIB)
 endif
-if BOXTYPE_GENERIC
-neutrino_LDADD += \
-	-lglut -lGL -lGLU -lGLEW -lao
-endif
-if BOXTYPE_SPARK
-neutrino_LDADD += \
-	-lass -lasound
-endif
+
 if BOXTYPE_TRIPLE
 neutrino_LDADD += \
-	$(top_builddir)/src/lcddisplay/liblcddisplay.a \
-	@DIRECTFB_LIBS@
+	$(top_builddir)/src/lcddisplay/liblcddisplay.a
 endif
 
 neutrino_LDADD += \
 	@AVFORMAT_LIBS@ \
 	@AVUTIL_LIBS@ \
 	@AVCODEC_LIBS@ \
-	@SWRESAMPLE_LIBS@ \
-	@SWSCALE_LIBS@
+	@SWRESAMPLE_LIBS@
