@@ -1662,6 +1662,16 @@ int CTPSelectHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 			old_selected = i;
 
 		std::string tname = t.description();
+#ifdef MARTII
+		if (actionkey == "terrestrial") {
+			uint32_t ch = (t.feparams.dvb_feparams.frequency - 306000)/8000;
+			if (ch * 8000 + 306000 == t.feparams.dvb_feparams.frequency) {
+				char s[20];
+				snprintf(s, sizeof(s), " (%u)", ch);
+				tname += std::string(s);
+			}
+		}
+#endif
 		CMenuForwarderNonLocalized * ts_item = new CMenuForwarderNonLocalized(tname.c_str(), true, NULL, selector, cnt, CRCInput::RC_nokey, NULL)/*, false*/;
 
 		ts_item->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
