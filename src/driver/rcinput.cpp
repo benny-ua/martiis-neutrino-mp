@@ -182,6 +182,10 @@ void CRCInput::open(int dev)
 	//+++++++++++++++++++++++++++++++++++++++
 #ifdef KEYBOARD_INSTEAD_OF_REMOTE_CONTROL
 	fd_keyb = STDIN_FILENO;
+#ifdef MARTII
+	if (fd_rc[0] < 0)
+		fd_rc[0] = fd_keyb;
+#endif
 #else
 	fd_keyb = 0;
 #endif /* KEYBOARD_INSTEAD_OF_REMOTE_CONTROL */
