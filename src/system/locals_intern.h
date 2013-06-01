@@ -1926,6 +1926,7 @@ const char * locale_real_names[] =
 	"subtitles.delay",
 	"subtitles.head",
 	"subtitles.stop",
+	"terrestrialsetup.area",
 	"terrestrialsetup.provider",
 	"three.d.off",
 	"three.d.save",

@@ -1899,6 +1899,7 @@ stringinput.clear clear all
 subtitles.delay DVB subtitles delay
 subtitles.head Subtitles
 subtitles.stop Stop subtitles
+terrestrialsetup.area Area
 terrestrialsetup.provider Terrestrial Provider
 three.d.off Inactive
 three.d.save Remember for this channel
