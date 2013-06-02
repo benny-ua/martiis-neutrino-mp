@@ -52,7 +52,7 @@
 #ifdef MARTII
 struct borderFrame { int sx, sy, ex, ey; };
 static map<t_channel_id, borderFrame> borderMap;
-#define BORDER_CONFIG_FILE CONFIGDIR "zapit/borders.conf"
+#define BORDER_CONFIG_FILE CONFIGDIR "/zapit/borders.conf"
 #else
 //int x_box = 15 * 5;
 
