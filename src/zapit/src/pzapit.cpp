@@ -98,6 +98,7 @@ int main (int argc, char** argv)
 	int m43 = -1;
 #ifdef MARTII
 	int lockrc = -1;
+	char *webtv_url = NULL;
 #endif
 	const char * channelName = NULL;
 
@@ -358,11 +359,6 @@ int main (int argc, char** argv)
 				continue;
 			}
 		}
-		else if (i < argc - 1)
-		{
-			if ((sscanf(argv[i], "%d", &bouquet) > 0) && (sscanf(argv[++i], "%u", &channel) > 0))
-				continue;
-		}
 #ifdef MARTII
 		else if (!strncmp(argv[i], "-lockrc", 7))
 		{
@@ -375,6 +371,11 @@ int main (int argc, char** argv)
 			continue;
 		}
 #endif
+		else if (i < argc - 1)
+		{
+			if ((sscanf(argv[i], "%d", &bouquet) > 0) && (sscanf(argv[++i], "%u", &channel) > 0))
+				continue;
+		}
 		else if (sscanf(argv[i], "%d", &bouquet) > 0)
 			continue;
 
