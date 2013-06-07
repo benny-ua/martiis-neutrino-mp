@@ -34,7 +34,8 @@
 #include <gui/components/cc.h>
 #include <gui/components/cc_frm.h>
 #include <gui/components/cc_frm_button.h>
-// #define TEST_MENU
+#include <gui/components/cc_frm_clock.h>
+#include <gui/components/cc_item_shapes.h>
 
 #include <string>
 
@@ -47,9 +48,11 @@ class CTestMenu : public CMenuTarget
 		CComponentsForm *form;
 		CComponentsText *txt;
 		CComponentsHeader *header;
+		CComponentsHeader *footer;
 		CComponentsIconForm *iconform;
 		CComponentsWindow *window;
 		CComponentsButton *button;
+		CComponentsFrmClock *clock ,*clock_r;
 		int width, selected;
 
 		int showTestMenu();

@@ -508,7 +508,7 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 #else
 			time_t now = time(NULL);
 			bool back = false;
-			if ((*lastEvent)->times.size() == 1)
+			if (*lastEvent!=NULL && (*lastEvent)->times.size() == 1)
 			{
 				if ((*lastEvent)->times.begin()->startzeit + (long)(*lastEvent)->times.begin()->dauer >= now - oldEventsAre)
 					back = true;
@@ -530,7 +530,9 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 				unlockMessaging();
 			}
 			// else fprintf(stderr, ">");
-			deleteEvent((*lastEvent)->uniqueKey());
+			unlockEvents();
+			if(*lastEvent!=NULL)
+				deleteEvent((*lastEvent)->uniqueKey());
 		}
 		// Pruefen ob es ein Meta-Event ist
 		MySIeventUniqueKeysMetaOrderServiceUniqueKey::iterator i = mySIeventUniqueKeysMetaOrderServiceUniqueKey.find(e->get_channel_id());
@@ -2331,27 +2333,23 @@ void CEitManager::getEventsServiceKey(t_channel_id serviceUniqueKey, CChannelEve
 
 			bool copy = true;
 			if(search){
-				if((search == 1) || (search == 5)) {//SEARCH_EPG_TITLE == 1 SEARCH_EPG_ALL == 5 defined in eventlist.h
+				if ((search == 1 /*EventList::SEARCH_EPG_TITLE*/) || (search == 5 /*EventList::SEARCH_EPG_ALL*/))
+				{
 					std::string eName = (*e)->getName();
 					std::transform(eName.begin(), eName.end(), eName.begin(), tolower);
-					if(eName.find(search_text) == std::string::npos)
-						copy = false;
+					copy = (eName.find(search_text) != std::string::npos);
 				}
-				if((search == 2) || (!copy && search == 5)) {//SEARCH_EPG_INFO1 == 2
+				if ((search == 2 /*EventList::SEARCH_EPG_INFO1*/) || (!copy && (search == 5 /*EventList::SEARCH_EPG_ALL*/)))
+				{
 					std::string eText = (*e)->getText();
 					std::transform(eText.begin(), eText.end(), eText.begin(), tolower);
-					if(eText.find(search_text) == std::string::npos)
-						copy = false;
-					else if(search == 5)
-						copy = true;
+					copy = (eText.find(search_text) != std::string::npos);
 				}
-				if((search == 3) || (!copy && search == 5)) {//SEARCH_EPG_INFO2 == 3
+				if ((search == 3 /*EventList::SEARCH_EPG_INFO2*/) || (!copy && (search == 5 /*EventList::SEARCH_EPG_ALL*/)))
+				{
 					std::string eExtendedText = (*e)->getExtendedText();
 					std::transform(eExtendedText.begin(), eExtendedText.end(), eExtendedText.begin(), tolower);
-					if(eExtendedText.find(search_text) == std::string::npos)
-						copy = false;
-					else if(search == 5)
-						copy = true;
+					copy = (eExtendedText.find(search_text) != std::string::npos);
 				}
 			}
 			if(copy) {

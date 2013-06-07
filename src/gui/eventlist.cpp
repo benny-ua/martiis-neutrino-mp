@@ -941,11 +941,15 @@ void CNeutrinoEventList::paint(t_channel_id channel_id)
 	frameBuffer->paintBoxRel(x+ width- 15,ypos, 15, sb,  COL_MENUCONTENT_PLUS_1);
 
 	int sbc= ((evtlist.size()- 1)/ listmaxshow)+ 1;
+	if (sbc < 1)
+		sbc = 1;
+
+	float sbh= (sb- 4)/ sbc;
 	int sbs= (selected/listmaxshow);
 	if (sbc < 1)
 		sbc = 1;
 
-	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ sbs * (sb-4)/sbc, 11, (sb-4)/sbc, COL_MENUCONTENT_PLUS_3);
+	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ sbs * sbh, 11, sbh, COL_MENUCONTENT_PLUS_3);
 
 }
 
@@ -1102,17 +1106,16 @@ bool CNeutrinoEventList::findEvents(void)
 			}
 			CEitManager::getInstance()->getEventsServiceKey(0,evtlist, m_search_epg_item,m_search_keyword, true);//all_chann
 
-			std::map<t_channel_id, t_channel_id>::iterator map_it;
-			CChannelEventList::iterator e;
 			if(!evtlist.empty()){
-				for ( e=evtlist.begin(); e!=evtlist.end();){
+				std::map<t_channel_id, t_channel_id>::iterator map_it;
+				CChannelEventList::iterator e;
+				for ( e=evtlist.begin(); e!=evtlist.end();++e){
 					map_it = ch_id_map.find(e->channelID);
 					if (map_it != ch_id_map.end()){
 						e->channelID = map_it->second;//map channelID48 to channelID
-						++e;
 					}
 					else{
-						evtlist.erase(e);// remove event for not found channels in channelList
+						evtlist.erase(e--);// remove event for not found channels in channelList
 					}
 				}
 			}

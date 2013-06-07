@@ -41,6 +41,7 @@
 #include <gui/eventlist.h>
 #include <gui/infoviewer.h>
 
+#include <gui/components/cc_frm.h>
 #include <gui/widget/menue.h>
 #include <gui/widget/buttons.h>
 #include <gui/widget/icons.h>
@@ -586,8 +587,8 @@ void CBouquetList::paintItem(int pos)
 
 void CBouquetList::paintHead()
 {
-	frameBuffer->paintBoxRel(x,y, width,theight+0, COL_MENUHEAD_PLUS_0, RADIUS_LARGE, CORNER_TOP);
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+10,y+theight+0, width, name, COL_MENUHEAD, 0, true); // UTF-8
+	CComponentsHeader header(x, y, width, theight, name, NULL /*no header icon*/);
+	header.paint(CC_SAVE_SCREEN_NO);
 }
 
 void CBouquetList::paint()
@@ -627,7 +628,8 @@ void CBouquetList::paint()
 	frameBuffer->paintBoxRel(x+ width- 15,ypos, 15, sb,  COL_MENUCONTENT_PLUS_1);
 
 	int sbc= ((bsize - 1)/ listmaxshow)+ 1; /* bsize is > 0, so sbc is also > 0 */
+	float sbh= (sb - 4)/ sbc;
 	int sbs= (selected/listmaxshow);
 
-	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ sbs * (sb-4)/sbc, 11, (sb-4)/sbc, COL_MENUCONTENT_PLUS_3);
+	frameBuffer->paintBoxRel(x+ width- 13, ypos+ 2+ sbs * sbh, 11, sbh, COL_MENUCONTENT_PLUS_3);
 }

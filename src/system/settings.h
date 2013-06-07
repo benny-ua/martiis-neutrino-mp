@@ -288,6 +288,7 @@ struct SNeutrinoSettings
 #ifdef MARTII
 		P_MPLAYER_INETPLAY,
 #endif
+		P_MPLAYER_YTPLAY,
 		
 		//feature keys
 		P_FEAT_KEY_FAVORIT,
@@ -307,15 +308,15 @@ struct SNeutrinoSettings
 	//timing
 	enum TIMING_SETTINGS 
 	{
-		TIMING_MENU        = 0,
-		TIMING_CHANLIST    = 1,
-		TIMING_EPG         = 2,
-		TIMING_INFOBAR     = 3,
-		TIMING_INFOBAR_RADIO = 4,
-		TIMING_INFOBAR_MOVIE = 5,
-//		TIMING_VOLUMEBAR,
-		TIMING_FILEBROWSER = 6,
-		TIMING_NUMERICZAP  = 7,
+		TIMING_MENU		= 0,
+		TIMING_CHANLIST		= 1,
+		TIMING_EPG		= 2,
+		TIMING_INFOBAR		= 3,
+		TIMING_INFOBAR_RADIO	= 4,
+		TIMING_INFOBAR_MOVIE	= 5,
+		TIMING_VOLUMEBAR	= 6,
+		TIMING_FILEBROWSER	= 7,
+		TIMING_NUMERICZAP	= 8,
 		
 		TIMING_SETTING_COUNT
 	};
@@ -499,6 +500,7 @@ struct SNeutrinoSettings
 	int mpkey_vtxt;
 	int mpkey_goto;
 #endif
+	int mpkey_subtitle;
 	int key_timeshift;
 	int key_plugin;
 
@@ -785,7 +787,7 @@ const time_settings_struct_t timing_setting[SNeutrinoSettings::TIMING_SETTING_CO
 	{ 6,	LOCALE_TIMING_INFOBAR     },
  	{ 0,	LOCALE_TIMING_INFOBAR_RADIO },
  	{ 6,	LOCALE_TIMING_INFOBAR_MOVIEPLAYER},
-// 	{ 3,	LOCALE_TIMING_VOLUMEBAR   },
+ 	{ 3,	LOCALE_TIMING_VOLUMEBAR   },
 	{ 60,	LOCALE_TIMING_FILEBROWSER },
 	{ 3,	LOCALE_TIMING_NUMERICZAP  }
 };

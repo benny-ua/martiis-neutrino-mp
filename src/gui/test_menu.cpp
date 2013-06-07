@@ -71,9 +71,11 @@ CTestMenu::CTestMenu()
 	form = NULL;
 	txt = NULL;
 	header = NULL;
+	footer = NULL;
 	iconform = NULL;
 	window = NULL;
 	button = NULL;
+	clock = clock_r = NULL;
 }
 
 CTestMenu::~CTestMenu()
@@ -84,9 +86,12 @@ CTestMenu::~CTestMenu()
 	delete form;
 	delete txt;
 	delete header;
+	delete footer;
 	delete iconform;
 	delete window;
 	delete button;
+	delete clock;
+	delete clock_r;
 }
 
 int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
@@ -439,7 +444,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		if (header == NULL){
 			header = new CComponentsHeader (100, 50, 500, hh, "Test-Header"/*, NEUTRINO_ICON_INFO, CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU*/);
 // 			header->addHeaderButton(NEUTRINO_ICON_BUTTON_RED);
-			header->setHeaderDefaultButtons(CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU);
+			header->setDefaultButtons(CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU);
 		}
 // 		else	//For existing instances it's recommended
 // 			//to remove old button icons before add new buttons, otherwise icons will be appended.
@@ -451,11 +456,11 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 // 		header->setCornerType(CORNER_TOP);
 
 //		change text of header
-		header->setHeaderText("Test");
+		header->setCaption("Test");
 
 //		add any other button icon
-//   		header->addHeaderButton(NEUTRINO_ICON_BUTTON_BLUE);
-// 		header->addHeaderButton(NEUTRINO_ICON_BUTTON_GREEN);
+//   		header->addButton(NEUTRINO_ICON_BUTTON_BLUE);
+// 		header->addButton(NEUTRINO_ICON_BUTTON_GREEN);
 
 //		example to replace the text item with an image item
 //		get text x position
@@ -474,6 +479,22 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 			header->paint();
 		else
 			header->hide();
+		return res;
+	}
+	else if (actionKey == "footer"){
+		int hh = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getHeight();
+		if (footer == NULL){
+			footer = new CComponentsFooter (100, 50, 500, hh, CComponentsHeader::CC_BTN_HELP | CComponentsHeader::CC_BTN_EXIT | CComponentsHeader::CC_BTN_MENU, true);
+			int start = 5, btnw =90;
+			footer->addCCItem(new CComponentsButtonRed(start, 0, btnw, hh, "Button1"));
+			footer->addCCItem(new CComponentsButtonGreen(start+=btnw, 0, btnw, hh, "Button2"));
+			footer->addCCItem(new CComponentsButtonYellow(start+=btnw, 0, btnw, hh, "Button3"));
+			footer->addCCItem(new CComponentsButtonBlue(start+=btnw, 0, btnw, hh, "Button4"));
+		}
+		if (!footer->isPainted())
+			footer->paint();
+		else
+			footer->hide();
 		return res;
 	}
 	else if (actionKey == "iconform"){
@@ -532,6 +553,40 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 
 		return res;
 	}
+	else if (actionKey == "running_clock"){	
+		if (clock_r == NULL){
+			clock_r = new CComponentsFrmClock(100, 50, 0, 50, "%H.%M:%S");
+			clock_r->setClockFontType(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
+			clock_r->setClockIntervall(1);
+// 			clock_r->doPaintBg(false);
+		}
+		
+ 		if (!clock_r->isClockRun()){
+			if (clock_r->Start())
+				return menu_return::RETURN_EXIT_ALL;;
+		}
+		else if (clock_r->isClockRun()){
+			if (clock_r->Stop()){
+				clock_r->hide();
+				delete clock;
+				clock = NULL;
+				return menu_return::RETURN_EXIT_ALL;;
+			}
+		}
+	}
+	else if (actionKey == "clock"){
+		if (clock == NULL){
+			clock = new CComponentsFrmClock(100, 50, 0, 50, "%H:%M");
+			clock->setClockFontType(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
+		}
+
+		if (!clock->isPainted())
+			clock->paint();
+		else
+			clock->hide();
+
+		return res;
+	}
 	
 	
 	return showTestMenu();
@@ -568,6 +623,8 @@ int CTestMenu::showTestMenu()
 void CTestMenu::showCCTests(CMenuWidget *widget)
 {
 	widget->addIntroItems();
+	widget->addItem(new CMenuForwarderNonLocalized("Running Clock", true, NULL, this, "running_clock"));
+	widget->addItem(new CMenuForwarderNonLocalized("Clock", true, NULL, this, "clock"));
 	widget->addItem(new CMenuForwarderNonLocalized("Button", true, NULL, this, "button"));
 	widget->addItem(new CMenuForwarderNonLocalized("Circle", true, NULL, this, "circle"));
 	widget->addItem(new CMenuForwarderNonLocalized("Square", true, NULL, this, "square"));
@@ -575,6 +632,7 @@ void CTestMenu::showCCTests(CMenuWidget *widget)
 	widget->addItem(new CMenuForwarderNonLocalized("Form", true, NULL, this, "form"));
 	widget->addItem(new CMenuForwarderNonLocalized("Text", true, NULL, this, "text"));
 	widget->addItem(new CMenuForwarderNonLocalized("Header", true, NULL, this, "header"));
+	widget->addItem(new CMenuForwarderNonLocalized("Footer", true, NULL, this, "footer"));
 	widget->addItem(new CMenuForwarderNonLocalized("Icon-Form", true, NULL, this, "iconform"));
 	widget->addItem(new CMenuForwarderNonLocalized("Window", true, NULL, this, "window"));
 }

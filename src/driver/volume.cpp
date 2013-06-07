@@ -83,7 +83,7 @@ void CVolume::setvol(int vol)
 	CZapit::getInstance()->SetVolume(vol);
 }
 
-void CVolume::setVolume(const neutrino_msg_t key, bool nowait)
+void CVolume::setVolume(const neutrino_msg_t key)
 {
 	if (!g_RCInput) /* don't die... */
 		return;
@@ -108,7 +108,7 @@ void CVolume::setVolume(const neutrino_msg_t key, bool nowait)
 	if (volscale == NULL){
 		volscale = new CVolumeBar();
 #ifdef MARTII
-		if (g_settings.volume_pos != 6) // off
+		if (g_settings.volume_pos != 7) // off
 #endif
 		volscale->paint();
 	}
@@ -200,12 +200,11 @@ void CVolume::setVolume(const neutrino_msg_t key, bool nowait)
 				break;
 			}
 
-			if (do_vol)
-				setvol(g_settings.current_volume);
-			timeoutEnd = CRCInput::calcTimeoutEnd(nowait ? 1 : 3);
+			setvol(g_settings.current_volume);
+			timeoutEnd = CRCInput::calcTimeoutEnd (g_settings.timing[SNeutrinoSettings::TIMING_VOLUMEBAR] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_VOLUMEBAR]);
 		}
 		else if (msg == NeutrinoMessages::EVT_VOLCHANGED) {
-			timeoutEnd = CRCInput::calcTimeoutEnd(3);
+			timeoutEnd = CRCInput::calcTimeoutEnd (g_settings.timing[SNeutrinoSettings::TIMING_VOLUMEBAR] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_VOLUMEBAR]);
 		}
 		else if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::unhandled) {
 			g_RCInput->postMsg(msg, data);

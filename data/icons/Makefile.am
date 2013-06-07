@@ -91,6 +91,8 @@ install_DATA += \
 	dd_avail.png \
 	dd_gray.png \
 	down.png \
+	dummy.png \
+	dummy_small.png \
 	error.png \
 	features.png \
 	file.png \
@@ -146,6 +148,7 @@ install_DATA += \
 	hint_tvradio_switch.png \
 	hint_vfd.png \
 	hint_video.png \
+	hint_ytplay.png \
 	home.png \
 	icon_green.png \
 	icon_movieplayer.png \

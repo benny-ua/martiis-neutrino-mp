@@ -191,8 +191,11 @@ int CAudioSelectMenuHandler::doMenu ()
 			AudioSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
 #endif
 
-		if(sep_added)
-			AudioSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
+		if(sep_added) {
+			CMenuForwarder * item = new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, &SubtitleChanger, "off", CRCInput::RC_stop);
+			item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
+			AudioSelector.addItem(item);
+		}
 	}
 
 	AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
