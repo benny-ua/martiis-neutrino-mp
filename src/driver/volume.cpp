@@ -215,7 +215,7 @@ void CVolume::setVolume(const neutrino_msg_t key)
 			if(vol != g_settings.current_volume) {
 				vol = g_settings.current_volume;
 #ifdef MARTII
-				if (g_settings.volume_pos != 6) // off
+				if (g_settings.volume_pos != 7) // off
 #endif
 				volscale->repaintVolScale();
 			}
