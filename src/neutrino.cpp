@@ -4254,6 +4254,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		w.exec(this, "");
 		return menu_return::RETURN_EXIT_ALL;
 	}
+	else if(actionKey=="ytplayback") {
+		CMoviePlayerGui::getInstance().exec(NULL, "ytplayback");
+		return menu_return::RETURN_EXIT_ALL;
+	}
 	else if(actionKey=="rass") {
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		if (g_Radiotext)

@@ -752,6 +752,7 @@ struct SNeutrinoSettings
                 ITEM_THREE_D_MODE = 25,
                 ITEM_WEBTV = 26,
                 ITEM_RASS = 27,
+                ITEM_YOUTUBE = 28,
 #endif
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;

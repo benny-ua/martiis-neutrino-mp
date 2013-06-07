@@ -589,7 +589,8 @@ bool CMoviePlayerGui::SelectFile()
 void *CMoviePlayerGui::ShowWebTVHint(void *arg) {
 	set_threadname(__func__);
 	CMoviePlayerGui *caller = (CMoviePlayerGui *)arg;
-	CHintBox hintbox(LOCALE_WEBTV_HEAD, g_settings.streaming_server_name.c_str());
+	neutrino_locale_t title = (caller->moviebrowser->getMode() == MB_SHOW_YT) ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
+	CHintBox hintbox(title, g_settings.streaming_server_name.c_str());
 	hintbox.paint();
 	while (caller->showWebTVHint) {
 		neutrino_msg_t msg;
@@ -1499,7 +1500,8 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			p_movie_info->dateOfLastPlay = current_time.time;
 			current_time.time = time(NULL);
 			p_movie_info->bookmarks.lastPlayStop = position / 1000;
-			cMovieInfo.saveMovieInfo(*p_movie_info);
+			if (!isWebTV)
+				cMovieInfo.saveMovieInfo(*p_movie_info);
 			//p_movie_info->fileInfoStale(); //TODO: we might to tell the Moviebrowser that the movie info has changed, but this could cause long reload times  when reentering the Moviebrowser
 		}
 	}
@@ -1603,7 +1605,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 		}
 		return;
 	}
-	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
+	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark && !isWebTV) {
 		if (newComHintBox.isPainted() == true) {
 			// yes, let's get the end pos of the jump forward
 			new_bookmark.length = play_sec - new_bookmark.pos;
@@ -1668,7 +1670,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				/* Moviebrowser plain bookmark */
 				new_bookmark.pos = play_sec;
 				new_bookmark.length = 0;
-				if (cMovieInfo.addNewBookmark(p_movie_info, new_bookmark) == true)
+				if (!isWebTV && cMovieInfo.addNewBookmark(p_movie_info, new_bookmark) == true)
 					cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
 				new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
 				cSelectedMenuBookStart[1].selected = false;	// clear for next bookmark menu
@@ -1684,13 +1686,13 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
 				newLoopHintBox.paint();
 				cSelectedMenuBookStart[3].selected = false;	// clear for next bookmark menu
-			} else if (cSelectedMenuBookStart[4].selected == true) {
+			} else if (!isWebTV && cSelectedMenuBookStart[4].selected == true) {
 				/* Moviebrowser movie start bookmark */
 				p_movie_info->bookmarks.start = play_sec;
 				TRACE("[mp] New movie start pos: %d\r\n", p_movie_info->bookmarks.start);
 				cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
 				cSelectedMenuBookStart[4].selected = false;	// clear for next bookmark menu
-			} else if (cSelectedMenuBookStart[5].selected == true) {
+			} else if (!isWebTV && cSelectedMenuBookStart[5].selected == true) {
 				/* Moviebrowser movie end bookmark */
 				p_movie_info->bookmarks.end = play_sec;
 				TRACE("[mp]  New movie end pos: %d\r\n", p_movie_info->bookmarks.start);

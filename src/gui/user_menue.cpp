@@ -460,6 +460,14 @@ bool CUserMenu::showUserMenu(int button)
 				menu->addItem(menu_item, 0);
 			}
 			break;
+		case SNeutrinoSettings::ITEM_YOUTUBE:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_YOUTUBE;
+			keyhelper.get(&key,&icon);
+			//keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback", key, icon);
+			menu->addItem(menu_item, 0);
+			break;
 #endif
 		default:
 			printf("[neutrino] WARNING! menu wrong item!!\n");
