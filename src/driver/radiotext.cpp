@@ -852,7 +852,7 @@ void CRadioText::RassDecode(unsigned char *mtext, int len)
 				if (slideshow || (slidecan && Rass_Show == -1)) {
 					if (filetype == 1) {	// show only mpeg-still
 						char *filepath;
-						asprintf(&filepath, "%s/%s", DataDir, "Rass_show.mpg");
+						asprintf(&filepath, "%s/%s", DataDir, "Rass_show.m2v");
 #ifdef MARTII
 						char *filepath_tmp;
 						asprintf(&filepath_tmp, "%s.tmp", filepath);
@@ -889,13 +889,13 @@ void CRadioText::RassDecode(unsigned char *mtext, int len)
 					//
 					char *filepath;
 					(filetype == 2) ? asprintf(&filepath, "%s/Rass_%d.def", DataDir, slidenumr)
-							: asprintf(&filepath, "%s/Rass_%d.mpg", DataDir, slidenumr);
+							: asprintf(&filepath, "%s/Rass_%d.m2v", DataDir, slidenumr);
 #ifdef MARTII
 					char *filepath_tmp;
 					asprintf(&filepath_tmp, "%s.tmp", filepath);
 					if (filetype == 1 && (slideshow || (slidecan && Rass_Show == -1))) {
 						char *showpath;
-						asprintf(&showpath, "%s/%s", DataDir, "Rass_show.mpg");
+						asprintf(&showpath, "%s/%s", DataDir, "Rass_show.m2v");
 						link(showpath, filepath_tmp);
 						free(showpath);
 					} else if ((fd = fopen(filepath_tmp, "wb")) != NULL) {
@@ -1273,9 +1273,9 @@ int CRadioText::RassImage(int QArchiv, int QKey, bool DirUp)
 	// show mpeg-still
 	char *image;
 	if (QArchiv >= 0)
-		asprintf(&image, "%s/Rass_%d.mpg", DataDir, QArchiv);
+		asprintf(&image, "%s/Rass_%d.m2v", DataDir, QArchiv);
 	else
-		asprintf(&image, "%s/Rass_show.mpg", DataDir);
+		asprintf(&image, "%s/Rass_show.m2v", DataDir);
 // Houdini: SetBackgroundImage() does not accept mpg stills
 //	frameBuffer->useBackground(frameBuffer->loadBackground(image));// set useBackground true or false
 //	frameBuffer->paintBackground();
@@ -1422,7 +1422,7 @@ void cRadioTextOsd::RassImgSave(char *size, int pos)
 			for (int i = 3; i >= 0; i--) {
 				filenr += (int) (pos * pow(10, i));
 				if (Rass_Flags[pos][3-i]) {
-					asprintf(&infile, "%s/Rass_%d.mpg", DataDir, filenr);
+					asprintf(&infile, "%s/Rass_%d.m2v", DataDir, filenr);
 					asprintf(&outfile, "%s/Rass_%s-%04d_%02d%02d%02d%02d.jpg", DataDir, RT_Titel, filenr, 
 						ts->tm_mon+1, ts->tm_mday, ts->tm_hour, ts->tm_min);
 					asprintf(&cmd, "ffmpeg -i %s -s %s -f mjpeg -y %s", infile, size, outfile);
@@ -1437,7 +1437,7 @@ void cRadioTextOsd::RassImgSave(char *size, int pos)
 		case 10:
 			for (int i = Rass_GalStart; i <= Rass_GalEnd; i++) {
 				if (Rass_Gallery[i]) {
-					asprintf(&infile, "%s/Rass_%d.mpg", DataDir, i);
+					asprintf(&infile, "%s/Rass_%d.m2v", DataDir, i);
 					asprintf(&outfile, "%s/Rass_%s-Gallery%04d_%02d%02d.jpg", DataDir, RT_Titel, i, 
 						ts->tm_mon+1, ts->tm_mday);
 					asprintf(&cmd, "ffmpeg -i %s -s %s -f mjpeg -y %s", infile, size, outfile);
@@ -1450,7 +1450,7 @@ void cRadioTextOsd::RassImgSave(char *size, int pos)
 
 		// single
 		default:
-			asprintf(&infile, "%s/Rass_%d.mpg", DataDir, Rass_Archiv);
+			asprintf(&infile, "%s/Rass_%d.m2v", DataDir, Rass_Archiv);
 			asprintf(&outfile, "%s/Rass_%s-%04d_%02d%02d%02d%02d.jpg", DataDir, RT_Titel, Rass_Archiv, 
 	        		ts->tm_mon+1, ts->tm_mday, ts->tm_hour, ts->tm_min);
 			asprintf(&cmd, "ffmpeg -i %s -s %s -f mjpeg -y %s", infile, size, outfile);
@@ -2615,7 +2615,7 @@ void CRadioText::RassShow(char *filename, unsigned char *md5sum)
 	}
 	if (memcmp(md5sum, last_md5sum, 16)) {
 		extern cVideo *videoDecoder;
-		videoDecoder->ShowPicture(filename, true);
+		videoDecoder->ShowPicture(filename);
 		lastRassPid = pid;
 		memcpy(last_md5sum, md5sum, 16);
 	}
@@ -2624,7 +2624,7 @@ void CRadioText::RassShow(char *filename, unsigned char *md5sum)
 void CRadioText::RassShow(int slidenumber, unsigned char *md5sum)
 {
 	char filename[255];
-	snprintf(filename, sizeof(filename), "%s/Rass_%d.mpg", DataDir, slidenumber);
+	snprintf(filename, sizeof(filename), "%s/Rass_%d.m2v", DataDir, slidenumber);
 	RassShow(filename, md5sum);
 }
 
@@ -2838,7 +2838,7 @@ void CRadioText::RASS_interactive_mode(void)
 		msg_old = msg;
 	}
 	char *filepath;
-	asprintf(&filepath, "%s/%s", DataDir, "Rass_show.mpg");
+	asprintf(&filepath, "%s/%s", DataDir, "Rass_show.m2v");
 	RassShow (filepath);
 	free(filepath);
 	framebuffer->Clear();
