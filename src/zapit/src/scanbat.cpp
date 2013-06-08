@@ -72,7 +72,7 @@ bool CBat::Stop()
 
 void CBat::run()
 {
-#ifdef MARTIi
+#ifdef MARTII
 	set_threadname(name.c_str());
 #endif
 	if(Parse())
