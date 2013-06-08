@@ -73,7 +73,7 @@ bool CBat::Stop()
 void CBat::run()
 {
 #ifdef MARTII
-	set_threadname(name.c_str());
+	set_threadname("CBat::run");
 #endif
 	if(Parse())
 		printf("[scan] BAT finished.\n");

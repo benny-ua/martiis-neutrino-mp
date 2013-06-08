@@ -98,7 +98,6 @@ int main (int argc, char** argv)
 	int m43 = -1;
 #ifdef MARTII
 	int lockrc = -1;
-	char *webtv_url = NULL;
 #endif
 	const char * channelName = NULL;
 
