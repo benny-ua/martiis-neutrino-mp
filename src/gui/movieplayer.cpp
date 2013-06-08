@@ -1241,7 +1241,7 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool& en
 			apidtitle.append(" (AAC)");
 			break;
 		case 6: /*DTS*/
-#if ! defined(HAVE_SPARK_HARDWARE) && ! defined (BOXMODEL_APOLLO)
+#if !defined (BOXMODEL_APOLLO)
 			if (apidtitle.find("DTS") == std::string::npos)
 				apidtitle.append(" (DTS)");
 			else
