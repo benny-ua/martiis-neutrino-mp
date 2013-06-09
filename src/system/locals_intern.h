@@ -1498,6 +1498,7 @@ const char * locale_real_names[] =
 	"moviebrowser.yt_most_shared",
 	"moviebrowser.yt_next_results",
 	"moviebrowser.yt_on_the_web",
+	"moviebrowser.yt_pref_quality",
 	"moviebrowser.yt_prev_results",
 	"moviebrowser.yt_recently_featured",
 	"moviebrowser.yt_region",
