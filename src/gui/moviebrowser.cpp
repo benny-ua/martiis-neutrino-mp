@@ -2252,6 +2252,15 @@ void CMovieBrowser::onDeleteFile(MI_MOVIE_INFO& movieSelectionHandler, bool skip
 
 void CMovieBrowser::onSetGUIWindow(MB_GUI gui)
 {
+	if (show_mode == MB_SHOW_YT)
+		switch(gui) {
+			case MB_GUI_MOVIE_INFO:
+			case MB_GUI_FILTER:
+				break;
+			default:
+				gui = MB_GUI_MOVIE_INFO;
+		}
+
 	m_settings.gui = gui;
 
 	if(gui == MB_GUI_MOVIE_INFO)
