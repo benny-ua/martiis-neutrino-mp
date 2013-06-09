@@ -153,26 +153,25 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	std::map<string, struct pkg>::iterator it = pkg_map.find(actionKey);
 	if (it != pkg_map.end()) {
-		if (it->second.installed)
-			return menu_return::RETURN_NONE;
 		if (parent)
 			parent->hide();
-		int r = execCmd(pkg_types[OM_UPDATE]);
-		if(r) {
-			std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_UPDATE);
-			char rs[strlen(loc.c_str()) + 20];
-			snprintf(rs, sizeof(rs), loc.c_str(), r);
-			DisplayInfoMessage(rs);
-		} else {
-			r = execCmd(pkg_types[OM_INSTALL] + it->second.name, true, true);
-			if(r) {
-				std::string loc = g_Locale->getText(LOCALE_OPKG_FAILURE_INSTALL);
-				char rs[strlen(loc.c_str()) + 20];
-				snprintf(rs, sizeof(rs), loc.c_str(), r);
-				DisplayInfoMessage(rs);
-			} else
-				installed = true;
+		std::string force = "";
+		int mode = OM_INSTALL;
+		neutrino_locale_t loc = LOCALE_OPKG_FAILURE_INSTALL;
+		if (it->second.installed) {
+			if (expert_mode)
+				force = "--force-reinstall ";
+			else
+				loc = LOCALE_OPKG_FAILURE_UPGRADE, mode = OM_UPGRADE;
 		}
+		int r = execCmd(pkg_types[mode] + force + actionKey, true, true);
+		if (r) {
+			std::string err = g_Locale->getText(loc);
+			char rs[strlen(err.c_str()) + 20];
+			snprintf(rs, sizeof(rs), err.c_str(), r);
+			DisplayInfoMessage(rs);
+		} else
+				installed = true;
 		refreshMenu();
 	}
 	return res;
