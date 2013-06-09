@@ -234,6 +234,7 @@ typedef struct
 	int ytmode;
 	int ytresults;
 	int ytquality;
+	int ytconcconn;
 	std::string ytregion;
 	std::string ytvid;
 	std::string ytsearch;
