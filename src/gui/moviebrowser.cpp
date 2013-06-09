@@ -1054,8 +1054,8 @@ int CMovieBrowser::exec(const char* path)
 				if(m_movieSelectionHandler != NULL)
 				{
 					// If there is any available bookmark, show the bookmark menu
-					if( m_movieSelectionHandler->bookmarks.lastPlayStop != 0 ||
-							m_movieSelectionHandler->bookmarks.start != 0)
+					if((show_mode != MB_SHOW_YT) && (m_movieSelectionHandler->bookmarks.lastPlayStop != 0 ||
+							m_movieSelectionHandler->bookmarks.start != 0))
 					{
 						TRACE("[mb] stop: %d start:%d \r\n",m_movieSelectionHandler->bookmarks.lastPlayStop,m_movieSelectionHandler->bookmarks.start);
 						m_currentStartPos = showStartPosSelectionMenu(); // display start menu m_currentStartPos =
