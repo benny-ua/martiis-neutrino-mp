@@ -259,11 +259,14 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 	startposition = 0;
 
-	puts("[movieplayer.cpp] executing " MOVIEPLAYER_START_SCRIPT ".");
-	if (my_system(MOVIEPLAYER_START_SCRIPT) != 0)
-		perror(MOVIEPLAYER_START_SCRIPT " failed");
+	if (!access(MOVIEPLAYER_START_SCRIPT, X_OK)) {
+		puts("[movieplayer.cpp] executing " MOVIEPLAYER_START_SCRIPT ".");
+		if (my_system(MOVIEPLAYER_START_SCRIPT) != 0)
+			perror(MOVIEPLAYER_START_SCRIPT " failed");
+	}
 	
 	isMovieBrowser = false;
+	bool isHTTP = false;
 	isWebTV = false;
 	isYT = false;
 	isBookmark = false;
@@ -295,12 +298,19 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		isBookmark = true;
 	}
 #endif
-#ifdef MARTII
 	else if (actionKey == "webtv")
 	{
 		isWebTV = true;
 	}
-#endif
+	else if (actionKey == "netstream")
+	{
+		isHTTP = true;
+		full_name = g_settings.streaming_server_url;
+		file_name = (isWebTV ? g_settings.streaming_server_name : g_settings.streaming_server_url);
+		p_movie_info = NULL;
+		is_file_player = 1;
+		PlayFile();
+	}
 	else {
 #ifdef MARTII
 		running = false;
@@ -311,7 +321,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 #ifdef MARTII
 	std::string oldservicename = CVFD::getInstance()->getServicename();
 #endif
-	while(SelectFile()) {
+	if (!isHTTP) while(SelectFile()) {
 #ifdef MARTII
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		if (isWebTV || isYT)
@@ -329,9 +339,11 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 	bookmarkmanager->flush();
 
-	puts("[movieplayer.cpp] executing " MOVIEPLAYER_END_SCRIPT ".");
-	if (my_system(MOVIEPLAYER_END_SCRIPT) != 0)
-		perror(MOVIEPLAYER_END_SCRIPT " failed");
+	if (!access(MOVIEPLAYER_END_SCRIPT, X_OK)) {
+		puts("[movieplayer.cpp] executing " MOVIEPLAYER_END_SCRIPT ".");
+		if (my_system(MOVIEPLAYER_END_SCRIPT) != 0)
+			perror(MOVIEPLAYER_END_SCRIPT " failed");
+	}
 
 	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 

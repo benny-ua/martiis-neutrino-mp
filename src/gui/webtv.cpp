@@ -39,7 +39,6 @@ CWebTV::CWebTV()
 	parser = NULL;
 	m = NULL;
 	menu_offset = 0;
-	fileSelected = false;
 }
 
 CWebTV::~CWebTV()
@@ -50,6 +49,7 @@ CWebTV::~CWebTV()
 
 bool CWebTV::getFile(std::string &file_name, std::string &full_name)
 {
+	fileSelected = false;
 	exec(NULL, "");
 	if (fileSelected) {
 		file_name = g_settings.streaming_server_name;
@@ -61,11 +61,9 @@ bool CWebTV::getFile(std::string &file_name, std::string &full_name)
 
 int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 {
-	fileSelected = false;
-
 	int res = menu_return::RETURN_REPAINT;
 
-	if (actionKey == "rc_setup") {
+	if (actionKey == "rc_info") {
 		int selected = m->getSelected() - menu_offset;
 		if (selected < 0)
 			return menu_return::RETURN_NONE;
@@ -106,7 +104,6 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		g_settings.streaming_server_name = streaming_server_name;
 		g_settings.streaming_server_url = streaming_server_url;
-
 		fileSelected = true;
 		return menu_return::RETURN_EXIT_ALL;
 	}
@@ -128,7 +125,7 @@ void CWebTV::Show()
 	m->addItem(GenericMenuSeparator);
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);
-	m->addKey(CRCInput::RC_setup, this, "rc_setup");
+	m->addKey(CRCInput::RC_info, this, "rc_info");
 	menu_offset = m->getItemsCount();
 
 	for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++)
