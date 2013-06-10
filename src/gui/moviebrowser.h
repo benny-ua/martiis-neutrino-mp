@@ -208,10 +208,8 @@ typedef struct
 
 	int reload;
 	int remount;
-#ifdef MARTII
 	int ts_only;
 	int ts_probe;
-#endif
 
 	int browser_serie_mode;
 	int serie_auto_create;
@@ -327,6 +325,7 @@ class CMovieBrowser : public CMenuTarget
 		void loadYTitles(int mode, std::string search = "", std::string id = "");
 		bool showYTMenu(void);
 
+		bool active;
 	public:  // Functions //////////////////////////////////////////////////////////7
 		CMovieBrowser(const char* path); //P1
 		CMovieBrowser(); //P1

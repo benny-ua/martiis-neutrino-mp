@@ -409,6 +409,7 @@ void CMovieBrowser::init(void)
 {
 	bool reinit_rows = false;
 	int i;
+	active = false;
 
 	//TRACE("[mb]->init\r\n");
 	initGlobalSettings();
@@ -856,6 +857,11 @@ int CMovieBrowser::exec(CMenuTarget* parent, const std::string & actionKey)
 {
     int returnval = menu_return::RETURN_REPAINT;
 
+    if (active)
+	return returnval;
+
+    active = true;
+
     if(actionKey == "loaddefault")
     {
         defaultSettings(&m_settings);
@@ -946,6 +952,7 @@ int CMovieBrowser::exec(CMenuTarget* parent, const std::string & actionKey)
 	showMenu(NULL);
     }
 #endif
+     active = false;
      return returnval;
 }
 
