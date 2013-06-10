@@ -38,6 +38,7 @@
 #include <linux/version.h>
 
 #include <global.h>
+#include <neutrino.h>
 
 #if HAVE_TRIPLEDRAGON
 /* TD kernel 2.6.12 is too old and does not have writesize yet, use oobsize instead */
@@ -159,6 +160,8 @@ bool CFlashTool::program( const std::string & filename, int globalProgressEndEra
 	ssize_t filesize;
 	int globalProgressBegin = 0;
 
+	CNeutrinoApp::getInstance()->saveEpg(false);
+
 	if(statusViewer)
 		statusViewer->showLocalStatus(0);
 
@@ -194,10 +197,12 @@ bool CFlashTool::program( const std::string & filename, int globalProgressEndEra
 	if(statusViewer) {
 		if(globalProgressEndErase!=-1)
 			statusViewer->showGlobalStatus(globalProgressEndErase);
-
 		statusViewer->showLocalStatus(0);
 		statusViewer->showStatusMessageUTF(g_Locale->getText(LOCALE_FLASHUPDATE_PROGRAMMINGFLASH)); // UTF-8
 	}
+#ifdef VFD_UPDATE
+	CVFD::getInstance()->ShowText("Write Flash");
+#endif
 
 	if( (fd = open( mtdDevice.c_str(), O_WRONLY )) < 0 ) {
 		ErrorMessage = g_Locale->getText(LOCALE_FLASHUPDATE_CANTOPENMTD);
@@ -266,6 +271,9 @@ bool CFlashTool::program( const std::string & filename, int globalProgressEndEra
 	// FIXME error message
 	if (fsize)
 		return false;
+#ifdef VFD_UPDATE
+	CVFD::getInstance()->ShowText("Flash OK.");
+#endif
 	return true;
 }
 
@@ -301,12 +309,18 @@ bool CFlashTool::erase(int globalProgressEnd)
 		return false;
 	}
 
-	printf("sectionsd shutdown\n");
-	CEitManager::getInstance()->Stop();
-	printf("sectionsd shutdown done\n");
+	CNeutrinoApp::getInstance()->stopDaemonsForFlash();
 
-	if(statusViewer)
+#ifdef VFD_UPDATE
+	CVFD::getInstance()->ShowText("Erase Flash");
+#endif
+
+	if(statusViewer) {
 		globalProgressBegin = statusViewer->getGlobalStatus();
+		statusViewer->paint();
+		statusViewer->showLocalStatus(0);
+		statusViewer->showGlobalStatus(globalProgressBegin);
+	}
 
 	lerase.length = meminfo.erasesize;
 
@@ -333,17 +347,15 @@ bool CFlashTool::erase(int globalProgressEnd)
 				continue;
 			}
 		}
-
 		if(ioctl( fd, MEMERASE, &lerase) != 0)
 		{
 			ErrorMessage = g_Locale->getText(LOCALE_FLASHUPDATE_ERASEFAILED);
 			close(fd);
 			return false;
 		}
-		printf( "Erasing %u Kbyte @ %x -- %2u %% complete.\n",
-				meminfo.erasesize/1024, lerase.start,
-				prog /* lerase.start*100/meminfo.size */);
+		printf( "Erasing %u Kbyte @ 0x%08X -- %2u %% complete.\n", meminfo.erasesize/1024, lerase.start, prog);
 	}
+	printf("\n");
 
 	close(fd);
 	return true;
@@ -380,7 +392,6 @@ bool CFlashTool::check_md5( const std::string & filename, const std::string & sm
 
 void CFlashTool::reboot()
 {
-	::sync();
 	::reboot(RB_AUTOBOOT);
 	::exit(0);
 }
