@@ -263,8 +263,8 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	
 	isMovieBrowser = false;
 #ifdef MARTII
-	bool isHTTP = false;
 	isWebTV = false;
+	isYT = false;
 #endif
 	isBookmark = false;
 	timeshift = 0;
@@ -277,7 +277,8 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		CAudioMute::getInstance()->enableMuteIcon(false);
 		isMovieBrowser = true;
 		moviebrowser->setMode(MB_SHOW_YT);
-		isWebTV = true;
+		isWebTV = false;
+		isYT = true;
 	}
 	else if (actionKey == "fileplayback") {
 	}
@@ -298,8 +299,8 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 #ifdef MARTII
 	else if (actionKey == "netstream" || actionKey == "webtv")
 	{
-		isHTTP = true;
 		isWebTV = actionKey == "webtv";
+		isYT = false;
 		full_name = g_settings.streaming_server_url;
 		file_name = (isWebTV ? g_settings.streaming_server_name : g_settings.streaming_server_url);
 		p_movie_info = NULL;
@@ -318,12 +319,12 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	std::string oldservicename = CVFD::getInstance()->getServicename();
 #endif
 #ifdef MARTII
-	if (!isHTTP)
+	if (!isWebTV)
 #endif
 	while(SelectFile()) {
 #ifdef MARTII
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
-		if (isWebTV)
+		if (isWebTV || isYT)
 			CVFD::getInstance()->showServicename(g_settings.streaming_server_name.c_str());
 		else
 			CVFD::getInstance()->showServicename(full_name.c_str());
@@ -348,7 +349,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	running = false;
 #endif
 
-	if (moviebrowser->getMode() == MB_SHOW_YT)
+	if (isWebTV || isYT)
 		CAudioMute::getInstance()->enableMuteIcon(true);
 
 	if (timeshift){
@@ -513,7 +514,7 @@ bool CMoviePlayerGui::SelectFile()
 				if (moviebrowser->getMode() == MB_SHOW_RECORDS) {
 					full_name = file->Name;
 				}
-				else if (moviebrowser->getMode() == MB_SHOW_YT) {
+				else if (isYT) {
 					g_settings.streaming_server_name = std::string(file->Name);
 					g_settings.streaming_server_url = std::string(file->Url);
 					full_name = file->Url;
@@ -590,7 +591,7 @@ bool CMoviePlayerGui::SelectFile()
 void *CMoviePlayerGui::ShowWebTVHint(void *arg) {
 	set_threadname(__func__);
 	CMoviePlayerGui *caller = (CMoviePlayerGui *)arg;
-	neutrino_locale_t title = (caller->moviebrowser->getMode() == MB_SHOW_YT) ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
+	neutrino_locale_t title = caller->isYT ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
 	CHintBox hintbox(title, g_settings.streaming_server_name.c_str());
 	hintbox.paint();
 	while (caller->showWebTVHint) {
@@ -673,7 +674,7 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 #ifdef MARTII
 	pthread_t thrWebTVHint = 0;
-	if (isWebTV) {
+	if (isWebTV || isYT) {
 		showWebTVHint = true;
 		pthread_create(&thrWebTVHint, NULL, CMoviePlayerGui::ShowWebTVHint, this);
 	}

@@ -113,6 +113,7 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string currentttxsub;
 
 	bool isWebTV;
+	bool isYT;
 	bool showWebTVHint;
 
 	bool probePids;
