@@ -110,7 +110,7 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 
 void CWebTV::Show()
 {
-	m = new CMenuWidget(LOCALE_WEBTV_HEAD, NEUTRINO_ICON_SETTINGS, width);
+	m = new CMenuWidget(LOCALE_WEBTV_HEAD, NEUTRINO_ICON_MOVIEPLAYER, width);
 	m->addItem(GenericMenuSeparator);
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);

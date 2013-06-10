@@ -592,7 +592,7 @@ void *CMoviePlayerGui::ShowWebTVHint(void *arg) {
 	set_threadname(__func__);
 	CMoviePlayerGui *caller = (CMoviePlayerGui *)arg;
 	neutrino_locale_t title = caller->isYT ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
-	CHintBox hintbox(title, g_settings.streaming_server_name.c_str());
+	CHintBox hintbox(title, g_settings.streaming_server_name.c_str(), 450, NEUTRINO_ICON_MOVIEPLAYER);
 	hintbox.paint();
 	while (caller->showWebTVHint) {
 		neutrino_msg_t msg;
