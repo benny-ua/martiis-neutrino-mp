@@ -521,8 +521,9 @@ bool CMoviePlayerGui::SelectFile()
 			menu_ret = moviebrowser->getMenuRet();
 	} else if (isWebTV) {
 		if (webtv->getFile(file_name, full_name)) {
-			ret = true;
+			is_file_player = true;
 			fillPids();
+			ret = true;
 		}
 	} else { // filebrowser
 		CAudioMute::getInstance()->enableMuteIcon(false);
