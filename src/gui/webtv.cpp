@@ -39,6 +39,7 @@ CWebTV::CWebTV()
 	parser = NULL;
 	m = NULL;
 	menu_offset = 0;
+	fileSelected = false;
 }
 
 CWebTV::~CWebTV()
@@ -47,8 +48,21 @@ CWebTV::~CWebTV()
 		xmlFreeDoc(parser);
 }
 
+bool CWebTV::getFile(std::string &file_name, std::string &full_name)
+{
+	exec(NULL, "");
+	if (fileSelected) {
+		file_name = g_settings.streaming_server_name;
+		full_name = g_settings.streaming_server_url;
+		return true;
+	}
+	return false;
+}
+
 int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 {
+	fileSelected = false;
+
 	int res = menu_return::RETURN_REPAINT;
 
 	if (actionKey == "rc_setup") {
@@ -93,8 +107,8 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 		g_settings.streaming_server_name = streaming_server_name;
 		g_settings.streaming_server_url = streaming_server_url;
 
-		CMoviePlayerGui::getInstance().exec(NULL, "webtv");
-		return res;
+		fileSelected = true;
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	if (m)
 		return res;
@@ -129,7 +143,8 @@ void CWebTV::Show()
 
 bool CWebTV::readXml()
 {
-	channels.clear();
+	if (!channels.empty())
+		return true;
 	if (parser)
 		xmlFreeDoc(parser);
 	parser = parseXmlFile(g_settings.webtv_xml.c_str());

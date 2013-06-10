@@ -43,9 +43,6 @@
 #include <gui/pictureviewer.h>
 #if ENABLE_UPNP
 #include <gui/upnpbrowser.h>
-#ifdef MARTII
-#include <gui/webtv.h>
-#endif
 #endif
 
 #include <gui/widget/icons.h>
@@ -130,13 +127,6 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(true);
 		return res;
 	}
-#ifdef MARTII
-	else if (actionKey == "webtv") {
-		CWebTV w;
-		w.exec(this, "");
-		return menu_return::RETURN_REPAINT;;
-	}
-#endif
 	
 	int res = initMenuMedia();
 	
@@ -315,8 +305,8 @@ void CMediaPlayerMenu::showMoviePlayer(CMenuWidget *moviePlayer, CPersonalizeGui
 	//fileplayback
 	p->addItem(moviePlayer, fw_file, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_FILEPLAY]);
 #ifdef MARTII
-	//networkplayback
-	CMenuForwarder *fw_network = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, this, "webtv");
+	//webtv
+	CMenuForwarder *fw_network = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, &CMoviePlayerGui::getInstance(), "webtv");
 	p->addItem(moviePlayer, fw_network, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_INETPLAY]);
 #endif
 

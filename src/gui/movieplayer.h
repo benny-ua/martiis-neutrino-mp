@@ -42,6 +42,7 @@
 #include <gui/movieinfo.h>
 #include <gui/widget/hintbox.h>
 #include <gui/timeosd.h>
+#include <gui/webtv.h>
 #include <driver/record.h>
 #include <playback.h>
 
@@ -133,6 +134,7 @@ class CMoviePlayerGui : public CMenuTarget
 	/* playback from MB */
 	bool isMovieBrowser;
 	CMovieBrowser* moviebrowser;
+	CWebTV* webtv;
 	MI_MOVIE_INFO * p_movie_info;
 	const static short MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
 
@@ -151,11 +153,7 @@ class CMoviePlayerGui : public CMenuTarget
 	static CMoviePlayerGui* instance_mp;
 
 	void Init(void);
-#ifdef MARTII
-	void PlayFile(bool doCutNeutrino = true);
-#else
 	void PlayFile();
-#endif
 	void cutNeutrino();
 	void restoreNeutrino();
 

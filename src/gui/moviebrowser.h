@@ -325,7 +325,6 @@ class CMovieBrowser : public CMenuTarget
 		void loadYTitles(int mode, std::string search = "", std::string id = "");
 		bool showYTMenu(void);
 
-		bool active;
 	public:  // Functions //////////////////////////////////////////////////////////7
 		CMovieBrowser(const char* path); //P1
 		CMovieBrowser(); //P1
