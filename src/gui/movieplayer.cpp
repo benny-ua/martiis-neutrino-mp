@@ -1069,9 +1069,9 @@ void CMoviePlayerGui::PlayFile(void)
 #ifdef SCREENSHOT
 		} else if (/*msg == (neutrino_msg_t) g_settings.key_screenshot ||*/ msg == CRCInput::RC_record) {
 
-			char ending[(sizeof(int)*2) + 6] = ".jpg";
+			char ending[(sizeof(int)*2) + 6] = ".png";
 			if(!g_settings.screenshot_cover)
-				snprintf(ending, sizeof(ending) - 1, "_%x.jpg", position);
+				snprintf(ending, sizeof(ending) - 1, "_%x.png", position);
 
 			std::string fname = full_name;
 			std::string::size_type pos = fname.find_last_of('.');
@@ -1091,10 +1091,16 @@ void CMoviePlayerGui::PlayFile(void)
 			if(!access(fname.c_str(), F_OK)) {
 			}
 #endif
-			CScreenShot * sc = new CScreenShot(fname);
+#if HAVE_SPARK_HARDWARE
+			unlink(fname.c_str());
+			CScreenShot sc(fname, CScreenShot::FORMAT_PNG);
+			sc.Start();
+#else
+			CScreenShot * sc = new CScreenShot(fname, CScreenShot::FORMAT_PNG);
 			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
 				sc->EnableVideo(true);
 			sc->Start();
+#endif
 #endif
 
 		} else if ( msg == NeutrinoMessages::EVT_SUBT_MESSAGE) {
