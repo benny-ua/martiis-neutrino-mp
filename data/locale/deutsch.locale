@@ -1856,6 +1856,7 @@ screenshot.res Auflösung
 screenshot.scale Skalierung
 screenshot.tv TV-Auflösung
 screenshot.video Video im Hintergrund
+screenshot.web yWeb
 servicemenu.boot_params_ask Soll wirklich SPARK gebootet werden?
 servicemenu.boot_params_head Änderung der Boot-Parameter
 servicemenu.boot_params_hint Bitte den Receiver nicht ausschalten!

@@ -21,7 +21,6 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MARTII
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -59,7 +58,9 @@ CScreenShot::CScreenShot(const std::string fname, screenshot_format_t fmt)
 	format = fmt;
 	filename = fname;
 	pixel_data = NULL;
+#if !HAVE_SPARK_HARDWARE
 	fd = NULL;
+#endif
 	xres = 0;
 	yres = 0;
 	get_video = g_settings.screenshot_video;
@@ -71,6 +72,7 @@ CScreenShot::~CScreenShot()
 {
 }
 
+#if !HAVE_SPARK_HARDWARE
 /* try to get video frame data in ARGB format, restore GXA state */
 bool CScreenShot::GetData()
 {
@@ -103,18 +105,50 @@ bool CScreenShot::GetData()
 	printf("CScreenShot::GetData: data: %p %d x %d\n", pixel_data, xres, yres);
 	return true;
 }
+#endif
 
 /* start ::run in new thread to save file in selected format */
 bool CScreenShot::Start()
 {
+#if HAVE_SPARK_HARDWARE
+	std::string cmd = "/bin/grab ";
+	if (get_osd && !get_video)
+		cmd += "-o ";
+	else if (!get_osd && get_video)
+		cmd += "-v ";
+	switch (format) {
+		case FORMAT_PNG:
+			cmd += "-p "; break;
+		case FORMAT_JPG:
+			cmd += "-j "; break;
+		default:
+			;
+	}
+	if (!scale_to_video)
+		cmd += " -d";
+
+	if (xres) {
+		char tmp[10];
+		snprintf(tmp, sizeof(tmp), "%d", xres);
+		cmd += "-w " + std::string(tmp);
+	}
+		
+	cmd += " '";
+	cmd += filename;
+	cmd += "'&";
+	system(cmd.c_str());
+	return true;
+#else
 	bool ret = false;
 	if(GetData())
 		ret = (start() == 0);
 	else
 		delete this;
 	return ret;
+#endif
 }
 
+#if !HAVE_SPARK_HARDWARE
 /* thread function to save data asynchroniosly. delete itself after saving */
 void CScreenShot::run()
 {
@@ -343,6 +377,7 @@ bool CScreenShot::SaveBmp()
 	return true;
 
 }
+#endif
 
 /* 
  * create filename member from channel name and its current EPG data,
@@ -399,4 +434,3 @@ void CScreenShot::MakeFileName(const t_channel_id channel_id)
 	printf("CScreenShot::MakeFileName: [%s]\n", fname);
 	filename = std::string(fname);
 }
-#endif

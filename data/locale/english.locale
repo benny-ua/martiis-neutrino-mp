@@ -1858,6 +1858,7 @@ screenshot.res Resolution
 screenshot.scale Scale
 screenshot.tv TV resolution
 screenshot.video Video in the background
+screenshot.web yWeb
 servicemenu.boot_params_ask Do you really want to boot SPARK?
 servicemenu.boot_params_head Changing boot parameters
 servicemenu.boot_params_hint Do not switch off your set-top box!

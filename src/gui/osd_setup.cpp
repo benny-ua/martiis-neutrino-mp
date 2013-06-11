@@ -1080,17 +1080,6 @@ int COsdSetup::showContextChanlistMenu()
 	return res;
 }
 
-#ifdef MARTII
-void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
-{
-	menu_screenshot->addIntroItems(LOCALE_SCREENSHOT_MENU);
-	if((uint)g_settings.key_screenshot == CRCInput::RC_nokey)
-		menu_screenshot->addItem( new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCREENSHOT_INFO));
-	menu_screenshot->addItem(new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, g_settings.screenshot_dir, this, "screenshot_dir"));
-	menu_screenshot->addItem(new CMenuOptionNumberChooser(LOCALE_SCREENSHOT_PNG_COMPRESSION, &g_settings.screenshot_png_compression, true, 1, 9, NULL));
-	menu_screenshot->addItem(new CMenuOptionChooser(LOCALE_SCREENSHOT_BACKBUFFER, &g_settings.screenshot_backbuffer, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-}
-#else
 #ifdef SCREENSHOT
 //screenshot
 #define SCREENSHOT_FMT_OPTION_COUNT 3
@@ -1140,6 +1129,8 @@ void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
 	mc = new CMenuOptionChooser(LOCALE_SCREENSHOT_COVER, &g_settings.screenshot_cover, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_SCREENSHOT_COVER);
 	menu_screenshot->addItem(mc);
+	menu_screenshot->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCREENSHOT_WEB));
+	menu_screenshot->addItem(new CMenuOptionNumberChooser(LOCALE_SCREENSHOT_PNG_COMPRESSION, &g_settings.screenshot_png_compression, true, 1, 9, NULL));
+	menu_screenshot->addItem(new CMenuOptionChooser(LOCALE_SCREENSHOT_BACKBUFFER, &g_settings.screenshot_backbuffer, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 }
-#endif
 #endif

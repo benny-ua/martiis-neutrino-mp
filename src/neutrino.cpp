@@ -652,6 +652,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.network_nfs_moviedir = configfile.getString( "network_nfs_moviedir", "/media/sda1/movies" );
 	g_settings.network_nfs_recordingdir = configfile.getString( "network_nfs_recordingdir", "/media/sda1/movies" );
 	g_settings.timeshiftdir = configfile.getString( "timeshiftdir", "" );
+	g_settings.downloadcache_dir = configfile.getString( "downloadcache_dir", g_settings.network_nfs_recordingdir.c_str());
 
 	g_settings.temp_timeshift = configfile.getInt32( "temp_timeshift", 0 );
 	g_settings.auto_timeshift = configfile.getInt32( "auto_timeshift", 0 );
@@ -715,17 +716,14 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.timeshift_pause = configfile.getInt32( "timeshift_pause", 1 );
 
-#ifdef MARTII
 	g_settings.screenshot_png_compression = configfile.getInt32( "screenshot_png_compression", 1);
 	g_settings.screenshot_backbuffer = configfile.getInt32( "screenshot_backbuffer",  1);
-#else
 	g_settings.screenshot_count = configfile.getInt32( "screenshot_count",  1);
 	g_settings.screenshot_format = configfile.getInt32( "screenshot_format",  1);
 	g_settings.screenshot_cover = configfile.getInt32( "screenshot_cover",  0);
 	g_settings.screenshot_mode = configfile.getInt32( "screenshot_mode",  0);
 	g_settings.screenshot_video = configfile.getInt32( "screenshot_video",  1);
 	g_settings.screenshot_scale = configfile.getInt32( "screenshot_scale",  0);
-#endif
 
 	g_settings.screenshot_dir = configfile.getString( "screenshot_dir", "/media/sda1/movies" );
 	g_settings.cacheTXT = configfile.getInt32( "cacheTXT",  0);
@@ -1202,6 +1200,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString( "network_nfs_picturedir", g_settings.network_nfs_picturedir);
 	configfile.setString( "network_nfs_moviedir", g_settings.network_nfs_moviedir);
 	configfile.setString( "network_nfs_recordingdir", g_settings.network_nfs_recordingdir);
+	configfile.setString( "downloadcache_dir", g_settings.downloadcache_dir);
 	configfile.setString( "timeshiftdir", g_settings.timeshiftdir);
 	configfile.setBool  ("filesystem_is_utf8"                 , g_settings.filesystem_is_utf8             );
 
@@ -1253,16 +1252,14 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "auto_delete", g_settings.auto_delete );
 	configfile.setInt32( "record_hours", g_settings.record_hours );
 	//printf("set: key_unlock =============== %d\n", g_settings.key_unlock);
-#ifdef MARTII
 	configfile.setInt32( "screenshot_png_compression", g_settings.screenshot_png_compression );
-#else
+	configfile.setInt32( "screenshot_backbuffer", g_settings.screenshot_backbuffer);
 	configfile.setInt32( "screenshot_count", g_settings.screenshot_count );
 	configfile.setInt32( "screenshot_format", g_settings.screenshot_format );
 	configfile.setInt32( "screenshot_cover", g_settings.screenshot_cover );
 	configfile.setInt32( "screenshot_mode", g_settings.screenshot_mode );
 	configfile.setInt32( "screenshot_video", g_settings.screenshot_video );
 	configfile.setInt32( "screenshot_scale", g_settings.screenshot_scale );
-#endif
 
 	configfile.setString( "screenshot_dir", g_settings.screenshot_dir);
 	configfile.setInt32( "cacheTXT", g_settings.cacheTXT );
@@ -3178,18 +3175,6 @@ _repeat:
 		delete sleepTimer;
 		return messages_return::handled;
 	}
-#ifdef MARTII
-	else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
-		char shotname[80];
-		time_t now = time(NULL);
-		struct tm *tm = localtime(&now);
-		strftime(shotname, sizeof(shotname), "/screenshot-%Y%m%d%H%M%S.png", tm);
-		CVFD::getInstance()->ShowText("screenshot");
-		frameBuffer->OSDShot(g_settings.screenshot_dir + string(shotname));
-		CVFD::getInstance()->ShowText(NULL);
-		return messages_return::handled;
-	}
-#else
 #ifdef SCREENSHOT
 	else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
 		//video+osd scaled to osd size
@@ -3199,7 +3184,6 @@ _repeat:
 		sc->Start();
 	}
 #endif
-#endif // MARTII
 
 	/* ================================== MESSAGES ================================================ */
 	else if (msg == NeutrinoMessages::EVT_VOLCHANGED) {

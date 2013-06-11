@@ -1067,7 +1067,7 @@ void CMoviePlayerGui::PlayFile(void)
 			if(restore)
 				FileTime.show(position);
 #ifdef SCREENSHOT
-		} else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
+		} else if (/*msg == (neutrino_msg_t) g_settings.key_screenshot ||*/ msg == CRCInput::RC_record) {
 
 			char ending[(sizeof(int)*2) + 6] = ".jpg";
 			if(!g_settings.screenshot_cover)
@@ -1118,6 +1118,7 @@ void CMoviePlayerGui::PlayFile(void)
 			// nothing
 		} else if (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites) {
 			//FIXME do nothing ?
+#if 0
 		} else if ((msg == CRCInput::RC_record) && !isWebTV && !isYT) {
 			std::string shot = full_name;
 			size_t found = shot.rfind(".ts");
@@ -1126,6 +1127,7 @@ void CMoviePlayerGui::PlayFile(void)
 				shot.append(".png");
 				my_system(4, "/bin/grab", "-vbr", "360", shot.c_str());
 			}
+#endif
 		} else {
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all) {
 				printf("CMoviePlayerGui::PlayFile: neutrino handleMsg messages_return::cancel_all\n");

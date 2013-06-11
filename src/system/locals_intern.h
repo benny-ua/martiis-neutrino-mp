@@ -1885,6 +1885,7 @@ const char * locale_real_names[] =
 	"screenshot.scale",
 	"screenshot.tv",
 	"screenshot.video",
+	"screenshot.web",
 	"servicemenu.boot_params_ask",
 	"servicemenu.boot_params_head",
 	"servicemenu.boot_params_hint",
