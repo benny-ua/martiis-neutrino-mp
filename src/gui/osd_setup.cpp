@@ -195,7 +195,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		fileBrowser.Filter = &fileFilter;
 		if (fileBrowser.exec(FONTDIR) == true)
 		{
-			strcpy(g_settings.font_file, fileBrowser.getSelectedFile()->Name.c_str());
+			g_settings.font_file = fileBrowser.getSelectedFile()->Name;
 			printf("[neutrino] new font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();
 		}
@@ -209,7 +209,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		fileBrowser.Filter = &fileFilter;
 		if (fileBrowser.exec(FONTDIR) == true)
 		{
-			strcpy(g_settings.ttx_font_file, fileBrowser.getSelectedFile()->Name.c_str());
+			g_settings.ttx_font_file = fileBrowser.getSelectedFile()->Name;
 			ttx_font_file = fileBrowser.getSelectedFile()->Name;
 			printf("[neutrino] ttx font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();

@@ -475,7 +475,7 @@ bool CTZChangeNotifier::changeNotify(const neutrino_locale_t, void * Data)
                 while (search) {
                         if (!strcmp(xmlGetName(search), "zone")) {
 				name = xmlGetAttribute(search, "name");
-				if(!strcmp(g_settings.timezone, name.c_str())) {
+				if(g_settings.timezone == name) {
 					zone = xmlGetAttribute(search, "zone");
 					if (!access(("/usr/share/zoneinfo/" + zone).c_str(), R_OK))
 						found = true;

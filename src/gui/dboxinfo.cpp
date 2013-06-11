@@ -561,37 +561,10 @@ void CDBoxInfoWidget::paint()
 							switch (j)
 							{
 							case 0: {
-#ifdef MARTII
 								if ((s.f_type != 0x72b6) && (s.f_type != 0x5941ff53))
-#else
-								if (s.f_type != 0x72b6)
-#endif
-								{
-									char *p1=NULL, *p2=NULL;
-									p1=strchr(g_settings.network_nfs_recordingdir+1,'/') ;
-									p2=strchr(mnt->mnt_dir+1,'/') ;
-#ifdef MARTII
-									if (p1 && p2) {
-#else
-									if (p2) {
-#endif
-										if (strstr(p1,p2)) {
-
-											rec_mp = true;
-										}
-									}
-									else {
-										if (strstr(g_settings.network_nfs_recordingdir,mnt->mnt_dir)) {
-											rec_mp = true;
-										}
-									}
-								}
+									rec_mp = g_settings.network_nfs_recordingdir.compare(0, strlen(mnt->mnt_dir), mnt->mnt_dir);
 								mpOffset = 10;
-#ifdef MARTII
 								snprintf(ubuf,buf_size,"%-20.20s", mnt->mnt_dir);
-#else
-								snprintf(ubuf,buf_size,"%-10.10s",basename(mnt->mnt_fsname));
-#endif
 							}
 							break;
 							case 1:

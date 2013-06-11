@@ -644,7 +644,7 @@ int CLuaInstance::Blit(lua_State *L)
 int CLuaInstance::GetLanguage(lua_State *L)
 {
 	// FIXME -- should conform to ISO 639-1/ISO 3166-1
-	lua_pushstring(L, g_settings.language);
+	lua_pushstring(L, g_settings.language.c_str());
 
 	return 1;
 }

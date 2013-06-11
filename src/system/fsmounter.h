@@ -94,10 +94,10 @@ class CFSMounter
 #endif
  public:
 	CFSMounter();
-	static bool isMounted(const char * const local_dir);
-	static CFSMounter::MountRes mount(const char * const ip, const char * const dir, const char * const local_dir, 
-					  const FSType fstype, const char * const username, const char * const password, 
-					  char * options1, char * options2);
+	static bool isMounted(const std::string &local_dir);
+	static CFSMounter::MountRes mount(const std::string &ip, const std::string &dir, const std::string &local_dir, 
+				       const FSType fstype, const std::string &username, const std::string &password, 
+				       std::string options1, std::string options2);
 	static bool automount();
 #ifdef MARTII
 	static void automount_async_start();

@@ -650,7 +650,7 @@ void CTimerManager::loadRecordingSafety()
 void CTimerManager::setWakeupTime()
 {
 	time_t nextAnnounceTime=0;
-	bool status=false;
+	//bool status=false;
 	timer_is_rec = false;
 
 	if (pthread_mutex_trylock(&tm_eventsMutex) == EBUSY)
@@ -730,7 +730,7 @@ bool CTimerManager::shutdown()
 #ifndef MARTII
 	timerd_debug = 1; //FIXME
 #endif
-	time_t nextAnnounceTime=0;
+	//time_t nextAnnounceTime=0;
 	bool status=false;
 	timer_is_rec = false;
 

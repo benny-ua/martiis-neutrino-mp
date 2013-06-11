@@ -224,8 +224,8 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 			StreamSubtitlePids	= stream_subtitle_pids;
 			StreamPmtPid		= stream_pmt_pid;
 		};
-		void SetDirectory(const char * const directory) { Directory	= directory; };
-		void SetTimeshiftDirectory(const char * const directory) { TimeshiftDirectory	= directory; };
+		void SetDirectory(std::string directory) { Directory	= directory; };
+		void SetTimeshiftDirectory(std::string directory) { TimeshiftDirectory	= directory; };
 #ifdef MARTII
 		std::string GetTimeshiftDirectory(void) { return TimeshiftDirectory; };
 #endif
