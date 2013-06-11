@@ -526,11 +526,7 @@ void CInfoViewer::showMovieTitle(const int playState, const std::string &Channel
 		CMoviePlayerGui::getInstance().file_prozent = 100;
 
 	char runningRest[32]; // %d can be 10 digits max...
-#ifdef MARTII
 	snprintf(runningRest, sizeof(runningRest), "%d / %d min", (curr_pos + 30000) / 60000, (duration - curr_pos + 30000) / 60000);
-#else
-	sprintf(runningRest, "%d / %d min", (curr_pos + 30000) / 60000, (duration + 30000) / 60000);
-#endif
 	display_Info(g_file_epg.c_str(), g_file_epg1.c_str(), true, false, CMoviePlayerGui::getInstance().file_prozent, NULL, runningRest);
 
 	int speed = CMoviePlayerGui::getInstance().GetSpeed();
@@ -1282,7 +1278,7 @@ int CInfoViewer::handleMsg (const neutrino_msg_t msg, neutrino_msg_data_t data)
 					char runningRest[32]; // %d can be 10 digits max...
 					int curr_pos = CMoviePlayerGui::getInstance().GetPosition(); 
 					int duration = CMoviePlayerGui::getInstance().GetDuration();
-					sprintf(runningRest, "%d / %d min", (curr_pos + 30000) / 60000, (duration + 30000) / 60000);
+					snprintf(runningRest, sizeof(runningRest), "%d / %d min", (curr_pos + 30000) / 60000, (duration - curr_pos + 30000) / 60000);
 					display_Info(NULL, NULL, true, false, CMoviePlayerGui::getInstance().file_prozent, NULL, runningRest);
 				} else {
 					show_Data( true );
