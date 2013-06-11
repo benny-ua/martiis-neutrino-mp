@@ -1118,6 +1118,14 @@ void CMoviePlayerGui::PlayFile(void)
 			// nothing
 		} else if (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites) {
 			//FIXME do nothing ?
+		} else if ((msg == CRCInput::RC_record) && !isWebTV && !isYT) {
+			std::string shot = full_name;
+			size_t found = shot.rfind(".ts");
+			if (found == (shot.length() - 3)) {
+				shot.erase(found);
+				shot.append(".png");
+				my_system(4, "/bin/grab", "-vbr", "360", shot.c_str());
+			}
 		} else {
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all) {
 				printf("CMoviePlayerGui::PlayFile: neutrino handleMsg messages_return::cancel_all\n");
