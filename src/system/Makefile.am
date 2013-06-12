@@ -38,6 +38,7 @@ libneutrino_system_a_SOURCES = \
 	helpers.cpp \
 	ping.c \
 	settings.cpp \
+	ytcache.cpp \
 	ytparser.cpp \
 	setting_helpers.cpp \
 	localize_bouquetnames.cpp \
