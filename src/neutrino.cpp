@@ -2672,7 +2672,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 						ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
 			}
 #endif
-#ifdef MARTII
 			else if((msg == (uint32_t) g_settings.key_audioplayback)) {
 				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
 				CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
@@ -2680,40 +2679,29 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
 				media->exec(NULL, "");
 			}
-#else
-			else if( (msg == CRCInput::RC_audio) && g_settings.audio_run_player) {
-				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
-				CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
-				media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
-				media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
-				media->exec(NULL, "");
-			}
-#endif
-#ifdef MARTII
 			else if(msg == (uint32_t) g_settings.key_tsplayback) {
 				//open moviebrowser via media player menu object
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
 #endif
+				if(g_settings.mode_clock)
+					InfoClock->StopClock();
 				StopSubtitles();
 				CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
 				StartSubtitles(0);
-#ifdef ENABLE_GRAPHLCD // MARTII
+				if(g_settings.mode_clock)
+					InfoClock->StartClock();
+#ifdef ENABLE_GRAPHLCD
 				nGLCD::unlockChannel();
 #endif
 			}
-#else
-			else if( msg == CRCInput::RC_video || msg == CRCInput::RC_play ) {
-				//open moviebrowser via media player menu object
-				if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
-					CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
-			}
-#endif
 #ifdef MARTII
 			else if (msg == (uint32_t) g_settings.key_fileplayback) {
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
+				if(g_settings.mode_clock)
+					InfoClock->StopClock();
 				StopSubtitles();
 				if(mode == NeutrinoMessages::mode_radio )
 					videoDecoder->StopPicture();
@@ -2721,7 +2709,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				if(mode == NeutrinoMessages::mode_radio )
 					videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 				StartSubtitles(0);
-#ifdef ENABLE_GRAPHLCD // MARTII
+				if(g_settings.mode_clock)
+					InfoClock->StartClock();
+#ifdef ENABLE_GRAPHLCD
 				nGLCD::unlockChannel();
 #endif
 			}
@@ -4218,11 +4208,23 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	}
 # endif 
 	else if(actionKey=="webtv") {
+		StopSubtitles();
+		if(g_settings.mode_clock)
+			InfoClock->StopClock();
 		CMoviePlayerGui::getInstance().exec(NULL, "webtv");
+		if(g_settings.mode_clock)
+			InfoClock->StartClock();
+		StartSubtitles();
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="ytplayback") {
+		StopSubtitles();
+		if(g_settings.mode_clock)
+			InfoClock->StopClock();
 		CMoviePlayerGui::getInstance().exec(NULL, "ytplayback");
+		if(g_settings.mode_clock)
+			InfoClock->StartClock();
+		StartSubtitles();
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
