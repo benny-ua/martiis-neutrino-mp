@@ -42,6 +42,8 @@
 #include <OpenThreads/ScopedLock>
 
 static int fedebug = 0;
+static int unused_demux;
+
 #define FEDEBUG(fmt, args...)					\
         do {							\
                 if (fedebug)					\
@@ -391,7 +393,7 @@ void CFEManager::linkFrontends(bool init)
 	INFO("linking..");
 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	enabled_count = 0;
-	have_sat = have_cable = have_terr = false;
+	unused_demux = 0;
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
 		CFrontend * fe = it->second;
 #if 0
@@ -443,18 +445,11 @@ void CFEManager::linkFrontends(bool init)
 		}
 		if (init && femode != CFrontend::FE_MODE_UNUSED)
 			fe->Init();
-		if (femode != CFrontend::FE_MODE_UNUSED)
-		{
+		if (femode != CFrontend::FE_MODE_UNUSED) {
 			enabled_count++;
-			if (fe->isSat())
-				have_sat = true;
-			else if (fe->isCable())
-				have_cable = true;
-			else if (fe->isTerr())
-				have_terr = true;
+		} else if (!unused_demux) {
+			unused_demux = fe->fenumber + 1;
 		}
-		else	/* unused -> no need to keep open */
-			fe->Close();
 	}
 }
 
@@ -696,7 +691,7 @@ CFrontend * CFEManager::allocateFE(CZapitChannel * channel, bool forrecord)
 #ifdef ENABLE_PIP
 		/* FIXME until proper demux management */
 		if (enabled_count < 4) {
-			channel->setPipDemux(PIP_DEMUX);
+			channel->setPipDemux(unused_demux ? unused_demux : PIP_DEMUX);
 			//cDemux::SetSource(PIP_DEMUX, frontend->fenumber);
 		}
 		INFO("pip demux: %d", channel->getPipDemux());

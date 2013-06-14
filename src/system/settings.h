@@ -179,6 +179,7 @@ struct SNeutrinoSettings
 	std::string epg_max_events;
 	std::string epg_extendedcache;
 	std::string epg_dir;
+	int epg_scan;
 #ifdef MARTII
 	int epg_enable_freesat;
 	int epg_enable_viasat;
