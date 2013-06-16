@@ -96,21 +96,11 @@ printf("url is %s\n", URL.c_str());
 		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
 #endif
 
-		if(strcmp(g_settings.softupdate_proxyserver, "")!=0)
-		{//use proxyserver
-#ifdef DEBUG
-printf("use proxyserver : %s\n", g_settings.softupdate_proxyserver);
-#endif
-			curl_easy_setopt(curl, CURLOPT_PROXY, g_settings.softupdate_proxyserver);
-
-			if(strcmp(g_settings.softupdate_proxyusername,"")!=0)
-			{//use auth
-				//printf("use proxyauth\n");
-				char tmp[200];
-				strcpy(tmp, g_settings.softupdate_proxyusername);
-				strcat(tmp, ":");
-				strcat(tmp, g_settings.softupdate_proxypassword);
-				curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, tmp);
+		if(g_settings.softupdate_proxyserver != "") {
+			curl_easy_setopt(curl, CURLOPT_PROXY, g_settings.softupdate_proxyserver.c_str());
+			if(g_settings.softupdate_proxyusername != "") {
+				std::string tmp = g_settings.softupdate_proxyusername + ":" + g_settings.softupdate_proxypassword;
+				curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, tmp.c_str());
 			}
 		}
 #ifdef DEBUG

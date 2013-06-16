@@ -793,11 +793,21 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.apply_kernel = configfile.getBool("apply_kernel" , false);
 	g_settings.apply_settings = configfile.getBool("apply_settings" , true);
 
-	strcpy(g_settings.softupdate_url_file, configfile.getString("softupdate_url_file", "/var/etc/update.urls").c_str());
-	strcpy(g_settings.softupdate_proxyserver, configfile.getString("softupdate_proxyserver", "" ).c_str());
-	strcpy(g_settings.softupdate_proxyusername, configfile.getString("softupdate_proxyusername", "" ).c_str());
-	strcpy(g_settings.softupdate_proxypassword, configfile.getString("softupdate_proxypassword", "" ).c_str());
-	//
+	g_settings.softupdate_url_file = configfile.getString("softupdate_url_file", "/var/etc/update.urls");
+	g_settings.softupdate_proxyserver = configfile.getString("softupdate_proxyserver", "" );
+	g_settings.softupdate_proxyusername = configfile.getString("softupdate_proxyusername", "" );
+	g_settings.softupdate_proxypassword = configfile.getString("softupdate_proxypassword", "" );
+
+	if (g_settings.softupdate_proxyserver == "")
+		unsetenv("http_proxy");
+	else {
+		std::string proxy = "http://";
+		if (g_settings.softupdate_proxyusername != "")
+			proxy += g_settings.softupdate_proxyusername + ":" + g_settings.softupdate_proxypassword + "@";
+		proxy += g_settings.softupdate_proxyserver;
+		setenv("http_proxy", proxy.c_str(), 1);
+	}
+
 	g_settings.font_file = configfile.getString("font_file", FONTDIR"/neutrino.ttf");
 	g_settings.ttx_font_file = configfile.getString( "ttx_font_file", FONTDIR"/DejaVuLGCSansMono-Bold.ttf");
 	ttx_font_file = g_settings.ttx_font_file.c_str();
