@@ -181,7 +181,7 @@ int CRecordSetup::showRecordSetup()
 	recordingSettings->addItem(GenericMenuSeparatorLine);
 
 	//record dir
-	CMenuForwarder* fRecDir = new CMenuForwarder(LOCALE_RECORDINGMENU_DEFDIR, true, g_settings.network_nfs_recordingdir, this, "recordingdir");
+	CMenuForwarder* fRecDir = new CMenuForwarder(LOCALE_RECORDINGMENU_DEFDIR, true, g_settings.network_nfs_recordingdir.c_str(), this, "recordingdir");
 	fRecDir->setHint("", LOCALE_MENU_HINT_RECORD_DIR);
 	recordingSettings->addItem(fRecDir);
 
@@ -253,17 +253,20 @@ void CRecordSetup::showRecordTimerSetup(CMenuWidget *menu_timersettings)
 	//recording start/end correcture
 	int pre,post;
 	g_Timerd->getRecordingSafety(pre,post);
-	sprintf(g_settings.record_safety_time_before, "%02d", pre/60);
-	sprintf(g_settings.record_safety_time_after, "%02d", post/60);
+	char tmp[10];
+	snprintf(tmp, sizeof(tmp), "%02d", pre/60);
+	g_settings.record_safety_time_before = std::string(tmp);
+	snprintf(tmp, sizeof(tmp), "%02d", post/60);
+	g_settings.record_safety_time_after = std::string(tmp);
 
 	//start
-	CStringInput * timerBefore = new CStringInput(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE, g_settings.record_safety_time_before, 2, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE_HINT_1, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE_HINT_2,"0123456789 ", this);
-	CMenuForwarder *fTimerBefore = new CMenuDForwarder(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE, true, g_settings.record_safety_time_before, timerBefore);
+	CStringInput * timerBefore = new CStringInput(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE, &g_settings.record_safety_time_before, 2, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE_HINT_1, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE_HINT_2,"0123456789 ", this);
+	CMenuForwarder *fTimerBefore = new CMenuDForwarder(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE, true, NULL, timerBefore);
 	fTimerBefore->setHint("", LOCALE_MENU_HINT_RECORD_TIMEBEFORE);
 
 	//end
-	CStringInput * timerAfter = new CStringInput(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER, g_settings.record_safety_time_after, 2, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER_HINT_1, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER_HINT_2,"0123456789 ", this);
-	CMenuForwarder *fTimerAfter = new CMenuDForwarder(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER, true, g_settings.record_safety_time_after, timerAfter);
+	CStringInput * timerAfter = new CStringInput(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER, &g_settings.record_safety_time_after, 2, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER_HINT_1, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER_HINT_2,"0123456789 ", this);
+	CMenuForwarder *fTimerAfter = new CMenuDForwarder(LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER, true, NULL, timerAfter);
 	fTimerAfter->setHint("", LOCALE_MENU_HINT_RECORD_TIMEAFTER);
 
 	//announce
@@ -336,7 +339,7 @@ void CRecordSetup::showRecordTimeShiftSetup(CMenuWidget *menu_ts)
 	menu_ts->addIntroItems(LOCALE_RECORDINGMENU_TIMESHIFT);
 
 	//timeshift dir
-	CMenuForwarder* fTsDir = new CMenuForwarder(LOCALE_RECORDINGMENU_TSDIR, true, g_settings.timeshiftdir, this, "timeshiftdir");
+	CMenuForwarder* fTsDir = new CMenuForwarder(LOCALE_RECORDINGMENU_TSDIR, true, g_settings.timeshiftdir.c_str(), this, "timeshiftdir");
 	fTsDir->setHint("", LOCALE_MENU_HINT_RECORD_TDIR);
 	menu_ts->addItem(fTsDir);
 
@@ -364,7 +367,7 @@ bool CRecordSetup::changeNotify(const neutrino_locale_t OptionName, void * /*dat
 {
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_BEFORE) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_TIMERSETTINGS_RECORD_SAFETY_TIME_AFTER)) {
-		g_Timerd->setRecordingSafety(atoi(g_settings.record_safety_time_before)*60, atoi(g_settings.record_safety_time_after)*60);
+		g_Timerd->setRecordingSafety(atoi(g_settings.record_safety_time_before.c_str())*60, atoi(g_settings.record_safety_time_after.c_str())*60);
 	} else if(ARE_LOCALES_EQUAL(OptionName, LOCALE_RECORDINGMENU_APIDS_STD) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_RECORDINGMENU_APIDS_ALT) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_RECORDINGMENU_APIDS_AC3)) {

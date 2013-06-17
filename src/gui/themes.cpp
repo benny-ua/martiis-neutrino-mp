@@ -115,9 +115,8 @@ void CThemes::readThemes(CMenuWidget &themes)
 		{
 			for(int count=0;count<n;count++)
 			{
-				char *file = themelist[count]->d_name;
-				char *pos = strstr(file, ".theme");
-				if(pos != NULL)
+				std::string file = std::string(themelist[count]->d_name);
+				if (file.length() > 6 && file.substr(file.length() - 7) == ".theme")
 				{
 					if ( p == 0 && hasCVSThemes == false ) {
 						themes.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_COLORTHEMEMENU_SELECT2));
@@ -126,12 +125,12 @@ void CThemes::readThemes(CMenuWidget &themes)
 						themes.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_COLORTHEMEMENU_SELECT1));
 						hasUserThemes = true;
 					}
-					*pos = '\0';
+					file.erase(file.length() - 7, std::string::npos);
 					if ( p == 1 ) {
-						userThemeFile = "{U}" + (std::string)file;
-						oj = new CMenuForwarderNonLocalized((char*)file, true, "", this, userThemeFile.c_str());
+						userThemeFile = "{U}" + file;
+						oj = new CMenuForwarder(file, true, "", this, userThemeFile);
 					} else
-						oj = new CMenuForwarderNonLocalized((char*)file, true, "", this, file);
+						oj = new CMenuForwarder(file, true, "", this, file);
 					themes.addItem( oj );
 				}
 				free(themelist[count]);

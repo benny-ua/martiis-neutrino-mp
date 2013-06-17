@@ -81,7 +81,7 @@ class CScanTs : public CMenuTarget
 		void prev_next_TP(bool);
 		TP_params TP;
 		int deltype;
-		char * pname;
+		std::string pname;
 
 	public:
 		CScanTs(int dtype = FE_QPSK);

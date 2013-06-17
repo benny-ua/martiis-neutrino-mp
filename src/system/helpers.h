@@ -21,6 +21,8 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include <string>
+#include <sstream>
 
 int my_system(const char * cmd);
 int my_system(int argc, const char *arg, ...); /* argc is number of arguments including command */
@@ -60,5 +62,12 @@ class CFileHelpers
 		bool removeDir(const char *Dir);
 
 };
+
+template<class C> std::string to_string(C i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
 
 #endif

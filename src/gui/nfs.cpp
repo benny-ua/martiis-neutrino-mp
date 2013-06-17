@@ -160,7 +160,7 @@ int CNFSMountGui::menu()
 	{
 		sprintf(s2,"mountentry%d",i);
 		ISO_8859_1_entry[i] = ZapitTools::UTF8_to_Latin1(m_entry[i].c_str());
-		mountMenuEntry[i] = new CMenuForwarderNonLocalized("", true, ISO_8859_1_entry[i], this, s2);
+		mountMenuEntry[i] = new CMenuForwarder("", true, ISO_8859_1_entry[i].c_str(), this, s2);
 		
 		if (CFSMounter::isMounted(g_settings.network_nfs[i].local_dir))
 		{
@@ -224,19 +224,19 @@ int CNFSMountGui::menuEntry(int nr)
 	CMenuOptionChooser *automountInput= new CMenuOptionChooser(LOCALE_NFS_AUTOMOUNT, &automount, MESSAGEBOX_NO_YES_OPTIONS, MESSAGEBOX_NO_YES_OPTION_COUNT, true);
 
 	CStringInputSMS options1Input(LOCALE_NFS_MOUNT_OPTIONS, &g_settings.network_nfs[nr].mount_options1, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-_=.,:|!?/ ");
-	CMenuForwarder *options1_fwd = new CMenuForwarder(LOCALE_NFS_MOUNT_OPTIONS, true, g_settings.network_nfs[nr].mount_options1, &options1Input);
+	CMenuForwarder *options1_fwd = new CMenuForwarder(LOCALE_NFS_MOUNT_OPTIONS, true, NULL, &options1Input);
 
 	CStringInputSMS options2Input(LOCALE_NFS_MOUNT_OPTIONS, &g_settings.network_nfs[nr].mount_options2, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-_=.,:|!?/ ");
-	CMenuForwarder *options2_fwd = new CMenuForwarder(LOCALE_NFS_MOUNT_OPTIONS, true, g_settings.network_nfs[nr].mount_options2, &options2Input);
+	CMenuForwarder *options2_fwd = new CMenuForwarder(LOCALE_NFS_MOUNT_OPTIONS, true, NULL, &options2Input);
 
 	CStringInputSMS userInput(LOCALE_NFS_USERNAME, &g_settings.network_nfs[nr].username, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-_.,:|!?/ ");
-	CMenuForwarder *username_fwd = new CMenuForwarder(LOCALE_NFS_USERNAME, (type != (int)CFSMounter::NFS), g_settings.network_nfs[nr].username, &userInput);
+	CMenuForwarder *username_fwd = new CMenuForwarder(LOCALE_NFS_USERNAME, (type != (int)CFSMounter::NFS), NULL, &userInput);
 
 	CStringInputSMS passInput(LOCALE_NFS_PASSWORD, &g_settings.network_nfs[nr].password, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-_.,:|!?/ ");
 	CMenuForwarder *password_fwd = new CMenuForwarder(LOCALE_NFS_PASSWORD, (type != (int)CFSMounter::NFS), NULL, &passInput);
 
 	CMACInput macInput(LOCALE_RECORDINGMENU_SERVER_MAC, g_settings.network_nfs[nr].mac, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CMenuForwarder * macInput_fwd = new CMenuForwarder(LOCALE_RECORDINGMENU_SERVER_MAC, true, g_settings.network_nfs[nr].mac, &macInput);
+	CMenuForwarder * macInput_fwd = new CMenuForwarder(LOCALE_RECORDINGMENU_SERVER_MAC, true, NULL, &macInput);
 
 	CMenuForwarder *mountnow_fwd = new CMenuForwarder(LOCALE_NFS_MOUNTNOW, !(CFSMounter::isMounted(g_settings.network_nfs[nr].local_dir)), NULL, this, cmd);
 
@@ -246,9 +246,9 @@ int CNFSMountGui::menuEntry(int nr)
 	notifier.addItem(password_fwd);
 
 	mountMenuEntryW.addItem(new CMenuOptionChooser(LOCALE_NFS_TYPE, &type, NFS_TYPE_OPTIONS, NFS_TYPE_OPTION_COUNT, typeEnabled, &notifier));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_IP      , true, g_settings.network_nfs[nr].ip,        &ipInput       ));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_DIR     , true, g_settings.network_nfs[nr].dir,       &dirInput      ));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_LOCALDIR, true, g_settings.network_nfs[nr].local_dir, this     , cmd2));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_IP      , true, NULL,        &ipInput       ));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_DIR     , true, NULL,       &dirInput      ));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_LOCALDIR, true, g_settings.network_nfs[nr].local_dir.c_str(), this     , cmd2));
 	mountMenuEntryW.addItem(automountInput);
 	mountMenuEntryW.addItem(options1_fwd);
 	mountMenuEntryW.addItem(options2_fwd);
@@ -299,7 +299,7 @@ int CNFSUmountGui::menu()
 			s1 += it->mountPoint;
 			std::string s2 = "doumount ";
 			s2 += it->mountPoint;
-			CMenuForwarder *forwarder = new CMenuForwarderNonLocalized(s1.c_str(), true, NULL, this, s2.c_str());
+			CMenuForwarder *forwarder = new CMenuForwarder(s1, true, NULL, this, s2.c_str());
 			forwarder->iconName = NEUTRINO_ICON_MOUNTED;
 			umountMenu.addItem(forwarder);
 		}

@@ -109,12 +109,12 @@ int CKeybindSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		CFileBrowser fileBrowser;
 		fileBrowser.Dir_Mode = true;
 		if (fileBrowser.exec("/var/tuxbox") == true) {
-			char  fname[256] = "keys.conf", sname[256];
-			CStringInputSMS * sms = new CStringInputSMS(LOCALE_EXTRA_SAVEKEYS, fname, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789. ");
+			std::string fname = "keys.conf", sname;
+			CStringInputSMS * sms = new CStringInputSMS(LOCALE_EXTRA_SAVEKEYS, &fname, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789. ");
 			sms->exec(NULL, "");
-			sprintf(sname, "%s/%s", fileBrowser.getSelectedFile()->Name.c_str(), fname);
-			printf("[neutrino keybind_setup] save keys: %s\n", sname);
-			CNeutrinoApp::getInstance()->saveKeys(sname);
+			sname = fileBrowser.getSelectedFile()->Name + "/" + fname;
+			printf("[neutrino keybind_setup] save keys: %s\n", sname.c_str());
+			CNeutrinoApp::getInstance()->saveKeys(sname.c_str());
 			delete sms;
 		}
 		return menu_return::RETURN_REPAINT;
@@ -268,8 +268,8 @@ int CKeybindSetup::showKeySetup()
 	keySettings->addItem(mf);
 
 	//rc tuning
-	CStringInput keySettings_repeat_genericblocker(LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC, g_settings.repeat_genericblocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
-	CStringInput keySettings_repeatBlocker(LOCALE_KEYBINDINGMENU_REPEATBLOCK, g_settings.repeat_blocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
+	CStringInput keySettings_repeat_genericblocker(LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC, &g_settings.repeat_genericblocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
+	CStringInput keySettings_repeatBlocker(LOCALE_KEYBINDINGMENU_REPEATBLOCK, &g_settings.repeat_blocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
 
 	keySettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_RC));
 #ifdef MARTII
@@ -281,11 +281,11 @@ int CKeybindSetup::showKeySetup()
 		mc->setHint("", LOCALE_MENU_HINT_KEY_HARDWARE);
 		keySettings->addItem(mc);
 	}
-	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_REPEATBLOCK, true, g_settings.repeat_blocker, &keySettings_repeatBlocker);
+	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_REPEATBLOCK, true, NULL, &keySettings_repeatBlocker);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_REPEATBLOCK);
 	keySettings->addItem(mf);
 
-	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC, true, g_settings.repeat_genericblocker, &keySettings_repeat_genericblocker);
+	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC, true, NULL, &keySettings_repeat_genericblocker);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_REPEATBLOCKGENERIC);
 	keySettings->addItem(mf);
 
@@ -514,8 +514,8 @@ bool CKeybindSetup::changeNotify(const neutrino_locale_t OptionName, void * /* d
 #endif
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC) ||
 			ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_REPEATBLOCK)) {
-		unsigned int fdelay = atoi(g_settings.repeat_blocker);
-		unsigned int xdelay = atoi(g_settings.repeat_genericblocker);
+		unsigned int fdelay = atoi(g_settings.repeat_blocker.c_str());
+		unsigned int xdelay = atoi(g_settings.repeat_genericblocker.c_str());
 
 		g_RCInput->repeat_block = fdelay * 1000;
 		g_RCInput->repeat_block_generic = xdelay * 1000;

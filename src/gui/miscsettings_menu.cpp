@@ -108,7 +108,7 @@ int CMiscMenue::exec(CMenuTarget* parent, const std::string &actionKey)
 				// e.g. vtxt-plugins
 				sprintf(id, "%d", count);
 				enabled_count++;
-				MoviePluginSelector.addItem(new CMenuForwarderNonLocalized(g_PluginList->getName(count), true, NULL, new COnekeyPluginChangeExec(), id, CRCInput::convertDigitToKey(count)), (cnt == 0));
+				MoviePluginSelector.addItem(new CMenuForwarder(g_PluginList->getName(count), true, NULL, new COnekeyPluginChangeExec(), id, CRCInput::convertDigitToKey(count)), (cnt == 0));
 				cnt++;
 			}
 		}
@@ -247,7 +247,7 @@ int CMiscMenue::showMiscSettingsMenu()
 
 	if (!g_info.hw_caps->can_shutdown) {
 		/* we don't have the energy menu, but put the sleeptimer directly here */
-		mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_SLEEPTIMER, true, g_settings.shutdown_min, new CSleepTimerWidget, "permanent", CRCInput::RC_1);
+		mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_SLEEPTIMER, true, g_settings.shutdown_min.c_str(), new CSleepTimerWidget, "permanent", CRCInput::RC_1);
 		mf->setHint("", LOCALE_MENU_HINT_INACT_TIMER);
 		misc_menue.addItem(mf);
 	}
@@ -268,7 +268,7 @@ int CMiscMenue::showMiscSettingsMenu()
 	//CPU
 	CMenuWidget misc_menue_cpu("CPU", NEUTRINO_ICON_SETTINGS, width);
 	showMiscSettingsMenuCPUFreq(&misc_menue_cpu);
-	misc_menue.addItem( new CMenuForwarderNonLocalized("CPU", true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4));
+	misc_menue.addItem( new CMenuForwarder("CPU", true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4));
 #endif /*CPU_FREQ*/
 #ifdef MARTII
 	KernelOptions_Menu kernelOptions;
@@ -314,11 +314,11 @@ void CMiscMenue::showMiscSettingsMenuGeneral(CMenuWidget *ms_general)
 		ms_general->addItem(mc);
 	}
 
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PLUGINS_HDD_DIR, true, g_settings.plugin_hdd_dir, this, "plugin_dir");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PLUGINS_HDD_DIR, true, g_settings.plugin_hdd_dir.c_str(), this, "plugin_dir");
 	mf->setHint("", LOCALE_MENU_HINT_PLUGINS_HDD_DIR);
 	ms_general->addItem(mf);
 #ifdef ONE_KEY_PLUGIN
-	ms_general->addItem(new CMenuForwarder(LOCALE_EXTRA_KEY_PLUGIN, true, g_settings.onekey_plugin,this,"onekeyplugin"));
+	ms_general->addItem(new CMenuForwarder(LOCALE_EXTRA_KEY_PLUGIN, true, g_settings.onekey_plugin.c_str(),this,"onekeyplugin"));
 #endif /*ONE_KEY_PLUGIN*/
 }
 
@@ -330,8 +330,8 @@ void CMiscMenue::showMiscSettingsMenuEnergy(CMenuWidget *ms_energy)
 	CMenuOptionChooser *m1 = new CMenuOptionChooser(LOCALE_MISCSETTINGS_SHUTDOWN_REAL_RCDELAY, &g_settings.shutdown_real_rcdelay, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, !g_settings.shutdown_real);
 	m1->setHint("", LOCALE_MENU_HINT_SHUTDOWN_RCDELAY);
 
-	CStringInput * miscSettings_shutdown_count = new CStringInput(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, g_settings.shutdown_count, 3, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT1, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT2, "0123456789 ");
-	CMenuForwarder *m2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, !g_settings.shutdown_real, g_settings.shutdown_count, miscSettings_shutdown_count);
+	CStringInput * miscSettings_shutdown_count = new CStringInput(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, &g_settings.shutdown_count, 3, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT1, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT2, "0123456789 ");
+	CMenuForwarder *m2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, !g_settings.shutdown_real, g_settings.shutdown_count.c_str(), miscSettings_shutdown_count);
 	m2->setHint("", LOCALE_MENU_HINT_SHUTDOWN_COUNT);
 	
 	miscNotifier = new COnOffNotifier(1);
@@ -345,7 +345,7 @@ void CMiscMenue::showMiscSettingsMenuEnergy(CMenuWidget *ms_energy)
 	ms_energy->addItem(m1);
 	ms_energy->addItem(m2);
 
-	m2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_SLEEPTIMER, true, g_settings.shutdown_min, new CSleepTimerWidget, "permanent");
+	m2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_SLEEPTIMER, true, g_settings.shutdown_min.c_str(), new CSleepTimerWidget, "permanent");
 	m2->setHint("", LOCALE_MENU_HINT_INACT_TIMER);
 	ms_energy->addItem(m2);
 }
@@ -360,22 +360,22 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	mc1->setHint("", LOCALE_MENU_HINT_EPG_SAVE_STANDBY);
 
 	CStringInput * miscSettings_epg_cache = new CStringInput(LOCALE_MISCSETTINGS_EPG_CACHE, &g_settings.epg_cache, 2,LOCALE_MISCSETTINGS_EPG_CACHE_HINT1, LOCALE_MISCSETTINGS_EPG_CACHE_HINT2 , "0123456789 ", sectionsdConfigNotifier);
-	CMenuForwarder * mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_CACHE, true, g_settings.epg_cache, miscSettings_epg_cache);
+	CMenuForwarder * mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_CACHE, true, g_settings.epg_cache.c_str(), miscSettings_epg_cache);
 	mf->setHint("", LOCALE_MENU_HINT_EPG_CACHE);
 
 	CStringInput * miscSettings_epg_cache_e = new CStringInput(LOCALE_MISCSETTINGS_EPG_EXTENDEDCACHE, &g_settings.epg_extendedcache, 3,LOCALE_MISCSETTINGS_EPG_EXTENDEDCACHE_HINT1, LOCALE_MISCSETTINGS_EPG_EXTENDEDCACHE_HINT2 , "0123456789 ", sectionsdConfigNotifier);
-	CMenuForwarder * mf1  = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_EXTENDEDCACHE, true, g_settings.epg_extendedcache, miscSettings_epg_cache_e);
+	CMenuForwarder * mf1  = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_EXTENDEDCACHE, true, g_settings.epg_extendedcache.c_str(), miscSettings_epg_cache_e);
 	mf1->setHint("", LOCALE_MENU_HINT_EPG_EXTENDEDCACHE);
 
 	CStringInput * miscSettings_epg_old_events = new CStringInput(LOCALE_MISCSETTINGS_EPG_OLD_EVENTS, &g_settings.epg_old_events, 3,LOCALE_MISCSETTINGS_EPG_OLD_EVENTS_HINT1, LOCALE_MISCSETTINGS_EPG_OLD_EVENTS_HINT2 , "0123456789 ", sectionsdConfigNotifier);
-	CMenuForwarder * mf2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_OLD_EVENTS, true, g_settings.epg_old_events, miscSettings_epg_old_events);
+	CMenuForwarder * mf2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_OLD_EVENTS, true, g_settings.epg_old_events.c_str(), miscSettings_epg_old_events);
 	mf2->setHint("", LOCALE_MENU_HINT_EPG_OLD_EVENTS);
 
 	CStringInput * miscSettings_epg_max_events = new CStringInput(LOCALE_MISCSETTINGS_EPG_MAX_EVENTS, &g_settings.epg_max_events, 6,LOCALE_MISCSETTINGS_EPG_MAX_EVENTS_HINT1, LOCALE_MISCSETTINGS_EPG_MAX_EVENTS_HINT2 , "0123456789 ", sectionsdConfigNotifier);
-	CMenuForwarder * mf3 = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_MAX_EVENTS, true, g_settings.epg_max_events, miscSettings_epg_max_events);
+	CMenuForwarder * mf3 = new CMenuDForwarder(LOCALE_MISCSETTINGS_EPG_MAX_EVENTS, true, g_settings.epg_max_events.c_str(), miscSettings_epg_max_events);
 	mf3->setHint("", LOCALE_MENU_HINT_EPG_MAX_EVENTS);
 
-	CMenuForwarder * mf4 = new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_DIR, g_settings.epg_save, g_settings.epg_dir, this, "epgdir");
+	CMenuForwarder * mf4 = new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_DIR, g_settings.epg_save, g_settings.epg_dir.c_str(), this, "epgdir");
 	mf4->setHint("", LOCALE_MENU_HINT_EPG_DIR);
 
 	miscEpgNotifier = new COnOffNotifier();

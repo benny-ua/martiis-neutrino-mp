@@ -137,7 +137,7 @@ int CHDDMenuHandler::exec(CMenuTarget* parent, const std::string &/*actionkey*/)
 			+ " MOUNTBASE=/tmp MDEV=" + it->devname + " /etc/mdev/mdev-mount.sh";
 			system(cmd.c_str());
 			it->mounted = is_mounted(it->devname.c_str());
-                	it->cmf->setOptionValue(g_Locale->getText(it->mounted ? LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
+                	it->cmf->setOption(g_Locale->getText(it->mounted ? LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
 			return menu_return::RETURN_REPAINT;
 		}
 #endif
@@ -289,7 +289,7 @@ int CHDDMenuHandler::doMenu ()
 		tempMenu[i]->addItem(mf);
 
 		snprintf(sstr, sizeof(sstr), "%s (%s)", g_Locale->getText(LOCALE_HDD_REMOVABLE_DEVICE),  namelist[i]->d_name);
-		mf = new CMenuForwarderNonLocalized((removable ? sstr : namelist[i]->d_name), enabled, tmp_str[i], tempMenu[i]);
+		mf = new CMenuForwarder(std::string(removable ? sstr : namelist[i]->d_name), enabled, tmp_str[i].c_str(), tempMenu[i]);
 		mf->setHint("", LOCALE_MENU_HINT_HDD_TOOLS);
 		hddmenu->addItem(mf);
 
@@ -324,7 +324,7 @@ int CHDDMenuHandler::doMenu ()
 			int shortcut = 1;
 			hddmenu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_HDD_MOUNT_UMOUNT));
 			for (std::vector<hdd_s>::iterator it = hdd_list.begin(); it != hdd_list.end(); ++it) {
-				it->cmf = new CMenuForwarderNonLocalized(it->devname.c_str(), true,
+				it->cmf = new CMenuForwarder(it->devname, true,
 					g_Locale->getText(it->mounted ?  LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT), this,
 					it->devname.c_str(), CRCInput::convertDigitToKey(shortcut++));
 				hddmenu->addItem(it->cmf);

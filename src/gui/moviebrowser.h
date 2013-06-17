@@ -507,7 +507,7 @@ class CMenuSelector : public CMenuItem
 class CMenuWidgetSelection : public CMenuWidget
 {
 	public:
-		CMenuWidgetSelection(const neutrino_locale_t Name, const std::string & Icon = "", const int mwidth = 30) : CMenuWidget(Name, Icon, mwidth){;};
+		CMenuWidgetSelection(const neutrino_locale_t Name, const char * const Icon = NULL, const int mwidth = 30) : CMenuWidget(Name, Icon, mwidth){;};
 		int getSelectedLine(void){return exit_pressed ? -1 : selected;};
 };
 
@@ -520,6 +520,7 @@ class CFileChooser : public CMenuWidget
 	public:
 		CFileChooser(std::string* path){dirPath= path;};
 		int exec(CMenuTarget* parent, const std::string & actionKey);
+		std::string getValueString(void) { return *dirPath; }
 };
 
 typedef enum

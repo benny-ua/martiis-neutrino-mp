@@ -126,8 +126,8 @@ int CAudioPlayerSetup::showAudioPlayerSetup()
 	mc->setHint("", LOCALE_MENU_HINT_AUDIOPLAYER_PLAYLIST);
 	audioplayerSetup->addItem(mc);
 
-	CStringInput audio_screensaver(LOCALE_AUDIOPLAYER_SCREENSAVER_TIMEOUT, g_settings.audioplayer_screensaver, 2, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "0123456789 ");
-	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_SCREENSAVER_TIMEOUT, true, g_settings.audioplayer_screensaver, &audio_screensaver);
+	CStringInput audio_screensaver(LOCALE_AUDIOPLAYER_SCREENSAVER_TIMEOUT, &g_settings.audioplayer_screensaver, 2, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "0123456789 ");
+	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_SCREENSAVER_TIMEOUT, true, NULL, &audio_screensaver);
 	mf->setHint("", LOCALE_MENU_HINT_AUDIOPLAYER_SCREENSAVER);
 	audioplayerSetup->addItem(mf);
 
@@ -138,7 +138,7 @@ int CAudioPlayerSetup::showAudioPlayerSetup()
 	if (CVFD::getInstance()->has_lcd) //FIXME
 		audioplayerSetup->addItem(new CMenuOptionChooser(LOCALE_AUDIOPLAYER_SPECTRUM     , &g_settings.spectrum    , MESSAGEBOX_NO_YES_OPTIONS      , MESSAGEBOX_NO_YES_OPTION_COUNT      , true ));
 #endif
-	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_DEFDIR, true, g_settings.network_nfs_audioplayerdir, this, "audioplayerdir");
+	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_DEFDIR, true, g_settings.network_nfs_audioplayerdir.c_str(), this, "audioplayerdir");
 	mf->setHint("", LOCALE_MENU_HINT_AUDIOPLAYER_DEFDIR);
 	audioplayerSetup->addItem(mf);
 

@@ -41,11 +41,8 @@ struct CLuaData
 #ifdef MARTII
 struct CLuaMenueItem
 {
-	union //value
-	{
-		int i;
-		char s[255];
-	};
+	int val_i;
+	std::string val_s;
 	std::string name;
 };
 
@@ -81,28 +78,30 @@ class CLuaMenueForwarder : public CMenuTarget
 class CLuaMenueFilebrowser : public CLuaMenueForwarder
 {
 	private:
-        	char *value;
+        	std::string *value;
         	bool dirMode;
 		std::vector<std::string> filter;
 	public:
-		CLuaMenueFilebrowser(lua_State *_L, std::string _luaAction, std::string _luaId, char *_value, bool _dirMode);
+		CLuaMenueFilebrowser(lua_State *_L, std::string _luaAction, std::string _luaId, std::string *_value, bool _dirMode);
 		int exec(CMenuTarget* parent, const std::string & actionKey);
-		void addFilter(std::string s) { filter.push_back(s); };
+		void addFilter(std::string s) { filter.push_back(s); }
+		std::string getValueString(void) { return *value; }
 };
 
 class CLuaMenueStringinput : public CLuaMenueForwarder
 {
 	private:
-        	char *value;
+        	std::string *value;
 		std::string valid_chars;
-		const char *name;
-		const char *icon;
+		std::string name;
+		std::string icon;
 		bool sms;
 		int size;
 		CChangeObserver *observ;
 	public:
-		CLuaMenueStringinput(lua_State *_L, std::string _luaAction, std::string _luaId, const char *_name, char *_value, int _size, std::string _valid_chars, CChangeObserver *_observ, const char *_icon, bool _sms);
+		CLuaMenueStringinput(lua_State *_L, std::string _luaAction, std::string _luaId, std::string _name, std::string *_value, int _size, std::string _valid_chars, CChangeObserver *_observ, std::string _icon, bool _sms);
 		int exec(CMenuTarget* parent, const std::string & actionKey);
+		std::string getValueString(void) { return *value; }
 };
 
 class CLuaHintbox

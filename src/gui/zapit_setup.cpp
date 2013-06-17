@@ -69,10 +69,10 @@ int CZapitSetup::showMenu()
 
 	CSelectChannelWidget select;
 
-	CMenuForwarder 	*zapit1 = new CMenuForwarder(LOCALE_ZAPITSETUP_LAST_TV    , !g_settings.uselastchannel, g_settings.StartChannelTV, &select, "tv", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN );
+	CMenuForwarder 	*zapit1 = new CMenuForwarder(LOCALE_ZAPITSETUP_LAST_TV    , !g_settings.uselastchannel, g_settings.StartChannelTV.c_str(), &select, "tv", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN );
 	zapit1->setHint("", LOCALE_MENU_HINT_LAST_TV);
 
-	CMenuForwarder 	*zapit2 = new CMenuForwarder(LOCALE_ZAPITSETUP_LAST_RADIO , !g_settings.uselastchannel, g_settings.StartChannelRadio, &select, "radio", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW );
+	CMenuForwarder 	*zapit2 = new CMenuForwarder(LOCALE_ZAPITSETUP_LAST_RADIO , !g_settings.uselastchannel, g_settings.StartChannelRadio.c_str(), &select, "radio", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW );
 	zapit2->setHint("", LOCALE_MENU_HINT_LAST_RADIO);
 
 	miscZapitNotifier->addItem(zapit1);
@@ -161,7 +161,7 @@ int CSelectChannelWidget::InitZapitChannelHelper(CZapitClient::channelsMode mode
 			char cChannelId[60] = {0};
 			snprintf(cChannelId, sizeof(cChannelId), "ZC%c:%d|%" PRIx64 "#", (mode==CZapitClient::MODE_TV)?'T':'R', channel->number, channel->channel_id);
 
-			CMenuForwarderNonLocalized * chan_item = new CMenuForwarderNonLocalized(channel->getName().c_str(), true, NULL, this, (std::string(cChannelId) + channel->getName()).c_str(), CRCInput::RC_nokey, NULL, channel->scrambled ?NEUTRINO_ICON_SCRAMBLED:NULL);
+			CMenuForwarder* chan_item = new CMenuForwarder(channel->getName(), true, NULL, this, (std::string(cChannelId) + channel->getName()).c_str(), CRCInput::RC_nokey, NULL, channel->scrambled ?NEUTRINO_ICON_SCRAMBLED:NULL);
 			chan_item->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
 			mwtv->addItem(chan_item);
 
@@ -173,7 +173,7 @@ int CSelectChannelWidget::InitZapitChannelHelper(CZapitClient::channelsMode mode
 #endif
 		if(!channels.empty() && (!g_bouquetManager->Bouquets[i]->bHidden ))
 		{
-			mctv.addItem(new CMenuForwarderNonLocalized(g_bouquetManager->Bouquets[i]->Name.c_str(), true, NULL, mwtv));
+			mctv.addItem(new CMenuForwarder(g_bouquetManager->Bouquets[i]->Name, true, NULL, mwtv));
 		}
 	}
 	int res = mctv.exec (NULL, "");
