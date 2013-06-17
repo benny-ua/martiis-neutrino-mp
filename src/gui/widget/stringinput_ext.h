@@ -164,7 +164,6 @@ class CIPInput : public CExtendedInput
 
 	public:
 		CIPInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
-		std::string getValueString(void) { return *ip; }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -182,7 +181,6 @@ class CDateInput : public CExtendedInput
 		CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 		~CDateInput();
 		char* getValue() {return value;}
-		std::string getValueString() { return std::string(value); }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -198,8 +196,6 @@ class CMACInput : public CExtendedInput
 
 	public:
 		CMACInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
-		std::string getValueString(void) {
-return *mac; }
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -238,7 +234,6 @@ class CIntInput : public CExtendedInput
 			return myValueStringOutput;
 		}
 		void updateValue() { onBeforeExec(); }
-		std::string getValueString() { return std::string(myValueStringOutput); }
 };
 
 #endif

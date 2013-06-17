@@ -1993,9 +1993,9 @@ void CControlAPI::SendTimersXML(CyhookHandler *hh)
 		hh->printf("\t\t\t\t<count>%s</count>\n",zRepCount.c_str());
 		hh->printf("\t\t\t\t<number>%d</number>\n",(int)timer->eventRepeat);
 		hh->printf("\t\t\t\t<text>%s</text>\n",zRep.c_str());
-		std::string weekdays;
+		char weekdays[8]= {0};
 		NeutrinoAPI->Timerd->setWeekdaysToStr(timer->eventRepeat, weekdays);
-		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n",weekdays.c_str());
+		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n",weekdays);
 		hh->WriteLn("\t\t\t</repeat>\n");
 
 		// channel infos

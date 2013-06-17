@@ -58,7 +58,7 @@ class COPKGManager : public CMenuTarget
 			bool installed;
 			bool upgradable;
 			int index;
-			CMenuForwarder *forwarder;
+			CMenuForwarderNonLocalized *forwarder;
 		};
 		std::map<std::string,struct pkg> pkg_map;
 		struct pkg **pkg_arr;

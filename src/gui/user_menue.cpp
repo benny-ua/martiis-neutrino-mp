@@ -329,7 +329,7 @@ bool CUserMenu::showUserMenu(int button)
 					StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
 #endif
 					keyhelper.get(&key,&icon, d_key);
-					menu_item = new CMenuForwarder(g_PluginList->getName(count), true, NULL, StreamFeaturesChanger, id, key, icon);
+					menu_item = new CMenuForwarderNonLocalized(g_PluginList->getName(count), true, NULL, StreamFeaturesChanger, id, key, icon);
 
 					menu->addItem(menu_item, 0);
 					cnt++;

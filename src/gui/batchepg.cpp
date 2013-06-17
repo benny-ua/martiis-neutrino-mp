@@ -384,8 +384,8 @@ void CBatchEPG_Menu::Settings()
 	for (unsigned int i = 0; i < epgChannels.size(); i++) {
 		char actionKey[80];
 		snprintf(actionKey, sizeof(actionKey), "%llx", (long long unsigned) epgChannels[i].channel_id);
-		menu->addItem(new CMenuForwarder(epgChannels[i].name,
-			true, "", this, std::string(actionKey), CRCInput::convertDigitToKey (shortcut++)),
+		menu->addItem(new CMenuForwarderNonLocalized(epgChannels[i].name.c_str(),
+			true, "", this, actionKey, CRCInput::convertDigitToKey (shortcut++)),
 			epgChannels[i].channel_id == live_channel_id);
 	}
 

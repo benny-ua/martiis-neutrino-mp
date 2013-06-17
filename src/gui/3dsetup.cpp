@@ -85,7 +85,7 @@ int C3DSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		if (actionKey == tdl[i].actionKey) {
 			frameBuffer->set3DMode(tdl[i].mode);
 			for (int j = 0; j < THREE_D_OPTIONS_COUNT; j++)
-				tdl[j].cmf->setOption(g_Locale->getText((i == j) ? LOCALE_OPTIONS_ON: LOCALE_OPTIONS_OFF));
+				tdl[j].cmf->setOptionValue(g_Locale->getText((i == j) ? LOCALE_OPTIONS_ON: LOCALE_OPTIONS_OFF));
 			return res;
 		}
 	}

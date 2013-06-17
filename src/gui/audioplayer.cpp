@@ -406,7 +406,7 @@ int CAudioPlayerGui::show()
 		if ( msg == CRCInput::RC_timeout  || msg == NeutrinoMessages::EVT_TIMER)
 		{
 			int timeout = time(NULL) - m_idletime;
-			int screensaver_timeout = atoi(g_settings.audioplayer_screensaver.c_str());
+			int screensaver_timeout = atoi(g_settings.audioplayer_screensaver);
 			if (screensaver_timeout !=0 && timeout > screensaver_timeout*60 && !m_screensaver)
 				screensaver(true);
 
@@ -2749,7 +2749,7 @@ void CAudioPlayerGui::savePlaylist()
 		absPlaylistDir += file->getFileName();
 
 		const int filenamesize = 30;
-		std::string filename;
+		char filename[filenamesize + 1] = "";
 
 		if (file->getType() == CFile::FILE_PLAYLIST)
 		{
@@ -2762,14 +2762,14 @@ void CAudioPlayerGui::savePlaylist()
 			{
 				return;
 			}
-			filename = name;
+			snprintf(filename, name.size(), "%s", name.c_str());
 		}
 		else if (file->getType() == CFile::FILE_DIR)
 		{
 			// query for filename
 			this->hide();
 			CStringInputSMS filenameInput(LOCALE_AUDIOPLAYER_PLAYLIST_NAME,
-						      &filename,
+						      filename,
 						      filenamesize - 1,
 						      LOCALE_AUDIOPLAYER_PLAYLIST_NAME_HINT1,
 						      LOCALE_AUDIOPLAYER_PLAYLIST_NAME_HINT2,

@@ -56,7 +56,6 @@
 #include <driver/volume.h>
 
 #include <zapit/femanager.h>
-#include <system/helpers.h>
 #include <system/debug.h>
 #include "cs_api.h"
 
@@ -220,33 +219,33 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 	else if (actionKey == "font_scaling") {
 		int xre = g_settings.screen_xres;
 		int yre = g_settings.screen_yres;
-		std::string val_x = to_string(g_settings.screen_xres);
-		std::string val_y = to_string(g_settings.screen_yres);
+		char val_x[4] = {0};
+		char val_y[4] = {0};
+		snprintf(val_x,sizeof(val_x), "%03d",g_settings.screen_xres);
+		snprintf(val_y,sizeof(val_y), "%03d",g_settings.screen_yres);
 
 		CMenuWidget fontscale(LOCALE_FONTMENU_HEAD, NEUTRINO_ICON_COLORS, width, MN_WIDGET_ID_OSDSETUP_FONTSCALE);
 		fontscale.addIntroItems(LOCALE_FONTMENU_SCALING);
 
-		CStringInput xres_count(LOCALE_FONTMENU_SCALING_X, &val_x, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_X_HINT2, "0123456789 ");
-		xres_count.setMinMax(50, 200);
-		CMenuForwarder *m_x = new CMenuForwarder(LOCALE_FONTMENU_SCALING_X, true, NULL, &xres_count);
+		CStringInput xres_count(LOCALE_FONTMENU_SCALING_X, val_x,50,200, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_X_HINT2, "0123456789 ");
+		CMenuForwarder *m_x = new CMenuForwarder(LOCALE_FONTMENU_SCALING_X, true, val_x, &xres_count);
 
-		CStringInput yres_count(LOCALE_FONTMENU_SCALING_Y, &val_y, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_Y_HINT2, "0123456789 ");
-		yres_count.setMinMax(50, 200);
-		CMenuForwarder *m_y = new CMenuForwarder(LOCALE_FONTMENU_SCALING_Y, true, NULL, &yres_count);
+		CStringInput yres_count(LOCALE_FONTMENU_SCALING_Y, val_y,50,200, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_Y_HINT2, "0123456789 ");
+		CMenuForwarder *m_y = new CMenuForwarder(LOCALE_FONTMENU_SCALING_Y, true, val_y, &yres_count);
 
 		fontscale.addItem(m_x);
 		fontscale.addItem(m_y);
 		int res = fontscale.exec(NULL, "");
-		xre = atoi(val_x.c_str());
-		yre = atoi(val_y.c_str());
+		xre = atoi(val_x);
+		yre = atoi(val_y);
 		//fallback for min/max bugs ;)
 		if( xre < 50 || xre > 200 ){
 			xre = g_settings.screen_xres;
-			val_x = to_string(g_settings.screen_xres);
+			snprintf(val_x,sizeof(val_x), "%03d",g_settings.screen_xres);
 		}
 		if( yre < 50 || yre > 200 ){
 			yre = g_settings.screen_yres;
-			val_y = to_string(g_settings.screen_yres);
+			snprintf(val_y,sizeof(val_y), "%03d",g_settings.screen_yres);
 		}
 
 		if (xre != g_settings.screen_xres || yre != g_settings.screen_yres) {
@@ -665,19 +664,19 @@ private:
 	CChangeObserver * observer;
 	CConfigFile     * configfile;
 	int32_t           defaultvalue;
-	std::string	  value;
+	char              value[11];
 
 protected:
 
-	virtual const std::string getOption(void)
+	virtual const char * getOption(void)
 		{
-			value = to_string(configfile->getInt32(locale_real_names[text], defaultvalue));
+			sprintf(value, "%u", configfile->getInt32(locale_real_names[text], defaultvalue));
 			return value;
 		}
 
 	virtual bool changeNotify(const neutrino_locale_t OptionName, void * Data)
 		{
-			configfile->setInt32(locale_real_names[text], atoi(value.c_str()));
+			configfile->setInt32(locale_real_names[text], atoi(value));
 			return observer->changeNotify(OptionName, Data);
 		}
 
@@ -692,8 +691,7 @@ public:
 
 	int exec(CMenuTarget * parent, const std::string & action_Key)
 		{
-			std::string opt = getOption();
-			CStringInput input(text, &opt, 3, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, "0123456789 ", this);
+			CStringInput input(text, (char *)getOption(), 3, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, "0123456789 ", this);
 			return input.exec(parent, action_Key);
 		}
 };
@@ -714,7 +712,7 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 
 	// select gui font file
 #ifdef MARTII
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, g_settings.font_file.c_str(), this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, g_settings.font_file, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 #else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, NULL, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 #endif
@@ -723,7 +721,7 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 
 	// select teletext font file
 #ifdef MARTII
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, g_settings.ttx_font_file.c_str(), this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, g_settings.ttx_font_file, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 #else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, NULL, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 #endif
@@ -772,8 +770,8 @@ void COsdSetup::showOsdTimeoutSetup(CMenuWidget* menu_timeout)
 
 	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
 	{
-		CStringInput * timing_item = new CStringInput(timing_setting[i].name, &g_settings.timing_string[i], 3, LOCALE_TIMING_HINT_1, LOCALE_TIMING_HINT_2, "0123456789 ", &timingsettingsnotifier);
-		menu_timeout->addItem(new CMenuDForwarder(timing_setting[i].name, true, NULL, timing_item));
+		CStringInput * timing_item = new CStringInput(timing_setting[i].name, g_settings.timing_string[i], 3, LOCALE_TIMING_HINT_1, LOCALE_TIMING_HINT_2, "0123456789 ", &timingsettingsnotifier);
+		menu_timeout->addItem(new CMenuDForwarder(timing_setting[i].name, true, g_settings.timing_string[i], timing_item));
 	}
 
 	menu_timeout->addItem(GenericMenuSeparatorLine);
@@ -838,7 +836,7 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	menu_infobar->addItem(mc);
 
 	// logo directory
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_MISCSETTINGS_INFOBAR_LOGO_HDD_DIR, true, g_settings.logo_hdd_dir.c_str(), this, "logo_dir");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_MISCSETTINGS_INFOBAR_LOGO_HDD_DIR, true, g_settings.logo_hdd_dir, this, "logo_dir");
 	mf->setHint("", LOCALE_MENU_HINT_INFOBAR_LOGO_DIR);
 	menu_infobar->addItem(mf);
 
@@ -1110,7 +1108,7 @@ void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
 	if((uint)g_settings.key_screenshot == CRCInput::RC_nokey)
 		menu_screenshot->addItem( new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCREENSHOT_INFO));
 
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, g_settings.screenshot_dir.c_str(), this, "screenshot_dir");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, g_settings.screenshot_dir, this, "screenshot_dir");
 	mf->setHint("", LOCALE_MENU_HINT_SCREENSHOT_DIR);
 	menu_screenshot->addItem(mf);
 
