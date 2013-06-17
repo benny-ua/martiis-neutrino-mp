@@ -36,6 +36,7 @@
 #include <gui/components/cc_frm_button.h>
 #include <gui/components/cc_frm_clock.h>
 #include <gui/components/cc_item_shapes.h>
+// #define TEST_MENU
 
 #include <string>
 

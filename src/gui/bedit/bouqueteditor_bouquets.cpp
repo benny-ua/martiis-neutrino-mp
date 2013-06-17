@@ -128,10 +128,12 @@ void CBEBouquetWidget::paint()
 	frameBuffer->paintBoxRel(x+ width- 15,ypos, 15, sb,  COL_MENUCONTENT_PLUS_1);
 
 	int sbc= ((Bouquets->size()- 1)/ listmaxshow)+ 1;
+
 	if (sbc < 1)
 		sbc = 1;
 
 	float sbh= (sb- 4)/ sbc;
+
 	int sbs= (selected/listmaxshow);
 	if (sbc < 1)
 		sbc = 1;

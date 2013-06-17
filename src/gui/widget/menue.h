@@ -462,7 +462,7 @@ class CMenuWidget : public CMenuTarget
 		neutrino_locale_t       name;
 		CFrameBuffer		*frameBuffer;
 		std::vector<CMenuItem*>	items;
-		std::vector<unsigned int> page_start;
+		std::vector<int>	page_start;
 #ifdef MARTII
 		struct keyAction { std::string action; CMenuTarget *menue; };
 		std::map<neutrino_msg_t, keyAction> keyActionMap;
