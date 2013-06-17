@@ -157,7 +157,7 @@ void CFollowScreenings::show()
 	} else {
 #endif
 		CMenuWidget m(LOCALE_EPGVIEWER_SELECT_SCREENING, NEUTRINO_ICON_SETTINGS);
-		const char *icon = NEUTRINO_ICON_BUTTON_RED;
+		std::string icon = NEUTRINO_ICON_BUTTON_RED;
 		neutrino_msg_t directKey = CRCInput::RC_red;
 		CChannelEventList::iterator e;
 		int i = 0;
@@ -172,11 +172,11 @@ void CFollowScreenings::show()
 			strftime(tmpstr, sizeof(tmpstr), ". %H:%M", tmStartZeit );
 			screening_date += tmpstr;
 			snprintf(actionstr, sizeof(actionstr), "%lu", e->startTime);
-			forwarders.push_back(new CMenuForwarderNonLocalized(screening_date.c_str(), true, NULL, this, actionstr, directKey, icon));
+			forwarders.push_back(new CMenuForwarder(screening_date, true, NULL, this, actionstr, directKey, icon.c_str()));
 			updateRightIcon(i, e->startTime, e->duration);
 			m.addItem(forwarders[i]);
 			directKey = CRCInput::convertDigitToKey(1 + i);
-			icon = NULL;
+			icon = "";
 		}
 		m.enableSaveScreen(true);
 		m.exec(NULL, "");

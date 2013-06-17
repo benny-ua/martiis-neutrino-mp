@@ -669,7 +669,7 @@ void CUpnpBrowserGui::playnext(void)
 				}
 				else if (mime.substr(0,6) == "image/")
 				{
-					timeout = time(NULL) + atoi(g_settings.picviewer_slide_time);
+					timeout = time(NULL) + atoi(g_settings.picviewer_slide_time.c_str());
 					g_PicViewer->SetScaling((CPictureViewer::ScalingMode)g_settings.picviewer_scaling);
 					g_PicViewer->SetVisible(g_settings.screen_StartX, g_settings.screen_EndX, g_settings.screen_StartY, g_settings.screen_EndY);
 					videoDecoder->setBlank(true);

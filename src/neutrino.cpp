@@ -451,15 +451,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.shutdown_real         = configfile.getBool("shutdown_real"        , false );
 	g_settings.shutdown_real_rcdelay = configfile.getBool("shutdown_real_rcdelay", false );
-	strcpy(g_settings.shutdown_count, configfile.getString("shutdown_count","0").c_str());
+	g_settings.shutdown_count	 = configfile.getString("shutdown_count","0");
 
-	strcpy(g_settings.shutdown_min, "000");
+	g_settings.shutdown_min = "000";
 	if (can_deepstandby || cs_get_revision() == 1)
-#ifdef MARTII
-		strcpy(g_settings.shutdown_min, configfile.getString("shutdown_min","000").c_str());
-#else
-		strcpy(g_settings.shutdown_min, configfile.getString("shutdown_min","180").c_str());
-#endif
+		g_settings.shutdown_min = configfile.getString("shutdown_min","000");
 
 	g_settings.infobar_sat_display   = configfile.getBool("infobar_sat_display"  , true );
 	g_settings.infobar_show_channeldesc   = configfile.getBool("infobar_show_channeldesc"  , false );
@@ -528,7 +524,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		g_settings.pref_subs[i] = configfile.getString(cfg_key, "none");
 	}
 	g_settings.zap_cycle = configfile.getInt32( "zap_cycle", 0 );
-	strcpy( g_settings.audio_PCMOffset, configfile.getString( "audio_PCMOffset", "0" ).c_str() );
+	g_settings.audio_PCMOffset = configfile.getString("audio_PCMOffset", "0");
 
 	//vcr
 	g_settings.vcr_AutoSwitch = configfile.getBool("vcr_AutoSwitch"       , true );
@@ -632,7 +628,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.glcd_scroll_speed = configfile.getInt32("glcd_scroll_speed", 8);
 #endif
 	//personalize
-	strcpy( g_settings.personalize_pincode, configfile.getString( "personalize_pincode", "0000" ).c_str() );
+	g_settings.personalize_pincode = configfile.getString("personalize_pincode", "0000");
 	for (int i = 0; i < SNeutrinoSettings::P_SETTINGS_MAX; i++)//settings.h, settings.cpp
 		g_settings.personalize[i] = configfile.getInt32( personalize_settings[i].personalize_settings_name, personalize_settings[i].personalize_default_val );
 
@@ -841,26 +837,26 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		g_settings.parentallock_lockage = 18;
 	}
 	g_settings.parentallock_defaultlocked = configfile.getInt32("parentallock_defaultlocked", 0);
-	strcpy( g_settings.parentallock_pincode, configfile.getString( "parentallock_pincode", "0000" ).c_str() );
+	g_settings.parentallock_pincode = configfile.getString( "parentallock_pincode", "0000");
 
 	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
 		g_settings.timing[i] = configfile.getInt32(locale_real_names[timing_setting[i].name], timing_setting[i].default_timing);
 
 	for (int i = 0; i < SNeutrinoSettings::LCD_SETTING_COUNT; i++)
 		g_settings.lcd_setting[i] = configfile.getInt32(lcd_setting[i].name, lcd_setting[i].default_value);
-	strcpy(g_settings.lcd_setting_dim_time, configfile.getString("lcd_dim_time","0").c_str());
+	g_settings.lcd_setting_dim_time = configfile.getString("lcd_dim_time","0");
 	g_settings.lcd_setting_dim_brightness = configfile.getInt32("lcd_dim_brightness", 0);
 	g_settings.lcd_info_line = configfile.getInt32("lcd_info_line", 0);//channel name or clock
 
 	//Picture-Viewer
-	strcpy( g_settings.picviewer_slide_time, configfile.getString( "picviewer_slide_time", "10" ).c_str() );
+	g_settings.picviewer_slide_time = configfile.getString("picviewer_slide_time", "10");
 	g_settings.picviewer_scaling = configfile.getInt32("picviewer_scaling", 1 /*(int)CPictureViewer::SIMPLE*/);
 	g_settings.picviewer_decode_server_ip = configfile.getString("picviewer_decode_server_ip", "");
 
 	//Audio-Player
 	g_settings.audioplayer_display = configfile.getInt32("audioplayer_display",(int)CAudioPlayerGui::ARTIST_TITLE);
 	g_settings.audioplayer_follow  = configfile.getInt32("audioplayer_follow",0);
-	strcpy( g_settings.audioplayer_screensaver, configfile.getString( "audioplayer_screensaver", "1" ).c_str() );
+	g_settings.audioplayer_screensaver = configfile.getString("audioplayer_screensaver", "1");
 	g_settings.audioplayer_highprio  = configfile.getInt32("audioplayer_highprio",0);
 	g_settings.audioplayer_select_title_by_name = configfile.getInt32("audioplayer_select_title_by_name",0);
 	g_settings.audioplayer_repeat_on = configfile.getInt32("audioplayer_repeat_on",0);
@@ -1841,7 +1837,7 @@ void CNeutrinoApp::SetupFonts()
 void CNeutrinoApp::SetupTiming()
 {
 	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
-		sprintf(g_settings.timing_string[i], "%d", g_settings.timing[i]);
+		g_settings.timing_string[i] = to_string(g_settings.timing[i]);
 }
 
 
@@ -2099,6 +2095,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	}
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	/* setup GUI */
+	CMenuItem::setupGenericItems();
 	SetupFonts();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	SetupTiming();
@@ -3101,8 +3098,8 @@ _repeat:
 					int timeout = 0;
 					int timeout1 = 0;
 
-					sscanf(g_settings.repeat_blocker, "%d", &timeout);
-					sscanf(g_settings.repeat_genericblocker, "%d", &timeout1);
+					sscanf(g_settings.repeat_blocker.c_str(), "%d", &timeout);
+					sscanf(g_settings.repeat_genericblocker.c_str(), "%d", &timeout1);
 
 					if (timeout1 > timeout)
 						timeout = timeout1;
@@ -4325,7 +4322,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 				// zB vtxt-plugins
 				sprintf(id, "%d", count);
 				enabled_count++;
-				MoviePluginSelector.addItem(new CMenuForwarderNonLocalized(g_PluginList->getName(count), true, NULL, MoviePluginChanger, id, CRCInput::convertDigitToKey(count)), (cnt == 0));
+				MoviePluginSelector.addItem(new CMenuForwarder(g_PluginList->getName(count), true, NULL, MoviePluginChanger, id, CRCInput::convertDigitToKey(count)), (cnt == 0));
 				cnt++;
 			}
 		}
@@ -4598,13 +4595,13 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.menu_left_exit = tconfig.getInt32( "menu_left_exit", 0 );
 	g_settings.audio_run_player = tconfig.getInt32( "audio_run_player", 1 );
 	g_settings.key_click = tconfig.getInt32( "key_click", 1 );
-	strcpy(g_settings.repeat_blocker, tconfig.getString("repeat_blocker", "450").c_str());
-	strcpy(g_settings.repeat_genericblocker, tconfig.getString("repeat_genericblocker", "100").c_str());
+	g_settings.repeat_blocker = tconfig.getString("repeat_blocker", "450");
+	g_settings.repeat_genericblocker = tconfig.getString("repeat_genericblocker", "100");
 #ifdef MARTII
 	if (g_settings.conf_version < 1) {
 		// Use default key repeat settings when upgrading from earlier releases:
-		strcpy(g_settings.repeat_blocker, "450");
-		strcpy(g_settings.repeat_genericblocker, "100");
+		g_settings.repeat_blocker = "450";
+		g_settings.repeat_genericblocker = "100";
 	}
 	g_settings.accept_other_remotes = tconfig.getInt32( "accept_other_remotes", 1);
 #endif

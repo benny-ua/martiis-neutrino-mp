@@ -273,7 +273,7 @@ int CPictureViewerGui::show()
 			timeout=50; // egal
 		else
 		{
-			timeout=(m_time+atoi(g_settings.picviewer_slide_time)-(long)time(NULL))*10;
+			timeout=(m_time+atoi(g_settings.picviewer_slide_time.c_str())-(long)time(NULL))*10;
 			if (timeout <0 )
 				timeout=1;
 		}

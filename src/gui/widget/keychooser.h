@@ -55,11 +55,11 @@ class CKeyChooser : public CMenuWidget
 		CKeyChooserItemNoKey	*keyDeleter;
 
 	public:
-		CKeyChooser(int * const Key, const neutrino_locale_t title, const std::string & Icon = "");
+		CKeyChooser(int * const Key, const neutrino_locale_t title, const char * const Icon = NULL);
 		~CKeyChooser();
 
 		void paint();
-		const std::string & getKeyName(){return keyName;};
+		const char * getKeyName(){return keyName.c_str();};
 };
 
 class CKeyChooserItem : public CMenuTarget

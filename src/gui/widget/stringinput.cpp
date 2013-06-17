@@ -34,6 +34,8 @@
 #include <driver/screen_max.h>
 #include <driver/display.h>
 
+#include <system/helpers.h>
+
 #include <gui/color.h>
 
 #include <gui/widget/buttons.h>
@@ -43,52 +45,10 @@
 #include <global.h>
 #include <neutrino.h>
 
-CStringInput::CStringInput(const neutrino_locale_t Name, char* Value, const int min_value, const int max_value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
-{
-	name =  Name;
-	head = NULL;
-	value = Value;
-	valueString = NULL;
-	lower_bound = min_value - 1;
-	upper_bound = max_value + 1;
-	size =  Size;
-
-	hint_1 = Hint_1;
-	hint_2 = Hint_2;
-	validchars = Valid_Chars;
-	iconfile = Icon ? Icon : "";
-
-	observ = Observ;
-	init();
-}
-
-CStringInput::CStringInput(const neutrino_locale_t Name, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
-{
-	name =  Name;
-	head = NULL;
-	value = Value;
-	valueString = NULL;
-	lower_bound = -1;
-	upper_bound = -1;
-
-	size =  Size;
-
-	hint_1 = Hint_1;
-	hint_2 = Hint_2;
-	validchars = Valid_Chars;
-	iconfile = Icon ? Icon : "";
-
-	observ = Observ;
-	init();
-}
-
 CStringInput::CStringInput(const neutrino_locale_t Name, std::string* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
 {
-        name =  Name;
-	head = NULL;
-        value = new char[Size+1];
-        value[Size] = '\0';
-        strncpy(value,Value->c_str(),Size);
+        name =  g_Locale->getText(Name);
+	loc = Name;
         valueString = Value;
 	lower_bound = -1;
 	upper_bound = -1;
@@ -103,14 +63,14 @@ CStringInput::CStringInput(const neutrino_locale_t Name, std::string* Value, int
         init();
 }
 
-CStringInput::CStringInput(char * Head, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
+CStringInput::CStringInput(std::string Name, std::string* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
 {
-        head = strdup(Head);
-        value = Value;
-        valueString = NULL;
+        name = std::string(Name);
+	loc = NONEXISTANT_LOCALE;
+        valueString = Value;
 	lower_bound = -1;
 	upper_bound = -1;
-        size =  Size;
+        size = Size;
 
         hint_1 = Hint_1;
         hint_2 = Hint_2;
@@ -123,13 +83,6 @@ CStringInput::CStringInput(char * Head, char* Value, int Size, const neutrino_lo
 
 CStringInput::~CStringInput()
 {
-	if (valueString != NULL)
-	{
-		delete[] value;
-	}
-	if(head) {
-		free(head);
-	}
 }
 
 #define CStringInputSMSButtonsCount 2
@@ -143,9 +96,6 @@ void CStringInput::init()
 {
 	frameBuffer = CFrameBuffer::getInstance();
 
-#ifdef DEBUG_STRINGINPUT
-	printf("HEAD: %s (len: %d)\n", head, strlen(head));
-#endif
 	hheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getHeight();
 	iheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_INFO]->getHeight();
 	fheight = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight() + 6;	// init min buttonbar height
@@ -156,10 +106,7 @@ void CStringInput::init()
 	width = std::max(size*input_w + 2*offset, (int) frameBuffer->getScreenWidth() / 100 * 45);
 
 	int tmp_w = 0;
-	if (head)
-		tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(head, true); // UTF-8
-	else
-		tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(name), true); // UTF-8
+	tmp_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(name, true); // UTF-8
 
 	if (!(iconfile.empty()))
 	{
@@ -199,9 +146,9 @@ void CStringInput::NormalKeyPressed(const neutrino_msg_t key)
 {
 	if (CRCInput::isNumeric(key))
 	{	
-		std::string tmp_value = value;
-		value[selected] = validchars[CRCInput::getNumericValue(key)];
-		int current_value = atoi(value);
+		std::string tmp_value = *valueString;
+		valueString->replace(selected, 1, 1, validchars[CRCInput::getNumericValue(key)]);
+		int current_value = atoi(valueString->c_str());
 		int tmp = current_value;
 		if (lower_bound != -1 || upper_bound != -1)
 		{
@@ -209,8 +156,8 @@ void CStringInput::NormalKeyPressed(const neutrino_msg_t key)
 				current_value = lower_bound + 1;
 			else if (current_value >= upper_bound)
 				current_value = upper_bound - 1;
-			if (tmp != current_value) /* size + 1 is correct, snprintf includes always '\0' */
-				snprintf(value, size + 1, "%*d", size, current_value);
+			if (tmp != current_value)
+				*valueString = to_string(current_value);
 		}
 		if( (lower_bound == -1 || upper_bound == -1) || (current_value > 0 && current_value > lower_bound && current_value < upper_bound) ){
 			if (selected < (size - 1))
@@ -226,7 +173,7 @@ void CStringInput::NormalKeyPressed(const neutrino_msg_t key)
 			else
 				paintChar(selected);
 		}else{
-			snprintf(value, size + 1, "%s", tmp_value.c_str());
+			*valueString = tmp_value;
 		}
 	}
 }
@@ -235,14 +182,11 @@ void CStringInput::keyBackspacePressed(void)
 {
 	if (selected > 0)
 	{
+		valueString->erase(selected);
 		selected--;
-		for (int i = selected; i < size - 1; i++)
-		{
-			value[i] = value[i + 1];
+		valueString->append(" ");
+		for (int i = selected; i < size; i++)
 			paintChar(i);
-		}
-		value[size - 1] = ' ';
-		paintChar(size - 1);
 	}
 }
 
@@ -252,7 +196,7 @@ void CStringInput::keyRedPressed()
 	if(lower_bound == -1 || upper_bound == -1){
 		if (index(validchars, ' ') != NULL)
 		{
-			value[selected] = ' ';
+			valueString->replace(selected, 1, " ");
 
 			if (selected < (size - 1))
 			{
@@ -269,40 +213,31 @@ void CStringInput::keyYellowPressed()
 {
 	if(lower_bound == -1 || upper_bound == -1){
 		selected=0;
+		valueString->assign(0, size, ' ');
 		for(int i=0 ; i < size ; i++)
-		{
-			value[i]=' ';
 			paintChar(i);
-		}
 	}
 }
 
 void CStringInput::keyBluePressed()
 {
-	if (((value[selected] | 32) >= 'a') && ((value[selected] | 32) <= 'z'))
-	{
-		char newValue = value[selected] ^ 32;
-		if (index(validchars, newValue) != NULL)
-		{
-			value[selected] = newValue;
-			paintChar(selected);
-		}
-	}
+	char c = valueString->at(selected);
+	c = toupper(c);
 }
 
 void CStringInput::keyUpPressed()
 {
 	int npos = 0;
-	std::string tmp_value = value;
+	std::string tmp_value = *valueString;
 	for(int count=0;count<(int)strlen(validchars);count++)
-		if(value[selected]==validchars[count])
+		if(valueString->at(selected)==validchars[count])
 			npos = count;
 	npos++;
 	if(npos>=(int)strlen(validchars))
 		npos = 0;
-	value[selected]=validchars[npos];
+	valueString->replace(selected, 1, 1, validchars[npos]);
 
-	int current_value = atoi(value);
+	int current_value = atoi(valueString->c_str());
 	int tmp = current_value;
 	if (lower_bound != -1 || upper_bound != -1)
 	{
@@ -310,8 +245,8 @@ void CStringInput::keyUpPressed()
 			current_value = lower_bound + 1;
 		else if (current_value >= upper_bound)
 			current_value = upper_bound - 1;
-		if (tmp != current_value) /* size + 1 is correct, snprintf includes always '\0' */
-			snprintf(value, size + 1, "%*d", size, current_value);
+		if (tmp != current_value)
+			*valueString = to_string(current_value);
 	}
 	if( (lower_bound == -1 || upper_bound == -1) || (current_value > 0 && current_value > lower_bound && current_value < upper_bound) ){
 		if (tmp != current_value)
@@ -322,23 +257,23 @@ void CStringInput::keyUpPressed()
 		else
 			paintChar(selected);
 	}else{
-		snprintf(value, size + 1, "%s", tmp_value.c_str());
+		*valueString = tmp_value;
 	}
 }
 
 void CStringInput::keyDownPressed()
 {
 	int npos = 0;
-	std::string tmp_value = value;
+	std::string tmp_value = *valueString;
 	for(int count=0;count<(int)strlen(validchars);count++)
-		if(value[selected]==validchars[count])
+		if(valueString->at(selected)==validchars[count])
 			npos = count;
 	npos--;
 	if(npos<0)
 		npos = strlen(validchars)-1;
-	value[selected]=validchars[npos];
+	valueString->replace(selected, 1, 1, validchars[npos]);
 
-	int current_value = atoi(value);
+	int current_value = atoi(valueString->c_str());
 	int tmp = current_value;
 	if (lower_bound != -1 || upper_bound != -1)
 	{
@@ -346,8 +281,8 @@ void CStringInput::keyDownPressed()
 			current_value = lower_bound + 1;
 		else if (current_value >= upper_bound)
 			current_value = upper_bound - 1;
-		if (tmp != current_value) /* size + 1 is correct, snprintf includes always '\0' */
-			snprintf(value, size + 1, "%*d", size, current_value);
+		if (tmp != current_value)
+			*valueString = to_string(current_value);
 	}
 	if( (lower_bound == -1 || upper_bound == -1) || (current_value > 0 && current_value > lower_bound && current_value < upper_bound) ){
 		if (tmp != current_value)
@@ -357,8 +292,8 @@ void CStringInput::keyDownPressed()
 		}
 		else
 			paintChar(selected);
-	}else{
-		snprintf(value, size + 1, "%s", tmp_value.c_str());
+	}else {
+		*valueString = tmp_value;
 	}
 }
 
@@ -388,30 +323,19 @@ void CStringInput::keyRightPressed()
 void CStringInput::keyMinusPressed()
 {
 	if(lower_bound == -1 || upper_bound == -1){
-		int item = selected;
-		while (item < (size -1))
-		{
-			value[item] = value[item+1];
-			paintChar(item);
-			item++;
-		}
-		value[item] = ' ';
-		paintChar(item);
+		valueString->erase(selected, 1);
+		for (int i = selected; i < size; i++)
+			paintChar(i);
+		valueString->append(" ");
 	}
 }
 
 void CStringInput::keyPlusPressed()
 {
 	if(lower_bound == -1 || upper_bound == -1){
-		int item = size -1;
-		while (item > selected)
-		{
-			value[item] = value[item-1];
-			paintChar(item);
-			item--;
-		}
-		value[item] = ' ';
-		paintChar(item);
+		valueString->insert(selected, " ");
+		for (int i = selected; i < size; i++)
+			paintChar(i);
 	}
 }
 
@@ -421,23 +345,14 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 	neutrino_msg_data_t data;
 	int res = menu_return::RETURN_REPAINT;
 
-        char *oldval = new char[size+1];
-	if(oldval == NULL)
-		return res;
-	char  *dispval = new char[size+1];
-	if(dispval == NULL){
-		delete[] oldval;
-		return res;
-	}
-        oldval[size] = 0;
-	memset(dispval, 0, size + 1);
+	std::string oldval = *valueString;
+	std::string dispval = *valueString;
 
 	if (parent)
 		parent->hide();
 
-	for(int count=strlen(value)-1;count<size-1;count++)
-		strcat(value, " ");
-	strncpy(oldval, value, size);
+	if (size > (int) valueString->length())
+		valueString->append(size - valueString->length(), ' ');
 
 	fb_pixel_t * pixbuf = new fb_pixel_t[(width + SHADOW_OFFSET) * (height + SHADOW_OFFSET)];
 
@@ -452,11 +367,10 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 	bool loop=true;
 	while (loop)
 	{
-		if ( strncmp(value, dispval, size) != 0)
+		if (*valueString != dispval)
 		{
-			std::string tmp = value;
-			CVFD::getInstance()->showMenuText(1,tmp.c_str() , selected+1);
-			strncpy(dispval, value, size);
+			dispval = *valueString;
+			CVFD::getInstance()->showMenuText(1, dispval.c_str(), selected+1);
  		}
 
 		g_RCInput->getMsgAbsoluteTimeout(&msg, &data, &timeoutEnd, true );
@@ -490,7 +404,7 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 		}
 		else if ( (msg==CRCInput::RC_green) && (index(validchars, '.') != NULL))
 		{
-			value[selected] = '.';
+			valueString->replace(selected, 1, ".");
 
 			if (selected < (size - 1))
 			{
@@ -511,18 +425,10 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 		else if (msg==CRCInput::RC_down)
 		{
 			keyDownPressed();
-#ifdef MARTII
 		} else if (msg==(neutrino_msg_t)g_settings.key_volumeup)
-#else
-		} else if (msg==CRCInput::RC_plus)
-#endif
 		{
 			keyPlusPressed();
-#ifdef MARTII
 		} else if (msg==(neutrino_msg_t)g_settings.key_volumedown)
-#else
-		} else if (msg==CRCInput::RC_minus)
-#endif
 		{
 			keyMinusPressed();
 		}
@@ -532,11 +438,16 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 		}
 		else if ( (msg==CRCInput::RC_home) || (msg==CRCInput::RC_timeout) )
 		{
-			if ( ( strcmp(value, oldval) != 0) &&
-			     (ShowLocalizedMessage(name, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
+			// trim
+			int len = valueString->length();
+			while (len > 0 && valueString->at(len - 1) == ' ')
+				len--;
+			valueString->erase(len);
+			if ( (*valueString != oldval) &&
+			     (ShowMsgUTF(name.c_str(), g_Locale->getText(LOCALE_MESSAGEBOX_DISCARD), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
 				continue;
 
-			strncpy(value, oldval, size);
+			*valueString = oldval;
 			loop=false;
 			res = menu_return::RETURN_EXIT_REPAINT;
 		}
@@ -571,28 +482,16 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 		delete[] pixbuf;//Mismatching allocation and deallocation: pixbuf
 	}
 
-	for(int count=size-1;count>=0;count--)
-	{
-		if((value[count]==' ') || (value[count]==0))
-		{
-			value[count]=0;
-		}
-		else
-			break;
-	}
-	value[size]=0;
-
-	if ( (valueString != NULL) && (msg == CRCInput::RC_ok) )
-        {
-                *valueString = value;
-        }
+	// trim
+	int len = valueString->length();
+	while (len > 0 && valueString->at(len - 1) == ' ')
+		len--;
+	valueString->erase(len);
 
         if ( (observ) && (msg==CRCInput::RC_ok) )
         {
-                observ->changeNotify(name, value);
+                observ->changeNotify(loc, (void *)valueString->c_str());
         }
-	delete[] dispval;
-	delete[] oldval;
 	return res;
 }
 
@@ -621,7 +520,7 @@ void CStringInput::paint(bool sms)
 		icol_o = icol_w + (offset/2);
 	}
 
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2)+ icol_o, y+ hheight, width- offset- icol_o, head ? head : g_Locale->getText(name), COL_MENUHEAD, 0, true); // UTF-8
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+ (offset/2)+ icol_o, y+ hheight, width- offset- icol_o, name, COL_MENUHEAD, 0, true); // UTF-8
 
 	int tmp_y = y+ hheight+ offset+ input_h+ offset;
 	if ((hint_1 != NONEXISTANT_LOCALE) || (hint_2 != NONEXISTANT_LOCALE))
@@ -656,8 +555,10 @@ void CStringInput::paint(bool sms)
 
 void CStringInput::paintChar(int pos)
 {
-	if(pos<(int)strlen(value))
-		paintChar(pos, value[pos]);
+	if(pos < (int) valueString->length())
+		paintChar(pos, valueString->at(pos));
+	else
+		paintChar(pos, ' ');
 }
 
 void CStringInput::paintChar(int pos, const char c)
@@ -689,24 +590,23 @@ void CStringInput::paintChar(int pos, const char c)
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(ch_x, ypos+ input_h, ch_w, ch, color);
 }
 
+void CStringInput::setMinMax(const int min_value, const int max_value)
+{
+	lower_bound = min_value - 1;
+	upper_bound = max_value + 1;
+}
+
 CStringInputSMS::CStringInputSMS(const neutrino_locale_t Name, std::string* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
 		: CStringInput(Name, Value, Size, Hint_1, Hint_2, Valid_Chars, Observ, Icon)
 {
 	initSMS(Valid_Chars);
 }
 
-CStringInputSMS::CStringInputSMS(const neutrino_locale_t Name, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
+CStringInputSMS::CStringInputSMS(const std::string Name, std::string* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
    		: CStringInput(Name, Value, Size, Hint_1, Hint_2, Valid_Chars, Observ, Icon)
 {
 	initSMS(Valid_Chars);
 }
-#ifdef MARTII
-CStringInputSMS::CStringInputSMS(char *Head, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
-   		: CStringInput(Head, Value, Size, Hint_1, Hint_2, Valid_Chars, Observ, Icon)
-{
-	initSMS(Valid_Chars);
-}
-#endif
 
 void CStringInputSMS::initSMS(const char * const Valid_Chars)
 {
@@ -769,13 +669,13 @@ void CStringInputSMS::NormalKeyPressed(const neutrino_msg_t key)
 		}
 		else
 			keyCounter = (keyCounter + 1) % arraySizes[numericvalue];
-		value[selected] = Chars[numericvalue][keyCounter];
+		valueString->replace(selected, 1, 1, Chars[numericvalue][keyCounter]);
 		last_digit = numericvalue;
 		paintChar(selected);
 	}
 	else
 	{
-		value[selected] = (char)CRCInput::getUnicodeValue(key);
+		valueString->replace(selected, 1, 1, (char)CRCInput::getUnicodeValue(key));
 		keyRedPressed();   /* to lower, paintChar */
 		keyRightPressed(); /* last_digit = -1, move to next position */
 	}
@@ -789,10 +689,15 @@ void CStringInputSMS::keyBackspacePressed(void)
 
 void CStringInputSMS::keyRedPressed()		// switch between lower & uppercase
 {
-	if (((value[selected] | 32) >= 'a') && ((value[selected] | 32) <= 'z'))
-	value[selected] ^= 32;
+	char o = valueString->at(selected);
+	char n = o;
+	if (((o | 32) >= 'a') && ((o | 32) <= 'z'))
+		n ^= 32;
 
-	paintChar(selected);
+	if (o != n) {
+		o = n;
+		paintChar(selected);
+	}
 }
 
 void CStringInputSMS::keyYellowPressed()		// clear all
@@ -822,7 +727,7 @@ void CStringInputSMS::keyDownPressed()
 
 	selected = size - 1;
 
-	while (value[selected] == ' ')
+	while (valueString->at(selected) == ' ')
 	{
 		selected--;
 		if (selected < 0)
@@ -855,7 +760,7 @@ void CStringInputSMS::paint(bool /*unused*/)
 
 void CPINInput::paintChar(int pos)
 {
-	CStringInput::paintChar(pos, (value[pos] == ' ') ? ' ' : '*');
+	CStringInput::paintChar(pos, (valueString->at(pos) == ' ') ? ' ' : '*');
 }
 
 int CPINInput::exec( CMenuTarget* parent, const std::string & )
@@ -868,8 +773,8 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 	if (parent)
 		parent->hide();
 
-	for(int count=strlen(value)-1;count<size-1;count++)
-		strcat(value, " ");
+	if ((int) valueString->length() < size)
+		valueString->append(size - valueString->length(), ' ');
 
 	paint();
 	frameBuffer->blit();
@@ -928,20 +833,14 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 
 	hide();
 
-	for(int count=size-1;count>=0;count--)
-	{
-		if((value[count]==' ') || (value[count]==0))
-		{
-			value[count]=0;
-		}
-		else
-			break;
-	}
-	value[size]=0;
+	int len = valueString->length();
+	while (len > 0 && valueString->at(len - 1) == ' ')
+		len--;
+	valueString->erase(len);
 
 	if ( (observ) && (msg==CRCInput::RC_ok) )
 	{
-		observ->changeNotify(name, value);
+		observ->changeNotify(loc, (void *)valueString->c_str());
 	}
 
 	return res;
@@ -950,9 +849,9 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 void CEnquiryInput::paintChar(int pos)
 {
 	if (blind)
-		CStringInput::paintChar(pos, (value[pos] == ' ') ? ' ' : '*');
+		CStringInput::paintChar(pos, (valueString->at(pos) == ' ') ? ' ' : '*');
 	else
-			CStringInput::paintChar(pos, value[pos]);
+			CStringInput::paintChar(pos, valueString->at(pos));
 }
 
 int CPLPINInput::handleOthers(neutrino_msg_t msg, neutrino_msg_data_t data)
@@ -980,7 +879,7 @@ const char * CPLPINInput::getHint1(void)
 	}
 	else
 	{
-		sprintf(hint, g_Locale->getText(LOCALE_PARENTALLOCK_LOCKEDPROGRAM), fsk);
+		snprintf(hint, sizeof(hint), g_Locale->getText(LOCALE_PARENTALLOCK_LOCKEDPROGRAM), fsk);
 		return hint;
 	}
 }

@@ -42,6 +42,7 @@
 #include <driver/screen_max.h>
 #include <driver/volume.h>
 #include <zapit/zapit.h>
+#include <system/helpers.h>
 
 extern CRemoteControl		* g_RemoteControl; /* neutrino.cpp */
 extern CAudioSetupNotifier	* audioSetupNotifier;
@@ -109,10 +110,8 @@ int CAudioSelectMenuHandler::doMenu ()
 	// -- setup menue due to Audio PIDs
 	for( uint i=0; i < p_count; i++ )
 	{
-		char apid[5];
-		sprintf(apid, "%d", i);
-		CMenuForwarderNonLocalized *fw = new CMenuForwarderNonLocalized(g_RemoteControl->current_PIDs.APIDs[i].desc, 
-				true, NULL, this, apid, CRCInput::convertDigitToKey(i + 1));
+		CMenuForwarder*fw = new CMenuForwarder(std::string(g_RemoteControl->current_PIDs.APIDs[i].desc), 
+				true, NULL, this, to_string(i), CRCInput::convertDigitToKey(i + 1));
 		fw->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
 		AudioSelector.addItem(fw, (i == g_RemoteControl->current_PIDs.PIDs.selected_apid));
 		shortcut_num = i+1;
@@ -164,8 +163,8 @@ int CAudioSelectMenuHandler::doMenu ()
 				snprintf(spid,sizeof(spid), "DVB:%d", sd->pId);
 				char item[64];
 				snprintf(item,sizeof(item), "DVB: %s (pid %x)", sd->ISO639_language_code.c_str(), sd->pId);
-				AudioSelector.addItem(new CMenuForwarderNonLocalized(item /*sd->ISO639_language_code.c_str()*/,
-							sd->pId != dvbsub_getpid(), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+				AudioSelector.addItem(new CMenuForwarder(std::string(item) /*sd->ISO639_language_code.c_str()*/,
+							sd->pId != dvbsub_getpid(), NULL, &SubtitleChanger, std::string(spid), CRCInput::convertDigitToKey(++shortcut_num)));
 			}
 			if (s->thisSubType == CZapitAbsSub::TTX)
 			{
@@ -181,9 +180,9 @@ int CAudioSelectMenuHandler::doMenu ()
 				int pid = sd->pId;
 				snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", sd->pId, page, sd->ISO639_language_code.c_str());
 				char item[64];
-				snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", sd->ISO639_language_code.c_str(), sd->pId, page);
-				AudioSelector.addItem(new CMenuForwarderNonLocalized(item /*sd->ISO639_language_code.c_str()*/,
-							!tuxtx_subtitle_running(&pid, &page, NULL), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+				snprintf(item,sizeof(item), "TTX: %s (pid %d page %03X)", sd->ISO639_language_code.c_str(), sd->pId, page);
+				AudioSelector.addItem(new CMenuForwarder(std::string(item) /*sd->ISO639_language_code.c_str()*/,
+							!tuxtx_subtitle_running(&pid, &page, NULL), NULL, &SubtitleChanger, std::string(spid), CRCInput::convertDigitToKey(++shortcut_num)));
 			}
 		}
 #ifdef MARTII
