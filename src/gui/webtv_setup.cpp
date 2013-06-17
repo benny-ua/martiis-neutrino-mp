@@ -72,7 +72,7 @@ void CWebTVSetup::Show()
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);
 	int shortcut = 1;
-	m->addItem(new CMenuForwarder(LOCALE_WEBTV_XML, true, g_settings.webtv_xml.c_str(), this, "select_xml",
+	m->addItem(new CMenuForwarder(LOCALE_WEBTV_XML, true, g_settings.webtv_xml, this, "select_xml",
 				CRCInput::convertDigitToKey(shortcut++)));
 	m->exec(NULL, "");
 	m->hide();

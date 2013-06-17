@@ -53,18 +53,18 @@ public:
 		keyvalue = k;
 	};
 
-	virtual std::string getString(void)
+	virtual const char * getString(void)
 		{
 			the_text  = g_Locale->getText(LOCALE_KEYCHOOSERMENU_CURRENTKEY);
 			the_text += ": ";
 			the_text += CRCInput::getKeyName(keyvalue);
-			return the_text;
+			return the_text.c_str();
 		};
 };
 
 
 
-CKeyChooser::CKeyChooser(int * const Key, const neutrino_locale_t title, const char * const Icon) : CMenuWidget(title, Icon)
+CKeyChooser::CKeyChooser(int * const Key, const neutrino_locale_t title, const std::string & Icon) : CMenuWidget(title, Icon)
 {
 	frameBuffer = CFrameBuffer::getInstance();
 	key = Key;

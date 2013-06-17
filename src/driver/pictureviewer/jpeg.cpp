@@ -81,7 +81,7 @@ int fh_jpeg_load_via_server(const char *filename,unsigned char *buffer,int x,int
 		perror("socket:");
 		return(FH_ERROR_FILE);
 	}
-	port=atoi(g_settings.picviewer_decode_server_port.c_str());
+	port=atoi(g_settings.picviewer_decode_server_port);
 	printf("Server %s [%d]\n",g_settings.picviewer_decode_server_ip.c_str(),port);
 	
 	memset((char *) &si_other, 0, sizeof(si_other));

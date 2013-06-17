@@ -77,8 +77,8 @@ int CUpdateSettings::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	if(actionKey == "update_dir") {
 		const char *action_str = "update";
-		if(chooserDir(g_settings.update_dir, true, action_str))
-			printf("[neutrino] new %s dir %s\n", action_str, g_settings.update_dir.c_str());
+		if(chooserDir(g_settings.update_dir, true, action_str, sizeof(g_settings.update_dir)-1))
+			printf("[neutrino] new %s dir %s\n", action_str, g_settings.update_dir);
 
 		return res;
 	}
@@ -91,7 +91,7 @@ int CUpdateSettings::exec(CMenuTarget* parent, const std::string &actionKey)
 		fileFilter.addFilter("urls");
 		fileBrowser.Filter = &fileFilter;
 		if (fileBrowser.exec("/var/etc") == true)
-			g_settings.softupdate_url_file = fileBrowser.getSelectedFile()->Name;
+			strncpy(g_settings.softupdate_url_file, fileBrowser.getSelectedFile()->Name.c_str(), 30);
 
 		return res;
 	}
@@ -109,9 +109,9 @@ int CUpdateSettings::initMenu()
 	CMenuWidget w_upsettings(LOCALE_SERVICEMENU_UPDATE, NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE_SETTINGS);
 	w_upsettings.addIntroItems(LOCALE_FLASHUPDATE_SETTINGS);
 
-	CMenuForwarder * fw_url 	= new CMenuForwarder(LOCALE_FLASHUPDATE_URL_FILE, true, g_settings.softupdate_url_file.c_str(), this, "select_url_config_file", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	CMenuForwarder * fw_url 	= new CMenuForwarder(LOCALE_FLASHUPDATE_URL_FILE, true, g_settings.softupdate_url_file, this, "select_url_config_file", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 //	fw_url->setHint("", LOCALE_MENU_HINT_XXX);
-	CMenuForwarder * fw_update_dir 	= new CMenuForwarder(LOCALE_EXTRA_UPDATE_DIR, true, g_settings.update_dir.c_str(), this, "update_dir", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * fw_update_dir 	= new CMenuForwarder(LOCALE_EXTRA_UPDATE_DIR, true, g_settings.update_dir , this, "update_dir", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 //	fw_update_dir->setHint("", LOCALE_MENU_HINT_XXX);
 
 	CMenuOptionChooser *apply_settings = new CMenuOptionChooser(LOCALE_FLASHUPDATE_MENU_APPLY_SETTINGS, &g_settings.apply_settings, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, OnOffNotifier);

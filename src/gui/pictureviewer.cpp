@@ -273,7 +273,7 @@ int CPictureViewerGui::show()
 			timeout=50; // egal
 		else
 		{
-			timeout=(m_time+atoi(g_settings.picviewer_slide_time.c_str())-(long)time(NULL))*10;
+			timeout=(m_time+atoi(g_settings.picviewer_slide_time)-(long)time(NULL))*10;
 			if (timeout <0 )
 				timeout=1;
 		}
@@ -769,12 +769,10 @@ void CPictureViewerGui::paint()
 	frameBuffer->paintBoxRel(x+ width- 15,ypos, 15, sb,  COL_MENUCONTENT_PLUS_1);
 
 	int sbc= ((playlist.size()- 1)/ listmaxshow)+ 1;
-
 	if (sbc < 1)
 		sbc = 1;
 
 	float sbh= (sb- 4)/ sbc;
-
 	int sbs= (selected/listmaxshow);
 	if (sbc < 1)
 		sbc = 1;

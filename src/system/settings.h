@@ -81,10 +81,10 @@ struct SNeutrinoSettings
 	//misc
 	int shutdown_real;
 	int shutdown_real_rcdelay;
-	std::string shutdown_count;
-	std::string shutdown_min;
-	std::string record_safety_time_before;
-	std::string record_safety_time_after;
+	char shutdown_count[4];
+	char shutdown_min[4];
+	char record_safety_time_before[3];
+	char record_safety_time_after[3];
 	int zapto_pre_time;
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
@@ -124,7 +124,7 @@ struct SNeutrinoSettings
 #endif
 	int auto_lang;
 	int auto_subs;
-	std::string audio_PCMOffset;
+	char audio_PCMOffset[3];
 	int srs_enable;
 	int srs_algo;
 	int srs_ref_volume;
@@ -304,7 +304,7 @@ struct SNeutrinoSettings
 	};
 
  	int  personalize[P_SETTINGS_MAX];
-	std::string personalize_pincode;
+	char personalize_pincode[5];
 
 	//timing
 	enum TIMING_SETTINGS 
@@ -323,7 +323,7 @@ struct SNeutrinoSettings
 	};
 
 	int  timing       [TIMING_SETTING_COUNT]   ;
-	std::string timing_string[TIMING_SETTING_COUNT];
+	char timing_string[TIMING_SETTING_COUNT][4];
 
 	//widget settings
 	int widget_fade;
@@ -560,8 +560,8 @@ struct SNeutrinoSettings
 	int channellist_new_zap_mode;
 	int channellist_sort_mode;
 	int channellist_numeric_adjust;
-	std::string repeat_blocker;
-	std::string repeat_genericblocker;
+	char repeat_blocker[4];
+	char repeat_genericblocker[4];
 #ifdef MARTII
 	int accept_other_remotes;
 #endif
@@ -609,7 +609,7 @@ struct SNeutrinoSettings
 	int parentallock_prompt;
 	int parentallock_lockage;
 	int parentallock_defaultlocked;
-	std::string parentallock_pincode;
+	char parentallock_pincode[5];
 
 
 	// Font sizes
@@ -663,7 +663,7 @@ struct SNeutrinoSettings
 	};
 	int lcd_setting[LCD_SETTING_COUNT];
 	int lcd_info_line;
-	std::string lcd_setting_dim_time;
+	char lcd_setting_dim_time[4];
 	int lcd_setting_dim_brightness;
 	int led_tv_mode;
 	int led_standby_mode;
@@ -675,15 +675,15 @@ struct SNeutrinoSettings
 #define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a))
 
 	// pictureviewer
-	std::string picviewer_slide_time;
-	std::string picviewer_decode_server_ip;
-	std::string picviewer_decode_server_port;
+	char   picviewer_slide_time[3];
 	int    picviewer_scaling;
+	std::string picviewer_decode_server_ip;
+	char    picviewer_decode_server_port[6];
 
 	//audioplayer
 	int   audioplayer_display;
 	int   audioplayer_follow;
-	std::string  audioplayer_screensaver;
+	char  audioplayer_screensaver[3];
 	int   audioplayer_highprio;
 	int   audioplayer_select_title_by_name;
 	int   audioplayer_repeat_on;
@@ -876,20 +876,20 @@ class CScanSettings
 		int		fast_op;
 		int		cable_nid;
 
-		std::string	satName;
+		char		satName[50];
 		int		sat_TP_fec;
 		int		sat_TP_pol;
-		std::string	sat_TP_freq;
-		std::string	sat_TP_rate;
+		char		sat_TP_freq[10];
+		char		sat_TP_rate[9];
 
-		std::string	cableName;
+		char		cableName[50];
 		int		cable_TP_mod;
 		int		cable_TP_fec;
-		std::string	cable_TP_freq;
-		std::string	cable_TP_rate;
+		char		cable_TP_freq[10];
+		char		cable_TP_rate[9];
 
-		std::string	terrName;
-		std::string	terr_TP_freq;
+		char		terrName[50];
+		char		terr_TP_freq[10];
 		CScanSettings();
 
 		//void useDefaults(const delivery_system_t _delivery_system);

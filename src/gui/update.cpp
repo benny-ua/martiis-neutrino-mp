@@ -159,10 +159,10 @@ bool CFlashUpdate::selectHttpImage(void)
 	SelectionWidget.addItem(GenericMenuBack);
 	SelectionWidget.addItem(new CMenuSeparator(CMenuSeparator::LINE));
 
-	SelectionWidget.addItem(new CMenuForwarder(current, false));
-	std::ifstream urlFile(g_settings.softupdate_url_file.c_str());
+	SelectionWidget.addItem(new CMenuForwarderNonLocalized(current, false));
+	std::ifstream urlFile(g_settings.softupdate_url_file);
 #ifdef DEBUG
-	printf("[update] file %s\n", g_settings.softupdate_url_file.c_str());
+	printf("[update] file %s\n", g_settings.softupdate_url_file);
 #endif
 
 	unsigned int i = 0;
@@ -191,7 +191,7 @@ bool CFlashUpdate::selectHttpImage(void)
 		}
 		//updates_lists.push_back(url.substr(startpos, endpos - startpos));
 
-		SelectionWidget.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, updates_lists.rbegin()->c_str(), LOCALE_FLASHUPDATE_SELECTIMAGE));
+		SelectionWidget.addItem(new CNonLocalizedMenuSeparator(updates_lists.rbegin()->c_str(), LOCALE_FLASHUPDATE_SELECTIMAGE));
 		if (httpTool.downloadFile(url, gTmpPath LIST_OF_UPDATES_LOCAL_FILENAME, 20))
 		{
 			std::ifstream in(gTmpPath LIST_OF_UPDATES_LOCAL_FILENAME);
@@ -227,10 +227,10 @@ bool CFlashUpdate::selectHttpImage(void)
 
 				descriptions.push_back(description); /* workaround since CMenuForwarder does not store the Option String itself */
 
-				//SelectionWidget.addItem(new CMenuForwarder(names[i].c_str(), enabled, descriptions[i].c_str(), new CUpdateMenuTarget(i, &selected)));
+				//SelectionWidget.addItem(new CMenuForwarderNonLocalized(names[i].c_str(), enabled, descriptions[i].c_str(), new CUpdateMenuTarget(i, &selected)));
 				CUpdateMenuTarget * up = new CUpdateMenuTarget(i, &selected);
 				update_t_list.push_back(up);
-				SelectionWidget.addItem(new CMenuForwarder(descriptions[i].c_str(), enabled, names[i].c_str(), up));
+				SelectionWidget.addItem(new CMenuForwarderNonLocalized(descriptions[i].c_str(), enabled, names[i].c_str(), up));
 				i++;
 			}
 		}
@@ -271,17 +271,18 @@ bool CFlashUpdate::getUpdateImage(const std::string & version)
 {
 	CHTTPTool httpTool;
 	char const * fname;
+	char dest_name[100];
 	httpTool.setStatusViewer(this);
 
 	fname = rindex(filename.c_str(), '/');
 	if(fname != NULL) fname++;
 	else return false;
 
-	std::string dest_name = g_settings.update_dir + "/" + fname;
+	sprintf(dest_name, "%s/%s", g_settings.update_dir, fname);
 	showStatusMessageUTF(std::string(g_Locale->getText(LOCALE_FLASHUPDATE_GETUPDATEFILE)) + ' ' + version); // UTF-8
 
-	printf("get update (url): %s - %s\n", filename.c_str(), dest_name.c_str());
-	return httpTool.downloadFile(filename, dest_name.c_str(), 40 );
+	printf("get update (url): %s - %s\n", filename.c_str(), dest_name);
+	return httpTool.downloadFile(filename, dest_name, 40 );
 	//return httpTool.downloadFile(filename, gTmpPath UPDATE_LOCAL_FILENAME, 40 );
 }
 
@@ -347,7 +348,7 @@ printf("[update] mode is %d\n", softupdate_mode);
 		UpdatesBrowser.Filter = &UpdatesFilter;
 
 		CFile * CFileSelected = NULL;
-		if (!(UpdatesBrowser.exec(g_settings.update_dir.c_str()))) {
+		if (!(UpdatesBrowser.exec(g_settings.update_dir))) {
 			menu_ret = UpdatesBrowser.getMenuRet();
 			return false;
 		}
@@ -423,13 +424,15 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 	if(softupdate_mode==1) //internet-update
 	{
 		char const * fname = rindex(filename.c_str(), '/') +1;
+		char fullname[255];
 
 		if(!getUpdateImage(newVersion)) {
 			hide();
 			ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, g_Locale->getText(LOCALE_FLASHUPDATE_GETUPDATEFILEERROR)); // UTF-8
 			return menu_return::RETURN_REPAINT;
 		}
-		filename = g_settings.update_dir + "/" + fname;
+		sprintf(fullname, "%s/%s", g_settings.update_dir, fname);
+		filename = std::string(fullname);
 	}
 
 	showGlobalStatus(40);
@@ -460,13 +463,20 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 #endif
 	if(fileType < '3') {
 		//flash it...
+<<<<<<< HEAD
+
 #if ENABLE_EXTUPDATE
+		if (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_APPLY_SETTINGS), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) == CMessageBox::mbrYes)
+			if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE))
+				return menu_return::RETURN_REPAINT;
+#endif
+=======
 		if (g_settings.apply_settings) {
 			if (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_APPLY_SETTINGS), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) == CMessageBox::mbrYes)
 				if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE))
 					return menu_return::RETURN_REPAINT;
 		}
-#endif
+>>>>>>> origin/next-cc
 
 #ifdef DEBUG1
 		if(1) {
@@ -505,10 +515,10 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		const char install_sh[] = "/bin/install.sh";
 #ifdef DEBUG1
-		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir.c_str(), filename.c_str() );
+		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir, filename.c_str() );
 #else
-		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir.c_str(), filename.c_str() );
-		my_system(3, install_sh, g_settings.update_dir.c_str(), filename.c_str());
+		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir, filename.c_str() );
+		my_system(3, install_sh, g_settings.update_dir, filename.c_str());
 #endif
 		showGlobalStatus(100);
 		ShowHintUTF(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_READY)); // UTF-8
@@ -635,11 +645,11 @@ void CFlashExpert::showMTDSelector(const std::string & actionkey)
 			enabled = false;
 #endif
 		sprintf(sActionKey, "%s%d", actionkey.c_str(), lx);
-		mtdselector->addItem(new CMenuForwarder(mtdInfo->getMTDName(lx).c_str(), enabled, NULL, this, sActionKey, CRCInput::convertDigitToKey(shortcut++)));
+		mtdselector->addItem(new CMenuForwarderNonLocalized(mtdInfo->getMTDName(lx).c_str(), enabled, NULL, this, sActionKey, CRCInput::convertDigitToKey(shortcut++)));
 	}
 #if ENABLE_EXTUPDATE
 	if (actionkey == "writemtd")
-		mtdselector->addItem(new CMenuForwarder("systemFS with settings", true, NULL, this, "writemtd10", CRCInput::convertDigitToKey(shortcut++)));
+		mtdselector->addItem(new CMenuForwarderNonLocalized("systemFS with settings", true, NULL, this, "writemtd10", CRCInput::convertDigitToKey(shortcut++)));
 #endif
 	mtdselector->exec(NULL,"");
 	delete mtdselector;
@@ -651,7 +661,7 @@ void CFlashExpert::showFileSelector(const std::string & actionkey)
 	fileselector->addIntroItems(LOCALE_FLASHUPDATE_FILESELECTOR, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
 
 	struct dirent **namelist;
-	int n = scandir(g_settings.update_dir.c_str(), &namelist, 0, alphasort);
+	int n = scandir(g_settings.update_dir, &namelist, 0, alphasort);
 	if (n < 0)
 	{
 		perror("no flashimages available");
@@ -665,7 +675,7 @@ void CFlashExpert::showFileSelector(const std::string & actionkey)
 			int pos = filen.find(".img");
 			if(pos!=-1)
 			{
-				fileselector->addItem(new CMenuForwarder(filen.c_str(), true, NULL, this, (actionkey + filen).c_str()));
+				fileselector->addItem(new CMenuForwarderNonLocalized(filen.c_str(), true, NULL, this, (actionkey + filen).c_str()));
 				//TODO  make sure filen is UTF-8 encoded
 			}
 			free(namelist[count]);

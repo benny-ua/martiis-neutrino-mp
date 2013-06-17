@@ -55,7 +55,7 @@ class CHDDMenuHandler : public CMenuTarget
 #ifdef MARTII
 		struct hdd_s {
 			std::string devname;
-			CMenuForwarder *cmf;
+			CMenuForwarderNonLocalized *cmf;
 			bool mounted;
 		};
 		std::vector<hdd_s> hdd_list;

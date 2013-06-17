@@ -56,7 +56,7 @@ class CFollowScreenings : public CMenuTarget
 		bool safety;
 		std::string recDir;
 		CTimerd::RecordingInfo eventInfo;
-		std::vector<CMenuForwarder*> forwarders;
+		std::vector<CMenuForwarderNonLocalized *> forwarders;
 		void updateRightIcon(int i, time_t start, unsigned int duration);
 	public:
                 CFollowScreenings(const t_channel_id Channel_id, time_t Starttime, time_t Stoptime, const std::string &Title, uint64_t EpgID=0,

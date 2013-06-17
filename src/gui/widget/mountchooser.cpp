@@ -41,7 +41,7 @@
 #include <driver/fontrenderer.h>
 #include <driver/rcinput.h>
 
-CMountChooser::CMountChooser(const neutrino_locale_t Name, const char * const Icon, int * chosenIndex, char * chosenLocalDir, const char * const selectedLocalDir, const int mwidth)
+CMountChooser::CMountChooser(const neutrino_locale_t Name, const std::string & Icon, int * chosenIndex, char * chosenLocalDir, const char * const selectedLocalDir, const int mwidth)
 	: CMenuWidget(Name, Icon, mwidth), index(chosenIndex), localDir(chosenLocalDir)
 {
 	char indexStr[2];
@@ -53,7 +53,7 @@ CMountChooser::CMountChooser(const neutrino_locale_t Name, const char * const Ic
 		{
 			std::string s = g_settings.network_nfs[i].local_dir + " (" + g_settings.network_nfs[i].ip + ":" + g_settings.network_nfs[i].dir + ")";
 			snprintf(indexStr,sizeof(indexStr),"%d",i);
-			addItem(new CMenuForwarder(s,true,NULL,this,std::string("MID:") + std::string(indexStr)),
+			addItem(new CMenuForwarderNonLocalized(s.c_str(),true,NULL,this,(std::string("MID:") + std::string(indexStr)).c_str()),
 				selectedLocalDir == g_settings.network_nfs[i].local_dir);
 		}
 	}	

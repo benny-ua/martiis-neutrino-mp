@@ -297,7 +297,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		ShowPinSetup(pMenu, pinChangeWidget);
 
 	//personalized menues
-	CMenuForwarder *p_mn[widget_count];
+	CMenuForwarderNonLocalized *p_mn[widget_count];
 	for (int i = 0; i<(widget_count); i++)
 	{
 		ostringstream i_str;
@@ -305,7 +305,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		string s(i_str.str());
 		string action_key = s;
 		string mn_name = v_widget[i]->getName();
-		p_mn[i] = new CMenuForwarder(mn_name, true, NULL, this, action_key.c_str(), CRCInput::convertDigitToKey(i+1));
+		p_mn[i] = new CMenuForwarderNonLocalized(mn_name.c_str(), true, NULL, this, action_key.c_str(), CRCInput::convertDigitToKey(i+1));
 		pMenu->addItem(p_mn[i]);
 	}
 	
@@ -402,9 +402,9 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 //init pin setup dialog
 void CPersonalizeGui::ShowPinSetup(CMenuWidget* p_widget, CPINChangeWidget *pin_widget)
 {
-	pin_widget = new CPINChangeWidget(LOCALE_PERSONALIZE_PINCODE, &g_settings.personalize_pincode, 4, LOCALE_PERSONALIZE_PINHINT);
+	pin_widget = new CPINChangeWidget(LOCALE_PERSONALIZE_PINCODE, g_settings.personalize_pincode, 4, LOCALE_PERSONALIZE_PINHINT);
 	
-	CMenuForwarder * fw_pin_setup = new CMenuForwarder(LOCALE_PERSONALIZE_PINCODE, true, g_settings.personalize_pincode.c_str(), pin_widget, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * fw_pin_setup = new CMenuForwarder(LOCALE_PERSONALIZE_PINCODE, true, g_settings.personalize_pincode, pin_widget, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
  	pin_setup_notifier = new CPinSetupNotifier(fw_pin_setup);
  	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_PIN_IN_USE, &g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, pin_setup_notifier));
 	
@@ -450,7 +450,7 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 		if (v_umenu[i]->getUsedItemsCount() > 0)
 			g_settings.usermenu_text[i] = g_settings.usermenu_text[i].empty() ? g_Locale->getText(usermenu[i].def_name) : g_settings.usermenu_text[i].c_str();
 		
-		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i].c_str(), v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
+		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
 	}
 #if 0		
 	//feature keys
@@ -527,7 +527,7 @@ void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget)
 	{
 		if( g_PluginList->getType(i)== CPlugins::P_TYPE_TOOL && !g_PluginList->isHidden(i)) //don't show hidden plugins an games
 		{
-			p_widget->addItem(new CMenuForwarder(g_PluginList->getName(i), true, g_PluginList->getDescription(i), NULL, NULL, getShortcut(d_key)));
+			p_widget->addItem(new CMenuForwarderNonLocalized(g_PluginList->getName(i), true, g_PluginList->getDescription(i), NULL, NULL, getShortcut(d_key)));
 			d_key++;
 		}
 	}
@@ -731,7 +731,7 @@ void CPersonalizeGui::addWidget(CMenuWidget *widget)
 void CPersonalizeGui::addWidgets(const struct mn_widget_t * const widget, const int& widgetCount)
 {
 	for (int i = 0; i<(widgetCount); i++)
-		addWidget(new CMenuWidget(widget[i].locale_text, widget[i].icon.c_str(), widget[i].width));
+		addWidget(new CMenuWidget(widget[i].locale_text, widget[i].icon, widget[i].width));
 }
 
 //returns a menu widget from v_widget

@@ -333,7 +333,7 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 						p.upgradable = false;
 						pkg_map[p.name] = p;
 						std::map<string, struct pkg>::iterator it = pkg_map.find(p.name); // don't use variables defined in local scope only
-						it->second.forwarder = new CMenuForwarder(it->second.description, true, NULL , this, it->second.name);
+						it->second.forwarder = new CMenuForwarderNonLocalized(it->second.description.c_str(), true, NULL , this, it->second.name.c_str());
 						break;
 					}
 					case OM_LIST_INSTALLED: //installed pkgs
