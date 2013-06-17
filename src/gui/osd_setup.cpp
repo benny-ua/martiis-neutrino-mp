@@ -270,13 +270,11 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		chooserDir(g_settings.logo_hdd_dir, false, action_str);
 		return menu_return::RETURN_REPAINT;
 	}
-#ifdef MARTII
 	else if(actionKey=="logo_dir_2") {
 		const char *action_str = "logo_2";
 		chooserDir(g_settings.logo_hdd_dir_2, false, action_str);
 		return menu_return::RETURN_REPAINT;
 	}
-#endif
 	else if(actionKey=="screenshot_dir") {
 		const char *action_str = "screenshot";
 		chooserDir(g_settings.screenshot_dir, true, action_str);
@@ -498,7 +496,7 @@ int COsdSetup::showOsdSetup()
 	mf->setHint("", LOCALE_MENU_HINT_VOLUME);
 	osd_menu->addItem(mf);
 
-#if defined(SCREENSHOT) || defined(MARTII)
+#if defined(SCREENSHOT)
 	//screenshot
 	CMenuWidget osd_menu_screenshot(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_SCREENSHOT);
 	showOsdScreenShotSetup(&osd_menu_screenshot);
@@ -683,7 +681,7 @@ protected:
 
 
 public:
-	CMenuNumberInput(const neutrino_locale_t Text, const int32_t DefaultValue, CChangeObserver * const Observer, CConfigFile * const Configfile) : CMenuForwarder(Text, true, NULL, this)
+	CMenuNumberInput(const neutrino_locale_t Text, const int32_t DefaultValue, CChangeObserver * const Observer, CConfigFile * const Configfile) : CMenuForwarder(Text, true, "", this)
 		{
 			observer     = Observer;
 			configfile   = Configfile;
@@ -713,20 +711,12 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 	fontSettings->addIntroItems(LOCALE_FONTMENU_HEAD);
 
 	// select gui font file
-#ifdef MARTII
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, g_settings.font_file.c_str(), this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-#else
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, NULL, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-#endif
 	mf->setHint("", LOCALE_MENU_HINT_FONT_GUI);
 	fontSettings->addItem(mf);
 
 	// select teletext font file
-#ifdef MARTII
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, g_settings.ttx_font_file.c_str(), this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
-#else
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, NULL, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
-#endif
 	mf->setHint("", LOCALE_MENU_HINT_FONT_TTX);
 	fontSettings->addItem(mf);
 
@@ -891,9 +881,8 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_COLORED_EVENT);
 	menu_infobar->addItem(mc);
 
-#ifdef MARTII
 	menu_infobar->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_INFOBAR_AUTOSHOW_IF_CN, &g_settings.infobar_cn, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-#endif
+
 	// radiotext
 	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_RADIOTEXT, &g_settings.radiotext_enable, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_RADIOTEXT);
