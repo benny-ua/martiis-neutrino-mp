@@ -421,7 +421,7 @@ int request_file(URL *url)
 
 				if(meta_int)
 				{
-					if (slot < 0){
+					if (slot < 0) {
 						dprintf(stderr, "error: meta_int != 0 && slot < 0");
 					} else {
 						/* hook in the filter function if there is meta */

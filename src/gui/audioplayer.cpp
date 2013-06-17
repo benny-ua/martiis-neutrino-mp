@@ -1676,7 +1676,7 @@ void CAudioPlayerGui::paintHead()
 #endif
 
 	header.paint(CC_SAVE_SCREEN_NO);
-	m_frameBuffer->blit();
+	//m_frameBuffer->blit(); // ??
 }
 
 //------------------------------------------------------------------------

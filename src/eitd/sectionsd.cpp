@@ -530,7 +530,6 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 				unlockMessaging();
 			}
 			// else fprintf(stderr, ">");
-			unlockEvents();
 			if(*lastEvent!=NULL)
 				deleteEvent((*lastEvent)->uniqueKey());
 		}
