@@ -83,7 +83,7 @@ void CEpgScan::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 				if (scanned.find(chan->getTransponderId()) == scanned.end())
 					scanmap.insert(eit_scanmap_pair_t(chan->getTransponderId(), chan->getChannelID()));
 			}
-			INFO("EVT_ZAP_COMPLETE, scan map size: %d\n", scanmap.size());
+			INFO("EVT_ZAP_COMPLETE, scan map size: %d\n", (int)scanmap.size());
 		}
 	}
 	else if (msg == NeutrinoMessages::EVT_EIT_COMPLETE) {
@@ -93,7 +93,7 @@ void CEpgScan::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 			scanned.insert(newchan->getTransponderId());
 			scanmap.erase(newchan->getTransponderId());
 		}
-		INFO("EIT read complete [" PRINTF_CHANNEL_ID_TYPE "], scan map size: %d", chid, scanmap.size());
+		INFO("EIT read complete [" PRINTF_CHANNEL_ID_TYPE "], scan map size: %d", chid, (int)scanmap.size());
 
 		if (scanmap.empty())
 			return;
