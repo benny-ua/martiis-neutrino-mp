@@ -460,6 +460,7 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 #endif
 	if(fileType < '3') {
 		//flash it...
+#if ENABLE_EXTUPDATE
 		if (g_settings.apply_settings) {
 			if (ShowMsg(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_APPLY_SETTINGS), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) == CMessageBox::mbrYes)
 				if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE)) {
@@ -467,6 +468,7 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 					return menu_return::RETURN_REPAINT;
 				}
 		}
+#endif
 
 #ifdef DEBUG1
 		if(1) {
@@ -505,10 +507,10 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		const char install_sh[] = "/bin/install.sh";
 #ifdef DEBUG1
-		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir, filename.c_str() );
+		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir.c_str(), filename.c_str() );
 #else
-		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir, filename.c_str() );
-		my_system(3, install_sh, g_settings.update_dir, filename.c_str());
+		printf("[update] calling %s %s %s\n",install_sh, g_settings.update_dir.c_str(), filename.c_str() );
+		my_system(3, install_sh, g_settings.update_dir.c_str(), filename.c_str());
 #endif
 		showGlobalStatus(100);
 		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_READY)); // UTF-8
@@ -651,7 +653,7 @@ void CFlashExpert::showFileSelector(const std::string & actionkey)
 	fileselector->addIntroItems(LOCALE_FLASHUPDATE_FILESELECTOR, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
 
 	struct dirent **namelist;
-	int n = scandir(g_settings.update_dir, &namelist, 0, alphasort);
+	int n = scandir(g_settings.update_dir.c_str(), &namelist, 0, alphasort);
 	if (n < 0)
 	{
 		perror("no flashimages available");
