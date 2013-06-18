@@ -37,6 +37,7 @@
 
 #include <gui/widget/messagebox.h>
 
+#include <system/helpers.h>
 #include <global.h>
 #include <neutrino.h>
 
@@ -52,6 +53,13 @@ CExtendedInput::CExtendedInput(const neutrino_locale_t Name, char* Value, const 
 
 	observ = Observ;
 	Init();
+}
+
+std::string CExtendedInput::getValueString(void)
+{
+	if (value)
+		return std::string(value);
+	return "";
 }
 
 void CExtendedInput::Init(void)
@@ -244,7 +252,7 @@ int CExtendedInput::exec( CMenuTarget* parent, const std::string & )
 		else if ( (msg==CRCInput::RC_home) || (msg==CRCInput::RC_timeout) )
 		{
 			if(strcmp(value, oldval)!= 0){
-				int erg = ShowLocalizedMessage(name, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbNo | CMessageBox::mbYes | CMessageBox::mbCancel);
+				int erg = ShowMsg(name, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbNo | CMessageBox::mbYes | CMessageBox::mbCancel);
 				 if(erg==CMessageBox::mbrYes){
 					strcpy(value, oldval);
 					loop=false;
@@ -456,6 +464,11 @@ CIPInput::CIPInput(const neutrino_locale_t Name, std::string & Value, const neut
 	calculateDialog();
 }
 
+std::string CIPInput::getValueString(void)
+{
+	return *ip;
+}
+
 void CIPInput::onBeforeExec()
 {
 	if (ip->empty())
@@ -513,6 +526,12 @@ CDateInput::CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrin
 	addInputField( new CExtendedInput_Item_newLiner(30) );
 	calculateDialog();
 }
+
+std::string CDateInput::getValueString(void)
+{
+	return std::string();
+}
+
 CDateInput::~CDateInput()
 {
 	delete value;
@@ -597,6 +616,11 @@ Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeOb
 	calculateDialog();
 }
 
+std::string CMACInput::getValueString(void)
+{
+	return *mac;
+}
+
 void CMACInput::onBeforeExec()
 {
 	if (value[0] == 0) /* strcmp(value, "") == 0 */
@@ -669,6 +693,11 @@ CTimeInput::CTimeInput(const neutrino_locale_t Name, char* Value, const neutrino
 	calculateDialog();
 }
 
+std::string CTimeInput::getValueString()
+{
+	return std::string(value);
+}
+
 void CTimeInput::onBeforeExec()
 {
 #ifndef MARTII
@@ -711,6 +740,11 @@ CIntInput::CIntInput(const neutrino_locale_t Name, int& Value, const unsigned in
 	}
 	addInputField( new CExtendedInput_Item_newLiner(30) );
 	calculateDialog();
+}
+
+std::string CIntInput::getValueString(void)
+{
+	return to_string(*myValue);
 }
 
 void CIntInput::onBeforeExec()

@@ -40,27 +40,6 @@
 #include <global.h>
 #include <neutrino.h>
 
-#ifdef MARTII
-CMessageBox::CMessageBox(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, NULL, Text, Width, Icon)
-{
-	Init(Default, ShowButtons);
-}
-
-CMessageBox::CMessageBox(const neutrino_locale_t Caption, ContentLines& Lines, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, NULL, Lines, Width, Icon)
-{
-	Init(Default, ShowButtons);
-}
-
-CMessageBox::CMessageBox(const char* Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(NONEXISTANT_LOCALE, Caption, Text, Width, Icon)
-{
-	Init(Default, ShowButtons);
-}
-
-CMessageBox::CMessageBox(const char* Caption, ContentLines& Lines, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(NONEXISTANT_LOCALE, Caption, Lines, Width, Icon)
-{
-	Init(Default, ShowButtons);
-}
-#else
 CMessageBox::CMessageBox(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, Text, Width, Icon)
 {
 	Init(Default, ShowButtons);
@@ -70,7 +49,16 @@ CMessageBox::CMessageBox(const neutrino_locale_t Caption, ContentLines& Lines, c
 {
 	Init(Default, ShowButtons);
 }
-#endif
+
+CMessageBox::CMessageBox(const std::string &Caption, const char * const Text, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, Text, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
+
+CMessageBox::CMessageBox(const std::string &Caption, ContentLines& Lines, const int Width, const char * const Icon, const CMessageBox::result_ &Default, const uint32_t ShowButtons) : CHintBoxExt(Caption, Lines, Width, Icon)
+{
+	Init(Default, ShowButtons);
+}
 
 void CMessageBox::Init(const CMessageBox::result_ &Default, const uint32_t ShowButtons)
 {
@@ -128,11 +116,7 @@ void CMessageBox::Init(const CMessageBox::result_ &Default, const uint32_t ShowB
 			ButtonDistance = (m_width - b_width * ButtonCount) / (ButtonCount + 1);
 
 	/* this is ugly: re-init (CHintBoxExt) to recalculate the number of lines and pages */
-#ifdef MARTII
-	init(m_caption, m_Caption.c_str(), m_width, m_iconfile == "" ? NULL : m_iconfile.c_str());
-#else
-	init(m_caption, m_width, m_iconfile == "" ? NULL : m_iconfile.c_str());
-#endif
+	init(m_caption, m_captionString, m_width, m_iconfile == "" ? NULL : m_iconfile.c_str());
 	m_height += m_bbheight;
 }
 
@@ -303,7 +287,7 @@ int CMessageBox::exec(int timeout)
 	return res;
 }
 
-int ShowMsgUTF(const neutrino_locale_t Caption, const char * const Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+int ShowMsg(const neutrino_locale_t Caption, const char * const Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
    	CMessageBox* messageBox = new CMessageBox(Caption, Text, Width, Icon, Default, ShowButtons);
 	messageBox->returnDefaultValueOnTimeout(returnDefaultOnTimeout);
@@ -313,8 +297,8 @@ int ShowMsgUTF(const neutrino_locale_t Caption, const char * const Text, const C
 
 	return res;
 }
-#ifdef MARTII
-int ShowMsgUTF(const char *Caption, const char * const Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+
+int ShowMsg(const std::string &Caption, const char * const Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
    	CMessageBox* messageBox = new CMessageBox(Caption, Text, Width, Icon, Default, ShowButtons);
 	messageBox->returnDefaultValueOnTimeout(returnDefaultOnTimeout);
@@ -324,24 +308,33 @@ int ShowMsgUTF(const char *Caption, const char * const Text, const CMessageBox::
 
 	return res;
 }
-#endif
 
-int ShowLocalizedMessage(const neutrino_locale_t Caption, const neutrino_locale_t Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+int ShowMsg(const neutrino_locale_t Caption, const neutrino_locale_t Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
-	return ShowMsgUTF(Caption, g_Locale->getText(Text), Default, ShowButtons, Icon, Width, timeout,returnDefaultOnTimeout);
+	return ShowMsg(Caption, g_Locale->getText(Text), Default, ShowButtons, Icon, Width, timeout, returnDefaultOnTimeout);
 }
 
-int ShowMsgUTF(const neutrino_locale_t Caption, const std::string & Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+int ShowMsg(const std::string &Caption, const neutrino_locale_t Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
 {
-	return ShowMsgUTF(Caption, Text.c_str(), Default, ShowButtons, Icon, Width, timeout,returnDefaultOnTimeout);
+	return ShowMsg(Caption, g_Locale->getText(Text), Default, ShowButtons, Icon, Width, timeout, returnDefaultOnTimeout);
+}
+
+int ShowMsg(const neutrino_locale_t Caption, const std::string & Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+{
+	return ShowMsg(Caption, Text.c_str(), Default, ShowButtons, Icon, Width, timeout,returnDefaultOnTimeout);
+}
+
+int ShowMsg(const std::string &Caption, const std::string & Text, const CMessageBox::result_ &Default, const uint32_t ShowButtons, const char * const Icon, const int Width, const int timeout, bool returnDefaultOnTimeout)
+{
+	return ShowMsg(Caption, Text.c_str(), Default, ShowButtons, Icon, Width, timeout,returnDefaultOnTimeout);
 }
 
 void DisplayErrorMessage(const char * const ErrorMsg)
 {
-	ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, ErrorMsg, CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+	ShowMsg(LOCALE_MESSAGEBOX_ERROR, ErrorMsg, CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 }
 
 void DisplayInfoMessage(const char * const ErrorMsg)
 {
-	ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, ErrorMsg, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+	ShowMsg(LOCALE_MESSAGEBOX_INFO, ErrorMsg, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 }

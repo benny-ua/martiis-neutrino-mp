@@ -61,9 +61,7 @@ class CHintBoxExt
 	int                      m_fheight;
 	int                      m_theight;
 	neutrino_locale_t        m_caption;
-#ifdef MARTII
-	std::string              m_Caption;
-#endif
+	std::string              m_captionString;
 	char *                   m_message;
 	ContentLines             m_lines;
 	std::string              m_iconfile;
@@ -72,22 +70,14 @@ class CHintBoxExt
 	void refresh(bool toround = 1);
 
  public:
-#ifdef MARTII
-	CHintBoxExt(const neutrino_locale_t Caption, const char *_Caption, const char * const Text, const int Width, const char * const Icon);
-	CHintBoxExt(const neutrino_locale_t Caption, const char *_Caption, ContentLines& lines, const int Width = 450, const char * const Icon = NEUTRINO_ICON_INFO);
-#else
 	CHintBoxExt(const neutrino_locale_t Caption, const char * const Text, const int Width, const char * const Icon);
-
 	CHintBoxExt(const neutrino_locale_t Caption, ContentLines& lines, const int Width = 450, const char * const Icon = NEUTRINO_ICON_INFO);
-#endif
+	CHintBoxExt(const std::string &Caption, const char * const Text, const int Width, const char * const Icon);
+	CHintBoxExt(const std::string &Caption, ContentLines& lines, const int Width = 450, const char * const Icon = NEUTRINO_ICON_INFO);
 
 	~CHintBoxExt(void);
 	
-#ifdef MARTII
-	void init(const neutrino_locale_t Caption, const char *_Caption, const int Width, const char * const Icon);
-#else
-	void init(const neutrino_locale_t Caption, const int Width, const char * const Icon);
-#endif
+	void init(const neutrino_locale_t Caption, const std::string &CaptionString, const int Width, const char * const Icon);
 
 	bool has_scrollbar(void);
 	void scroll_up(void);

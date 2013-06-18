@@ -84,6 +84,8 @@ class CExtendedInput : public CMenuTarget
 		void calculateDialog();
 
 		void addInputField( CExtendedInput_Item* );
+
+		std::string getValueString(void);
 };
 
 
@@ -164,6 +166,7 @@ class CIPInput : public CExtendedInput
 
 	public:
 		CIPInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		std::string getValueString(void);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -181,6 +184,7 @@ class CDateInput : public CExtendedInput
 		CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 		~CDateInput();
 		char* getValue() {return value;}
+		std::string getValueString(void);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -196,6 +200,7 @@ class CMACInput : public CExtendedInput
 
 	public:
 		CMACInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		std::string getValueString(void);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -208,6 +213,7 @@ class CTimeInput : public CExtendedInput
 
 	public:
 		CTimeInput(const neutrino_locale_t Name, char* Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel=NULL);
+		std::string getValueString(void);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -234,6 +240,7 @@ class CIntInput : public CExtendedInput
 			return myValueStringOutput;
 		}
 		void updateValue() { onBeforeExec(); }
+		std::string getValueString(void);
 };
 
 #endif
