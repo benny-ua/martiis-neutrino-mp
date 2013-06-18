@@ -160,9 +160,9 @@ bool CFlashUpdate::selectHttpImage(void)
 	SelectionWidget.addItem(new CMenuSeparator(CMenuSeparator::LINE));
 
 	SelectionWidget.addItem(new CMenuForwarder(current, false));
-	std::ifstream urlFile(g_settings.softupdate_url_file);
+	std::ifstream urlFile(g_settings.softupdate_url_file.c_str());
 #ifdef DEBUG
-	printf("[update] file %s\n", g_settings.softupdate_url_file);
+	printf("[update] file %s\n", g_settings.softupdate_url_file.c_str());
 #endif
 
 	unsigned int i = 0;
@@ -191,7 +191,7 @@ bool CFlashUpdate::selectHttpImage(void)
 		}
 		//updates_lists.push_back(url.substr(startpos, endpos - startpos));
 
-		SelectionWidget.addItem(new CNonLocalizedMenuSeparator(updates_lists.rbegin()->c_str(), LOCALE_FLASHUPDATE_SELECTIMAGE));
+		SelectionWidget.addItem(new CMenuSeparator(CMenuSeparator::STRING | CMenuSeparator::LINE, updates_lists.rbegin()->c_str(), LOCALE_FLASHUPDATE_SELECTIMAGE));
 		if (httpTool.downloadFile(url, gTmpPath LIST_OF_UPDATES_LOCAL_FILENAME, 20))
 		{
 			std::ifstream in(gTmpPath LIST_OF_UPDATES_LOCAL_FILENAME);
@@ -271,18 +271,17 @@ bool CFlashUpdate::getUpdateImage(const std::string & version)
 {
 	CHTTPTool httpTool;
 	char const * fname;
-	char dest_name[100];
 	httpTool.setStatusViewer(this);
 
 	fname = rindex(filename.c_str(), '/');
 	if(fname != NULL) fname++;
 	else return false;
 
-	sprintf(dest_name, "%s/%s", g_settings.update_dir, fname);
+	std::string dest_name = g_settings.update_dir + "/" + fname;
 	showStatusMessageUTF(std::string(g_Locale->getText(LOCALE_FLASHUPDATE_GETUPDATEFILE)) + ' ' + version); // UTF-8
 
-	printf("get update (url): %s - %s\n", filename.c_str(), dest_name);
-	return httpTool.downloadFile(filename, dest_name, 40 );
+	printf("get update (url): %s - %s\n", filename.c_str(), dest_name.c_str());
+	return httpTool.downloadFile(filename, dest_name.c_str(), 40 );
 	//return httpTool.downloadFile(filename, gTmpPath UPDATE_LOCAL_FILENAME, 40 );
 }
 
@@ -348,7 +347,7 @@ printf("[update] mode is %d\n", softupdate_mode);
 		UpdatesBrowser.Filter = &UpdatesFilter;
 
 		CFile * CFileSelected = NULL;
-		if (!(UpdatesBrowser.exec(g_settings.update_dir))) {
+		if (!(UpdatesBrowser.exec(g_settings.update_dir.c_str()))) {
 			menu_ret = UpdatesBrowser.getMenuRet();
 			return false;
 		}
@@ -424,15 +423,13 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 	if(softupdate_mode==1) //internet-update
 	{
 		char const * fname = rindex(filename.c_str(), '/') +1;
-		char fullname[255];
 
 		if(!getUpdateImage(newVersion)) {
 			hide();
 			ShowHint(LOCALE_MESSAGEBOX_ERROR, g_Locale->getText(LOCALE_FLASHUPDATE_GETUPDATEFILEERROR)); // UTF-8
 			return menu_return::RETURN_REPAINT;
 		}
-		sprintf(fullname, "%s/%s", g_settings.update_dir, fname);
-		filename = std::string(fullname);
+		filename = g_settings.update_dir + "/" + fname;
 	}
 
 	showGlobalStatus(40);
@@ -463,20 +460,13 @@ int CFlashUpdate::exec(CMenuTarget* parent, const std::string &actionKey)
 #endif
 	if(fileType < '3') {
 		//flash it...
-<<<<<<< HEAD
-
-#if ENABLE_EXTUPDATE
-		if (ShowMsg(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_APPLY_SETTINGS), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) == CMessageBox::mbrYes)
-			if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE))
-				return menu_return::RETURN_REPAINT;
-#endif
-=======
 		if (g_settings.apply_settings) {
 			if (ShowMsg(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FLASHUPDATE_APPLY_SETTINGS), CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) == CMessageBox::mbrYes)
-				if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE))
+				if (!CExtUpdate::getInstance()->applySettings(filename, CExtUpdate::MODE_SOFTUPDATE)) {
+					hide();
 					return menu_return::RETURN_REPAINT;
+				}
 		}
->>>>>>> origin/next-cc
 
 #ifdef DEBUG1
 		if(1) {

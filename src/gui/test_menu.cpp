@@ -55,6 +55,7 @@
 #include <zapit/zapit.h>
 #include <zapit/scan.h>
 #include <zapit/femanager.h>
+#include <system/helpers.h>
 #include <gui/widget/messagebox.h>
 
 
@@ -305,9 +306,8 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		int fnum = atoi(actionKey.substr(5, 1));
 		printf("22kon: fe %d sat pos %d\n", fnum, test_pos[fnum]);
-		sprintf(scansettings.sat_TP_freq, "%d", 12000*1000);
-		strncpy(scansettings.satName,
-			CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]).c_str(), 50);
+		scansettings.sat_TP_freq = to_string(12000*1000);
+		scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
 		CScanTs scanTs(FE_QPSK);
 		scanTs.exec(NULL, "test");
 		return res;
@@ -316,9 +316,8 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		int fnum = atoi(actionKey.substr(6, 1));
 		printf("22koff: fe %d sat pos %d\n", fnum, test_pos[fnum]);
-		sprintf(scansettings.sat_TP_freq, "%d", 11000*1000);
-		strncpy(scansettings.satName,
-			CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]).c_str(), 50);
+		scansettings.sat_TP_freq = to_string(11000*1000);
+		scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
 		CScanTs scanTs(FE_QPSK);
 		scanTs.exec(NULL, "test");
 		return res;
@@ -331,10 +330,9 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		CFrontend *frontend = CFEManager::getInstance()->getFE(fnum);
 		switch (frontend->getInfo()->type) {
 			case FE_QPSK:
-				strncpy(scansettings.satName,
-						CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]).c_str(), 50);
-				sprintf(scansettings.sat_TP_freq, "%d", (fnum & 1) ? 12439000: 12538000);
-				sprintf(scansettings.sat_TP_rate, "%d", (fnum & 1) ? 2500*1000 : 41250*1000);
+				scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
+				scansettings.sat_TP_freq = to_string((fnum & 1) ? 12439000: 12538000);
+				scansettings.sat_TP_rate = to_string((fnum & 1) ? 2500*1000 : 41250*1000);
 				scansettings.sat_TP_fec = (fnum & 1) ? FEC_3_4 : FEC_1_2;
 				scansettings.sat_TP_pol = (fnum & 1) ? 0 : 1;
 				break;
@@ -347,9 +345,9 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 							fe->setMode(CFrontend::FE_MODE_UNUSED);
 					}
 					frontend->setMode(CFrontend::FE_MODE_INDEPENDENT);
-					strncpy(scansettings.cableName, "CST Berlin", 50);
-					sprintf(scansettings.cable_TP_freq, "%d", 474*1000);
-					sprintf(scansettings.cable_TP_rate, "%d", 6875*1000);
+					scansettings.cableName = "CST Berlin";
+					scansettings.cable_TP_freq = to_string(474*1000);
+					scansettings.cable_TP_rate = to_string(6875*1000);
 					scansettings.cable_TP_fec = 1;
 					scansettings.cable_TP_mod = 5;
 				}
@@ -646,7 +644,7 @@ int CTestMenu::showTestMenu()
 	
 	//hardware
 	CMenuWidget * w_hw = new CMenuWidget("Hardware Test", NEUTRINO_ICON_INFO, width, MN_WIDGET_ID_TESTMENU_HARDWARE);
-	w_test.addItem(new CMenuForwarder(w_hw->getName().c_str(), true, NULL, w_hw));
+	w_test.addItem(new CMenuForwarder(w_hw->getName(), true, NULL, w_hw));
 	showHWTests(w_hw);
 	
 	//buttons
@@ -654,7 +652,7 @@ int CTestMenu::showTestMenu()
 	
 	//components
 	CMenuWidget * w_cc = new CMenuWidget("OSD-Components Demo", NEUTRINO_ICON_INFO, width, MN_WIDGET_ID_TESTMENU_COMPONENTS);
-	w_test.addItem(new CMenuForwarder(w_cc->getName().c_str(), true, NULL, w_cc));
+	w_test.addItem(new CMenuForwarder(w_cc->getName(), true, NULL, w_cc));
 	showCCTests(w_cc);
 
 	//exit
