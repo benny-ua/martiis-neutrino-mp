@@ -22,6 +22,10 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdlib.h>
+#include <string>
+#include <sstream>
+
 int my_system(const char * cmd);
 int my_system(int argc, const char *arg, ...); /* argc is number of arguments including command */
 
@@ -60,5 +64,15 @@ class CFileHelpers
 		bool removeDir(const char *Dir);
 
 };
+
+template<class C> std::string to_string(C i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+int inline atoi(std::string &s) { return atoi(s.c_str()); }
+int inline atoi(const std::string &s) { return atoi(s.c_str()); }
 
 #endif
