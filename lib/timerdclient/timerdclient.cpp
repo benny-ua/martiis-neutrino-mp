@@ -448,8 +448,10 @@ void CTimerdClient::getRecordingSafety(int &pre, int &post)
 
 //-------------------------------------------------------------------------
 //void CTimerdClient::getWeekdaysFromStr(int *rep, const char* str)
-void CTimerdClient::getWeekdaysFromStr(CTimerd::CTimerEventRepeat *eventRepeat, const char* str)
+void CTimerdClient::getWeekdaysFromStr(CTimerd::CTimerEventRepeat *eventRepeat, std::string &str)
 {
+	if (str.length() < 7)
+		str.append(str.length() - 7, '-');
 	int rep = (int) *eventRepeat;
 	if(rep >= (int)CTimerd::TIMERREPEAT_WEEKDAYS)
 	{
@@ -468,21 +470,22 @@ void CTimerdClient::getWeekdaysFromStr(CTimerd::CTimerEventRepeat *eventRepeat, 
 	*eventRepeat = (CTimerd::CTimerEventRepeat) rep;
 }
 //-------------------------------------------------------------------------
-void CTimerdClient::setWeekdaysToStr(CTimerd::CTimerEventRepeat rep, char* str)
+void CTimerdClient::setWeekdaysToStr(CTimerd::CTimerEventRepeat rep, std::string &str)
 {
+	if (str.length() < 7)
+		str.append(str.length() - 7, '-');
 	if(rep >= CTimerd::TIMERREPEAT_WEEKDAYS)
 	{
 		for(int n=0;n<7;n++)
 		{
 			if(rep & (1 << (n+9)))
-				str[n]='X';
+				str.at(n)='X';
 			else
-				str[n]='-';
+				str.at(n)='-';
 		}
-		str[7]=0;
 	}
 	else
-		strcpy(str,"-------");
+		str = "-------";
 }
 //-------------------------------------------------------------------------
 void CTimerdClient::stopTimerEvent( int evId)

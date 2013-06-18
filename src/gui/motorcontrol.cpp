@@ -42,6 +42,7 @@
 #include <gui/widget/menue.h>
 #include <gui/widget/messagebox.h>
 #include <system/settings.h>
+#include <system/helpers.h>
 #include <driver/screen_max.h>
 
 #include <zapit/satconfig.h>
@@ -155,7 +156,8 @@ int CMotorControl::exec(CMenuTarget* parent, const std::string &)
 #endif
        	/* send satellite list to zapit */
 	sat.position = CServiceManager::getInstance()->GetSatellitePosition(scansettings.satName);
-	strncpy(sat.satName, scansettings.satName, 49);
+	sat.satName[sizeof(sat.satName) - 1] = 0;
+	strncpy(sat.satName, scansettings.satName.c_str(), sizeof(sat.satName) - 1);
 	satList.push_back(sat);
 
 	satellite_map_t & satmap = frontend->getSatellites();
@@ -379,7 +381,7 @@ int CMotorControl::exec(CMenuTarget* parent, const std::string &)
 									buf += " ";
 									buf += satname;
 									buf += " ?";
-									store = (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, buf,CMessageBox::mbrNo,CMessageBox::mbNo|CMessageBox::mbYes) == CMessageBox::mbrYes);
+									store = (ShowMsg(LOCALE_MESSAGEBOX_INFO, buf,CMessageBox::mbrNo,CMessageBox::mbNo|CMessageBox::mbYes) == CMessageBox::mbrYes);
 								}
 							}
 							if(store)

@@ -64,6 +64,7 @@
 #include <driver/screen_max.h>
 #include <driver/display.h>
 
+#include <system/helpers.h>
 #include <system/settings.h>
 
 #include <algorithm>
@@ -856,7 +857,7 @@ void CPictureViewerGui::endView()
 void CPictureViewerGui::deletePicFile(unsigned int index, bool mode)
 {
 	CVFD::getInstance()->showMenuText(0, playlist[index].Name.c_str());
-	if (ShowMsgUTF(LOCALE_FILEBROWSER_DELETE, playlist[index].Filename, CMessageBox::mbrNo, CMessageBox::mbYes|CMessageBox::mbNo)==CMessageBox::mbrYes)
+	if (ShowMsg(LOCALE_FILEBROWSER_DELETE, playlist[index].Filename, CMessageBox::mbrNo, CMessageBox::mbYes|CMessageBox::mbNo)==CMessageBox::mbrYes)
 	{
 		unlink(playlist[index].Filename.c_str());
 		printf("[ %s ]  delete file: %s\r\n",__FUNCTION__,playlist[index].Filename.c_str());

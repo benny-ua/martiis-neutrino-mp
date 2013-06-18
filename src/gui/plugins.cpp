@@ -233,11 +233,11 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 
 		if (cmd == "index")
 		{
-			plugin_data->index = atoi(parm.c_str());
+			plugin_data->index = atoi(parm);
 		}
 		else if (cmd == "pluginversion")
 		{
-			plugin_data->key = atoi(parm.c_str());
+			plugin_data->key = atoi(parm);
 		}
 		else if (cmd == "name")
 		{
@@ -253,7 +253,7 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 		}
 		else if (cmd == "type")
 		{
-			plugin_data->type = getPluginType(atoi(parm.c_str()));
+			plugin_data->type = getPluginType(atoi(parm));
 		}
 		else if (cmd == "needfb")
 		{

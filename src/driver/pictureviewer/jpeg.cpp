@@ -20,6 +20,7 @@
 	
 #include <setjmp.h>
 
+#include <system/helpers.h>
 #include <global.h>
 #include "pictureviewer.h"
 #include "picv_client_server.h"

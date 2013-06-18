@@ -33,6 +33,7 @@
 #include <OpenThreads/ScopedLock>
 #include "settings.h"
 #include "set_threadname.h"
+#include "helpers.h"
 #include <global.h>
 
 #include "ytparser.h"
@@ -373,7 +374,7 @@ bool cYTFeedParser::parseFeedXml(std::string &answer)
 						}
 					}
 					else if (name == "yt:duration") {
-						vinfo.duration = atoi(getXmlAttr(media, "seconds").c_str());
+						vinfo.duration = atoi(getXmlAttr(media, "seconds"));
 					}
 #if 0
 					else if (name == "media:player") {
@@ -463,7 +464,7 @@ bool cYTFeedParser::decodeVideoInfo(std::string &answer, cYTVideoInfo &vinfo)
 			cYTVideoUrl yurl;
 			yurl.url = smap["url"];
 			yurl.sig = smap["sig"];
-			int id = atoi(smap["itag"].c_str());
+			int id = atoi(smap["itag"]);
 			if (supportedFormat(id) && !yurl.url.empty() && !yurl.sig.empty()) {
 				yurl.quality = smap["quality"];
 				yurl.type = smap["type"];

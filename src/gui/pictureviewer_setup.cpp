@@ -105,8 +105,8 @@ int CPictureViewerSetup::showPictureViewerSetup()
 	mc->setHint("", LOCALE_MENU_HINT_PICTUREVIEWER_SCALING);
 	picviewsetup->addItem(mc);
 
-	CStringInput pic_timeout(LOCALE_PICTUREVIEWER_SLIDE_TIME, g_settings.picviewer_slide_time, 2, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "0123456789 ");
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_SLIDE_TIME, true, g_settings.picviewer_slide_time, &pic_timeout);
+	CStringInput pic_timeout(LOCALE_PICTUREVIEWER_SLIDE_TIME, &g_settings.picviewer_slide_time, 2, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "0123456789 ");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_SLIDE_TIME, true, NULL, &pic_timeout);
 	mf->setHint("", LOCALE_MENU_HINT_PICTUREVIEWER_SLIDE_TIME);
 	picviewsetup->addItem(mf);
 

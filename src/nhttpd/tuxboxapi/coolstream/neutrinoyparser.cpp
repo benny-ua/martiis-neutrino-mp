@@ -33,11 +33,10 @@
 #include <eitd/sectionsd.h>
 #include <cs_api.h>
 #include <system/configure_network.h>
-#ifdef MARTII
 #include <hardware_caps.h>
 #include <system/localize_bouquetnames.h>
+#include <system/helpers.h>
 #include <dirent.h>
-#endif
 
 extern CBouquetManager *g_bouquetManager;
 
@@ -223,7 +222,7 @@ std::string  CNeutrinoYParser::func_get_bouquets_as_dropdown(CyhookHandler *, st
 
 	ySplitString(para," ",nr_str, do_show_hidden);
 	if(nr_str != "")
-		nr = atoi(nr_str.c_str());
+		nr = atoi(nr_str);
 
 	int mode = NeutrinoAPI->Zapit->getMode();
 	for (int i = 0; i < (int) g_bouquetManager->Bouquets.size(); i++) {
@@ -307,7 +306,7 @@ std::string  CNeutrinoYParser::func_get_channels_as_dropdown(CyhookHandler *, st
 
 	ySplitString(para," ",abouquet, achannel_id);
 	if(abouquet != "")
-		bnumber = atoi(abouquet.c_str());
+		bnumber = atoi(abouquet);
 	if(bnumber > 0) {
 		bnumber--;
 		ZapitChannelList channels;
@@ -344,7 +343,7 @@ std::string CNeutrinoYParser::func_get_bouquets_with_epg(CyhookHandler *hh, std:
 
 	ySplitString(para," ",abnumber, tmp);
 	if(abnumber != "")
-		BouquetNr = atoi(abnumber.c_str());
+		BouquetNr = atoi(abnumber);
 	if (BouquetNr > 0) {
 		BouquetNr--;
 #if 0
@@ -548,7 +547,7 @@ std::string  CNeutrinoYParser::func_get_video_pids(CyhookHandler *, std::string 
 	pids.PIDs.vpid=0;
 
 	if(para != "")
-		apid_no = atoi(para.c_str());
+		apid_no = atoi(para);
 	NeutrinoAPI->Zapit->getPIDS(pids);
 
 	if( apid_no < (int)pids.APIDs.size())
@@ -919,7 +918,7 @@ std::string  CNeutrinoYParser::func_set_timer_form(CyhookHandler *hh, std::strin
 	{
 		// init timerid
 		if(stimerid != "")
-			timerId = (unsigned)atoi(stimerid.c_str());
+			timerId = (unsigned)atoi(stimerid);
 
 		NeutrinoAPI->Timerd->getTimer(timer, timerId);
 		std::string zType = NeutrinoAPI->timerEventType2Str(timer.eventType);
@@ -997,7 +996,7 @@ std::string  CNeutrinoYParser::func_set_timer_form(CyhookHandler *hh, std::strin
 		string_printf("<option value=\"%d\" %s>%s</option>\n",(int)CTimerd::TIMERREPEAT_WEEKDAYS, sel.c_str(), zRep.c_str());
 
 	// Weekdays
-	char weekdays[8];
+	std::string weekdays;
 	NeutrinoAPI->Timerd->setWeekdaysToStr(timer.eventRepeat, weekdays);
 	hh->ParamList["weekdays"]=	 weekdays;
 
@@ -1062,7 +1061,7 @@ std::string  CNeutrinoYParser::func_bouquet_editor_main(CyhookHandler *hh, std::
 		hh->ParamList["have_saved"]="true";
 
 	if (hh->ParamList["selected"] != "")
-		selected = atoi(hh->ParamList["selected"].c_str());
+		selected = atoi(hh->ParamList["selected"]);
 
 	int bouquetSize = (int) g_bouquetManager->Bouquets.size();
 	int mode = NeutrinoAPI->Zapit->getMode();
@@ -1114,7 +1113,7 @@ std::string  CNeutrinoYParser::func_set_bouquet_edit_form(CyhookHandler *hh, std
 {
 	if (!(hh->ParamList["selected"].empty()))
 	{
-		int selected = atoi(hh->ParamList["selected"].c_str()) - 1;
+		int selected = atoi(hh->ParamList["selected"]) - 1;
 		int mode = NeutrinoAPI->Zapit->getMode();
 		ZapitChannelList* channels = mode == CZapitClient::MODE_TV ? &(g_bouquetManager->Bouquets[selected]->tvChannels) : &(g_bouquetManager->Bouquets[selected]->radioChannels);
 		for(int j = 0; j < (int) channels->size(); j++) {

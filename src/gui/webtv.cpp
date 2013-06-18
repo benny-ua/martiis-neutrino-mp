@@ -67,7 +67,7 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 		int selected = m->getSelected() - menu_offset;
 		if (selected < 0)
 			return menu_return::RETURN_NONE;
-		ShowHintUTF(channels[selected].name.c_str(), channels[selected].url);
+		ShowHint(channels[selected].name.c_str(), channels[selected].url);
 		return res;
 	}
 
@@ -129,7 +129,7 @@ void CWebTV::Show()
 	menu_offset = m->getItemsCount();
 
 	for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++)
-		m->addItem(new CMenuForwarderNonLocalized(i->name.c_str(), true, NULL, this, i->url),
+		m->addItem(new CMenuForwarder(i->name.c_str(), true, NULL, this, i->url),
 			!strcmp(i->url, g_settings.streaming_server_url.c_str()));
 
 	m->exec(NULL, "");

@@ -32,6 +32,7 @@
 
 #include <timerdclient/timerdclient.h>
 
+#include <system/helpers.h>
 #include <global.h>
 
 #include <daemonc/remotecontrol.h>
@@ -53,7 +54,7 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 	is_running = true;
 
 	int    shutdown_min = 0;
-	char   value[16];
+	std::string   value;
 	CStringInput  *inbox;
 	bool   permanent = (actionKey == "permanent");
 
@@ -61,14 +62,16 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 		parent->hide();
 
 	if(permanent) {
-		strcpy(value,g_settings.shutdown_min);
+		value = g_settings.shutdown_min;
 	} else {
 		shutdown_min = g_Timerd->getSleepTimerRemaining();  // remaining shutdown time?
-		sprintf(value,"%03d", shutdown_min);
+		value = to_string(shutdown_min);
+		if (value.length() < 3)
+			value.insert(0, 3 - value.length(), '0');
 	}
 
 	if(permanent) {
-		inbox = new CStringInput(LOCALE_SLEEPTIMERBOX_TITLE2, value, 3, LOCALE_SLEEPTIMERBOX_HINT1, LOCALE_SLEEPTIMERBOX_HINT3, "0123456789 ");
+		inbox = new CStringInput(LOCALE_SLEEPTIMERBOX_TITLE2, &value, 3, LOCALE_SLEEPTIMERBOX_HINT1, LOCALE_SLEEPTIMERBOX_HINT3, "0123456789 ");
 	} else {
 		CSectionsdClient::CurrentNextInfo info_CurrentNext;
 		g_InfoViewer->getEPG(g_RemoteControl->current_channel_id, info_CurrentNext);
@@ -77,11 +80,13 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 			int current_epg_zeit_dauer_rest = (info_CurrentNext.current_zeit.dauer+150 - (jetzt - info_CurrentNext.current_zeit.startzeit ))/60 ;
 			if(shutdown_min == 0 && current_epg_zeit_dauer_rest > 0 && current_epg_zeit_dauer_rest < 1000)
 			{
-				sprintf(value,"%03d",current_epg_zeit_dauer_rest);
+				value = to_string(current_epg_zeit_dauer_rest);
+				if (value.length() < 3)
+					value.insert(0, 3 - value.length(), '0');
 			}
 		}
 
-		inbox = new CStringInput(LOCALE_SLEEPTIMERBOX_TITLE, value, 3, LOCALE_SLEEPTIMERBOX_HINT1, LOCALE_SLEEPTIMERBOX_HINT2, "0123456789 ");
+		inbox = new CStringInput(LOCALE_SLEEPTIMERBOX_TITLE, &value, 3, LOCALE_SLEEPTIMERBOX_HINT1, LOCALE_SLEEPTIMERBOX_HINT2, "0123456789 ");
 	}
 	int ret = inbox->exec (NULL, "");
 
@@ -96,8 +101,8 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	int new_val = atoi(value);
 	if(permanent) {
-		sprintf(g_settings.shutdown_min,"%03d", new_val);
-		printf("permanent sleeptimer min: %s\n", g_settings.shutdown_min);
+		g_settings.shutdown_min = to_string(new_val);
+		printf("permanent sleeptimer min: %s\n", g_settings.shutdown_min.c_str());
 	}
 	else if(shutdown_min != new_val) {
 		shutdown_min = new_val;

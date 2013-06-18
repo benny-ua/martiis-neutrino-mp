@@ -38,6 +38,7 @@
 
 #include <driver/screen_max.h>
 #include <driver/display.h>
+#include <system/helpers.h>
 #include <system/debug.h>
 
 #include <cs_api.h>
@@ -133,7 +134,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		text[12*len] = 0;
 
 		CVFD::getInstance()->ShowText(text);
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "VFD test, Press OK to return", CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, "VFD test, Press OK to return", CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		CVFD::getInstance()->Clear();
 		
 		return res;
@@ -173,7 +174,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 
 		close(fd);
 		
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		
 		return res;
 	}
@@ -185,17 +186,17 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		switch(ret)
 		{
 			case 0:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, "info.raw");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, "info.raw");
 				break;
 			case -1:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 ATR read failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 ATR read failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 			case -2:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 reset failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 reset failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 			default:
 			case -3:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 open failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 1 open failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 		}
 		
@@ -208,17 +209,17 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		switch(ret)
 		{
 			case 0:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, "info.raw");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack, "info.raw");
 				break;
 			case -1:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 ATR read failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 ATR read failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 			case -2:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 reset failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 reset failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 			default:
 			case -3:
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 open failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, "Smardcard 2 open failed", CMessageBox::mbrBack, CMessageBox::mbBack, "info");
 				break;
 		}
 		
@@ -242,7 +243,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		sprintf(buffer, "HDD: /dev/sda1 is %s", mounted ? "mounted" : "NOT mounted");
 		printf("%s\n", buffer);
 		
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, buffer, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, buffer, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		
 		return res;
 	}
@@ -263,7 +264,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		sprintf(buffer, "MMC: /dev/mmcblk0p1 is %s", mounted ? "mounted" : "NOT mounted");
 		printf("%s\n", buffer);
 		
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, buffer, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, buffer, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		
 		return res;
 	}
@@ -302,7 +303,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey.find("22kon") != std::string::npos)
 	{
-		int fnum = atoi(actionKey.substr(5, 1).c_str());
+		int fnum = atoi(actionKey.substr(5, 1));
 		printf("22kon: fe %d sat pos %d\n", fnum, test_pos[fnum]);
 		sprintf(scansettings.sat_TP_freq, "%d", 12000*1000);
 		strncpy(scansettings.satName,
@@ -313,7 +314,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey.find("22koff") != std::string::npos)
 	{
-		int fnum = atoi(actionKey.substr(6, 1).c_str());
+		int fnum = atoi(actionKey.substr(6, 1));
 		printf("22koff: fe %d sat pos %d\n", fnum, test_pos[fnum]);
 		sprintf(scansettings.sat_TP_freq, "%d", 11000*1000);
 		strncpy(scansettings.satName,
@@ -324,7 +325,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	else if (actionKey.find("scan") != std::string::npos)
 	{
-		int fnum = atoi(actionKey.substr(4, 1).c_str());
+		int fnum = atoi(actionKey.substr(4, 1));
 		printf("scan: fe %d sat pos %d\n", fnum, test_pos[fnum]);
 
 		CFrontend *frontend = CFEManager::getInstance()->getFE(fnum);
@@ -645,15 +646,15 @@ int CTestMenu::showTestMenu()
 	
 	//hardware
 	CMenuWidget * w_hw = new CMenuWidget("Hardware Test", NEUTRINO_ICON_INFO, width, MN_WIDGET_ID_TESTMENU_HARDWARE);
-	w_test.addItem(new CMenuForwarderNonLocalized(w_hw->getName().c_str(), true, NULL, w_hw));
+	w_test.addItem(new CMenuForwarder(w_hw->getName().c_str(), true, NULL, w_hw));
 	showHWTests(w_hw);
 	
 	//buttons
-	w_test.addItem(new CMenuForwarderNonLocalized("Buttons", true, NULL, this, "buttons"));
+	w_test.addItem(new CMenuForwarder("Buttons", true, NULL, this, "buttons"));
 	
 	//components
 	CMenuWidget * w_cc = new CMenuWidget("OSD-Components Demo", NEUTRINO_ICON_INFO, width, MN_WIDGET_ID_TESTMENU_COMPONENTS);
-	w_test.addItem(new CMenuForwarderNonLocalized(w_cc->getName().c_str(), true, NULL, w_cc));
+	w_test.addItem(new CMenuForwarder(w_cc->getName().c_str(), true, NULL, w_cc));
 	showCCTests(w_cc);
 
 	//exit
@@ -663,31 +664,31 @@ int CTestMenu::showTestMenu()
 void CTestMenu::showCCTests(CMenuWidget *widget)
 {
 	widget->addIntroItems();
-	widget->addItem(new CMenuForwarderNonLocalized("Running Clock", true, NULL, this, "running_clock"));
-	widget->addItem(new CMenuForwarderNonLocalized("Clock", true, NULL, this, "clock"));
-	widget->addItem(new CMenuForwarderNonLocalized("Button", true, NULL, this, "button"));
-	widget->addItem(new CMenuForwarderNonLocalized("Circle", true, NULL, this, "circle"));
-	widget->addItem(new CMenuForwarderNonLocalized("Square", true, NULL, this, "square"));
-	widget->addItem(new CMenuForwarderNonLocalized("Picture", true, NULL, this, "picture"));
-	widget->addItem(new CMenuForwarderNonLocalized("Form", true, NULL, this, "form"));
-	widget->addItem(new CMenuForwarderNonLocalized("Text", true, NULL, this, "text"));
-	widget->addItem(new CMenuForwarderNonLocalized("Header", true, NULL, this, "header"));
-	widget->addItem(new CMenuForwarderNonLocalized("Footer", true, NULL, this, "footer"));
-	widget->addItem(new CMenuForwarderNonLocalized("Icon-Form", true, NULL, this, "iconform"));
-	widget->addItem(new CMenuForwarderNonLocalized("Window", true, NULL, this, "window"));
+	widget->addItem(new CMenuForwarder("Running Clock", true, NULL, this, "running_clock"));
+	widget->addItem(new CMenuForwarder("Clock", true, NULL, this, "clock"));
+	widget->addItem(new CMenuForwarder("Button", true, NULL, this, "button"));
+	widget->addItem(new CMenuForwarder("Circle", true, NULL, this, "circle"));
+	widget->addItem(new CMenuForwarder("Square", true, NULL, this, "square"));
+	widget->addItem(new CMenuForwarder("Picture", true, NULL, this, "picture"));
+	widget->addItem(new CMenuForwarder("Form", true, NULL, this, "form"));
+	widget->addItem(new CMenuForwarder("Text", true, NULL, this, "text"));
+	widget->addItem(new CMenuForwarder("Header", true, NULL, this, "header"));
+	widget->addItem(new CMenuForwarder("Footer", true, NULL, this, "footer"));
+	widget->addItem(new CMenuForwarder("Icon-Form", true, NULL, this, "iconform"));
+	widget->addItem(new CMenuForwarder("Window", true, NULL, this, "window"));
 }
 
 void CTestMenu::showHWTests(CMenuWidget *widget)
 {
 	widget->addIntroItems();
-	widget->addItem(new CMenuForwarderNonLocalized("VFD", true, NULL, this, "vfd"));
-	widget->addItem(new CMenuForwarderNonLocalized("Network", true, NULL, this, "network"));
+	widget->addItem(new CMenuForwarder("VFD", true, NULL, this, "vfd"));
+	widget->addItem(new CMenuForwarder("Network", true, NULL, this, "network"));
 #if HAVE_COOL_HARDWARE
-	widget->addItem(new CMenuForwarderNonLocalized("Smartcard 1", true, NULL, this, "card0"));
-	widget->addItem(new CMenuForwarderNonLocalized("Smartcard 2", true, NULL, this, "card1"));
+	widget->addItem(new CMenuForwarder("Smartcard 1", true, NULL, this, "card0"));
+	widget->addItem(new CMenuForwarder("Smartcard 2", true, NULL, this, "card1"));
 #endif
-	widget->addItem(new CMenuForwarderNonLocalized("HDD", true, NULL, this, "hdd"));
-	widget->addItem(new CMenuForwarderNonLocalized("SD/MMC", true, NULL, this, "mmc"));
+	widget->addItem(new CMenuForwarder("HDD", true, NULL, this, "hdd"));
+	widget->addItem(new CMenuForwarder("SD/MMC", true, NULL, this, "mmc"));
 
 	for (unsigned i = 0; i < sizeof(test_pos)/sizeof(int); i++) {
 		CServiceManager::getInstance()->InitSatPosition(test_pos[i], NULL, true);
@@ -707,7 +708,7 @@ void CTestMenu::showHWTests(CMenuWidget *widget)
 		} else
 			continue;
 
-		widget->addItem(new CMenuForwarderNonLocalized(title, true, NULL, this, scan));
+		widget->addItem(new CMenuForwarder(title, true, NULL, this, scan));
 		if (frontend->getInfo()->type == FE_QPSK) {
 			frontend->setMode(CFrontend::FE_MODE_INDEPENDENT);
 
@@ -715,20 +716,20 @@ void CTestMenu::showHWTests(CMenuWidget *widget)
 			satmap[test_pos[i]].configured = 1;
 			frontend->setSatellites(satmap);
 			if (i == 0) {
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 1: 22 Khz ON", true, NULL, this, "22kon0"));
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 1: 22 Khz OFF", true, NULL, this, "22koff0"));
+				widget->addItem(new CMenuForwarder("Tuner 1: 22 Khz ON", true, NULL, this, "22kon0"));
+				widget->addItem(new CMenuForwarder("Tuner 1: 22 Khz OFF", true, NULL, this, "22koff0"));
 			}
 			if (i == 1) {
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 2: 22 Khz ON", true, NULL, this, "22kon1"));
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 2: 22 Khz OFF", true, NULL, this, "22koff1"));
+				widget->addItem(new CMenuForwarder("Tuner 2: 22 Khz ON", true, NULL, this, "22kon1"));
+				widget->addItem(new CMenuForwarder("Tuner 2: 22 Khz OFF", true, NULL, this, "22koff1"));
 			}
 			if (i == 2) {
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 3: 22 Khz ON", true, NULL, this, "22kon2"));
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 3: 22 Khz OFF", true, NULL, this, "22koff2"));
+				widget->addItem(new CMenuForwarder("Tuner 3: 22 Khz ON", true, NULL, this, "22kon2"));
+				widget->addItem(new CMenuForwarder("Tuner 3: 22 Khz OFF", true, NULL, this, "22koff2"));
 			}
 			if (i == 3) {
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 4: 22 Khz ON", true, NULL, this, "22kon3"));
-				widget->addItem(new CMenuForwarderNonLocalized("Tuner 4: 22 Khz OFF", true, NULL, this, "22koff3"));
+				widget->addItem(new CMenuForwarder("Tuner 4: 22 Khz ON", true, NULL, this, "22kon3"));
+				widget->addItem(new CMenuForwarder("Tuner 4: 22 Khz OFF", true, NULL, this, "22koff3"));
 			}
 		}
 	}

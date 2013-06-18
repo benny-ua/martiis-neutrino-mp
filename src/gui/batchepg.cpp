@@ -384,7 +384,7 @@ void CBatchEPG_Menu::Settings()
 	for (unsigned int i = 0; i < epgChannels.size(); i++) {
 		char actionKey[80];
 		snprintf(actionKey, sizeof(actionKey), "%llx", (long long unsigned) epgChannels[i].channel_id);
-		menu->addItem(new CMenuForwarderNonLocalized(epgChannels[i].name.c_str(),
+		menu->addItem(new CMenuForwarder(epgChannels[i].name.c_str(),
 			true, "", this, actionKey, CRCInput::convertDigitToKey (shortcut++)),
 			epgChannels[i].channel_id == live_channel_id);
 	}
@@ -403,7 +403,7 @@ void CBatchEPG_Menu::Settings()
 		"run", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
 	menu->exec (NULL, "");
 
-	if (Changed() && (ShowLocalizedMessage (LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS,
+	if (Changed() && (ShowMsg (LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS,
 						LOCALE_MESSAGEBOX_ACCEPT, CMessageBox::mbrYes,
 						CMessageBox::mbYes | CMessageBox::mbCancel)
 					  == CMessageBox::mbrCancel))

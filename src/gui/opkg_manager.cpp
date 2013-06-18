@@ -113,7 +113,7 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 			return menu_return::RETURN_NONE;
 		char loc[200];
 		snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), pkg_arr[selected]->name.c_str());
-		if (ShowMsgUTF(LOCALE_OPKG_TITLE, loc, CMessageBox::mbrCancel, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
+		if (ShowMsg(LOCALE_OPKG_TITLE, loc, CMessageBox::mbrCancel, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
 			if (parent)
 				parent->hide();
 			execCmd(pkg_types[OM_REMOVE] + pkg_arr[selected]->name, true, true);
@@ -333,7 +333,7 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 						p.upgradable = false;
 						pkg_map[p.name] = p;
 						std::map<string, struct pkg>::iterator it = pkg_map.find(p.name); // don't use variables defined in local scope only
-						it->second.forwarder = new CMenuForwarderNonLocalized(it->second.description.c_str(), true, NULL , this, it->second.name.c_str());
+						it->second.forwarder = new CMenuForwarder(it->second.description.c_str(), true, NULL , this, it->second.name.c_str());
 						break;
 					}
 					case OM_LIST_INSTALLED: //installed pkgs

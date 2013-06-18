@@ -21,9 +21,7 @@
 #include <cstdio>               /* perror... */
 #include <sys/wait.h>
 #include <sys/types.h>          /* u_char */
-#ifdef MARTII
 #include <sys/stat.h>
-#endif
 #include <string.h>
 #include <unistd.h>
 #include "configure_network.h"

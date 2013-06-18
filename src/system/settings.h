@@ -81,10 +81,10 @@ struct SNeutrinoSettings
 	//misc
 	int shutdown_real;
 	int shutdown_real_rcdelay;
-	char shutdown_count[4];
-	char shutdown_min[4];
-	char record_safety_time_before[3];
-	char record_safety_time_after[3];
+	std::string shutdown_count; // FIXME
+	std::string shutdown_min; // FIXME
+	std::string record_safety_time_before; // FIXME
+	std::string record_safety_time_after; // FIXME
 	int zapto_pre_time;
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
@@ -124,7 +124,7 @@ struct SNeutrinoSettings
 #endif
 	int auto_lang;
 	int auto_subs;
-	char audio_PCMOffset[3];
+	std::string audio_PCMOffset; //FIXME
 	int srs_enable;
 	int srs_algo;
 	int srs_ref_volume;
@@ -304,7 +304,7 @@ struct SNeutrinoSettings
 	};
 
  	int  personalize[P_SETTINGS_MAX];
-	char personalize_pincode[5];
+	std::string personalize_pincode;
 
 	//timing
 	enum TIMING_SETTINGS 
@@ -323,7 +323,7 @@ struct SNeutrinoSettings
 	};
 
 	int  timing       [TIMING_SETTING_COUNT]   ;
-	char timing_string[TIMING_SETTING_COUNT][4];
+	std::string timing_string[TIMING_SETTING_COUNT];
 
 	//widget settings
 	int widget_fade;
@@ -560,8 +560,8 @@ struct SNeutrinoSettings
 	int channellist_new_zap_mode;
 	int channellist_sort_mode;
 	int channellist_numeric_adjust;
-	char repeat_blocker[4];
-	char repeat_genericblocker[4];
+	std::string repeat_blocker; //FIXME
+	std::string repeat_genericblocker; //FIXME
 #ifdef MARTII
 	int accept_other_remotes;
 #endif
@@ -609,7 +609,7 @@ struct SNeutrinoSettings
 	int parentallock_prompt;
 	int parentallock_lockage;
 	int parentallock_defaultlocked;
-	char parentallock_pincode[5];
+	std::string parentallock_pincode;
 
 
 	// Font sizes
@@ -663,7 +663,7 @@ struct SNeutrinoSettings
 	};
 	int lcd_setting[LCD_SETTING_COUNT];
 	int lcd_info_line;
-	char lcd_setting_dim_time[4];
+	std::string lcd_setting_dim_time; //FIXME
 	int lcd_setting_dim_brightness;
 	int led_tv_mode;
 	int led_standby_mode;
@@ -675,15 +675,15 @@ struct SNeutrinoSettings
 #define FILESYSTEM_ENCODING_TO_UTF8_STRING(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a))
 
 	// pictureviewer
-	char   picviewer_slide_time[3];
+	std::string picviewer_slide_time; //FIXME
 	int    picviewer_scaling;
 	std::string picviewer_decode_server_ip;
-	char    picviewer_decode_server_port[6];
+	std::string picviewer_decode_server_port; //FIXME
 
 	//audioplayer
 	int   audioplayer_display;
 	int   audioplayer_follow;
-	char  audioplayer_screensaver[3];
+	std::string  audioplayer_screensaver; //FIXME
 	int   audioplayer_highprio;
 	int   audioplayer_select_title_by_name;
 	int   audioplayer_repeat_on;
@@ -876,20 +876,20 @@ class CScanSettings
 		int		fast_op;
 		int		cable_nid;
 
-		char		satName[50];
+		std::string	satName;
 		int		sat_TP_fec;
 		int		sat_TP_pol;
-		char		sat_TP_freq[10];
-		char		sat_TP_rate[9];
+		std::string	sat_TP_freq;
+		std::string	sat_TP_rate;
 
-		char		cableName[50];
+		std::string	cableName;
 		int		cable_TP_mod;
 		int		cable_TP_fec;
-		char		cable_TP_freq[10];
-		char		cable_TP_rate[9];
+		std::string	cable_TP_freq;
+		std::string	cable_TP_rate;
 
-		char		terrName[50];
-		char		terr_TP_freq[10];
+		std::string	terrName;
+		std::string	terr_TP_freq;
 		CScanSettings();
 
 		//void useDefaults(const delivery_system_t _delivery_system);

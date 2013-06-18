@@ -12,6 +12,7 @@
 
 #include "mod_weblog.h"
 #include <helper.h>
+#include <system/helpers.h>
 
 //=============================================================================
 // Initialization of static variables
@@ -337,7 +338,7 @@ void CmWebLog::AddLogEntry_ELF(CyhookHandler *hh)
 
 	std::string time_taken_request = hh->HookVarList["enlapsed_request"];
 	std::string time_taken_response = hh->HookVarList["enlapsed_response"];
-	long time_taken = atoi(time_taken_request.c_str()) + atoi(time_taken_response.c_str());
+	long time_taken = atoi(time_taken_request) + atoi(time_taken_response);
 
 	printf("%s %s %s \"%s\" %s %d %s %d %ld %s %s %d\n",
 		c_ip.c_str(),

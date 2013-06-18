@@ -1375,7 +1375,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 
 		char cnt[5];
 		sprintf(cnt, "%d", count);
-		CMenuForwarderNonLocalized * item = new CMenuForwarderNonLocalized(apidtitle.c_str(), enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
+		CMenuForwarder * item = new CMenuForwarder(apidtitle.c_str(), enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
 		APIDSelector.addItem(item, defpid);
 	}
 
@@ -1401,7 +1401,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", pid, page, lang);
 		char item[64];
 		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, pid, page);
-		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, strcmp(spid, currentttxsub.c_str()), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		APIDSelector.addItem(new CMenuForwarder(item, strcmp(spid, currentttxsub.c_str()), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
 		shortcut_num++;
 	}
 	for (unsigned int count = 0; count < numpidd; count++) {
@@ -1409,7 +1409,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		snprintf(spid,sizeof(spid), "DVB:%d", dpids[count]);
 		char item[64];
 		snprintf(item,sizeof(item), "DVB: %s (track %x)", dlanguage[count].c_str(), dpids[count]);
-		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, dpids[count] != currentdpid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		APIDSelector.addItem(new CMenuForwarder(item, dpids[count] != currentdpid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
 		shortcut_num++;
 	}
 	for (unsigned int count = 0; count < numpids; count++) {
@@ -1417,7 +1417,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		snprintf(spid,sizeof(spid), "SUB:%d", spids[count]);
 		char item[64];
 		snprintf(item,sizeof(item), "SUB: %s (track %x)", slanguage[count].c_str(), spids[count]);
-		APIDSelector.addItem(new CMenuForwarderNonLocalized(item, spids[count] != currentspid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
+		APIDSelector.addItem(new CMenuForwarder(item, spids[count] != currentspid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
 		shortcut_num++;
 	}
 	if (numpidd > 0)
@@ -1808,7 +1808,7 @@ void CMoviePlayerGui::selectChapter()
 	char cnt[5];
 	for (unsigned i = 0; i < positions.size(); i++) {
 		sprintf(cnt, "%d", i);
-		CMenuForwarderNonLocalized * item = new CMenuForwarderNonLocalized(titles[i].c_str(), true, NULL, selector, cnt, CRCInput::convertDigitToKey(i + 1));
+		CMenuForwarder * item = new CMenuForwarder(titles[i].c_str(), true, NULL, selector, cnt, CRCInput::convertDigitToKey(i + 1));
 		ChSelector.addItem(item, position > positions[i]);
 	}
 	ChSelector.exec(NULL, "");
@@ -1845,7 +1845,7 @@ void CMoviePlayerGui::selectSubtitle()
 			title = pidnumber;
 		}
 		sprintf(cnt, "%d", count);
-		CMenuForwarderNonLocalized * item = new CMenuForwarderNonLocalized(title.c_str(), enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
+		CMenuForwarder * item = new CMenuForwarder(title.c_str(), enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
 		item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
 		APIDSelector.addItem(item, defpid);
 	}

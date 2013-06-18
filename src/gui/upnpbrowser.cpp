@@ -70,6 +70,7 @@
 #include <gui/widget/stringinput.h>
 #include <gui/widget/stringinput_ext.h>
 
+#include <system/helpers.h>
 #include <system/settings.h>
 
 #include <video.h>
@@ -435,7 +436,7 @@ void CUpnpBrowserGui::selectDevice()
 	catch (std::runtime_error error)
 	{
 		delete scanBox;
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		return;
 	}
 #endif
@@ -446,7 +447,7 @@ void CUpnpBrowserGui::selectDevice()
 
 	if (m_devices.empty())
 	{
-		ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, LOCALE_UPNPBROWSER_NOSERVERS, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_UPNPBROWSER_NOSERVERS, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 		delete scanBox;
 		return;
 	}
@@ -508,7 +509,7 @@ void CUpnpBrowserGui::selectDevice()
 			catch (std::runtime_error error)
 			{
 				delete scanBox;
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 				return;
 			}
 #endif
@@ -518,7 +519,7 @@ void CUpnpBrowserGui::selectDevice()
 			scanBox->hide();
 			if (m_devices.empty())
 			{
-				ShowLocalizedMessage(LOCALE_MESSAGEBOX_INFO, LOCALE_UPNPBROWSER_NOSERVERS, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_UPNPBROWSER_NOSERVERS, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 				delete scanBox;
 				return;
 			}
@@ -588,7 +589,7 @@ void CUpnpBrowserGui::playnext(void)
 		}
 		catch (std::runtime_error error)
 		{
-			ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+			ShowMsg(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 			m_folderplay = false;
 			return;
 		}
@@ -600,7 +601,7 @@ void CUpnpBrowserGui::playnext(void)
 		{
 			if (i->first=="NumberReturned")
 			{
-				if (atoi(i->second.c_str()) != 1)
+				if (atoi(i->second) != 1)
 				{
 					m_folderplay = false;
 					return;
@@ -753,7 +754,7 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			}
 			catch (std::runtime_error error)
 			{
-				ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+				ShowMsg(LOCALE_MESSAGEBOX_INFO, error.what(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 				if (entries)
 					delete entries;
 				return endall;
@@ -766,12 +767,12 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			{
 				if (i->first=="NumberReturned")
 				{
-					returned=atoi(i->second.c_str());
+					returned=atoi(i->second);
 					nfound=true;
 				}
 				if (i->first=="TotalMatches")
 				{
-					dirnum=atoi(i->second.c_str());
+					dirnum=atoi(i->second);
 					tfound=true;
 				}
 				if (i->first=="Result")

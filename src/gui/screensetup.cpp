@@ -118,7 +118,7 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &action)
 	}
 	if (action == "ex" || action == "ti") {
 		if (action == "ex" && ((startX != x_coord[0] ) || ( endX != x_coord[1] ) || ( startY != y_coord[0] ) || ( endY != y_coord[1] ) ) &&
-			(ShowLocalizedMessage(LOCALE_VIDEOMENU_SCREENSETUP, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
+			(ShowMsg(LOCALE_VIDEOMENU_SCREENSETUP, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
 			return menu_return::RETURN_NONE;
 		loadBorder(channel_id);
 		return (action == "ex") ? menu_return::RETURN_EXIT : menu_return::RETURN_EXIT_ALL;
@@ -286,7 +286,7 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &)
 							( g_settings.screen_EndX != x_coord[1] ) ||
 							( g_settings.screen_StartY != y_coord[0] ) ||
 							( g_settings.screen_EndY != y_coord[1] ) ) &&
-						(ShowLocalizedMessage(LOCALE_VIDEOMENU_SCREENSETUP, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
+						(ShowMsg(LOCALE_VIDEOMENU_SCREENSETUP, LOCALE_MESSAGEBOX_DISCARD, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel))
 					break;
 
 			case CRCInput::RC_timeout:

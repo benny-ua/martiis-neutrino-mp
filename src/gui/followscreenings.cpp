@@ -89,7 +89,7 @@ int CFollowScreenings::exec(CMenuTarget* /*parent*/, const std::string & actionK
 							if (followlist.size() > 1)
 								forwarders[ix]->iconName_Info_right = "";
 							else
-								ShowLocalizedMessage(LOCALE_TIMER_EVENTREMOVED_TITLE, LOCALE_TIMER_EVENTREMOVED_MSG,
+								ShowMsg(LOCALE_TIMER_EVENTREMOVED_TITLE, LOCALE_TIMER_EVENTREMOVED_MSG,
 									CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 #else
 							forwarders[ix]->iconName_Info_right = "";
@@ -110,7 +110,7 @@ int CFollowScreenings::exec(CMenuTarget* /*parent*/, const std::string & actionK
 					if (followlist.size() > 1)
 						forwarders[ix]->iconName_Info_right = NEUTRINO_ICON_REC;
 					else
-						ShowLocalizedMessage(LOCALE_TIMER_EVENTRECORD_TITLE, LOCALE_TIMER_EVENTRECORD_MSG,
+						ShowMsg(LOCALE_TIMER_EVENTRECORD_TITLE, LOCALE_TIMER_EVENTRECORD_MSG,
 							CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 #else
 					forwarders[ix]->iconName_Info_right = NEUTRINO_ICON_REC;
@@ -172,7 +172,7 @@ void CFollowScreenings::show()
 			strftime(tmpstr, sizeof(tmpstr), ". %H:%M", tmStartZeit );
 			screening_date += tmpstr;
 			snprintf(actionstr, sizeof(actionstr), "%lu", e->startTime);
-			forwarders.push_back(new CMenuForwarderNonLocalized(screening_date.c_str(), true, NULL, this, actionstr, directKey, icon));
+			forwarders.push_back(new CMenuForwarder(screening_date.c_str(), true, NULL, this, actionstr, directKey, icon));
 			updateRightIcon(i, e->startTime, e->duration);
 			m.addItem(forwarders[i]);
 			directKey = CRCInput::convertDigitToKey(1 + i);

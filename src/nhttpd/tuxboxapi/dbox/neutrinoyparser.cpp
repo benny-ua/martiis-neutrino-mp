@@ -18,6 +18,7 @@
 #include "mod_yparser.h"
 // tuxbox
 #include <zapit/client/zapittools.h> //timer list
+#include <system/helpers.h>
 // nhttpd
 #include "neutrinoyparser.h"
 #include "neutrinoapi.h"
@@ -200,7 +201,7 @@ std::string  CNeutrinoYParser::func_get_bouquets_as_dropdown(CyhookHandler *, st
 
 	ySplitString(para," ",nr_str, do_show_hidden);
 	if(nr_str != "")
-		nr = atoi(nr_str.c_str());
+		nr = atoi(nr_str);
 	for (unsigned int i = 0; i < NeutrinoAPI->BouquetList.size();i++)
 	{
 		sel=(nr==(i+1)) ? "selected=\"selected\"" : "";
@@ -269,7 +270,7 @@ std::string  CNeutrinoYParser::func_get_channels_as_dropdown(CyhookHandler *, st
 
 	ySplitString(para," ",abouquet, achannel_id);
 	if(abouquet != "")
-		bnumber = atoi(abouquet.c_str());
+		bnumber = atoi(abouquet);
 	if(bnumber != 0) //Bouquet View
 	{
 		bouquet = NeutrinoAPI->GetBouquet(bnumber, mode);
@@ -300,7 +301,7 @@ std::string CNeutrinoYParser::func_get_bouquets_with_epg(CyhookHandler *hh, std:
 
 	ySplitString(para," ",abnumber, tmp);
 	if(abnumber != "")
-		BouquetNr = atoi(abnumber.c_str());
+		BouquetNr = atoi(abnumber);
 	if (BouquetNr > 0)
 		channellist = NeutrinoAPI->GetBouquet(BouquetNr, CZapitClient::MODE_CURRENT);
 	else
@@ -477,7 +478,7 @@ std::string  CNeutrinoYParser::func_get_video_pids(CyhookHandler *, std::string 
 	pids.PIDs.vpid=0;
 
 	if(para != "")
-		apid_no = atoi(para.c_str());
+		apid_no = atoi(para);
 	NeutrinoAPI->Zapit->getPIDS(pids);
 
 	if( apid_no < (int)pids.APIDs.size())
@@ -839,7 +840,7 @@ std::string  CNeutrinoYParser::func_set_timer_form(CyhookHandler *hh, std::strin
 	{
 		// init timerid
 		if(stimerid != "")
-			timerId = (unsigned)atoi(stimerid.c_str());
+			timerId = (unsigned)atoi(stimerid);
 
 		NeutrinoAPI->Timerd->getTimer(timer, timerId);
 		std::string zType = NeutrinoAPI->timerEventType2Str(timer.eventType);
@@ -984,7 +985,7 @@ std::string  CNeutrinoYParser::func_bouquet_editor_main(CyhookHandler *hh, std::
 		hh->ParamList["have_saved"]="true";
 
 	if (hh->ParamList["selected"] != "")
-		selected = atoi(hh->ParamList["selected"].c_str());
+		selected = atoi(hh->ParamList["selected"]);
 
 	// List of all bouquets
 	CZapitClient::BouquetList AllBouquetList;
@@ -1035,7 +1036,7 @@ std::string  CNeutrinoYParser::func_set_bouquet_edit_form(CyhookHandler *hh, std
 		CZapitClient::BouquetChannelList BChannelList;
 		CZapitClient::BouquetChannelList::iterator channels;
 
-		int selected = atoi(hh->ParamList["selected"].c_str()) - 1;
+		int selected = atoi(hh->ParamList["selected"]) - 1;
 
 		// List channels in bouquet
 		NeutrinoAPI->Zapit->getBouquetChannels(selected, BChannelList, CZapitClient::MODE_CURRENT, true); // UTF-8

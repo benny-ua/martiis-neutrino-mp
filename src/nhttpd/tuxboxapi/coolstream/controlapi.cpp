@@ -49,10 +49,9 @@
 // nhttpd
 #include "neutrinoapi.h"
 #include "controlapi.h"
-#ifdef MARTII
 #include <hardware_caps.h>
 #include <system/localize_bouquetnames.h>
-#endif
+#include <system/helpers.h>
 
 extern CPlugins *g_PluginList;//for relodplugins
 extern CBouquetManager *g_bouquetManager;
@@ -146,7 +145,7 @@ void CControlAPI::compatibility_Timer(CyhookHandler *hh)
 	{
 		if(hh->ParamList["action"] == "remove")
 		{
-			unsigned removeId = atoi(hh->ParamList["id"].c_str());
+			unsigned removeId = atoi(hh->ParamList["id"]);
 			NeutrinoAPI->Timerd->removeTimerEvent(removeId);
 		}
 		else if(hh->ParamList["action"] == "modify")
@@ -299,7 +298,7 @@ void CControlAPI::TimerCGI(CyhookHandler *hh)
 				doModifyTimer(hh);
 			else if (hh->ParamList["action"] == "remove")
 			{
-				unsigned removeId = atoi(hh->ParamList["id"].c_str());
+				unsigned removeId = atoi(hh->ParamList["id"]);
 				NeutrinoAPI->Timerd->removeTimerEvent(removeId);
 				hh->SendOk();
 			}
@@ -1109,7 +1108,7 @@ void CControlAPI::GetBouquetCGI(CyhookHandler *hh) {
 			int bsize = (int) g_bouquetManager->Bouquets.size();
 			if (hh->ParamList["bouquet"] != "") {
 				// list for given bouquet
-				BouquetNr = atoi(hh->ParamList["bouquet"].c_str());
+				BouquetNr = atoi(hh->ParamList["bouquet"]);
 				if (BouquetNr > 0)
 					BouquetNr--;
 				startBouquet = BouquetNr;
@@ -1324,7 +1323,7 @@ void CControlAPI::epgDetailList(CyhookHandler *hh) {
 	// max = maximal output items
 	int max = -1;
 	if (!(hh->ParamList["max"].empty()))
-		max = atoi(hh->ParamList["max"].c_str());
+		max = atoi(hh->ParamList["max"]);
 
 	// stoptime = maximal output items until starttime >= stoptime
 	long stoptime = -1;
@@ -1346,7 +1345,7 @@ void CControlAPI::epgDetailList(CyhookHandler *hh) {
 	if (hh->ParamList["bouquetnr"] == "all")
 		all_bouquets = true;
 	else if (!(hh->ParamList["bouquetnr"].empty())) {
-		bouquetnr = atoi(hh->ParamList["bouquetnr"].c_str());
+		bouquetnr = atoi(hh->ParamList["bouquetnr"]);
 		bouquetnr--;
 	}
 
@@ -1993,9 +1992,9 @@ void CControlAPI::SendTimersXML(CyhookHandler *hh)
 		hh->printf("\t\t\t\t<count>%s</count>\n",zRepCount.c_str());
 		hh->printf("\t\t\t\t<number>%d</number>\n",(int)timer->eventRepeat);
 		hh->printf("\t\t\t\t<text>%s</text>\n",zRep.c_str());
-		char weekdays[8]= {0};
+		std::string weekdays;
 		NeutrinoAPI->Timerd->setWeekdaysToStr(timer->eventRepeat, weekdays);
-		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n",weekdays);
+		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n",weekdays.c_str());
 		hh->WriteLn("\t\t\t</repeat>\n");
 
 		// channel infos
@@ -2237,11 +2236,11 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 	// if alarm given then in parameters im time_t format
 	if(hh->ParamList["alarm"] != "")
 	{
-		alarmTimeT = atoi(hh->ParamList["alarm"].c_str());
+		alarmTimeT = atoi(hh->ParamList["alarm"]);
 		if(hh->ParamList["stop"] != "")
-			stopTimeT = atoi(hh->ParamList["stop"].c_str());
+			stopTimeT = atoi(hh->ParamList["stop"]);
 		if(hh->ParamList["announce"] != "")
-			announceTimeT = atoi(hh->ParamList["announce"].c_str());
+			announceTimeT = atoi(hh->ParamList["announce"]);
 		else
 			announceTimeT = alarmTimeT;
 	}
@@ -2288,15 +2287,15 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 		time_t now = time(NULL);
 		struct tm *alarmTime=localtime(&now);
 		if(hh->ParamList["ad"] != "")
-			alarmTime->tm_mday = atoi(hh->ParamList["ad"].c_str());
+			alarmTime->tm_mday = atoi(hh->ParamList["ad"]);
 		if(hh->ParamList["amo"] != "")
-			alarmTime->tm_mon = atoi(hh->ParamList["amo"].c_str())-1;
+			alarmTime->tm_mon = atoi(hh->ParamList["amo"])-1;
 		if(hh->ParamList["ay"] != "")
-			alarmTime->tm_year = atoi(hh->ParamList["ay"].c_str())-1900;
+			alarmTime->tm_year = atoi(hh->ParamList["ay"])-1900;
 		if(hh->ParamList["ah"] != "")
-			alarmTime->tm_hour = atoi(hh->ParamList["ah"].c_str());
+			alarmTime->tm_hour = atoi(hh->ParamList["ah"]);
 		if(hh->ParamList["ami"] != "")
-			alarmTime->tm_min = atoi(hh->ParamList["ami"].c_str());
+			alarmTime->tm_min = atoi(hh->ParamList["ami"]);
 		alarmTime->tm_sec = 0;
 		correctTime(alarmTime);
 		alarmTimeT = mktime(alarmTime);
@@ -2305,15 +2304,15 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 		// stop time
 		struct tm *stopTime = alarmTime;
 		if(hh->ParamList["sd"] != "")
-			stopTime->tm_mday = atoi(hh->ParamList["sd"].c_str());
+			stopTime->tm_mday = atoi(hh->ParamList["sd"]);
 		if(hh->ParamList["smo"] != "")
-			stopTime->tm_mon = atoi(hh->ParamList["smo"].c_str())-1;
+			stopTime->tm_mon = atoi(hh->ParamList["smo"])-1;
 		if(hh->ParamList["sy"] != "")
-			stopTime->tm_year = atoi(hh->ParamList["sy"].c_str())-1900;
+			stopTime->tm_year = atoi(hh->ParamList["sy"])-1900;
 		if(hh->ParamList["sh"] != "")
-			stopTime->tm_hour = atoi(hh->ParamList["sh"].c_str());
+			stopTime->tm_hour = atoi(hh->ParamList["sh"]);
 		if(hh->ParamList["smi"] != "")
-			stopTime->tm_min = atoi(hh->ParamList["smi"].c_str());
+			stopTime->tm_min = atoi(hh->ParamList["smi"]);
 		stopTime->tm_sec = 0;
 		correctTime(stopTime);
 		stopTimeT = mktime(stopTime);
@@ -2324,22 +2323,22 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 
 	CTimerd::CTimerEventTypes type;
 	if(hh->ParamList["type"] != "")
-		type  = (CTimerd::CTimerEventTypes) atoi(hh->ParamList["type"].c_str());
+		type  = (CTimerd::CTimerEventTypes) atoi(hh->ParamList["type"]);
 	else // default is: record
 		type = CTimerd::TIMER_RECORD;
 
 	// repeat
 	if(hh->ParamList["repcount"] != "")
 	{
-		repCount = atoi(hh->ParamList["repcount"].c_str());
+		repCount = atoi(hh->ParamList["repcount"]);
 	}
 	CTimerd::CTimerEventRepeat rep;
 	if(hh->ParamList["rep"] != "")
-		rep = (CTimerd::CTimerEventRepeat) atoi(hh->ParamList["rep"].c_str());
+		rep = (CTimerd::CTimerEventRepeat) atoi(hh->ParamList["rep"]);
 	else // default: no repeat
 		rep = (CTimerd::CTimerEventRepeat)0;
 	if(((int)rep) >= ((int)CTimerd::TIMERREPEAT_WEEKDAYS) && hh->ParamList["wd"] != "")
-		NeutrinoAPI->Timerd->getWeekdaysFromStr(&rep, hh->ParamList["wd"].c_str());
+		NeutrinoAPI->Timerd->getWeekdaysFromStr(&rep, hh->ParamList["wd"]);
 
 	// apids
 	bool changeApids=false;
@@ -2429,7 +2428,7 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 	{
 		if(hh->ParamList["id"] != "")
 		{
-			unsigned modyId = atoi(hh->ParamList["id"].c_str());
+			unsigned modyId = atoi(hh->ParamList["id"]);
 			if(type == CTimerd::TIMER_RECORD)
 				NeutrinoAPI->Timerd->modifyRecordTimerEvent(modyId, announceTimeT, alarmTimeT, stopTimeT, rep,repCount,_rec_dir.c_str());
 			else
@@ -2472,7 +2471,7 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 void CControlAPI::setBouquetCGI(CyhookHandler *hh)
 {
 	if (hh->ParamList["selected"] != "") {
-		int selected = atoi(hh->ParamList["selected"].c_str());
+		int selected = atoi(hh->ParamList["selected"]);
 		if(hh->ParamList["action"].compare("hide") == 0)
 			NeutrinoAPI->Zapit->setBouquetHidden(selected - 1,true);
 		else if(hh->ParamList["action"].compare("show") == 0)
@@ -2500,7 +2499,7 @@ void CControlAPI::moveBouquetCGI(CyhookHandler *hh)
 				hh->ParamList["action"] == "up" ||
 				hh->ParamList["action"] == "down"))
 	{
-		int selected = atoi(hh->ParamList["selected"].c_str());
+		int selected = atoi(hh->ParamList["selected"]);
 		if (hh->ParamList["action"] == "up") {
 			NeutrinoAPI->Zapit->moveBouquet(selected - 1, (selected - 1) - 1);
 			selected--;
@@ -2517,7 +2516,7 @@ void CControlAPI::moveBouquetCGI(CyhookHandler *hh)
 void CControlAPI::deleteBouquetCGI(CyhookHandler *hh)
 {
 	if (hh->ParamList["selected"] != "") {
-		int selected = atoi(hh->ParamList["selected"].c_str());
+		int selected = atoi(hh->ParamList["selected"]);
 		NeutrinoAPI->Zapit->deleteBouquet(selected - 1);
 		hh->SendOk();
 	}
@@ -2548,7 +2547,7 @@ void CControlAPI::renameBouquetCGI(CyhookHandler *hh)
 		{
 			if (NeutrinoAPI->Zapit->existsBouquet((hh->ParamList["nameto"]).c_str()) == -1)
 			{
-				NeutrinoAPI->Zapit->renameBouquet(atoi(hh->ParamList["selected"].c_str()) - 1, hh->ParamList["nameto"].c_str());
+				NeutrinoAPI->Zapit->renameBouquet(atoi(hh->ParamList["selected"]) - 1, hh->ParamList["nameto"].c_str());
 				hh->SendOk();
 				return;
 			}
@@ -2561,7 +2560,7 @@ void CControlAPI::changeBouquetCGI(CyhookHandler *hh)
 {
 	if (!(hh->ParamList["selected"].empty()))
 	{
-		int selected = atoi(hh->ParamList["selected"].c_str());
+		int selected = atoi(hh->ParamList["selected"]);
 		CZapitClient::BouquetChannelList BChannelList;
 		NeutrinoAPI->Zapit->getBouquetChannels(selected - 1, BChannelList, CZapitClient::MODE_CURRENT, true);
 		CZapitClient::BouquetChannelList::iterator channels = BChannelList.begin();
@@ -2614,7 +2613,7 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 		pids.PIDs.vpid=0;
 
 		if(hh->ParamList["audio_no"] !="")
-			apid_no = atoi(hh->ParamList["audio_no"].c_str());
+			apid_no = atoi(hh->ParamList["audio_no"]);
 		NeutrinoAPI->Zapit->getPIDS(pids);
 
 		if( apid_no < (int)pids.APIDs.size())

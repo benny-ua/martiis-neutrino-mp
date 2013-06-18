@@ -213,7 +213,7 @@ CPSISetup::exec (CMenuTarget * parent, const std::string &)
 	       && (psi_list[i].value == psi_list[i].value_old); i++);
 
 	  if (i < PSI_RESET)
-	    if (ShowLocalizedMessage
+	    if (ShowMsg
 		(name, LOCALE_MESSAGEBOX_ACCEPT, CMessageBox::mbrYes,
 		 CMessageBox::mbYes | CMessageBox::mbCancel) ==
 		CMessageBox::mbrCancel)

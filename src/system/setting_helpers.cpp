@@ -337,7 +337,7 @@ printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, pt
 int CNVODChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	//    printf("CNVODChangeExec exec: %s\n", actionKey.c_str());
-	unsigned sel= atoi(actionKey.c_str());
+	unsigned sel= atoi(actionKey);
 	g_RemoteControl->setSubChannel(sel);
 
 	parent->hide();
@@ -348,7 +348,7 @@ int CNVODChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 int CStreamFeaturesChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	//printf("CStreamFeaturesChangeExec exec: %s\n", actionKey.c_str());
-	int sel= atoi(actionKey.c_str());
+	int sel= atoi(actionKey);
 
 	if(parent != NULL)
 		parent->hide();
@@ -380,7 +380,7 @@ int CStreamFeaturesChangeExec::exec(CMenuTarget* parent, const std::string & act
 
 int CMoviePluginChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {
-	int sel= atoi(actionKey.c_str());
+	int sel= atoi(actionKey);
 	parent->hide();
 	if (sel>=0)
 	{
@@ -390,7 +390,7 @@ int CMoviePluginChangeExec::exec(CMenuTarget* parent, const std::string & action
 }
 int COnekeyPluginChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {
-	int sel= atoi(actionKey.c_str());
+	int sel= atoi(actionKey);
 	parent->hide();
 	if (sel>=0)
 	{
@@ -517,7 +517,7 @@ int CDataResetNotifier::exec(CMenuTarget* /*parent*/, const std::string& actionK
 
 	/* no need to confirm if we only remove deleted channels */
 	if (!delete_removed) {
-		int result = ShowMsgUTF(msg, g_Locale->getText(LOCALE_RESET_CONFIRM), CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo);
+		int result = ShowMsg(msg, g_Locale->getText(LOCALE_RESET_CONFIRM), CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo);
 		if (result != CMessageBox::mbrYes)
 			return true;
 	}

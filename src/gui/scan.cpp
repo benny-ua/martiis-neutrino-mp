@@ -163,7 +163,7 @@ void CScanTs::testFunc()
 		sprintf(buffer, "%u", TP.feparams.dvb_feparams.frequency); /* no way int can overflow the buffer */
 	}
 printf("CScanTs::testFunc: %s\n", buffer);
-	paintLine(xpos2, ypos_cur_satellite, w - 95, pname);
+	paintLine(xpos2, ypos_cur_satellite, w - 95, pname.c_str());
 	paintLine(xpos2, ypos_frequency, w, buffer);
 	paintRadar();
 	success = g_Zapit->tune_TP(TP);
@@ -285,14 +285,16 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 	}
 	else if(manual || !scan_all) {
 		sat.position = CServiceManager::getInstance()->GetSatellitePosition(pname);
-		strncpy(sat.satName, pname, 49);
+		sat.satName[sizeof(sat.satName) - 1] = 0;
+		strncpy(sat.satName, pname.c_str(), sizeof(sat.satName) - 1);
 		satList.push_back(sat);
 	} else {
 		satellite_map_t & satmap = CServiceManager::getInstance()->SatelliteList();
 		for(sit = satmap.begin(); sit != satmap.end(); ++sit) {
 			if(sit->second.use_in_scan) {
 				sat.position = sit->first;
-				strncpy(sat.satName, sit->second.name.c_str(), 49);
+				sat.satName[sizeof(sat.satName) - 1] = 0;
+				strncpy(sat.satName, sit->second.name.c_str(), sizeof(sat.satName - 1));
 				satList.push_back(sat);
 			}
 		}
@@ -351,7 +353,7 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 			else if(msg == CRCInput::RC_home) {
 				if(manual && !scansettings.scan_nit_manual)
 					continue;
-				if (ShowLocalizedMessage(LOCALE_SCANTS_ABORT_HEADER, LOCALE_SCANTS_ABORT_BODY, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
+				if (ShowMsg(LOCALE_SCANTS_ABORT_HEADER, LOCALE_SCANTS_ABORT_BODY, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
 					g_Zapit->stopScan();
 				}
 			}

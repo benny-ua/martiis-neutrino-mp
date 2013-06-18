@@ -40,6 +40,7 @@
 #include <neutrino_menue.h>
 #include <gui/widget/messagebox.h>
 #include <gui/widget/hintbox.h>
+#include <system/helpers.h>
 #include <system/flashtool.h>
 
 #include <stdio.h>
@@ -473,7 +474,7 @@ bool CExtUpdate::readConfig(const std::string & line)
 	std::string tmp1 = line;
 	if (findConfigEntry(tmp1, "Log")) {
 		if (tmp1 != "")
-			fLogEnabled = atoi(tmp1.c_str());
+			fLogEnabled = atoi(tmp1);
 		return true;
 	}
 	tmp1 = line;
@@ -506,7 +507,7 @@ bool CExtUpdate::checkSpecialFolders(std::string line, bool copy)
 		neutrino_locale_t msg = (copy) ? LOCALE_FLASHUPDATE_UPDATE_WITH_SETTINGS_SKIPPED : LOCALE_FLASHUPDATE_UPDATE_WITH_SETTINGS_DEL_SKIPPED;
 		snprintf(buf, sizeof(buf), g_Locale->getText(msg), line.c_str());
 		WRITE_UPDATE_LOG("%s%s", buf, "\n");
-		ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, buf, CMessageBox::mbrOk, CMessageBox::mbOk, NEUTRINO_ICON_INFO);
+		ShowMsg(LOCALE_MESSAGEBOX_INFO, buf, CMessageBox::mbrOk, CMessageBox::mbOk, NEUTRINO_ICON_INFO);
 		return true;
 	}
 	return false;
@@ -676,13 +677,13 @@ bool CExtUpdate::readBackupList(const std::string & dstPath)
 		memset(buf1, '\0', sizeof(buf1));
 		if (free3 <= flashError) {
 			snprintf(buf1, sizeof(buf1)-1, g_Locale->getText(LOCALE_FLASHUPDATE_UPDATE_WITH_SETTINGS_ERROR), free3, total);
-			ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, buf1, CMessageBox::mbrOk, CMessageBox::mbOk, NEUTRINO_ICON_ERROR);
+			ShowMsg(LOCALE_MESSAGEBOX_ERROR, buf1, CMessageBox::mbrOk, CMessageBox::mbOk, NEUTRINO_ICON_ERROR);
 			flashErrorFlag = true;
 			return false;
 		}
 		else if (free3 <= flashWarning) {
 			snprintf(buf1, sizeof(buf1)-1, g_Locale->getText(LOCALE_FLASHUPDATE_UPDATE_WITH_SETTINGS_WARNING), free3, total);
-		    	if (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, buf1, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_INFO) != CMessageBox::mbrYes) {
+		    	if (ShowMsg(LOCALE_MESSAGEBOX_INFO, buf1, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_INFO) != CMessageBox::mbrYes) {
 				flashErrorFlag = true;
 				return false;
 		    	}

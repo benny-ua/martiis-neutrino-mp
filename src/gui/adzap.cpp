@@ -152,7 +152,7 @@ void *CAdZapMenu::Run(void *)
 			std::string name =
 			    g_Locale->getText(LOCALE_ADZAP_ANNOUNCE);
 			name += "\n" + azm->channelName;
-			ShowHintUTF(LOCALE_ADZAP, name.c_str());
+			ShowHint(LOCALE_ADZAP, name.c_str());
 		    }
 		    azm->alerted = true;
 		    azm->zapBackTime.tv_sec += ZAPBACK_ALERT_PERIOD;
@@ -200,7 +200,7 @@ int CAdZapMenu::exec(CMenuTarget *, const std::string & actionKey)
 	    monitor = false;
 	    alerted = false;
 	    Update();
-	    ShowLocalizedHint(LOCALE_ADZAP, LOCALE_ADZAP_CANCEL, 450, 1);
+	    ShowHint(LOCALE_ADZAP, LOCALE_ADZAP_CANCEL, 450, 1);
 	    return res;
 	}
     }

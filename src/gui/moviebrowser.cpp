@@ -1868,7 +1868,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 				char buf1[1024];
 				memset(buf1, '\0', sizeof(buf1));
 				snprintf(buf1, sizeof(buf1)-1, g_Locale->getText(LOCALE_MOVIEBROWSER_ASK_REC_TO_DELETE), delName.c_str());
-				if(ShowMsgUTF(LOCALE_RECORDINGMENU_RECORD_IS_RUNNING, buf1,
+				if(ShowMsg(LOCALE_RECORDINGMENU_RECORD_IS_RUNNING, buf1,
 						CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, false) == CMessageBox::mbrNo)
 					onDelete = false;
 				else {
@@ -1908,7 +1908,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 	}
 	else if (msg == CRCInput::RC_text || msg == CRCInput::RC_radio) {
 		if((show_mode == MB_SHOW_RECORDS) &&
-		(ShowMsgUTF (LOCALE_MESSAGEBOX_INFO, msg == CRCInput::RC_radio ? "Copy jumps from movie to new file ?" : "Copy jumps from movie to new files ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)) {
+		(ShowMsg (LOCALE_MESSAGEBOX_INFO, msg == CRCInput::RC_radio ? "Copy jumps from movie to new file ?" : "Copy jumps from movie to new files ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)) {
 			CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, "Coping, please wait");
 			hintBox->paint();
 			sleep(1);
@@ -1918,7 +1918,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 			off64_t res = copy_movie(m_movieSelectionHandler, &m_movieInfo, msg == CRCInput::RC_radio);
 			//g_RCInput->clearRCMsg();
 			if(res == 0)
-				ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "Copy failed, is there jump bookmarks ? Or check free space.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+				ShowMsg(LOCALE_MESSAGEBOX_ERROR, "Copy failed, is there jump bookmarks ? Or check free space.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 			else
 				loadMovies();
 			refresh();
@@ -1927,11 +1927,11 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 	else if (msg == CRCInput::RC_audio) {
 #if 0
 		if((m_movieSelectionHandler == playing_info) && (NeutrinoMessages::mode_ts == CNeutrinoApp::getInstance()->getMode()))
-			ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "Impossible to cut playing movie.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+			ShowMsg(LOCALE_MESSAGEBOX_ERROR, "Impossible to cut playing movie.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 		else
 #endif
 		if((show_mode == MB_SHOW_RECORDS) &&
-				(ShowMsgUTF (LOCALE_MESSAGEBOX_INFO, "Cut jumps from movie ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)) {
+				(ShowMsg (LOCALE_MESSAGEBOX_INFO, "Cut jumps from movie ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)) {
 			CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, "Cutting, please wait");
 			hintBox->paint();
 			sleep(1);
@@ -1941,7 +1941,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 			off64_t res = cut_movie(m_movieSelectionHandler, &m_movieInfo);
 			//g_RCInput->clearRCMsg();
 			if(res == 0)
-				ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "Cut failed, is there jump bookmarks ? Or check free space.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+				ShowMsg(LOCALE_MESSAGEBOX_ERROR, "Cut failed, is there jump bookmarks ? Or check free space.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 			else {
 				loadMovies();
 			}
@@ -1951,11 +1951,11 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 	else if (msg == CRCInput::RC_games) {
 		if((show_mode == MB_SHOW_RECORDS) && m_movieSelectionHandler != NULL) {
 			if((m_movieSelectionHandler == playing_info) && (NeutrinoMessages::mode_ts == CNeutrinoApp::getInstance()->getMode()))
-				ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "Impossible to truncate playing movie.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+				ShowMsg(LOCALE_MESSAGEBOX_ERROR, "Impossible to truncate playing movie.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 			else if(m_movieSelectionHandler->bookmarks.end == 0)
-				ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "No End bookmark defined!", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+				ShowMsg(LOCALE_MESSAGEBOX_ERROR, "No End bookmark defined!", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 			else {
-				if(ShowMsgUTF (LOCALE_MESSAGEBOX_INFO, "Truncate movie ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
+				if(ShowMsg (LOCALE_MESSAGEBOX_INFO, "Truncate movie ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
 					CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, "Truncating, please wait");
 					hintBox->paint();
 					off64_t res = truncate_movie(m_movieSelectionHandler);
@@ -1963,7 +1963,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 					delete hintBox;
 					g_RCInput->clearRCMsg();
 					if(res == 0)
-						ShowMsgUTF(LOCALE_MESSAGEBOX_ERROR, "Truncate failed.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
+						ShowMsg(LOCALE_MESSAGEBOX_ERROR, "Truncate failed.", CMessageBox::mbrCancel, CMessageBox::mbCancel, NEUTRINO_ICON_ERROR);
 					else {
 						//printf("New movie info: size %lld len %d\n", res, m_movieSelectionHandler->bookmarks.end/60);
 						m_movieInfo.saveMovieInfo( *m_movieSelectionHandler);
@@ -1975,7 +1975,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 		}
         } else if (msg == CRCInput::RC_topleft) {
           if (m_movieSelectionHandler != NULL) {
-                if(ShowMsgUTF (LOCALE_MESSAGEBOX_INFO, "Remove screenshot ?", CMessageBox::mbrNo, CMessageBox:: mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
+                if(ShowMsg (LOCALE_MESSAGEBOX_INFO, "Remove screenshot ?", CMessageBox::mbrNo, CMessageBox:: mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
 			std::string fname = getScreenshotName(m_movieSelectionHandler->file.Name);
 			if (fname != "")
 	                        unlink(fname.c_str());
@@ -2223,7 +2223,7 @@ void CMovieBrowser::onDeleteFile(MI_MOVIE_INFO& movieSelectionHandler, bool skip
 
 		msg += "\r\n ";
 		msg += g_Locale->getText(LOCALE_FILEBROWSER_DODELETE2);
-		if ((skipAsk) || (ShowMsgUTF(LOCALE_FILEBROWSER_DELETE, msg, CMessageBox::mbrYes, CMessageBox::mbYes|CMessageBox::mbNo)==CMessageBox::mbrYes))
+		if ((skipAsk) || (ShowMsg(LOCALE_FILEBROWSER_DELETE, msg, CMessageBox::mbrYes, CMessageBox::mbYes|CMessageBox::mbNo)==CMessageBox::mbrYes))
 		{
 			CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_MOVIEBROWSER_DELETE_INFO));
 			hintBox->paint();
@@ -3069,7 +3069,7 @@ int CMovieBrowser::showMovieInfoMenu(MI_MOVIE_INFO* movie_info)
         pBookItemMenu[li]->addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_POSITION, true,  pBookPosIntInput[li]->getValue(), pBookPosIntInput[li]));
         pBookItemMenu[li]->addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE,     true,  pBookTypeIntInput[li]->getValue(),pBookTypeIntInput[li]));
 
-        bookmarkMenu.addItem( new CMenuForwarderNonLocalized (movie_info->bookmarks.user[li].name.c_str(),   true, pBookPosIntInput[li]->getValue(),pBookItemMenu[li]));
+        bookmarkMenu.addItem( new CMenuForwarder (movie_info->bookmarks.user[li].name.c_str(),   true, pBookPosIntInput[li]->getValue(),pBookItemMenu[li]));
     }
 
 /********************************************************************/
@@ -3399,7 +3399,7 @@ int CMovieBrowser::showStartPosSelectionMenu(void) // P2
 				position[menu_nr] = m_movieSelectionHandler->bookmarks.user[i].pos + m_movieSelectionHandler->bookmarks.user[i].length;
 
 			snprintf(book[i], 19,"%5d min",position[menu_nr]/60);
-			startPosSelectionMenu.addItem(new CMenuForwarderNonLocalized (m_movieSelectionHandler->bookmarks.user[i].name.c_str(), 	true, book[i]));
+			startPosSelectionMenu.addItem(new CMenuForwarder (m_movieSelectionHandler->bookmarks.user[i].name.c_str(), 	true, book[i]));
 			menu_nr++;
 		}
 	}
@@ -3793,7 +3793,7 @@ int CYTCacheSelectorTarget::exec(CMenuTarget* /*parent*/, const std::string & ac
 		cYTCache::getInstance()->remove(&movieBrowser->yt_completed[selected - movieBrowser->yt_completed_offset]);
 	} else if (actionKey == "") {
 		if (movieBrowser->yt_pending_offset && selected >= movieBrowser->yt_pending_offset && selected < movieBrowser->yt_completed_offset) {
-			if(ShowMsgUTF (LOCALE_MOVIEBROWSER_YT_CACHE, g_Locale->getText(LOCALE_MOVIEBROWSER_YT_CANCEL_TRANSFER), CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)
+			if(ShowMsg (LOCALE_MOVIEBROWSER_YT_CACHE, g_Locale->getText(LOCALE_MOVIEBROWSER_YT_CANCEL_TRANSFER), CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes)
 				cYTCache::getInstance()->cancel(&movieBrowser->yt_pending[selected - movieBrowser->yt_pending_offset]);
 			else
 				return menu_return::RETURN_NONE;
@@ -3841,7 +3841,7 @@ void CMovieBrowser::refreshYTMenu()
 		int i = 0;
 		yt_pending_offset = yt_menue->getItemsCount();
 		for (std::vector<MI_MOVIE_INFO>::iterator it = yt_pending.begin(); it != yt_pending.end(); ++it, ++i) {
-			yt_menue->addItem(new CMenuForwarderNonLocalized((*it).file.Name.c_str(), true, NULL, ytcache_selector));
+			yt_menue->addItem(new CMenuForwarder((*it).file.Name.c_str(), true, NULL, ytcache_selector));
 		}
 	}
 
@@ -3852,7 +3852,7 @@ void CMovieBrowser::refreshYTMenu()
 		int i = 0;
 		yt_completed_offset = yt_menue->getItemsCount();
 		for (std::vector<MI_MOVIE_INFO>::iterator it = yt_completed.begin(); it != yt_completed.end(); ++it, ++i) {
-			yt_menue->addItem(new CMenuForwarderNonLocalized((*it).file.Name.c_str(), true, NULL, ytcache_selector));
+			yt_menue->addItem(new CMenuForwarder((*it).file.Name.c_str(), true, NULL, ytcache_selector));
 		}
 	}
 
@@ -3863,7 +3863,7 @@ void CMovieBrowser::refreshYTMenu()
 		int i = 0;
 		yt_failed_offset = yt_menue->getItemsCount();
 		for (std::vector<MI_MOVIE_INFO>::iterator it = yt_failed.begin(); it != yt_failed.end(); ++it, ++i) {
-			yt_menue->addItem(new CMenuForwarderNonLocalized((*it).file.Name.c_str(), true, NULL, ytcache_selector));
+			yt_menue->addItem(new CMenuForwarder((*it).file.Name.c_str(), true, NULL, ytcache_selector));
 		}
 	}
 
@@ -3907,9 +3907,8 @@ bool CMovieBrowser::showYTMenu()
 	mainMenu.addItem(GenericMenuSeparatorLine);
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_RESULTS, &m_settings.ytresults, true, 10, 50, NULL));
 
-	char rstr[20];
-	sprintf(rstr, "%s", m_settings.ytregion.c_str());
-	CMenuOptionStringChooser * region = new CMenuOptionStringChooser(LOCALE_MOVIEBROWSER_YT_REGION, rstr, true, NULL, CRCInput::RC_nokey, "", true);
+	std::string rstr = m_settings.ytregion;
+	CMenuOptionStringChooser * region = new CMenuOptionStringChooser(LOCALE_MOVIEBROWSER_YT_REGION, &rstr, true, NULL, CRCInput::RC_nokey, "", true);
 	region->addOption("default");
 	region->addOption("DE");
 	region->addOption("PL");
@@ -4158,7 +4157,7 @@ int CDirMenu::exec(CMenuTarget* parent, const std::string & actionKey)
     else if(actionKey.size() == 1)
     {
         printf("[CDirMenu].exec %s\n",actionKey.c_str());
-        int number = atoi(actionKey.c_str());
+        int number = atoi(actionKey);
         if(number < MAX_DIR)
         {
             if(dirState[number] == DIR_STATE_SERVER_DOWN)
@@ -4285,7 +4284,7 @@ int CDirMenu::show(void)
     {
         snprintf(tmp, sizeof(tmp),"%d",i);
         tmp[1]=0;
-        dirMenu.addItem( new CMenuForwarderNonLocalized ( (*dirList)[i].name.c_str(),       (dirState[i] != DIR_STATE_UNKNOWN), dirOptionText[i],       this,tmp));
+        dirMenu.addItem( new CMenuForwarder ( (*dirList)[i].name.c_str(),       (dirState[i] != DIR_STATE_UNKNOWN), dirOptionText[i],       this,tmp));
     }
     int ret = dirMenu.exec(NULL," ");
     return ret;
@@ -4493,7 +4492,7 @@ static int get_input(bool * stop)
 	* stop = false;
 	g_RCInput->getMsg(&msg, &data, 1, false);
 	if(msg == CRCInput::RC_home) {
-		if(ShowMsgUTF (LOCALE_MESSAGEBOX_INFO, "Cancel movie cut/split ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
+		if(ShowMsg (LOCALE_MESSAGEBOX_INFO, "Cancel movie cut/split ?", CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo) == CMessageBox::mbrYes) {
 			* stop = true;
 		}
 	}

@@ -2749,7 +2749,7 @@ void CAudioPlayerGui::savePlaylist()
 		absPlaylistDir += file->getFileName();
 
 		const int filenamesize = 30;
-		char filename[filenamesize + 1] = "";
+		std::string filename;
 
 		if (file->getType() == CFile::FILE_PLAYLIST)
 		{
@@ -2762,14 +2762,14 @@ void CAudioPlayerGui::savePlaylist()
 			{
 				return;
 			}
-			snprintf(filename, name.size(), "%s", name.c_str());
+			filename = name;
 		}
 		else if (file->getType() == CFile::FILE_DIR)
 		{
 			// query for filename
 			this->hide();
 			CStringInputSMS filenameInput(LOCALE_AUDIOPLAYER_PLAYLIST_NAME,
-						      filename,
+						      &filename,
 						      filenamesize - 1,
 						      LOCALE_AUDIOPLAYER_PLAYLIST_NAME_HINT1,
 						      LOCALE_AUDIOPLAYER_PLAYLIST_NAME_HINT2,
@@ -2850,7 +2850,7 @@ bool CAudioPlayerGui::askToOverwriteFile(const std::string& filename) {
 		 "%s\n%s",
 		 g_Locale->getText(LOCALE_AUDIOPLAYER_PLAYLIST_FILEOVERWRITE_MSG),
 		 filename.c_str());
-	bool res = (ShowMsgUTF(LOCALE_AUDIOPLAYER_PLAYLIST_FILEOVERWRITE_TITLE,
+	bool res = (ShowMsg(LOCALE_AUDIOPLAYER_PLAYLIST_FILEOVERWRITE_TITLE,
 			       msg,CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo)
 		    == CMessageBox::mbrYes);
 	this->paint();
