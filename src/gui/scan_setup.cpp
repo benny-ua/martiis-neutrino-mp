@@ -496,7 +496,7 @@ printf("C: %d S: %d T: %d\n", CFEManager::getInstance()->haveCable(),CFEManager:
 			nc->setHint("", LOCALE_MENU_HINT_SCAN_FETIMEOUT);
 			settings->addItem(nc);
 		}
-		nid = new CIntInput(LOCALE_SATSETUP_CABLE_NID, (int&) scansettings.cable_nid, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
+		nid = new CIntInput(LOCALE_SATSETUP_CABLE_NID, (int *) &scansettings.cable_nid, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
 
 		//auto scan
 		char autoscan[64];
@@ -905,13 +905,13 @@ int CScanSetup::showUnicableSetup()
 	int unicable_qrg = fe_config.uni_qrg;
 
 	CMenuOptionNumberChooser *uniscr = new CMenuOptionNumberChooser(LOCALE_UNICABLE_SCR, &unicable_scr, true, 0, 7);
-	CIntInput		 *uniqrg = new CIntInput(LOCALE_UNICABLE_QRG, unicable_qrg, 4, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
+	CIntInput		 *uniqrg = new CIntInput(LOCALE_UNICABLE_QRG, &unicable_qrg, 4, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
 
 	CMenuWidget *uni_setup = new CMenuWidget(LOCALE_SATSETUP_UNI_SETTINGS, NEUTRINO_ICON_SETTINGS, width);
 	uni_setup->addIntroItems();
 
 	uni_setup->addItem(uniscr);
-	CMenuForwarder *mf = new CMenuDForwarder(LOCALE_UNICABLE_QRG, true, uniqrg->getValue(), uniqrg);
+	CMenuForwarder *mf = new CMenuDForwarder(LOCALE_UNICABLE_QRG, true, NULL, uniqrg);
 	uni_setup->addItem(mf);
 	res = uni_setup->exec(NULL, "");
 	delete uni_setup;
@@ -1151,9 +1151,9 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 	if(!satconfig.use_usals)
 		all_usals = 0;
 
-	CIntInput* lofL = new CIntInput(LOCALE_SATSETUP_LOFL, (int&) satconfig.lnbOffsetLow, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
-	CIntInput* lofH = new CIntInput(LOCALE_SATSETUP_LOFH, (int&) satconfig.lnbOffsetHigh, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
-	CIntInput* lofS = new CIntInput(LOCALE_SATSETUP_LOFS, (int&) satconfig.lnbSwitch, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
+	CIntInput* lofL = new CIntInput(LOCALE_SATSETUP_LOFL, (int*) &satconfig.lnbOffsetLow, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
+	CIntInput* lofH = new CIntInput(LOCALE_SATSETUP_LOFH, (int*) &satconfig.lnbOffsetHigh, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
+	CIntInput* lofS = new CIntInput(LOCALE_SATSETUP_LOFS, (int*) &satconfig.lnbSwitch, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
 
 	if (!unicable) {
 		temp_sat->addItem(diseqc);
@@ -1165,14 +1165,14 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 		temp_sat->addItem(unilnb);
 	}
 
-	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFL, true, lofL->getValue(), lofL);
+	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFL, true, NULL, lofL);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_LOFL);
 	temp_sat->addItem(mf);
-	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFH, true, lofH->getValue(), lofH);
+	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFH, true, NULL, lofH);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_LOFH);
 	temp_sat->addItem(mf);
 
-	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFS, true, lofS->getValue(), lofS);
+	mf = new CMenuDForwarder(LOCALE_SATSETUP_LOFS, true, NULL, lofS);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_LOFS);
 	temp_sat->addItem(mf);
 }
@@ -1188,7 +1188,7 @@ void CScanSetup::addScanMenuManualScan(CMenuWidget *manual_Scan)
 	//----------------------------------------------------------------------
 	if (r_system == DVB_C)  {
 		manual_Scan->addItem(cableSelect);
-		mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, nid->getValue(), nid);
+		mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, NULL, nid);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_NID);
 		manual_Scan->addItem(mf);
 		mf = new CMenuDForwarder(LOCALE_SCANTS_SELECT_TP, true, NULL, new CTPSelectHandler(), "cable", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
@@ -1296,7 +1296,7 @@ void CScanSetup::addScanMenuAutoScan(CMenuWidget *auto_Scan)
 	const char *action;
 	if (r_system == DVB_C)  { //cable
 		auto_Scan->addItem(cableSelect);
-		mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, nid->getValue(), nid);
+		mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, NULL, nid);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_NID);
 		auto_Scan->addItem(mf);
 		action = "cauto";
@@ -1332,7 +1332,7 @@ void CScanSetup::addScanMenuCable(CMenuWidget *menu)
 	select->setHint("", LOCALE_MENU_HINT_SCAN_CABLE);
 	menu->addItem(select);
 
-	mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, nid->getValue(), nid);
+	mf = new CMenuForwarder(LOCALE_SATSETUP_CABLE_NID, true, NULL, nid);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_NID);
 	menu->addItem(mf);
 

@@ -89,12 +89,12 @@ private:
 	CMenuItem* m4;
 	CMenuItem* m5;
 	CMenuItem* m6;
-	char* display;
+	std::string * display;
 	int* iType;
 	time_t* stopTime;
 public:
 	CTimerListNewNotifier( int* Type, time_t* time,CMenuItem* a1, CMenuItem* a2,
-			       CMenuItem* a3, CMenuItem* a4, CMenuItem* a5, CMenuItem* a6,char* d)
+			       CMenuItem* a3, CMenuItem* a4, CMenuItem* a5, CMenuItem* a6, std::string *d)
 	{
 		m1 = a1;
 		m2 = a2;
@@ -113,16 +113,18 @@ public:
 		{
 			*stopTime=(time(NULL)/60)*60;
 			struct tm *tmTime2 = localtime(stopTime);
-			sprintf( display, "%02d.%02d.%04d %02d:%02d", tmTime2->tm_mday, tmTime2->tm_mon+1,
+			char disp[40];
+			snprintf(disp, sizeof(disp), "%02d.%02d.%04d %02d:%02d", tmTime2->tm_mday, tmTime2->tm_mon+1,
 				 tmTime2->tm_year+1900,
 				 tmTime2->tm_hour, tmTime2->tm_min);
+			*display = std::string(disp);
 			m1->setActive(true);
 			m6->setActive((g_settings.recording_type == RECORDING_FILE));
 		}
 		else
 		{
 			*stopTime=0;
-			strcpy(display,"                ");
+			*display = "                ";
 			m1->setActive (false);
 			m6->setActive(false);
 		}
@@ -1106,7 +1108,7 @@ int CTimerList::modifyTimer()
 	timer->eventRepeat = (CTimerd::CTimerEventRepeat)(((int)timer->eventRepeat) & 0x1FF);
 	CStringInput timerSettings_weekdays(LOCALE_TIMERLIST_WEEKDAYS, &m_weekdaysStr, 7, LOCALE_TIMERLIST_WEEKDAYS_HINT_1, LOCALE_TIMERLIST_WEEKDAYS_HINT_2, "-X");
 	CMenuForwarder *m4 = new CMenuForwarder(LOCALE_TIMERLIST_WEEKDAYS, ((int)timer->eventRepeat) >= (int)CTimerd::TIMERREPEAT_WEEKDAYS, m_weekdaysStr, &timerSettings_weekdays );
-	CIntInput timerSettings_repeatCount(LOCALE_TIMERLIST_REPEATCOUNT, (int&)timer->repeatCount,3, LOCALE_TIMERLIST_REPEATCOUNT_HELP1, LOCALE_TIMERLIST_REPEATCOUNT_HELP2);
+	CIntInput timerSettings_repeatCount(LOCALE_TIMERLIST_REPEATCOUNT, (int *) &timer->repeatCount,3, LOCALE_TIMERLIST_REPEATCOUNT_HELP1, LOCALE_TIMERLIST_REPEATCOUNT_HELP2);
 
 	CMenuForwarder *m5 = new CMenuForwarder(LOCALE_TIMERLIST_REPEATCOUNT, timer->eventRepeat != (int)CTimerd::TIMERREPEAT_ONCE , NULL , &timerSettings_repeatCount);
 
@@ -1188,7 +1190,7 @@ int CTimerList::newTimer()
 	CStringInput timerSettings_weekdays(LOCALE_TIMERLIST_WEEKDAYS, &m_weekdaysStr, 7, LOCALE_TIMERLIST_WEEKDAYS_HINT_1, LOCALE_TIMERLIST_WEEKDAYS_HINT_2, "-X");
 	CMenuForwarder *m4 = new CMenuForwarder(LOCALE_TIMERLIST_WEEKDAYS, false,  NULL, &timerSettings_weekdays);
 
-	CIntInput timerSettings_repeatCount(LOCALE_TIMERLIST_REPEATCOUNT, (int&)timerNew.repeatCount,3, LOCALE_TIMERLIST_REPEATCOUNT_HELP1, LOCALE_TIMERLIST_REPEATCOUNT_HELP2);
+	CIntInput timerSettings_repeatCount(LOCALE_TIMERLIST_REPEATCOUNT, (int *) &timerNew.repeatCount,3, LOCALE_TIMERLIST_REPEATCOUNT_HELP1, LOCALE_TIMERLIST_REPEATCOUNT_HELP2);
 	CMenuForwarder *m5 = new CMenuForwarder(LOCALE_TIMERLIST_REPEATCOUNT, false, NULL, &timerSettings_repeatCount);
 
 	CTimerListRepeatNotifier notifier((int *)&timerNew.eventRepeat,m4,m5, &m_weekdaysStr);
@@ -1263,7 +1265,7 @@ int CTimerList::newTimer()
 
 	CTimerListNewNotifier notifier2((int *)&timerNew.eventType,
 					&timerNew.stopTime,m2,m6,m8,m9,m10,m7,
-					timerSettings_stopTime.getValue());
+					timerSettings_stopTime.getValuePtr());
 	CMenuOptionChooser* m0;
 	if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 		m0 = new CMenuOptionChooser(LOCALE_TIMERLIST_TYPE, (int *)&timerNew.eventType, TIMERLIST_TYPE_OPTIONS, TIMERLIST_TYPE_OPTION_COUNT, true, &notifier2);

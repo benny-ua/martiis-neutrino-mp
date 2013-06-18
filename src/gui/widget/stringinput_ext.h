@@ -63,10 +63,11 @@ class CExtendedInput : public CMenuTarget
 		int selectedChar;
 
 		neutrino_locale_t name;
+		std::string nameString;
 		neutrino_locale_t hint_1;
 		neutrino_locale_t hint_2;
 
-		char*	value;
+		std::string *valueString;
 		CChangeObserver*   observ;
 		bool* cancel;
 
@@ -76,7 +77,8 @@ class CExtendedInput : public CMenuTarget
 
 	public:
 
-		CExtendedInput(const neutrino_locale_t Name, char* Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel = NULL);
+		CExtendedInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel = NULL);
+		CExtendedInput(std::string &Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel = NULL);
 		~CExtendedInput();
 
 		void hide();
@@ -85,7 +87,7 @@ class CExtendedInput : public CMenuTarget
 
 		void addInputField( CExtendedInput_Item* );
 
-		std::string getValueString(void);
+		virtual std::string getValueString(void);
 };
 
 
@@ -157,23 +159,20 @@ class CExtendedInput_Item_Char : public CExtendedInput_Item
 
 class CIPInput : public CExtendedInput
 {
-	char          IP[16];
-	std::string * ip;
-
 	protected:
 		virtual void onBeforeExec();
 		virtual void onAfterExec();
 
 	public:
-		CIPInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
-		std::string getValueString(void);
+		CIPInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
 
 class CDateInput : public CExtendedInput
 {
-   private:
+	private:
+		std::string timeValue;
 		time_t* time;
 
 	protected:
@@ -183,37 +182,32 @@ class CDateInput : public CExtendedInput
 	public:
 		CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 		~CDateInput();
-		char* getValue() {return value;}
-		std::string getValueString(void);
+		std::string *getValuePtr(void ) {return &timeValue;}
 };
 
 //----------------------------------------------------------------------------------------------------
 
 class CMACInput : public CExtendedInput
 {
-	char          MAC[32];
-	std::string * mac;
-
 	protected:
 		virtual void onBeforeExec();
 		virtual void onAfterExec();
 
 	public:
-		CMACInput(const neutrino_locale_t Name, std::string & Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
-		std::string getValueString(void);
+		CMACInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
 
 class CTimeInput : public CExtendedInput
 {
+	private:
+		std::string timeValue;
 	protected:
 		virtual void onBeforeExec();
 		virtual void onAfterExec();
-
 	public:
-		CTimeInput(const neutrino_locale_t Name, char* Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel=NULL);
-		std::string getValueString(void);
+		CTimeInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel=NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -222,8 +216,8 @@ class CIntInput : public CExtendedInput
 {
 #define MAX_CINTINPUT_SIZE 16
 
-	char myValueStringInput[MAX_CINTINPUT_SIZE];
-	char myValueStringOutput[MAX_CINTINPUT_SIZE];
+	std::string myValueStringInput;
+	std::string myValueStringOutput;
 
  	int* myValue;
 	unsigned int m_size;
@@ -235,10 +229,8 @@ class CIntInput : public CExtendedInput
 		/**
 		 *@param Size how many digits can be entered
 		 */
-		CIntInput(const neutrino_locale_t Name, int& Value, const unsigned int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
-		char* getValue() {
-			return myValueStringOutput;
-		}
+		CIntInput(const neutrino_locale_t Name, int *Value, const unsigned int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		//char* getValue() { return myValueStringOutput; }
 		void updateValue() { onBeforeExec(); }
 		std::string getValueString(void);
 };

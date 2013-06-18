@@ -213,7 +213,7 @@ class CMenuForwarder : public CMenuItem
 	const std::string * option_string;
 	CMenuTarget *       jumpTarget;
 
-	const char * getOption(void);
+	std::string getOption(void);
 
  public:
 

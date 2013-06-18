@@ -978,7 +978,6 @@ void CMoviePlayerGui::PlayFile(void)
 			handleMovieBrowser(CRCInput::RC_0, position);
 #ifdef MARTII
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_goto) {
-			char Value[10];
 			bool cancel = true;
 			playback->GetPosition(position, duration);
 			int ss = position/1000;
@@ -986,16 +985,14 @@ void CMoviePlayerGui::PlayFile(void)
 			ss -= hh * 3600;
 			int mm = ss/60;
 			ss -= mm * 60;
-#if 1 // eplayer lacks precision, omit seconds
-			snprintf(Value, sizeof(Value), "%.2d:%.2d", hh, mm);
+			char val[10];
+			snprintf(val, sizeof(val), "%.2d:%.2d", hh, mm); // eplayer lacks precision, omit seconds
+			std::string Value = std::string(val);
 			ss = 0;
-#else
-			snprintf(Value, sizeof(Value), "%.2d:%.2d:%.2d", hh, mm, ss);
-#endif
-			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
+			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, &Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
 			jumpTime.exec(NULL, "");
 			jumpTime.hide();
-			if (!cancel && ((3 == sscanf(Value, "%d:%d:%d", &hh, &mm, &ss)) || (2 == sscanf(Value, "%d:%d", &hh, &mm))))
+			if (!cancel && ((3 == sscanf(Value.c_str(), "%d:%d:%d", &hh, &mm, &ss)) || (2 == sscanf(Value.c_str(), "%d:%d", &hh, &mm))))
 				playback->SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
 		} else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
 #else

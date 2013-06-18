@@ -137,11 +137,11 @@ void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height,
 {
 	if (select_mode)
 	{
-		char str[256];
-
-		if (right_text != NULL) 
+		if (right_text && *right_text) 
 		{
-			snprintf(str, 255, "%s %s", left_text, right_text);
+			ssize_t len = strlen(left_text) + strlen(right_text) + 2;
+			char *str = (char *) alloca(len);
+			snprintf(str, len, "%s %s", left_text, right_text);
 			CVFD::getInstance()->showMenuText(0, str, -1, true);
 		} 
 		else
@@ -160,7 +160,7 @@ void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height,
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(name_start_x, y+ item_height, _dx- (name_start_x - x), left_text, item_color, 0, true); // UTF-8
 
 	//right text
-	if (right_text != NULL)
+	if (right_text && *right_text)
 	{
 		int stringwidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(right_text, true);
 		int stringstartposOption = std::max(name_start_x + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(left_text, true) + icon_frame_w, x + dx - stringwidth - icon_frame_w); //+ offx
@@ -1898,18 +1898,11 @@ int CMenuForwarder::getWidth(void)
 {
 	const char *_name = (name == NONEXISTANT_LOCALE) ? nameString.c_str() : g_Locale->getText(name);
 	int tw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(_name, true);
-	const char * option_name = NULL;
 
-	if (option)
-		option_name = option;
-	else if (option_string)
-		option_name = option_string->c_str();
-	else if (!option && !option_string && jumpTarget)
-		option_name = jumpTarget->getValueString().c_str();
+	std::string option_name = getOption();
 
-
-        if (option_name != NULL)
-                tw += 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(option_name, true);
+        if (!option_name.empty())
+                tw += 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(option_name.c_str(), true);
 
 	return tw;
 }
@@ -1926,17 +1919,15 @@ int CMenuForwarder::exec(CMenuTarget* parent)
 	}
 }
 
-const char * CMenuForwarder::getOption(void)
+std::string CMenuForwarder::getOption(void)
 {
 	if (option)
-		return option;
-	else
-		if (option_string)
-			return option_string->c_str();
-		else if (jumpTarget)
-			return jumpTarget->getValueString().c_str();
-		else
-			return NULL;
+		return std::string(option);
+	if (option_string)
+		return *option_string;
+	if (jumpTarget)
+		return jumpTarget->getValueString();
+	return "";
 }
 
 int CMenuForwarder::paint(bool selected)
@@ -1944,7 +1935,7 @@ int CMenuForwarder::paint(bool selected)
 	int height = getHeight();
  	const char * l_name = getName();
  
- 	const char * option_name = getOption();
+ 	std::string option_name = getOption();
 	
 	//paint item
 	prepareItem(selected, height);
@@ -1953,7 +1944,7 @@ int CMenuForwarder::paint(bool selected)
 	paintItemButton(selected, height);
 	
 	//caption
-	paintItemCaption(selected, height, l_name, option_name);
+	paintItemCaption(selected, height, l_name, option_name.c_str());
 	
 	return y+ height;
 }

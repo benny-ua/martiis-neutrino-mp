@@ -659,7 +659,7 @@ int CAudioPlayerGui::show()
 					// is no stream, so we do not have to test for this case
 					int seconds=0;
 					CIntInput secondsInput(LOCALE_AUDIOPLAYER_JUMP_DIALOG_TITLE,
-							       seconds,
+							       &seconds,
 							       5,
 							       LOCALE_AUDIOPLAYER_JUMP_DIALOG_HINT1,
 							       LOCALE_AUDIOPLAYER_JUMP_DIALOG_HINT2);
@@ -766,7 +766,7 @@ int CAudioPlayerGui::show()
 					// is no stream, so we do not have to test for this case
 					int seconds=0;
 					CIntInput secondsInput(LOCALE_AUDIOPLAYER_JUMP_DIALOG_TITLE,
-							       seconds,
+							       &seconds,
 							       5,
 							       LOCALE_AUDIOPLAYER_JUMP_DIALOG_HINT1,
 							       LOCALE_AUDIOPLAYER_JUMP_DIALOG_HINT2);
