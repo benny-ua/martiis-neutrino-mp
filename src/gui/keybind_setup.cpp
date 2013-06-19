@@ -49,9 +49,7 @@
 #include <gui/filebrowser.h>
 
 #include <driver/screen_max.h>
-#ifdef SCREENSHOT
 #include <driver/screenshot.h>
-#endif
 
 #include <system/debug.h>
 #include <system/helpers.h>
@@ -386,11 +384,9 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", key_settings[KEY_UNLOCK].hint);
 	bindSettings->addItem(mf);
 	// screenshot
-#if defined(MARTII) || defined (SCREENSHOT)
 	mf = new CMenuDForwarder(key_settings[KEY_SCREENSHOT].keydescription, true, keychooser[KEY_SCREENSHOT]->getKeyName(), keychooser[KEY_SCREENSHOT]);
 	mf->setHint("", key_settings[KEY_SCREENSHOT].hint);
 	bindSettings->addItem(mf);
-#endif
 #ifdef ENABLE_PIP
 	// pip
 	mf = new CMenuDForwarder(key_settings[KEY_PIP_CLOSE].keydescription, true, keychooser[KEY_PIP_CLOSE]->getKeyName(), keychooser[KEY_PIP_CLOSE]);

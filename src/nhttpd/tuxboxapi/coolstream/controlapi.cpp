@@ -36,9 +36,7 @@
 #include <global.h>
 #include <gui/plugins.h>//for relodplugins
 #include <neutrino.h>
-#ifdef SCREENSHOT
 #include <driver/screenshot.h>
-#endif
 #include <gui/rc_lock.h>
 
 // yhttpd
@@ -183,9 +181,7 @@ const CControlAPI::TyCgiCall CControlAPI::yCgiCallList[]=
 	{"version", 		&CControlAPI::VersionCGI,		""},
 	{"reloadsetup", 	&CControlAPI::ReloadNutrinoSetupfCGI,		""},
 	{"reloadplugins", 	&CControlAPI::ReloadPluginsCGI,		""},
-#if defined(SCREENSHOT) || defined(MARTII)
 	{"screenshot", 		&CControlAPI::ScreenshotCGI,		""},
-#endif
 	// boxcontrol - devices
 	{"volume", 			&CControlAPI::VolumeCGI,		"text/plain"},
 	{"lcd", 			&CControlAPI::LCDAction,		"text/plain"},
@@ -1531,7 +1527,6 @@ void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 	hh->SendOk();
 }
 #else
-#ifdef SCREENSHOT
 void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 {
 	bool enableOSD = true;
@@ -1558,7 +1553,6 @@ void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 		hh->SendError();
 #endif
 }
-#endif
 #endif // MARTII
 
 //-----------------------------------------------------------------------------

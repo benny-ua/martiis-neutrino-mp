@@ -1063,7 +1063,6 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 			if(restore)
 				FileTime.show(position);
-#ifdef SCREENSHOT
 		} else if (/*msg == (neutrino_msg_t) g_settings.key_screenshot ||*/ msg == CRCInput::RC_record) {
 
 			char ending[(sizeof(int)*2) + 6] = ".png";
@@ -1097,7 +1096,6 @@ void CMoviePlayerGui::PlayFile(void)
 			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
 				sc->EnableVideo(true);
 			sc->Start();
-#endif
 #endif
 
 		} else if ( msg == NeutrinoMessages::EVT_SUBT_MESSAGE) {

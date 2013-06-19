@@ -2551,7 +2551,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					numericZap( msg );
 				}
 			}
-#ifdef SCREENSHOT
 			else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
 				for(int i = 0; i < g_settings.screenshot_count; i++) {
 					CScreenShot * sc = new CScreenShot("", (CScreenShot::screenshot_format_t)g_settings.screenshot_format);
@@ -2559,7 +2558,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					sc->Start();
 				}
 			}
-#endif
 			else if( msg == (neutrino_msg_t) g_settings.key_lastchannel ) {
 				// Quick Zap
 				numericZap( msg );
@@ -3192,7 +3190,6 @@ _repeat:
 		delete sleepTimer;
 		return messages_return::handled;
 	}
-#ifdef SCREENSHOT
 	else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
 		//video+osd scaled to osd size
 		CScreenShot * sc = new CScreenShot("", (CScreenShot::screenshot_format_t)g_settings.screenshot_format);
@@ -3200,8 +3197,6 @@ _repeat:
 		sc->MakeFileName(CZapit::getInstance()->GetCurrentChannelID());
 		sc->Start();
 	}
-#endif
-
 	/* ================================== MESSAGES ================================================ */
 	else if (msg == NeutrinoMessages::EVT_VOLCHANGED) {
 		//setVolume(msg, false, true);
