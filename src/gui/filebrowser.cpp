@@ -1433,15 +1433,6 @@ void CFileBrowser::paintHead()
 	free(l_name);
 }
 
-bool chooserDir(char *setting_dir, bool test_dir, const char *action_str, size_t str_leng)
-{
-	std::string tmp_setting_dir = setting_dir;
-	if(chooserDir(tmp_setting_dir, test_dir, action_str)){
-		strncpy(setting_dir,tmp_setting_dir.c_str(), str_leng);
-		return true;
-	}
-	return false;
-}
 bool chooserDir(std::string &setting_dir, bool test_dir, const char *action_str)
 {
 	const char *wrong_str = "Wrong/unsupported";

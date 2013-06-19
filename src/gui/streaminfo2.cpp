@@ -493,33 +493,34 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 
 	//Video RESOLUTION
 	ypos += iheight;
-	sprintf (buf, "%s:",g_Locale->getText (LOCALE_STREAMINFO_RESOLUTION));
+	snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_STREAMINFO_RESOLUTION));
 	g_Font[font_info]->RenderString (xpos, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8
-	sprintf (buf, "%dx%d", xres, yres);
+	snprintf (buf, sizeof(buf), "%dx%d", xres, yres);
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8
 
 	//audio rate
 	ypos += iheight;
-	sprintf (buf, "%s:",g_Locale->getText (LOCALE_STREAMINFO_ARATIO));
+	snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_STREAMINFO_ARATIO));
 	g_Font[font_info]->RenderString (xpos, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8
 	switch (aspectRatio) {
 		case 0:
-			sprintf (buf, "N/A");
+			snprintf (buf, sizeof(buf), "N/A");
 			break;
 		case 1:
-			sprintf (buf, "4:3");
+			snprintf (buf, sizeof(buf), "4:3");
 			break;
 		case 2:
-			sprintf (buf, "14:9");
+			snprintf (buf, sizeof(buf), "14:9");
 			break;
 		case 3:
-			sprintf (buf, "16:9");
+			snprintf (buf, sizeof(buf), "16:9");
 			break;
 		case 4:
-			sprintf (buf, "20:9");
+			snprintf (buf, sizeof(buf), "20:9");
 			break;
 		default:
 			strncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_ARATIO_UNKNOWN), sizeof (buf)-1);
+			buf[sizeof(buf) - 1] = 0;
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8
 
@@ -554,6 +555,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 			break;
 		default:
 			strncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN), sizeof (buf)-1);
+			buf[sizeof(buf) - 1] = 0;
 			break;
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8

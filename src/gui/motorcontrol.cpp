@@ -549,7 +549,7 @@ void CMotorControl::paintSeparator(int xpos, int *pypos, int pwidth, const char 
 void CMotorControl::paintStatus()
 {
 	char buf[256];
-	char buf2[256];
+	neutrino_locale_t loc = NONEXISTANT_LOCALE;
 
 	int xpos1 = x + 10;
 	int xpos2 = xpos1 + 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(g_Locale->getText(LOCALE_MOTORCONTROL_MOTOR_POS));
@@ -560,53 +560,53 @@ void CMotorControl::paintStatus()
 	paintSeparator(xpos1, &ypos, width, g_Locale->getText(LOCALE_MOTORCONTROL_SETTINGS));
 
 	paintLine(xpos1, &ypos, width1, g_Locale->getText(LOCALE_MOTORCONTROL_MOTOR_POS));
-	sprintf(buf, "%d", motorPosition);
-	paintLine(xpos2, ypos, width2 , buf);
+	paintLine(xpos2, ypos, width2 , to_string(motorPosition).c_str());
 
 	paintLine(xpos1, &ypos, width1, g_Locale->getText(LOCALE_MOTORCONTROL_MOVEMENT));
 	switch(stepMode)
 	{
 		case STEP_MODE_ON:
-			strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_STEP_MODE));
+			loc = LOCALE_MOTORCONTROL_STEP_MODE;
 			break;
 		case STEP_MODE_OFF:
-			strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_DRIVE_MODE));
+			loc = LOCALE_MOTORCONTROL_DRIVE_MODE;
 			break;
 		case STEP_MODE_AUTO:
-			strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_DRIVE_MODE_AUTO));
+			loc = LOCALE_MOTORCONTROL_DRIVE_MODE_AUTO;
 			break;
 		case STEP_MODE_TIMED:
-			strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_TIMED_MODE));
+			loc = LOCALE_MOTORCONTROL_TIMED_MODE;
 			break;
 	}
-	paintLine(xpos2, ypos, width2, buf);
+	if (loc != NONEXISTANT_LOCALE) {
+		paintLine(xpos2, ypos, width2, g_Locale->getText(loc));
+		loc = NONEXISTANT_LOCALE;
+	}
 
 	paintLine(xpos1, &ypos, width1, g_Locale->getText(LOCALE_MOTORCONTROL_STEP_SIZE));
+	*buf = 0;
 	switch(stepMode)
 	{
 		case STEP_MODE_ON:
-			sprintf(buf, "%d", stepSize);
+			snprintf(buf, sizeof(buf), "%d", stepSize);
 			break;
 		case STEP_MODE_AUTO:
 			if(moving)
-				strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_STOP_MOVING));
+				loc = LOCALE_MOTORCONTROL_STOP_MOVING;
 			else
-				strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_STOP_STOPPED));
+				loc = LOCALE_MOTORCONTROL_STOP_STOPPED;
 			break;
 		case STEP_MODE_OFF:
-			strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_NO_MODE));
+			loc =  LOCALE_MOTORCONTROL_NO_MODE;
 			break;
 		case STEP_MODE_TIMED:
-			sprintf(buf, "%d ", stepSize * stepDelay);
-			strcat(buf, g_Locale->getText(LOCALE_MOTORCONTROL_MSEC));
+			snprintf(buf, sizeof(buf), "%d %s", stepSize * stepDelay, g_Locale->getText(LOCALE_MOTORCONTROL_MSEC));
 			break;
 	}
-	paintLine(xpos2, ypos, width2, buf);
+	paintLine(xpos2, ypos, width2, (loc == NONEXISTANT_LOCALE) ? buf : g_Locale->getText(loc));
 
 	paintSeparator(xpos1, &ypos, width, g_Locale->getText(LOCALE_MOTORCONTROL_STATUS));
-	strcpy(buf, g_Locale->getText(LOCALE_MOTORCONTROL_SAT_POS));
-	sprintf(buf2, "%d", satellitePosition);
-	strcat(buf, buf2);
+	snprintf(buf, sizeof(buf), "%s%d", g_Locale->getText(LOCALE_MOTORCONTROL_SAT_POS), satellitePosition);
 	paintLine(xpos1, &ypos, width1, buf);
 	paintSeparator(xpos1, &ypos, width, g_Locale->getText(LOCALE_MOTORCONTROL_SETTINGS));
 }

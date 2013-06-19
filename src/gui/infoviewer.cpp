@@ -253,7 +253,7 @@ void CInfoViewer::paintTime (bool show_dot, bool firstPaint)
 	if (! gotTime)
 		return;
 
-	char timestr[10];
+	char timestr[sizeof(old_timestr)];
 	time_t rawtime = time(NULL);
 	strftime ((char *) &timestr, sizeof(timestr), "%H:%M", localtime(&rawtime));
 

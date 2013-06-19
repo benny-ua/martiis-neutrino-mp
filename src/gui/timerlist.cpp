@@ -376,7 +376,10 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey == "rec_dir1") {
 		parent->hide();
 		const char *action_str = "RecDir1";
-		if(chooserDir(timerlist[selected].recordingDir, true, action_str, sizeof(timerlist[selected].recordingDir)-1)) {
+		std::string tmp(timerlist[selected].recordingDir);
+		if(chooserDir(tmp, true, action_str)) {
+			strncpy(timerlist[selected].recordingDir, tmp.c_str(), sizeof(timerlist[selected].recordingDir) - 1);
+			timerlist[selected].recordingDir[sizeof(timerlist[selected].recordingDir) - 1] = 0;
 			printf("[timerlist] new %s dir %s\n", action_str, timerlist[selected].recordingDir);
 		}
 		return menu_return::RETURN_REPAINT;
@@ -384,7 +387,10 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey == "rec_dir2") {
 		parent->hide();
 		const char *action_str = "RecDir2";
-		if(chooserDir(timerNew.recordingDir, true, action_str, sizeof(timerNew.recordingDir)-1)) {
+		std::string tmp(timerNew.recordingDir);
+		if(chooserDir(tmp, true, action_str)-1) {
+			strncpy(timerNew.recordingDir, tmp.c_str(), sizeof(timerNew.recordingDir) - 1);
+			timerNew.recordingDir[sizeof(timerNew.recordingDir) - 1] = 0;
 			printf("[timerlist] new %s dir %s\n", action_str, timerNew.recordingDir);
 		}
 		return menu_return::RETURN_REPAINT;
@@ -1089,7 +1095,8 @@ int CTimerList::modifyTimer()
 	timerSettings.addItem(GenericMenuSeparatorLine);
 
 	char type[80];
-	strcpy(type, convertTimerType2String(timer->eventType)); // UTF
+	strncpy(type, convertTimerType2String(timer->eventType), sizeof(type) - 1); // UTF
+	type[sizeof(type) - 1] = 0;
 	CMenuForwarder *m0 = new CMenuForwarder(LOCALE_TIMERLIST_TYPE, false, type);
 	timerSettings.addItem( m0);
 
@@ -1251,7 +1258,7 @@ int CTimerList::newTimer()
 
 	CMenuOptionChooser* m8 = new CMenuOptionChooser(LOCALE_TIMERLIST_STANDBY, &timerNew_standby_on, TIMERLIST_STANDBY_OPTIONS, TIMERLIST_STANDBY_OPTION_COUNT, false);
 
-	std::string timerNew_message = std::string(timerNew.message);
+	std::string timerNew_message(timerNew.message);
 	CStringInputSMS timerSettings_msg(LOCALE_TIMERLIST_MESSAGE, &timerNew_message, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-.,:!?/ ");
 	CMenuForwarder *m9 = new CMenuForwarder(LOCALE_TIMERLIST_MESSAGE, false, NULL, &timerSettings_msg );
 

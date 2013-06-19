@@ -86,7 +86,7 @@ void reformatExtendedEvents(std::string strItem, std::string strLabel, bool bUse
 			// Look for matching items
 			int nPos = findItem(std::string(strItem) + std::string(index), vecDescriptions);
 			if (-1 != nPos) {
-				std::string item = std::string(vecItems[nPos]);
+				std::string item(vecItems[nPos]);
 				vecDescriptions.erase(vecDescriptions.begin() + nPos);
 				vecItems.erase(vecItems.begin() + nPos);
 				if (false == bHasItems) {

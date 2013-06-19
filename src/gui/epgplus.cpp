@@ -652,7 +652,7 @@ void EpgPlus::init()
 #endif
 	usableScreenWidth = frameBuffer->getScreenWidthRel();
 	usableScreenHeight = frameBuffer->getScreenHeightRel();
-	std::string FileName = std::string (g_settings.font_file);
+	std::string FileName(g_settings.font_file);
 	for (size_t i = 0; i < NumberOfFontSettings; ++i) {
 		int size = fontSettingTable[i].size;
 		if (bigfont && (fontSettingTable[i].settingID == EpgPlus::EPGPlus_channelentry_font ||

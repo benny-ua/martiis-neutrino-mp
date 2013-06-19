@@ -285,10 +285,10 @@ bool CRecordInstance::Stop(bool remove_event)
 	char buf[FILENAMEBUFFERSIZE]={0};
 
 	struct stat test;
-	snprintf(buf,sizeof(buf), "%s.xml", filename);
+	snprintf(buf,sizeof(buf), "%s.xml", filename.c_str());
 	if(stat(buf, &test) == 0){
 		cMovieInfo->clearMovieInfo(recMovieInfo);
-		snprintf(buf,sizeof(buf), "%s.ts", filename);
+		snprintf(buf,sizeof(buf), "%s.ts", filename.c_str());
 		recMovieInfo->file.Name = buf;
 		cMovieInfo->loadMovieInfo(recMovieInfo);//restore user bookmark
 	}
@@ -321,9 +321,9 @@ bool CRecordInstance::Stop(bool remove_event)
         CCamManager::getInstance()->Stop(channel_id, CCamManager::RECORD);
 
         if((autoshift && g_settings.auto_delete) /* || autoshift_delete*/) {
-		snprintf(buf,sizeof(buf), "nice -n 20 rm -f \"%s.ts\" &", filename);
+		snprintf(buf,sizeof(buf), "nice -n 20 rm -f \"%s.ts\" &", filename.c_str());
 		my_system(3, "/bin/sh", "-c", buf);
-		snprintf(buf,sizeof(buf), "%s.xml", filename);
+		snprintf(buf,sizeof(buf), "%s.xml", filename.c_str());
                 //autoshift_delete = false;
                 unlink(buf);
         }
@@ -416,7 +416,8 @@ void CRecordInstance::GetPids(CZapitChannel * channel)
 	for (uint32_t  i = 0; i < channel->getAudioChannelCount(); i++) {
 		CZapitClient::responseGetAPIDs response;
 		response.pid = channel->getAudioPid(i);
-		strncpy(response.desc, channel->getAudioChannel(i)->description.c_str(), DESC_MAX_LEN - 1);
+		strncpy(response.desc, channel->getAudioChannel(i)->description.c_str(), sizeof(response.desc) - 1);
+		response.desc[sizeof(response.desc) - 1] = 0;
 		response.is_ac3 = response.is_aac = 0;
 		if (channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::AC3) {
 			response.is_ac3 = 1;
@@ -655,7 +656,6 @@ void CRecordInstance::FillMovieInfo(CZapitChannel * channel, APIDList & apid_lis
 record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 {
 	std::string ext_channel_name;
-	unsigned int pos;
 
 	if(check_dir(Directory.c_str())) {
 		/* check if Directory and network_nfs_recordingdir the same */
@@ -671,63 +671,61 @@ record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 	}
 
 	// Create filename for recording
-	pos = Directory.size();
-	strcpy(filename, Directory.c_str());
+	filename = Directory;
 
-	if ((pos == 0) || (filename[pos - 1] != '/')) {
-		filename[pos] = '/';
-		pos++;
-		filename[pos] = '\0';
-	}
-	pos = strlen(filename);
+	if (filename.empty() || filename.at(filename.length() - 1) != '/')
+		filename += "/";
 
 	ext_channel_name = channel->getName();
 
 	if (!(ext_channel_name.empty())) {
-		strcpy(&(filename[pos]), UTF8_TO_FILESYSTEM_ENCODING(ext_channel_name.c_str()));
-		ZapitTools::replace_char(&filename[pos]);
+		std::string tmp = UTF8_TO_FILESYSTEM_ENCODING(ext_channel_name.c_str());
+		ZapitTools::replace_char(tmp);
+		filename += tmp;
 
 		if (!autoshift && g_settings.recording_save_in_channeldir) {
 			struct stat statInfo;
-			int res = stat(filename,&statInfo);
+			int res = stat(filename.c_str(),&statInfo);
 			if (res == -1) {
 				if (errno == ENOENT) {
-					res = safe_mkdir(filename);
+					res = safe_mkdir(filename.c_str());
 					if (res == 0)
-						strncat(filename,"/",FILENAMEBUFFERSIZE - strlen(filename) -1);
+						filename += "/";
 					else
 						perror("[vcrcontrol] mkdir");
 				} else
 					perror("[vcrcontrol] stat");
 			} else
 				// directory exists
-				strncat(filename,"/",FILENAMEBUFFERSIZE - strlen(filename)-1);
+				filename += "/";
 		} else
-			strncat(filename, "_",FILENAMEBUFFERSIZE - strlen(filename)-1);
+			filename += "_";
 	}
 
-	pos = strlen(filename);
 	if (g_settings.recording_epg_for_filename) {
 		if(epgid != 0) {
 			CShortEPGData epgdata;
 			if(CEitManager::getInstance()->getEPGidShort(epgid, &epgdata)) {
 				if (!(epgdata.title.empty())) {
-					strcpy(&(filename[pos]), epgdata.title.c_str());
-					ZapitTools::replace_char(&filename[pos]);
+					std::string tmp = epgdata.title;
+					ZapitTools::replace_char(tmp);
+					filename += tmp;
 				}
 			}
 		} else if (!epgTitle.empty()) {
-			strcpy(&(filename[pos]), epgTitle.c_str());
-			ZapitTools::replace_char(&filename[pos]);
+			std::string tmp = epgTitle;
+			ZapitTools::replace_char(tmp);
+			filename += tmp;
 		}
 	}
 
-	pos = strlen(filename);
+	char buf[40];
 	time_t t = time(NULL);
-	pos += strftime(&(filename[pos]), sizeof(filename) - pos - 1, "%Y%m%d_%H%M%S", localtime(&t));
+	strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", localtime(&t));
+	filename += std::string(buf);
 
 	if(autoshift)
-		strncat(filename, "_temp",FILENAMEBUFFERSIZE - strlen(filename)-1);
+		filename += "_temp";
 
 	return RECORD_OK;
 }

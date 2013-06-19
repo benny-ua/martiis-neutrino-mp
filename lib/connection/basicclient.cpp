@@ -52,7 +52,7 @@ bool CBasicClient::open_connection()
 
 	memset(&servaddr, 0, sizeof(struct sockaddr_un));
 	servaddr.sun_family = AF_UNIX;
-	strcpy(servaddr.sun_path, getSocketName());              // no length check !!!
+	strncpy(servaddr.sun_path, getSocketName(), sizeof(servaddr.sun_path) - 1);
 	clilen = sizeof(servaddr.sun_family) + strlen(servaddr.sun_path);
 
 	if ((sock_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)

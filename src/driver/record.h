@@ -106,7 +106,7 @@ class CRecordInstance
 		bool		autoshift;
 
 		std::string	Directory;
-		char		filename[FILENAMEBUFFERSIZE];
+		std::string	filename;
 		std::string	rec_stop_msg;
 
 		CMovieInfo *	cMovieInfo;
@@ -135,7 +135,7 @@ class CRecordInstance
 		std::string GetEpgTitle(void) { return epgTitle; };
 		MI_MOVIE_INFO * GetMovieInfo(void) { return recMovieInfo; };
 		void GetRecordString(std::string& str);
-		const char * GetFileName() { return filename; };
+		const char * GetFileName() { return filename.c_str(); };
 		bool Timeshift() { return autoshift; };
 		int tshift_mode;
 		void SetStopMessage(const char* text) {rec_stop_msg = text;} ;

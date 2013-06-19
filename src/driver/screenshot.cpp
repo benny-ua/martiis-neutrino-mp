@@ -386,52 +386,48 @@ bool CScreenShot::SaveBmp()
  */
 void CScreenShot::MakeFileName(const t_channel_id channel_id)
 {
-	char		fname[512]; // UTF-8
 	std::string	channel_name;
 	CEPGData	epgData;
-	unsigned int	pos = 0;
 
-	snprintf(fname, sizeof(fname), "%s/", g_settings.screenshot_dir.c_str());
-	pos = strlen(fname);
+	filename = g_settings.screenshot_dir + "/";
 
 	channel_name = CServiceManager::getInstance()->GetServiceName(channel_id);
 	if (!(channel_name.empty())) {
-		strcpy(&(fname[pos]), UTF8_TO_FILESYSTEM_ENCODING(channel_name.c_str()));
-		ZapitTools::replace_char(&fname[pos]);
-		strcat(fname, "_");
+		std::string tmp = UTF8_TO_FILESYSTEM_ENCODING(channel_name.c_str());
+		ZapitTools::replace_char(tmp);
+		filename += tmp + "_";
 	}
-	pos = strlen(fname);
 
 	if(CEitManager::getInstance()->getActualEPGServiceKey(channel_id, &epgData)) {
 		CShortEPGData epgdata;
 		if(CEitManager::getInstance()->getEPGidShort(epgData.eventID, &epgdata)) {
 			if (!(epgdata.title.empty())) {
-				strcpy(&(fname[pos]), epgdata.title.c_str());
-				ZapitTools::replace_char(&fname[pos]);
+				std::string tmp = epgdata.title;
+				ZapitTools::replace_char(tmp);
+				filename += tmp;
 			}
 		}
 	}
-	pos = strlen(fname);
-
 	struct timeval tv;
-	gettimeofday(&tv, NULL);	
-	strftime(&(fname[pos]), sizeof(fname) - pos - 1, "_%Y%m%d_%H%M%S", localtime(&tv.tv_sec));
-	pos = strlen(fname);
-	snprintf(&(fname[pos]), sizeof(fname) - pos - 1, "_%03d", (int) tv.tv_usec/1000);
+	gettimeofday(&tv, NULL);
+	char buf[40];
+	strftime(buf, sizeof(buf), "_%Y%m%d_%H%M%S", localtime(&tv.tv_sec));
+	filename += std::string(buf);
+	snprintf(buf, sizeof(buf), "_%03d", (int) tv.tv_usec/1000);
+	filename += std::string(buf);
 
 	switch (format) {
 	case FORMAT_PNG:
-		strcat(fname, ".png");
+		filename += ".png";
 		break;
 	default:
 		printf("CScreenShot::MakeFileName unsupported format %d, using jpeg\n", format);
 	case FORMAT_JPG:
-		strcat(fname, ".jpg");
+		filename += ".jpg";
 		break;
 	case FORMAT_BMP:
-		strcat(fname, ".bmp");
+		filename += ".bmp";
 		break;
 	}
-	printf("CScreenShot::MakeFileName: [%s]\n", fname);
-	filename = std::string(fname);
+	printf("CScreenShot::MakeFileName: [%s]\n", filename.c_str());
 }

@@ -374,7 +374,7 @@ std::string COPKGManager::getBlankPkgName(const std::string& line)
 int COPKGManager::execCmd(const char *cmdstr, bool verbose, bool acknowledge)
 {
 fprintf(stderr, "execCmd(%s)\n", cmdstr);
-	std::string cmd = std::string(cmdstr);
+	std::string cmd(cmdstr);
 	if (verbose) {
 		cmd += " 2>&1";
 		int res;

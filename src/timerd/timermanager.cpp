@@ -1236,8 +1236,10 @@ void CTimerEvent_Record::fireEvent()
 	Refresh();
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
-	strcpy(ri.recordingDir, recordingDir.substr(0,sizeof(ri.recordingDir)-1).c_str());
-	strcpy(ri.epgTitle, epgTitle.substr(0,sizeof(ri.epgTitle)-1).c_str());
+	strncpy(ri.recordingDir, recordingDir.c_str(), sizeof(ri.recordingDir) - 1);
+	ri.recordingDir[sizeof(ri.recordingDir) - 1] = 0;
+	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle) - 1);
+	ri.epgTitle[sizeof(ri.epgTitle) - 1] = 0;
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_RECORD_START,
 								  CEventServer::INITID_TIMERD,
 								  &ri,
@@ -1250,8 +1252,10 @@ void CTimerEvent_Record::announceEvent()
 	Refresh();
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
-	strcpy(ri.recordingDir, recordingDir.substr(0,sizeof(ri.recordingDir)-1).c_str());
-	strcpy(ri.epgTitle, epgTitle.substr(0,sizeof(ri.epgTitle)-1).c_str());
+	strncpy(ri.recordingDir, recordingDir.c_str(), sizeof(ri.recordingDir) - 1);
+	ri.recordingDir[sizeof(ri.recordingDir) - 1] = 0;
+	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle) - 1);
+	ri.epgTitle[sizeof(ri.epgTitle) - 1] = 0;
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_ANNOUNCE_RECORD, CEventServer::INITID_TIMERD,
 								  &ri,sizeof(CTimerd::RecordingInfo));
 	dprintf("Record announcement\n");
@@ -1345,7 +1349,8 @@ void CTimerEvent_Zapto::announceEvent()
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
 	ri.recordingDir[0] = 0;
-	strcpy(ri.epgTitle, epgTitle.substr(0,sizeof(ri.epgTitle)-1).c_str());
+	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle)-1);
+	ri.epgTitle[sizeof(ri.epgTitle)-1] = 0;
 
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_ANNOUNCE_ZAPTO,
 								  CEventServer::INITID_TIMERD,
@@ -1484,7 +1489,8 @@ CTimerEvent(CTimerd::TIMER_REMIND, config, iId)
 	std::stringstream ostr;
 	ostr << iId;
 	std::string id=ostr.str();
-	strcpy(message, config->getString("MESSAGE_"+id).c_str());
+	strncpy(message, config->getString("MESSAGE_"+id).c_str(), sizeof(message) - 1);
+	message[sizeof(message) - 1] = 0;
 	dprintf("read MESSAGE_%s %s (%p)\n",id.c_str(),message,message);
 }
 //------------------------------------------------------------
@@ -1527,7 +1533,8 @@ CTimerEvent(CTimerd::TIMER_EXEC_PLUGIN, config, iId)
 	std::stringstream ostr;
 	ostr << iId;
 	std::string id=ostr.str();
-	strcpy(name, config->getString("NAME_"+id).c_str());
+	strncpy(name, config->getString("NAME_"+id).c_str(), sizeof(name) - 1);
+	name[sizeof(name) - 1] = 0;
 	dprintf("read NAME_%s %s (%p)\n",id.c_str(),name,name);
 }
 //------------------------------------------------------------

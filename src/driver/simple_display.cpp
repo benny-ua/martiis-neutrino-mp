@@ -446,7 +446,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 
 	waitSec = 0;
 	if (str) {
-		std::string s = std::string(str);
+		std::string s(str);
 
 		size_t start = s.find_first_not_of (" \t\n");
 		if (start != std::string::npos) {

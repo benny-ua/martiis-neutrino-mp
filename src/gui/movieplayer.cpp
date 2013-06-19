@@ -987,7 +987,7 @@ void CMoviePlayerGui::PlayFile(void)
 			ss -= mm * 60;
 			char val[10];
 			snprintf(val, sizeof(val), "%.2d:%.2d", hh, mm); // eplayer lacks precision, omit seconds
-			std::string Value = std::string(val);
+			std::string Value(val);
 			ss = 0;
 			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, &Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
 			jumpTime.exec(NULL, "");

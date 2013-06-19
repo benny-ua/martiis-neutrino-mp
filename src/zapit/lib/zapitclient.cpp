@@ -1181,7 +1181,8 @@ void CZapitClient::registerEvent(const unsigned int eventID, const unsigned int 
 	msg.eventID = eventID;
 	msg.clientID = clientID;
 
-	strcpy(msg.udsName, udsName);
+	strncpy(msg.udsName, udsName, sizeof(msg.udsName) - 1);
+	msg.udsName[sizeof(msg.udsName) - 1] = 0;
 
 	send(CZapitMessages::CMD_REGISTEREVENTS, (char*)&msg, sizeof(msg));
 

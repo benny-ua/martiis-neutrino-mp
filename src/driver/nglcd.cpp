@@ -152,7 +152,7 @@ void nGLCD::Exec() {
 			char timebuf[10];
 			strftime(timebuf, sizeof(timebuf), "%H:%M", tm);
 
-			std::string Time = std::string(timebuf);
+			std::string Time(timebuf);
 
 			bitmap->DrawText(max(2,(bitmap->Width() - 4 - font_time_standby.Width(Time))/2),
 				(bitmap->Height() - font_time_standby.Height(Time))/2, bitmap->Width() - 1, Time,
@@ -266,7 +266,7 @@ void nGLCD::Exec() {
 		char timebuf[10];
 		strftime(timebuf, sizeof(timebuf), "%H:%M", tm);
 
-		std::string Time = std::string(timebuf);
+		std::string Time(timebuf);
 
 		bitmap->DrawText(max(2,(bitmap->Width() - 4 - font_time.Width(Time))/2),
 			off * bitmap->Height()/100, bitmap->Width() - 1, Time,

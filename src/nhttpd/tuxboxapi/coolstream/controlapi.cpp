@@ -1372,7 +1372,7 @@ void CControlAPI::epgDetailList(CyhookHandler *hh) {
 		for (int i = start_bouquet; i < bouquet_size; i++) {
 			channels = mode == CZapitClient::MODE_RADIO ? g_bouquetManager->Bouquets[i]->radioChannels : g_bouquetManager->Bouquets[i]->tvChannels;
 #ifdef MARTII
-			std::string bouquet = std::string(g_bouquetManager->Bouquets[i]->lName.c_str());
+			std::string bouquet = g_bouquetManager->Bouquets[i]->lName;
 #else
 			std::string bouquet = std::string(g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : g_bouquetManager->Bouquets[i]->Name.c_str());
 #endif

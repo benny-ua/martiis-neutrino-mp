@@ -88,7 +88,7 @@ bool CBasicServer::prepare(const char* socketname)
 
 	memset(&servaddr, 0, sizeof(struct sockaddr_un));
 	servaddr.sun_family = AF_UNIX;
-	strcpy(servaddr.sun_path, socketname);
+	strncpy(servaddr.sun_path, socketname, sizeof(servaddr.sun_path) - 1);
 	clilen = sizeof(servaddr.sun_family) + strlen(servaddr.sun_path);
 
 	unlink(socketname);

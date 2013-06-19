@@ -33,6 +33,7 @@ namespace ZapitTools
 	std::string Latin1_to_UTF8 (const char *);
 	std::string Latin1_to_UTF8 (const std::string &s);
 	void replace_char(char * p_act);
+	void replace_char(std::string &s);
 }
 
 #endif

@@ -286,12 +286,13 @@ void netGetMacAddr(std::string &ifname, unsigned char *mac)
 	struct ifreq ifr;
 
 	memset(mac, 0, 6);
+	memset(&ifr, 0, sizeof(ifr));
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if(fd < 0)
 		return;
 
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name, ifname.c_str(), sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, ifname.c_str(), sizeof(ifr.ifr_name) - 1);
 
 	if(ioctl(fd, SIOCGIFHWADDR, &ifr) < 0)
 		return;

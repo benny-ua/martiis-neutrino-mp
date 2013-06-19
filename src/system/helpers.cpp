@@ -190,7 +190,6 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 	return(fp);
 }
 
-#ifdef MARTII
 int safe_mkdir(const char * path)
 {
 	struct statfs s;
@@ -214,22 +213,6 @@ int safe_mkdir(const char * path)
 		return -1;
 	return mkdir(path, 0755);
 }
-#else
-int safe_mkdir(char * path)
-{
-	struct statfs s;
-	int ret = 0;
-	if(!strncmp(path, "/hdd", 4)) {
-		ret = statfs("/hdd", &s);
-		if((ret != 0) || (s.f_type == 0x72b6))
-			ret = -1;
-		else
-			mkdir(path, 0755);
-	} else
-		mkdir(path, 0755);
-	return ret;
-}
-#endif
 
 /* function used to check is this dir writable, i.e. not flash, for record etc */
 int check_dir(const char * dir)
@@ -420,8 +403,8 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 	DIR *Directory;
 	struct dirent *CurrentFile;
 	static struct stat FileInfo;
-	char srcPath[PATH_MAX];
-	char dstPath[PATH_MAX];
+	std::string srcPath;
+	std::string dstPath;
 	char buf[PATH_MAX];
 
 	//open directory
@@ -454,27 +437,23 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 	while ((CurrentFile = readdir(Directory)) != NULL) {
 		// ignore '.' and '..'
 		if (strcmp(CurrentFile->d_name, ".") && strcmp(CurrentFile->d_name, "..")) {
-			strcpy(srcPath, Src);
-			strcat(srcPath, "/");
-			strcat(srcPath, CurrentFile->d_name);
-			if (lstat(srcPath, &FileInfo) == -1) {
+			srcPath = std::string(Src) + "/" + std::string(CurrentFile->d_name);
+			if (lstat(srcPath.c_str(), &FileInfo) == -1) {
 				closedir(Directory);
 				return false;
 			}
-			strcpy(dstPath, Dst);
-			strcat(dstPath, "/");
-			strcat(dstPath, CurrentFile->d_name);
+			dstPath = std::string(Dst) + "/" + std::string(CurrentFile->d_name);
 			// is symlink
 			if (S_ISLNK(FileInfo.st_mode)) {
-				int len = readlink(srcPath, buf, sizeof(buf)-1);
-				if (len != -1) {
+				int len = readlink(srcPath.c_str(), buf, sizeof(buf)-1);
+				if (len != -1 && len < (int) sizeof(buf)) {
 					buf[len] = '\0';
-					symlink(buf, dstPath);
+					symlink(buf, dstPath.c_str());
 				}
 			}
 			// is directory
 			else if (S_ISDIR(FileInfo.st_mode)) {
-				copyDir(srcPath, dstPath);
+				copyDir(srcPath.c_str(), dstPath.c_str());
 			}
 			// is file
 			else if (S_ISREG(FileInfo.st_mode)) {
@@ -484,7 +463,7 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 				if (backupMode && (CExtUpdate::getInstance()->isBlacklistEntry(srcPath)))
 					save = ".save";
 #endif
-				copyFile(srcPath, (dstPath + save).c_str(), FileInfo.st_mode & 0x0FFF);
+				copyFile(srcPath.c_str(), (dstPath + save).c_str(), FileInfo.st_mode & 0x0FFF);
 			}
 		}
 	}
@@ -494,7 +473,7 @@ bool CFileHelpers::copyDir(const char *Src, const char *Dst, bool backupMode)
 
 bool CFileHelpers::createDir(const char *Dir, mode_t mode)
 {
-	char dirPath[PATH_MAX];
+	char dirPath[strlen(Dir) + 1];
 	DIR *dir;
 	if ((dir = opendir(Dir)) != NULL) {
 		closedir(dir);

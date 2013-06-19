@@ -489,7 +489,7 @@ void CKeybindSetup::showKeyBindMovieplayerSetup(CMenuWidget *bindSettings_mplaye
 
 bool CKeybindSetup::changeNotify(const neutrino_locale_t OptionName, void * /* data */)
 {
-#ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES)) {
 		struct sockaddr_un sun;
 		memset(&sun, 0, sizeof(sun));

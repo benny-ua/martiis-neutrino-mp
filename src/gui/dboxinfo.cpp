@@ -53,10 +53,8 @@
 #include <sys/sysinfo.h>
 #include <sys/vfs.h>
 #include <system/helpers.h>
-#ifdef MARTII
 #include <map>
 #include <ctype.h>
-#endif
 
 static const int FSHIFT = 16;              /* nr of bits of precision */
 #define FIXED_1         (1<<FSHIFT)     /* 1.0 as fixed-point */
@@ -194,19 +192,11 @@ void CDBoxInfoWidget::paint()
 	int fontWidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
 	int sizeOffset = fontWidth * 7;//9999.99M
 	int percOffset = fontWidth * 3 ;//100%
-#ifdef MARTII
 	int nameOffset = fontWidth * 19;//WWWwwwwwww
-#else
-	int nameOffset = fontWidth * 9;//WWWwwwwwww
-#endif
 	int offsetw = nameOffset+ (sizeOffset+10)*3 +10+percOffset+10;
 	offsetw += 20;
 	width = offsetw + 10 + 120;
-#ifdef MARTII
 	height = hheight + 9 * mheight;
-#else
-	height = hheight + 6 * mheight;
-#endif
 
 	struct statfs s;
 	FILE *          mountFile;
@@ -217,19 +207,15 @@ void CDBoxInfoWidget::paint()
 	if ((mountFile = setmntent("/proc/mounts", "r")) == NULL) {
 		perror("/proc/mounts");
 	} else {
-#ifdef MARTII
 		map<dev_t,bool>seen;
-#endif
 		while ((mnt = getmntent(mountFile)) != NULL) {
 			if (strcmp(mnt->mnt_fsname, "rootfs") == 0)
 				continue;
 			if (::statfs(mnt->mnt_dir, &s) == 0) {
-#ifdef MARTII
 				struct stat st;
 				if (!stat(mnt->mnt_dir, &st) && seen.find(st.st_dev) != seen.end())
 					continue;
 				seen[st.st_dev] = true;
-#endif
 				switch (s.f_type)	/* f_type is long */
 				{
 				case 0xEF53L:		/*EXT2 & EXT3*/
@@ -240,16 +226,8 @@ void CDBoxInfoWidget::paint()
 				case 0x65735546L:	/*fuse for ntfs*/
 				case 0x58465342L:	/*xfs*/
 				case 0x4d44L:		/*msdos*/
-#ifndef MARTII
-					break;
-#endif
 				case 0x72b6L:		/*jffs2*/
-#ifdef MARTII
 				case 0x5941ff53L:	/*yaffs2*/
-#endif
-#ifndef MARTII
-					height += mheight;
-#endif
 					break;
 				default:
 					continue;
@@ -265,14 +243,13 @@ void CDBoxInfoWidget::paint()
 	x = getScreenStartX(width);
 	y = getScreenStartY(height);
 
-#ifndef MARTII
-	fprintf(stderr, "CDBoxInfoWidget::CDBoxInfoWidget() x = %d, y = %d, width = %d height = %d\n", x, y, width, height);
-#endif
+	// fprintf(stderr, "CDBoxInfoWidget::CDBoxInfoWidget() x = %d, y = %d, width = %d height = %d\n", x, y, width, height);
+
 	int ypos=y;
 	int i = 0;
 	frameBuffer->paintBoxRel(x, ypos, width, hheight, COL_MENUHEAD_PLUS_0, RADIUS_LARGE, CORNER_TOP);
 	frameBuffer->paintBoxRel(x, ypos+ hheight, width, height- hheight, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
-#ifdef MARTII
+
 	//paint menu head
 	string iconfile = NEUTRINO_ICON_SHELL;
 	int HeadiconOffset = 0;
@@ -286,7 +263,6 @@ void CDBoxInfoWidget::paint()
 		width-((fw/3)+HeadiconOffset), g_Locale->getText(LOCALE_EXTRA_DBOXINFO),
 		COL_MENUHEAD, 0, true); // UTF-8
 	frameBuffer->paintIcon(iconfile, x + fw/4, y, hheight);
-#endif
 
 	ypos+= hheight + (mheight >>1);
 	FILE* fd = fopen("/proc/cpuinfo", "rt");
@@ -324,9 +300,7 @@ void CDBoxInfoWidget::paint()
 				continue;
 			if (read > 0 && buffer[read-1] == '\n')
 				buffer[read-1] = '\0';
-#ifdef MARTII
 			buffer[0] = toupper(buffer[0]);
-#endif
 			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, buffer, COL_MENUCONTENT);
 			ypos+= mheight;
 		}
@@ -379,7 +353,6 @@ void CDBoxInfoWidget::paint()
 		int headOffset=0;
 		int mpOffset=0;
 		bool rec_mp=false, memory_flag = false;
-#ifdef MARTII
 		const int headSize_mem = 5;
 		const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use%"};
 		// paint mount head
@@ -469,7 +442,6 @@ void CDBoxInfoWidget::paint()
 			ypos+= mheight;
 		}
 		ypos+= mheight;
-#endif
 		
 		// paint mount head
 		for (int j = 0; j < headSize; j++) {
@@ -499,41 +471,28 @@ void CDBoxInfoWidget::paint()
 			perror("/proc/mounts");
 		}
 		else {
-#ifdef MARTII
 			map<dev_t,bool>seen;
-#endif
 			while ((mnt = getmntent(mountFile)) != 0) {
 				if (::statfs(mnt->mnt_dir, &s) == 0) {
-#ifndef MARTII
-					if (strcmp(mnt->mnt_fsname, "rootfs") == 0) {
-						strcpy(mnt->mnt_fsname, "memory");
-						memory_flag = true;
-					}
-#endif
 
-#ifdef MARTII
-				struct stat st;
-				if (!stat(mnt->mnt_dir, &st) && seen.find(st.st_dev) != seen.end())
-					continue;
-				seen[st.st_dev] = true;
-#endif
-					switch (s.f_type)
-					{
-					case (int) 0xEF53:      /*EXT2 & EXT3*/
-					case (int) 0x6969:      /*NFS*/
-					case (int) 0xFF534D42:  /*CIFS*/
-					case (int) 0x517B:      /*SMB*/
-					case (int) 0x52654973:  /*REISERFS*/
-					case (int) 0x65735546:  /*fuse for ntfs*/
-					case (int) 0x58465342:  /*xfs*/
-					case (int) 0x4d44:      /*msdos*/
-					case (int) 0x72b6:	/*jffs2*/
-#ifdef MARTII
-					case (int) 0x5941ff53:	/*yaffs2*/
-#endif
-						break;
-					default:
+					struct stat st;
+					if (!stat(mnt->mnt_dir, &st) && seen.find(st.st_dev) != seen.end())
 						continue;
+					seen[st.st_dev] = true;
+					switch (s.f_type) {
+						case (int) 0xEF53:      /*EXT2 & EXT3*/
+						case (int) 0x6969:      /*NFS*/
+						case (int) 0xFF534D42:  /*CIFS*/
+						case (int) 0x517B:      /*SMB*/
+						case (int) 0x52654973:  /*REISERFS*/
+						case (int) 0x65735546:  /*fuse for ntfs*/
+						case (int) 0x58465342:  /*xfs*/
+						case (int) 0x4d44:      /*msdos*/
+						case (int) 0x72b6:	/*jffs2*/
+						case (int) 0x5941ff53:	/*yaffs2*/
+							break;
+						default:
+							continue;
 					}
 					if ( s.f_blocks > 0 || memory_flag ) {
 						int percent_used;
