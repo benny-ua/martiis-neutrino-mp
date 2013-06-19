@@ -43,8 +43,11 @@
 #include <gui/widget/stringinput_ext.h>
 #include <gui/widget/hintbox.h>
 #include <gui/widget/messagebox.h>
-
 #include <gui/network_service.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <global.h>
 #include <neutrino.h>
@@ -203,6 +206,16 @@ static int my_filter(const struct dirent * dent)
 	return 1;
 }
 
+void CNetworkSetup::setBroadcast(void)
+{
+	in_addr_t na = inet_addr(network_address.c_str());
+	in_addr_t nm = inet_addr(network_netmask.c_str());
+	struct in_addr in;
+	in.s_addr = na | ~nm;
+	char tmp[40];
+	network_broadcast = (inet_ntop(AF_INET, &in, tmp, sizeof(tmp))) ? std::string(tmp) : "0.0.0.0";
+}
+
 int CNetworkSetup::showNetworkSetup()
 {
 	struct dirent **namelist;
@@ -246,8 +259,7 @@ int CNetworkSetup::showNetworkSetup()
 
 	//prepare input entries
 	CIPInput networkSettings_NetworkIP(LOCALE_NETWORKMENU_IPADDRESS  , &network_address   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, this);
-	CIPInput networkSettings_NetMask  (LOCALE_NETWORKMENU_NETMASK    , &network_netmask   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CIPInput networkSettings_Broadcast(LOCALE_NETWORKMENU_BROADCAST  , &network_broadcast , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
+	CIPInput networkSettings_NetMask  (LOCALE_NETWORKMENU_NETMASK    , &network_netmask   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, this);
 	CIPInput networkSettings_Gateway  (LOCALE_NETWORKMENU_GATEWAY    , &network_gateway   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
 	CIPInput networkSettings_NameServer(LOCALE_NETWORKMENU_NAMESERVER, &network_nameserver, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
 
@@ -263,7 +275,8 @@ int CNetworkSetup::showNetworkSetup()
 
 	CMenuForwarder *m1 = new CMenuForwarder(LOCALE_NETWORKMENU_IPADDRESS , networkConfig->inet_static, NULL, &networkSettings_NetworkIP );
 	CMenuForwarder *m2 = new CMenuForwarder(LOCALE_NETWORKMENU_NETMASK   , networkConfig->inet_static, NULL, &networkSettings_NetMask   );
-	CMenuForwarder *m3 = new CMenuForwarder(LOCALE_NETWORKMENU_BROADCAST , networkConfig->inet_static, NULL, &networkSettings_Broadcast );
+	setBroadcast();
+	CMenuForwarder *m3 = new CMenuForwarder(LOCALE_NETWORKMENU_BROADCAST , false, network_broadcast);
 	CMenuForwarder *m4 = new CMenuForwarder(LOCALE_NETWORKMENU_GATEWAY   , networkConfig->inet_static, NULL, &networkSettings_Gateway   );
 	CMenuForwarder *m5 = new CMenuForwarder(LOCALE_NETWORKMENU_NAMESERVER, networkConfig->inet_static, NULL, &networkSettings_NameServer);
 	CMenuForwarder *m8 = new CMenuForwarder(LOCALE_NETWORKMENU_HOSTNAME  , true,			   NULL, &networkSettings_Hostname  );
@@ -632,7 +645,7 @@ void CNetworkSetup::restoreNetworkSettings()
 	network_dhcp			= old_network_dhcp;
 	network_address			= old_network_address;
 	network_netmask			= old_network_netmask;
-	network_broadcast		= old_network_broadcast;
+	setBroadcast();
 	network_nameserver		= old_network_nameserver;
 	network_gateway			= old_network_gateway;
 	network_hostname		= old_network_hostname;
@@ -662,17 +675,9 @@ void CNetworkSetup::restoreNetworkSettings()
 bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void * Data)
 {
 	if(locale == LOCALE_NETWORKMENU_IPADDRESS) {
-		char ip[16];
-		unsigned char _ip[4];
-		sscanf((char*) Data, "%hhu.%hhu.%hhu.%hhu", &_ip[0], &_ip[1], &_ip[2], &_ip[3]);
-
-		sprintf(ip, "%hhu.%hhu.%hhu.255", _ip[0], _ip[1], _ip[2]);
-		networkConfig->broadcast = ip;
-		network_broadcast = networkConfig->broadcast;
-
-		networkConfig->netmask = (_ip[0] == 10) ? "255.0.0.0" : "255.255.255.0";
-		network_netmask = networkConfig->netmask;
-
+		setBroadcast();
+	} else if(locale == LOCALE_NETWORKMENU_NETMASK) {
+		setBroadcast();
 	} else if(locale == LOCALE_NETWORKMENU_SELECT_IF) {
 #ifdef MARTII
 		// Width may change. Clear framebuffer, caller will redraw anyway.
