@@ -206,10 +206,10 @@ int CAudioSelectMenuHandler::doMenu ()
 	int percent[p_count];
 	for (uint i=0; i < p_count; i++) {
 		percent[i] = CZapit::getInstance()->GetPidVolume(0, g_RemoteControl->current_PIDs.APIDs[i].pid);
-		AudioSelector.addItem(new CMenuOptionNumberChooser(NONEXISTANT_LOCALE, &percent[i],
+		AudioSelector.addItem(new CMenuOptionNumberChooser(g_RemoteControl->current_PIDs.APIDs[i].desc,
+					&percent[i],
 					i == g_RemoteControl->current_PIDs.PIDs.selected_apid,
-					0, 999, CVolume::getInstance(), 0, 0, NONEXISTANT_LOCALE,
-					g_RemoteControl->current_PIDs.APIDs[i].desc));
+					0, 999, CVolume::getInstance()));
 	}
 
 #ifdef MARTII
