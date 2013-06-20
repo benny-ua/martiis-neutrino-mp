@@ -97,6 +97,20 @@ CColorChooser::CColorChooser(const neutrino_locale_t Name, unsigned char *R, uns
 	value[VALUE_ALPHA] = Alpha;
 }
 
+std::string CColorChooser::getValueString(fb_pixel_t *bgcol)
+{
+	if (bgcol) {
+		int color = convertSetupColor2RGB(*(value[VALUE_R]), *(value[VALUE_G]), *(value[VALUE_B]));
+		int tAlpha = (value[VALUE_ALPHA]) ? (convertSetupAlpha2Alpha(*(value[VALUE_ALPHA]))) : 0;
+
+		if(!value[VALUE_ALPHA]) tAlpha = 0xFF;
+
+		*bgcol = ((tAlpha << 24) & 0xFF000000) | color;
+	}
+
+	return "";
+}
+
 void CColorChooser::setColor()
 {
 	int color = convertSetupColor2RGB(*(value[VALUE_R]), *(value[VALUE_G]), *(value[VALUE_B]));

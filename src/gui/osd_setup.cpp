@@ -667,7 +667,7 @@ private:
 
 protected:
 
-	std::string getOption(void) {
+	std::string getOption(fb_pixel_t * bgcol __attribute__((unused)) = NULL) {
 		return to_string(configfile->getInt32(locale_real_names[name], defaultvalue));
 	}
 

@@ -55,7 +55,7 @@ CExtendedInput::CExtendedInput(const neutrino_locale_t Name, std::string *Value,
 	Init();
 }
 
-std::string CExtendedInput::getValueString(void)
+std::string CExtendedInput::getValueString(fb_pixel_t *)
 {
 	if (valueString) {
 		std::string res = *valueString;
@@ -714,7 +714,7 @@ CIntInput::CIntInput(const neutrino_locale_t Name, int *Value, const unsigned in
 	addInputField( new CExtendedInput_Item_newLiner(30) );
 }
 
-std::string CIntInput::getValueString(void)
+std::string CIntInput::getValueString(fb_pixel_t *)
 {
 	return to_string(*myValue);
 }

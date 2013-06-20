@@ -87,7 +87,7 @@ class CExtendedInput : public CMenuTarget
 
 		void addInputField( CExtendedInput_Item* );
 
-		virtual std::string getValueString(void);
+		virtual std::string getValueString(fb_pixel_t *bgcol = NULL);
 };
 
 
@@ -232,7 +232,7 @@ class CIntInput : public CExtendedInput
 		CIntInput(const neutrino_locale_t Name, int *Value, const unsigned int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
 		//char* getValue() { return myValueStringOutput; }
 		void updateValue() { onBeforeExec(); }
-		std::string getValueString(void);
+		std::string getValueString(fb_pixel_t *);
 };
 
 #endif

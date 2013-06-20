@@ -89,7 +89,7 @@ class CStringInput : public CMenuTarget
 		void hide();
 		int exec( CMenuTarget* parent, const std::string & actionKey );
 		void setMinMax(const int min_value, const int max_value);
-		std::string getValueString(void);
+		std::string getValueString(fb_pixel_t *);
 };
 
 class CStringInputSMS : public CStringInput
