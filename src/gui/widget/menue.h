@@ -213,7 +213,7 @@ class CMenuForwarder : public CMenuItem
 	const std::string * option_string;
 	CMenuTarget *       jumpTarget;
 
-	std::string getOption(void);
+	virtual std::string getOption(void);
 
  public:
 
@@ -228,7 +228,7 @@ class CMenuForwarder : public CMenuItem
 	int paint(bool selected=false);
 	int getHeight(void) const;
 	int getWidth(void);
-	void setOption(const char *Option);
+	// void setOption(const char *Option);
 	// void setTextLocale(const neutrino_locale_t Text);
 	neutrino_locale_t getTextLocale(){return name;};
 	CMenuTarget* getTarget(){return jumpTarget;};

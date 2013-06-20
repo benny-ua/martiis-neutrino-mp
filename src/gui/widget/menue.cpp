@@ -1874,6 +1874,7 @@ int CMenuForwarder::getHeight(void) const
 	return g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 }
 
+#if 0 // unused --martii
 // used gets set by the addItem() function. This is for set to paint Option string by just not calling the addItem() function.
 // Without this, the changeNotifiers would become machine-dependent.
 void CMenuForwarder::setOption(const char *Option)
@@ -1884,7 +1885,6 @@ void CMenuForwarder::setOption(const char *Option)
 		paint();
 }
 
-#if 0 // unused --martii
 // used gets set by the addItem() function. This is for set to paint Text from locales by just not calling the addItem() function.
 // Without this, the changeNotifiers would become machine-dependent.
 void CMenuForwarder::setTextLocale(const neutrino_locale_t Text)
