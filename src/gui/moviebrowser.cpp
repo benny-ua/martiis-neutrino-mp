@@ -3934,7 +3934,6 @@ bool CMovieBrowser::showYTMenu()
 	mainMenu.addItem(new CMenuOptionChooser(LOCALE_MOVIEBROWSER_YT_PREF_QUALITY, &m_settings.ytquality, YT_QUALITY_OPTIONS, YT_QUALITY_OPTION_COUNT, true, NULL, CRCInput::RC_nokey, "", true));
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_CONCURRENT_CONNECTIONS, &m_settings.ytconcconn, true, 1, 8));
 
-
 	yt_menue = &mainMenu;
 	yt_menue_end = yt_menue->getItemsCount();
 	CYTCacheSelectorTarget ytcache_sel(this);

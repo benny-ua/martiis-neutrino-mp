@@ -32,9 +32,9 @@
 
 #include <OpenThreads/ScopedLock>
 #include "settings.h"
-#include "set_threadname.h"
 #include "helpers.h"
 #include <global.h>
+#include "set_threadname.h"
 
 #include "ytparser.h"
 #include "ytcache.h"

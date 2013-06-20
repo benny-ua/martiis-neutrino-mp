@@ -432,10 +432,8 @@ class CMenuWidget : public CMenuTarget
 		CFrameBuffer		*frameBuffer;
 		std::vector<CMenuItem*>	items;
 		std::vector<int>	page_start;
-#ifdef MARTII
 		struct keyAction { std::string action; CMenuTarget *menue; };
 		std::map<neutrino_msg_t, keyAction> keyActionMap;
-#endif
 		std::string		iconfile;
 
 		int			min_width;
