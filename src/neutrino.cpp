@@ -322,7 +322,6 @@ std::string ttx_font_file = "";
 
 int CNeutrinoApp::loadSetup(const char * fname)
 {
-	char cfg_key[81];
 	int erg = 0;
 
 	configfile.clear();
@@ -379,10 +378,12 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_Format = configfile.getInt32("video_Format", DISPLAY_AR_16_9);
 	g_settings.video_43mode = configfile.getInt32("video_43mode", DISPLAY_AR_MODE_LETTERBOX);
 	g_settings.current_volume = configfile.getInt32("current_volume", 50);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	g_settings.audio_mixer_volume_analog = configfile.getInt32("audio_mixer_volume_analog", 50);
 	g_settings.audio_mixer_volume_hdmi = configfile.getInt32("audio_mixer_volume_hdmi", 75);
 	g_settings.audio_mixer_volume_spdif = configfile.getInt32("audio_mixer_volume_spdif", 75);
+	g_settings.audio_volume_percent_ac3 = configfile.getInt32("audio_volume_percent_ac3", 100);
+	g_settings.audio_volume_percent_pcm = configfile.getInt32("audio_volume_percent_pcm", 100);
 #endif
 	g_settings.current_volume_step = configfile.getInt32("current_volume_step", 2);
 	g_settings.channel_mode = configfile.getInt32("channel_mode", LIST_MODE_PROV);
@@ -403,8 +404,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_dbdr = configfile.getInt32("video_dbdr", 0);
 
 	for(int i = 0; i < VIDEOMENU_VIDEOMODE_OPTION_COUNT; i++) {
-		sprintf(cfg_key, "enabled_video_mode_%d", i);
-		g_settings.enabled_video_modes[i] = configfile.getInt32(cfg_key, 0);
+		g_settings.enabled_video_modes[i] = configfile.getInt32("enabled_video_mode_" + to_string(i), 0);
 	}
 #ifndef MARTII
 #if VIDEOMENU_VIDEOMODE_OPTION_COUNT > 3
@@ -503,10 +503,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.auto_subs = configfile.getInt32( "auto_subs", 0 );
 
 	for(int i = 0; i < 3; i++) {
-		sprintf(cfg_key, "pref_lang_%d", i);
-		g_settings.pref_lang[i] = configfile.getString(cfg_key, "none");
-		sprintf(cfg_key, "pref_subs_%d", i);
-		g_settings.pref_subs[i] = configfile.getString(cfg_key, "none");
+		std::string i_str(to_string(i));
+		g_settings.pref_lang[i] = configfile.getString("pref_lang_" + i_str, "none");
+		g_settings.pref_subs[i] = configfile.getString("pref_subs_" + i_str, "none");
 	}
 	g_settings.zap_cycle = configfile.getInt32( "zap_cycle", 0 );
 	g_settings.audio_PCMOffset = configfile.getString( "audio_PCMOffset", "0" );
@@ -628,26 +627,17 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	//network
 	for(int i=0 ; i < NETWORK_NFS_NR_OF_ENTRIES ; i++) {
-		sprintf(cfg_key, "network_nfs_ip_%d", i);
-		g_settings.network_nfs[i].ip = configfile.getString(cfg_key, "");
-		sprintf(cfg_key, "network_nfs_dir_%d", i);
-		g_settings.network_nfs[i].dir = configfile.getString(cfg_key, "");
-		sprintf(cfg_key, "network_nfs_local_dir_%d", i);
-		g_settings.network_nfs[i].local_dir = configfile.getString( cfg_key, "" );
-		sprintf(cfg_key, "network_nfs_automount_%d", i);
-		g_settings.network_nfs[i].automount = configfile.getInt32( cfg_key, 0);
-		sprintf(cfg_key, "network_nfs_type_%d", i);
-		g_settings.network_nfs[i].type = configfile.getInt32( cfg_key, 0);
-		sprintf(cfg_key,"network_nfs_username_%d", i);
-		g_settings.network_nfs[i].username = configfile.getString( cfg_key, "" );
-		sprintf(cfg_key, "network_nfs_password_%d", i);
-		g_settings.network_nfs[i].password = configfile.getString( cfg_key, "" );
-		sprintf(cfg_key, "network_nfs_mount_options1_%d", i);
-		g_settings.network_nfs[i].mount_options1 = configfile.getString( cfg_key, "ro,soft,udp" );
-		sprintf(cfg_key, "network_nfs_mount_options2_%d", i);
-		g_settings.network_nfs[i].mount_options2 = configfile.getString( cfg_key, "nolock,rsize=8192,wsize=8192" );
-		sprintf(cfg_key, "network_nfs_mac_%d", i);
-		g_settings.network_nfs[i].mac = configfile.getString( cfg_key, "11:22:33:44:55:66");
+		std::string i_str(to_string(i));
+		g_settings.network_nfs[i].ip = configfile.getString("network_nfs_ip_" + i_str, "");
+		g_settings.network_nfs[i].dir = configfile.getString("network_nfs_dir_" + i_str, "");
+		g_settings.network_nfs[i].local_dir = configfile.getString("network_nfs_local_dir_" + i_str, "" );
+		g_settings.network_nfs[i].automount = configfile.getInt32("network_nfs_automount_" + i_str, 0);
+		g_settings.network_nfs[i].type = configfile.getInt32("network_nfs_type_" + i_str, 0);
+		g_settings.network_nfs[i].username = configfile.getString("network_nfs_username_" + i_str, "" );
+		g_settings.network_nfs[i].password = configfile.getString("network_nfs_password_" + i_str, "" );
+		g_settings.network_nfs[i].mount_options1 = configfile.getString("network_nfs_mount_options1_" + i_str, "ro,soft,udp" );
+		g_settings.network_nfs[i].mount_options2 = configfile.getString("network_nfs_mount_options2_" + i_str, "nolock,rsize=8192,wsize=8192" );
+		g_settings.network_nfs[i].mac = configfile.getString("network_nfs_mac_" + i_str, "11:22:33:44:55:66");
 	}
 	g_settings.network_nfs_audioplayerdir = configfile.getString( "network_nfs_audioplayerdir", "/media/sda1/music" );
 	g_settings.network_nfs_picturedir = configfile.getString( "network_nfs_picturedir", "/media/sda1/pictures" );
@@ -873,48 +863,42 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	//-------------------------------------------
 	// this is as the current neutrino usermen
 	const char* usermenu_default[SNeutrinoSettings::BUTTON_MAX]={
-		"2,3,4,13",                     // RED
-		"6",                            // GREEN
-		"7",                       // YELLOW
-		"12,11,20,21,19,14,15"    // BLUE
+		"2,3,4,13",		// RED
+		"6",			// GREEN
+		"7",			// YELLOW
+		"12,11,20,21,19,14,15"	// BLUE
 	};
-	char txt1[81];
-	std::string txt2;
-	const char* txt2ptr;
+
 	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++)
 	{
-		snprintf(txt1,80,"usermenu_tv_%s_text",usermenu_button_def[button]);
-		txt1[80] = 0; // terminate for sure
-		g_settings.usermenu_text[button] = configfile.getString(txt1, "");
+		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
 
-		snprintf(txt1,80,"usermenu_tv_%s",usermenu_button_def[button]);
-		txt2 = configfile.getString(txt1,usermenu_default[button]);	
-		txt2ptr = txt2.c_str();
+		std::string txt2 = configfile.getString(txt1,usermenu_default[button]);	
+		const char* txt2ptr = txt2.c_str();
 		for( int pos = 0; pos < SNeutrinoSettings::ITEM_MAX; pos++)
 		{
 			// find next comma or end of string - if it's not the first round
-			if(pos != 0)
-			{
-				while(*txt2ptr != 0 && *txt2ptr != ',')
+			if(pos) {
+				while(*txt2ptr && *txt2ptr != ',')
 					txt2ptr++;
-				if(*txt2ptr != 0)
+				if(*txt2ptr)
 					txt2ptr++;
 			}
-			if(*txt2ptr != 0)
-			{
+			if(*txt2ptr) {
 				g_settings.usermenu[button][pos] = atoi(txt2ptr);  // there is still a string
 				if(g_settings.usermenu[button][pos] >= SNeutrinoSettings::ITEM_MAX)
 					g_settings.usermenu[button][pos] = 0;
-			}
-			else
+			} else
 				g_settings.usermenu[button][pos] = 0;     // string empty, fill up with 0
 
 		}
+		txt1 += "_text";
+		g_settings.usermenu_text[button] = configfile.getString(txt1, "");
+
 	}
 
-	if(configfile.getUnknownKeyQueryedFlag() && (erg==0)) {
+	if(configfile.getUnknownKeyQueryedFlag() && (erg==0))
 		erg = 2;
-	}
 
 	/* in case FB resolution changed */
 	if((g_settings.screen_width && g_settings.screen_width != (int) frameBuffer->getScreenWidth(true))
@@ -948,7 +932,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 **************************************************************************************/
 void CNeutrinoApp::saveSetup(const char * fname)
 {
-	char cfg_key[81];
 	//scansettings
 	if(!scansettings.saveSettings(NEUTRINO_SCAN_SETTINGS_FILE)) {
 		dprintf(DEBUG_NORMAL, "error while saving scan-settings!\n");
@@ -981,6 +964,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("audio_mixer_volume_analog", g_settings.audio_mixer_volume_analog);
 	configfile.setInt32("audio_mixer_volume_hdmi", g_settings.audio_mixer_volume_hdmi);
 	configfile.setInt32("audio_mixer_volume_spdif", g_settings.audio_mixer_volume_spdif);
+	configfile.setInt32("audio_volume_percent_ac3", g_settings.audio_volume_percent_ac3);
+	configfile.setInt32("audio_volume_percent_pcm", g_settings.audio_volume_percent_pcm);
 #endif
 	configfile.setInt32( "channel_mode", g_settings.channel_mode );
 	configfile.setInt32( "channel_mode_radio", g_settings.channel_mode_radio );
@@ -998,8 +983,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "clockrec", g_settings.clockrec);
 	configfile.setInt32( "video_dbdr", g_settings.video_dbdr);
 	for(int i = 0; i < VIDEOMENU_VIDEOMODE_OPTION_COUNT; i++) {
-		sprintf(cfg_key, "enabled_video_mode_%d", i);
-		configfile.setInt32(cfg_key, g_settings.enabled_video_modes[i]);
+		configfile.setInt32("enabled_video_mode_" + to_string(i), g_settings.enabled_video_modes[i]);
 	}
 	configfile.setInt32( "cpufreq", g_settings.cpufreq);
 	configfile.setInt32( "standby_cpufreq", g_settings.standby_cpufreq);
@@ -1066,10 +1050,9 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "auto_lang", g_settings.auto_lang );
 	configfile.setInt32( "auto_subs", g_settings.auto_subs );
 	for(int i = 0; i < 3; i++) {
-		sprintf(cfg_key, "pref_lang_%d", i);
-		configfile.setString(cfg_key, g_settings.pref_lang[i]);
-		sprintf(cfg_key, "pref_subs_%d", i);
-		configfile.setString(cfg_key, g_settings.pref_subs[i]);
+		std::string i_str(to_string(i));
+		configfile.setString("pref_lang_" + i_str, g_settings.pref_lang[i]);
+		configfile.setString("pref_subs_" + i_str, g_settings.pref_subs[i]);
 	}
 	configfile.setString( "audio_PCMOffset", g_settings.audio_PCMOffset );
 #ifdef MARTII
@@ -1191,26 +1174,17 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "contrast_fonts", g_settings.contrast_fonts );
 	//network
 	for(int i=0 ; i < NETWORK_NFS_NR_OF_ENTRIES ; i++) {
-		sprintf(cfg_key, "network_nfs_ip_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].ip);
-		sprintf(cfg_key, "network_nfs_dir_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].dir);
-		sprintf(cfg_key, "network_nfs_local_dir_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].local_dir);
-		sprintf(cfg_key, "network_nfs_automount_%d", i);
-		configfile.setInt32(cfg_key, g_settings.network_nfs[i].automount);
-		sprintf(cfg_key, "network_nfs_type_%d", i);
-		configfile.setInt32(cfg_key, g_settings.network_nfs[i].type);
-		sprintf(cfg_key, "network_nfs_username_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].username);
-		sprintf(cfg_key, "network_nfs_password_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].password);
-		sprintf(cfg_key, "network_nfs_mount_options1_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].mount_options1);
-		sprintf(cfg_key, "network_nfs_mount_options2_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].mount_options2);
-		sprintf(cfg_key, "network_nfs_mac_%d", i);
-		configfile.setString(cfg_key, g_settings.network_nfs[i].mac);
+		std::string i_str(to_string(i));
+		configfile.setString("network_nfs_ip_" + i_str, g_settings.network_nfs[i].ip);
+		configfile.setString("network_nfs_dir_" + i_str, g_settings.network_nfs[i].dir);
+		configfile.setString("network_nfs_local_dir_" + i_str, g_settings.network_nfs[i].local_dir);
+		configfile.setInt32("network_nfs_automount_" + i_str, g_settings.network_nfs[i].automount);
+		configfile.setInt32("network_nfs_type_" + i_str, g_settings.network_nfs[i].type);
+		configfile.setString("network_nfs_username_" + i_str, g_settings.network_nfs[i].username);
+		configfile.setString("network_nfs_password_" + i_str, g_settings.network_nfs[i].password);
+		configfile.setString("network_nfs_mount_options1_" + i_str, g_settings.network_nfs[i].mount_options1);
+		configfile.setString("network_nfs_mount_options2_" + i_str, g_settings.network_nfs[i].mount_options2);
+		configfile.setString("network_nfs_mac_" + i_str, g_settings.network_nfs[i].mac);
 	}
 	configfile.setString( "network_nfs_audioplayerdir", g_settings.network_nfs_audioplayerdir);
 	configfile.setString( "network_nfs_picturedir", g_settings.network_nfs_picturedir);
@@ -1379,23 +1353,20 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	// USERMENU
 	//---------------------------------------
-	char txt1[81];
-	char txt2[81];
 	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++) {
-		snprintf(txt1,80,"usermenu_tv_%s_text",usermenu_button_def[button]);
-		txt1[80] = 0; // terminate for sure
-		configfile.setString(txt1,g_settings.usermenu_text[button]);
+		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
 
-		char* txt2ptr = txt2;
-		snprintf(txt1,80,"usermenu_tv_%s",usermenu_button_def[button]);
+		std::string txt2;
 		for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX; pos++) {
-			if( g_settings.usermenu[button][pos] != 0) {
-				if(pos != 0)
-					*txt2ptr++ = ',';
-				txt2ptr += snprintf(txt2ptr,80,"%d",g_settings.usermenu[button][pos]);
+			if( g_settings.usermenu[button][pos]) {
+				if(!txt2.empty())
+					txt2 += ",";
+				txt2 += to_string(g_settings.usermenu[button][pos]);
 			}
 		}
 		configfile.setString(txt1,txt2);
+		txt1 += "_text";
+		configfile.setString(txt1, g_settings.usermenu_text[button]);
 	}
 
 	configfile.setInt32("bigFonts", g_settings.bigFonts);
@@ -2016,11 +1987,10 @@ static void *autodelete_thread(void *) {
 	DIR *d = opendir(timeshiftDir.c_str());
 	if(d){
 		std::list<std::string> l;
-		while (struct dirent *e = readdir(d))
-		{
+		while (struct dirent *e = readdir(d)) {
 			std::string filename = e->d_name;
-			if ((filename.find("_temp.ts") == filename.size() - 8) || (filename.find("_temp.xml") == filename.size() - 9))
-			{
+			size_t len = filename.size();
+			if (((len > 8) && filename.substr(len - 8) == "_temp.ts") || ((len > 9) && filename.substr(len - 9) == "_temp.xml")) {
 				std::string timeshiftDir_filename = timeshiftDir + "/" + filename;
 				l.push_back(timeshiftDir_filename);
 			}
@@ -4120,7 +4090,8 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey=="reboot")
 	{
 		FILE *f = fopen("/tmp/.reboot", "w");
-		fclose(f);
+		if (f)
+			fclose(f);
 		ExitRun(true);
 		unlink("/tmp/.reboot");
 		returnval = menu_return::RETURN_NONE;
@@ -4295,12 +4266,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		char id[5];
 		int cnt = 0;
-		int enabled_count = 0;
 		for(unsigned int count=0;count < (unsigned int) g_PluginList->getNumberOfPlugins();count++) {
 			if (g_PluginList->getType(count)== CPlugins::P_TYPE_TOOL && !g_PluginList->isHidden(count)) {
 				// zB vtxt-plugins
 				sprintf(id, "%d", count);
-				enabled_count++;
 				MoviePluginSelector.addItem(new CMenuForwarder(g_PluginList->getName(count), true, NULL, MoviePluginChanger, id, CRCInput::convertDigitToKey(count)), (cnt == 0));
 				cnt++;
 			}
