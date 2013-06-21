@@ -48,10 +48,8 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			KEY_POWER_OFF,
 			KEY_PAGE_UP,
 			KEY_PAGE_DOWN,
-#ifdef MARTII
 			KEY_VOLUME_UP,
 			KEY_VOLUME_DOWN,
-#endif
 			KEY_LIST_START,
 			KEY_LIST_END,
 			KEY_CANCEL_ACTION,
@@ -76,16 +74,13 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			MPKEY_SUBTITLE,
 			MPKEY_TIME,
 			MPKEY_BOOKMARK,
-#ifdef MARTII
 			MPKEY_GOTO,
 			MPKEY_NEXT3DMODE,
 			MPKEY_VTXT,
-#endif
 			KEY_TIMESHIFT,
 			MPKEY_PLUGIN,
 			/*KEY_PLUGIN,*/
 			KEY_UNLOCK,
-#ifdef MARTII
 			KEY_TIMERLIST,
 			KEY_SHOWCLOCK,
 			KEY_Help,
@@ -95,7 +90,6 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			KEY_MOVIEPLAYER,
 			KEY_FILEPLAYER,
 			KEY_AUDIOPLAYER,
-#endif
 			KEY_SCREENSHOT,
 			KEY_PIP_CLOSE,
 			KEY_PIP_SETUP,

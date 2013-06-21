@@ -162,10 +162,8 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_KEYBINDINGMENU_POWEROFF,      	&g_settings.key_power_off,		LOCALE_MENU_HINT_KEY_POWEROFF },
 	{LOCALE_KEYBINDINGMENU_PAGEUP, 		&g_settings.key_channelList_pageup,	LOCALE_MENU_HINT_KEY_PAGEUP },
 	{LOCALE_KEYBINDINGMENU_PAGEDOWN, 	&g_settings.key_channelList_pagedown, 	LOCALE_MENU_HINT_KEY_PAGEDOWN },
-#ifdef MARTII
 	{LOCALE_KEYBINDINGMENU_VOLUMEUP, 	&g_settings.key_volumeup,		LOCALE_MENU_HINT_KEY_VOLUMEUP },
 	{LOCALE_KEYBINDINGMENU_VOLUMEDOWN,	&g_settings.key_volumedown, 		LOCALE_MENU_HINT_KEY_VOLUMEDOWN },
-#endif
 	{LOCALE_EXTRA_KEY_LIST_START, 		&g_settings.key_list_start, 		LOCALE_MENU_HINT_KEY_LIST_START },
 	{LOCALE_EXTRA_KEY_LIST_END,	 	&g_settings.key_list_end,		LOCALE_MENU_HINT_KEY_LIST_END },
 	{LOCALE_KEYBINDINGMENU_CANCEL,		&g_settings.key_channelList_cancel,	LOCALE_MENU_HINT_KEY_CANCEL },
@@ -190,16 +188,13 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_MPKEY_SUBTITLE,			&g_settings.mpkey_subtitle,		LOCALE_MENU_HINT_KEY_MPSUBTITLE },
 	{LOCALE_MPKEY_TIME,			&g_settings.mpkey_time,			LOCALE_MENU_HINT_KEY_MPTIME },
 	{LOCALE_MPKEY_BOOKMARK,			&g_settings.mpkey_bookmark, 		LOCALE_MENU_HINT_KEY_MPBOOKMARK },
-#ifdef MARTII
 	{LOCALE_MPKEY_GOTO,			&g_settings.mpkey_goto,	 		NONEXISTANT_LOCALE},
 	{LOCALE_MPKEY_NEXT3DMODE,		&g_settings.mpkey_next3dmode,		NONEXISTANT_LOCALE},
 	{LOCALE_MPKEY_VTXT,			&g_settings.mpkey_vtxt,	 		NONEXISTANT_LOCALE},
-#endif
 	{LOCALE_EXTRA_KEY_TIMESHIFT,		&g_settings.key_timeshift,  		LOCALE_MENU_HINT_KEY_MPTIMESHIFT },
 	{LOCALE_MPKEY_PLUGIN,			&g_settings.mpkey_plugin,		LOCALE_MENU_HINT_KEY_MPPLUGIN },
 	/*{LOCALE_EXTRA_KEY_PLUGIN,		&g_settings.key_plugin,			},*/
 	{LOCALE_EXTRA_KEY_UNLOCK,		&g_settings.key_unlock,			LOCALE_MENU_HINT_KEY_UNLOCK},
-#ifdef MARTII
 	{LOCALE_EXTRA_KEY_TIMERLIST,		&g_settings.key_timerlist,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SHOWCLOCK,		&g_settings.key_showclock,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
@@ -209,7 +204,6 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_MOVIEBROWSER_HEAD,		&g_settings.key_tsplayback,		NONEXISTANT_LOCALE},
 	{LOCALE_MOVIEPLAYER_FILEPLAYBACK,	&g_settings.key_fileplayback,		NONEXISTANT_LOCALE},
 	{LOCALE_AUDIOPLAYER_NAME,		&g_settings.key_audioplayback,		NONEXISTANT_LOCALE},
-#endif
 	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT },
 	{LOCALE_EXTRA_KEY_PIP_CLOSE,		&g_settings.key_pip_close,		LOCALE_MENU_HINT_KEY_PIP_CLOSE },
 	{LOCALE_EXTRA_KEY_PIP_SETUP,		&g_settings.key_pip_setup,		LOCALE_MENU_HINT_KEY_PIP_SETUP },
@@ -219,6 +213,7 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 
 int CKeybindSetup::showKeySetup()
 {
+#ifndef HAVE_SPARK_HARDWARE
 	//save original rc hardware selection and initialize text strings
 	int org_remote_control_hardware = g_settings.remote_control_hardware;
 	char RC_HW_str[4][32];
@@ -228,14 +223,11 @@ int CKeybindSetup::showKeySetup()
 	snprintf(RC_HW_str[CRCInput::RC_HW_TRIPLEDRAGON], sizeof(RC_HW_str[CRCInput::RC_HW_TRIPLEDRAGON])-1, "%s", g_Locale->getText(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE_TRIPLEDRAGON));
 	char RC_HW_msg[256];
 	snprintf(RC_HW_msg, sizeof(RC_HW_msg)-1, "%s", g_Locale->getText(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE_MSG_PART1));
+#endif
 
 	//keysetup menu
 	CMenuWidget* keySettings = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP);
-#ifdef MARTII
 	keySettings->addIntroItems(LOCALE_MAINSETTINGS_KEYBINDING, LOCALE_KEYBINDINGMENU_HEAD);
-#else
-	keySettings->addIntroItems(LOCALE_MAINSETTINGS_KEYBINDING);
-#endif
 
 	//keybindings menu
 	CMenuWidget bindSettings(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING);
@@ -245,16 +237,9 @@ int CKeybindSetup::showKeySetup()
 	showKeyBindSetup(&bindSettings);
 	CMenuForwarder * mf;
 
-#ifdef MARTII
 	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_EDIT, true, NULL, &bindSettings, NULL, CRCInput::convertDigitToKey(shortcut++));
 	mf->setHint("", LOCALE_MENU_HINT_KEY_BINDING);
 	keySettings->addItem(mf);
-#else
-	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_HEAD, true, NULL, &bindSettings, NULL, CRCInput::convertDigitToKey(shortcut++));
-	mf->setHint("", LOCALE_MENU_HINT_KEY_BINDING);
-	keySettings->addItem(mf);
-	keySettings->addItem(GenericMenuSeparator);
-#endif
 
 	mf = new CMenuForwarder(LOCALE_EXTRA_LOADKEYS, true, NULL, this, "loadkeys", CRCInput::convertDigitToKey(shortcut++));
 	mf->setHint("", LOCALE_MENU_HINT_KEY_LOAD);
@@ -269,15 +254,17 @@ int CKeybindSetup::showKeySetup()
 	CStringInput keySettings_repeatBlocker(LOCALE_KEYBINDINGMENU_REPEATBLOCK, &g_settings.repeat_blocker, 3, LOCALE_REPEATBLOCKER_HINT_1, LOCALE_REPEATBLOCKER_HINT_2, "0123456789 ", this);
 
 	keySettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_RC));
-#ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE
 	g_settings.accept_other_remotes = access("/etc/lircd_predata_lock", R_OK) ? 1 : 0;
 	keySettings->addItem(new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES, &g_settings.accept_other_remotes, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this));
 #endif
+#ifndef HAVE_SPARK_HARDWARE
 	if (RC_HW_SELECT) {
 		CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE, &g_settings.remote_control_hardware, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTIONS, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTION_COUNT, true);
 		mc->setHint("", LOCALE_MENU_HINT_KEY_HARDWARE);
 		keySettings->addItem(mc);
 	}
+#endif
 	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_REPEATBLOCK, true, NULL, &keySettings_repeatBlocker);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_REPEATBLOCK);
 	keySettings->addItem(mf);
@@ -288,6 +275,7 @@ int CKeybindSetup::showKeySetup()
 
 	int res = keySettings->exec(NULL, "");
 
+#ifndef HAVE_SPARK_HARDWARE
 	//check if rc hardware selection has changed before leaving the menu
 	if (org_remote_control_hardware != g_settings.remote_control_hardware) {
 		g_RCInput->CRCInput::set_rc_hw();
@@ -300,6 +288,7 @@ int CKeybindSetup::showKeySetup()
 			g_RCInput->CRCInput::set_rc_hw();
 		}
 	}
+#endif
 
 	delete keySettings;
 	return res;
@@ -343,7 +332,7 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", LOCALE_MENU_HINT_KEY_MOVIEPLAYER);
 	bindSettings->addItem(mf);
 
-#ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE
 	//video
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VIDEO));
 	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++) {
@@ -400,18 +389,10 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	bindSettings->addItem(mf);
 #endif
 
-#ifdef MARTII
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_TIMERLIST].keydescription, true, keychooser[KEY_TIMERLIST]->getKeyName(), keychooser[KEY_TIMERLIST]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_SHOWCLOCK].keydescription, true, keychooser[KEY_SHOWCLOCK]->getKeyName(), keychooser[KEY_SHOWCLOCK]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_HDDMENU].keydescription, true, keychooser[KEY_HDDMENU]->getKeyName(), keychooser[KEY_HDDMENU]));
-#else
-	//bindSettings->addItem(new CMenuOptionChooser(LOCALE_EXTRA_ZAP_CYCLE, &g_settings.zap_cycle, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-	// left-exit, FIXME is this option really change anything ??
-	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_MENU_LEFT_EXIT, &g_settings.menu_left_exit, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	mc->setHint("", LOCALE_MENU_HINT_KEY_LEFT_EXIT);
-	bindSettings->addItem(mc);
-#endif
 
 	// audio for audio player
 	mc = new CMenuOptionChooser(LOCALE_EXTRA_AUDIO_RUN_PLAYER, &g_settings.audio_run_player, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
@@ -446,11 +427,7 @@ void CKeybindSetup::showKeyBindChannellistSetup(CMenuWidget *bindSettings_chlist
 	CMenuOptionChooser *oj = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_BOUQUETHANDLING, &g_settings.bouquetlist_mode, KEYBINDINGMENU_BOUQUETHANDLING_OPTIONS, KEYBINDINGMENU_BOUQUETHANDLING_OPTION_COUNT, true );
 	bindSettings_chlist->addItem(oj);
 #endif
-#ifdef MARTII
 	for (int i = KEY_LIST_START; i <= KEY_CURRENT_TRANSPONDER; i++) {
-#else
-	for (int i = KEY_PAGE_UP; i <= KEY_CURRENT_TRANSPONDER; i++) {
-#endif
 		CMenuForwarder * mf = new CMenuDForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_chlist->addItem(mf);
