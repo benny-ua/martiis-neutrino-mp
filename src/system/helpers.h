@@ -47,11 +47,6 @@ std::string trim(std::string &str, const std::string &trimChars = " \n\r\t");
 
 class CFileHelpers
 {
-	private:
-		int FileBufSize;
-		char *FileBuf;
-		int fd1, fd2;
-
 	public:
 		CFileHelpers();
 		~CFileHelpers();
