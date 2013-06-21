@@ -45,6 +45,7 @@
 #include <driver/screen_max.h>
 
 #include <audio.h>
+#include <zapit/zapit.h>
 
 #include <system/debug.h>
 
@@ -64,8 +65,14 @@ CAudioSetup::~CAudioSetup()
 
 }
 
-int CAudioSetup::exec(CMenuTarget* parent, const std::string &/*actionKey*/)
+int CAudioSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 {
+	if (actionKey == "clear_vol_map") {
+		CZapit::getInstance()->ClearVolumeMap();
+		CZapit::getInstance()->SetVolumePercent(g_settings.audio_volume_percent_ac3, g_settings.audio_volume_percent_pcm);
+		return menu_return::RETURN_NONE;
+	}
+
 	dprintf(DEBUG_DEBUG, "init audio setup\n");
 	int   res = menu_return::RETURN_REPAINT;
 
@@ -143,11 +150,7 @@ int CAudioSetup::showAudioSetup()
 	as_oj_analogmode->setHint("", LOCALE_MENU_HINT_AUDIO_ANALOG_MODE);
 
 	//dd subchannel auto on/off
-#ifdef MARTII
 	CMenuOptionChooser * as_oj_ddsubchn 	= new CMenuOptionChooser(LOCALE_AUDIOMENU_DOLBYDIGITAL_AUTO, &g_settings.audio_DolbyDigital, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, audioSetupNotifier);
-#else
-	CMenuOptionChooser * as_oj_ddsubchn 	= new CMenuOptionChooser(LOCALE_AUDIOMENU_DOLBYDIGITAL, &g_settings.audio_DolbyDigital, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, audioSetupNotifier);
-#endif
 	as_oj_ddsubchn->setHint("", LOCALE_MENU_HINT_AUDIO_DD);
 
 	//dd via hdmi
@@ -202,11 +205,7 @@ int CAudioSetup::showAudioSetup()
 	audioSettings->addIntroItems(LOCALE_MAINSETTINGS_AUDIO);
 	//---------------------------------------------------------
 	audioSettings->addItem(as_oj_analogmode);
-#ifdef MARTII
 	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_DOLBYDIGITAL));
-#else
-	audioSettings->addItem(GenericMenuSeparatorLine);
-#endif
 	//---------------------------------------------------------
 	if (g_info.hw_caps->has_HDMI)
 		audioSettings->addItem(as_oj_dd_hdmi);
@@ -229,8 +228,7 @@ int CAudioSetup::showAudioSetup()
 #if 0
 	audioSettings->addItem(mf);
 #endif
-#ifdef MARTII
-# ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_MIXER_VOLUME));
 	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG,
 		(int *)&g_settings.audio_mixer_volume_analog, true, 0, 100, audioSetupNotifier));
@@ -238,11 +236,17 @@ int CAudioSetup::showAudioSetup()
 		(int *)&g_settings.audio_mixer_volume_hdmi, true, 0, 100, audioSetupNotifier));
 	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF,
 		(int *)&g_settings.audio_mixer_volume_spdif, true, 0, 100, audioSetupNotifier));
-# endif
 #endif
+	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT));
+	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_AC3,
+		(int *)&g_settings.audio_volume_percent_ac3, true, 0, 100, audioSetupNotifier));
+	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_PCM,
+		(int *)&g_settings.audio_volume_percent_pcm, true, 0, 100, audioSetupNotifier));
+	audioSettings->addItem(new CMenuForwarder(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_CLEAR, true, NULL, this, "clear_vol_map"));
 
 	int res = audioSettings->exec(NULL, "");
 	selected = audioSettings->getSelected();
+	CZapit::getInstance()->SetVolumePercent(g_settings.audio_volume_percent_ac3, g_settings.audio_volume_percent_pcm);
 	delete audioSettings;
 	return res;
 }

@@ -120,6 +120,8 @@ struct SNeutrinoSettings
 	int audio_mixer_volume_analog;
 	int audio_mixer_volume_spdif;
 	int audio_mixer_volume_hdmi;
+	int audio_volume_percent_ac3;
+	int audio_volume_percent_pcm;
 	int dvb_subtitle_delay;
 #endif
 	int auto_lang;
