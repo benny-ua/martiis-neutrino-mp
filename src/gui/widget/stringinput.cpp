@@ -207,7 +207,7 @@ void CStringInput::NormalKeyPressed(const neutrino_msg_t key)
 				current_value = lower_bound + 1;
 			else if (current_value >= upper_bound)
 				current_value = upper_bound - 1;
-			if (tmp != current_value) /* size + 1 is correct, snprintf includes always '\0' */
+			if (tmp != current_value)
 				*valueString = to_string(current_value).substr(0, size);
 		}
 		if( (lower_bound == -1 || upper_bound == -1) || (current_value > 0 && current_value > lower_bound && current_value < upper_bound) ){
