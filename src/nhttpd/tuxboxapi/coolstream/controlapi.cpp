@@ -1520,13 +1520,6 @@ void CControlAPI::ReloadPluginsCGI(CyhookHandler *hh)
 	hh->SendOk();
 }
 
-#ifdef MARTII
-void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
-{
-	CFrameBuffer::getInstance()->OSDShot("/tmp/screenshot.png");
-	hh->SendOk();
-}
-#else
 void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 {
 	bool enableOSD = true;
@@ -1540,9 +1533,21 @@ void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 	if(hh->ParamList["name"] != "")
 		filename = hh->ParamList["name"];
 
-	CScreenShot * sc = new CScreenShot("/tmp/" + filename + ".png", (CScreenShot::screenshot_format_t)0 /*PNG*/);
+#if HAVE_SPARK_HARDWARE
+	if (!enableVideo) {
+		CFrameBuffer::getInstance()->OSDShot("/tmp/screenshot.png");
+		hh->SendOk();
+		return;
+	}
+#endif
+
+	CScreenShot * sc = new CScreenShot("/tmp/" + filename + ".bmp", CScreenShot::FORMAT_BMP);
 	sc->EnableOSD(enableOSD);
 	sc->EnableVideo(enableVideo);
+#if HAVE_SPARK_HARDWARE
+	sc->Start();
+	hh->SendOk();
+#else
 #if 0
 	sc->Start();
 	hh->SendOk(); // FIXME what if sc->Start() failed?
@@ -1552,8 +1557,8 @@ void CControlAPI::ScreenshotCGI(CyhookHandler *hh)
 	else
 		hh->SendError();
 #endif
+#endif
 }
-#endif // MARTII
 
 //-----------------------------------------------------------------------------
 void CControlAPI::ZaptoCGI(CyhookHandler *hh)

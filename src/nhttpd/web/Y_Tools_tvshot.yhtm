@@ -5,12 +5,18 @@
 //<![CDATA[
 function do_snapshot(){
 	loadSyncURL("/control/screenshot");
-	window.setTimeout("do_showshot();", 3500);
+	window.setTimeout("do_showshot_bmp();", 3500);
 }
 function do_showshot(){
 	$('statusline').hide();
 	$('buttons').show();
 	$('shot').src = "/tmp/screenshot.png?"+Math.random();
+	$('shot').show();
+}
+function do_showshot_bmp(){
+	$('statusline').hide();
+	$('buttons').show();
+	$('shot').src = "/tmp/screenshot._bmp?"+Math.random();
 	$('shot').show();
 }
 function do_snapshot_again(){

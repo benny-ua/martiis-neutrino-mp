@@ -133,7 +133,7 @@ bool CScreenShot::Start()
 		
 	cmd += " '";
 	cmd += filename;
-	cmd += "'&";
+	cmd += "'";
 	fprintf(stderr, "running: %s\n", cmd.c_str());
 	system(cmd.c_str());
 	return true;
