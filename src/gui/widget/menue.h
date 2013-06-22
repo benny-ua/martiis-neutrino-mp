@@ -521,14 +521,14 @@ class CMenuWidget : public CMenuTarget
 class CPINProtection
 {
 	protected:
-		std::string validPIN;
+		std::string *validPIN;
 		bool check();
 		virtual CMenuTarget* getParent() = 0;
 		neutrino_locale_t title, hint;
 	public:
 		CPINProtection(std::string &validpin)
 		{ 
-			validPIN = validpin;
+			validPIN = &validpin;
 			hint = NONEXISTANT_LOCALE;
 			title = LOCALE_PINPROTECTION_HEAD;
 		};

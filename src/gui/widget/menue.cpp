@@ -2080,8 +2080,8 @@ bool CPINProtection::check()
 		PINInput->exec( getParent(), "");
 		delete PINInput;
 		hint = LOCALE_PINPROTECTION_WRONGCODE;
-	} while ((cPIN != validPIN) && !cPIN.empty());
-	return (cPIN == validPIN);
+	} while ((cPIN != *validPIN) && !cPIN.empty());
+	return (cPIN == *validPIN);
 }
 
 
@@ -2100,10 +2100,10 @@ bool CZapProtection::check()
 		std::string systemstr = CONFIGDIR "/pinentered.sh " + cPIN;
 		system(systemstr.c_str());
 		hint = LOCALE_PINPROTECTION_WRONGCODE;
-	} while ( (cPIN != validPIN) && !cPIN.empty() &&
+	} while ( (cPIN != *validPIN) && !cPIN.empty() &&
 		  ( res == menu_return::RETURN_REPAINT ) &&
 		  ( fsk >= g_settings.parentallock_lockage ) );
-	return ( (cPIN == validPIN) ||
+	return ( (cPIN == *validPIN) ||
 			 ( fsk < g_settings.parentallock_lockage ) );
 }
 
