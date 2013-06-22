@@ -452,7 +452,7 @@ void CTimerdClient::getRecordingSafety(int &pre, int &post)
 void CTimerdClient::getWeekdaysFromStr(CTimerd::CTimerEventRepeat *eventRepeat, std::string &str)
 {
 	if (str.length() < 7)
-		str.append(str.length() - 7, '-');
+		str.append(7 - str.length(), '-');
 	int rep = (int) *eventRepeat;
 	if(rep >= (int)CTimerd::TIMERREPEAT_WEEKDAYS)
 	{
@@ -474,7 +474,7 @@ void CTimerdClient::getWeekdaysFromStr(CTimerd::CTimerEventRepeat *eventRepeat, 
 void CTimerdClient::setWeekdaysToStr(CTimerd::CTimerEventRepeat rep, std::string &str)
 {
 	if (str.length() < 7)
-		str.append(str.length() - 7, '-');
+		str.append(7 - str.length(), '-');
 	if(rep >= CTimerd::TIMERREPEAT_WEEKDAYS)
 	{
 		for(int n=0;n<7;n++)
