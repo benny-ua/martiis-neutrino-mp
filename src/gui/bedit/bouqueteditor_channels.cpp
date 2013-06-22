@@ -349,13 +349,9 @@ int CBEChannelWidget::exec(CMenuTarget* parent, const std::string & /*actionKey*
 			if (!(Channels->empty())) {
                                 int step = (msg == (neutrino_msg_t)g_settings.key_channelList_pageup) ? listmaxshow : 1;  // browse or step 1
                                 int new_selected = selected - step;
+                                if (new_selected < 0)
+					new_selected = (selected == 0) ? Channels->size() - 1 : 0;
 
-                                if (new_selected < 0) {
-                                        if (selected != 0 && step != 1)
-                                                new_selected = 0;
-                                        else
-                                                new_selected = Channels->size() - 1;
-                                }
                                 updateSelection(new_selected);
 			}
 		}
@@ -364,14 +360,9 @@ int CBEChannelWidget::exec(CMenuTarget* parent, const std::string & /*actionKey*
                         if (!(Channels->empty())) {
                                 int step =  ((int) msg == g_settings.key_channelList_pagedown) ? listmaxshow : 1;  // browse or step 1
                                 int new_selected = selected + step;
-                                if (new_selected >= (int) Channels->size()) {
-                                        if ((Channels->size() - listmaxshow -1 < selected) && (selected != (Channels->size() - 1)) && (step != 1))
-                                                new_selected = Channels->size() - 1;
-                                        else if (((Channels->size() / listmaxshow) + 1) * listmaxshow == Channels->size() + listmaxshow) // last page has full entries
-                                                new_selected = 0;
-                                        else
-                                                new_selected = ((step == (int) listmaxshow) && (new_selected < (int) (((Channels->size() / listmaxshow)+1) * listmaxshow))) ? (Channels->size() - 1) : 0;
-                                }
+                                if (new_selected >= (int) Channels->size())
+					new_selected = (selected == Channels->size() - 1) ? 0 : Channels->size() - 1;
+
                                 updateSelection(new_selected);
                         }
 		}
