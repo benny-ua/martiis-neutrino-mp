@@ -759,7 +759,7 @@ int CChannelList::show()
 			if (new_selected >= (int) chanlist.size()) {
 				if ((chanlist.size() - listmaxshow -1 < selected) && (selected != (chanlist.size() - 1)) && (step != 1))
 					new_selected = chanlist.size() - 1;
-				else if (((chanlist.size() / listmaxshow) + 1) * listmaxshow == chanlist.size() + listmaxshow) // last page has full entries
+				else if ((selected == chanlist.size() - 1) && ((chanlist.size() / listmaxshow) + 1) * listmaxshow == chanlist.size() + listmaxshow) // last page has full entries
 					new_selected = 0;
 				else
 					new_selected = ((step == (int) listmaxshow) && (new_selected < (int) (((chanlist.size() / listmaxshow)+1) * listmaxshow))) ? (chanlist.size() - 1) : 0;
