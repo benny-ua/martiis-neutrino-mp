@@ -233,8 +233,8 @@ void CMoviePlayerGui::restoreNeutrino()
 	CZapit::getInstance()->SetVolume(CZapit::getInstance()->GetVolume());
 #endif
 
-	g_Zapit->unlockPlayBack();
 	g_Sectionsd->setPauseScanning(false);
+	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 
 	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::CHANGEMODE, m_LastMode);
 }

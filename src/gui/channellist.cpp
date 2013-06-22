@@ -1014,11 +1014,13 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	// werden sollte (vorgesperrt) da ist
 	// oder das bouquet des Kanals ist vorgesperrt
 
+#if 0 // zapProtection is ALWAYS NULL here ... --martii
 	if (zapProtection != NULL) {
 		zapProtection->fsk = data;
 		startvideo = false;
 		goto out;
 	}
+#endif
 
 	// require password if either
 	// CHANGETOLOCK mode and channel/bouquet is pre locked (0x100)
@@ -1030,6 +1032,9 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	/* already unlocked */
 	if (chanlist[selected]->last_unlocked_EPGid == g_RemoteControl->current_EPGid && g_RemoteControl->current_EPGid != 0)
 		goto out;
+
+	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
+		data = chanlist[selected]->last_fsk;
 
 	/* PARENTALLOCK_PROMPT_CHANGETOLOCKED: only pre-locked channels, don't care for fsk sent in SI */
 	if (g_settings.parentallock_prompt == PARENTALLOCK_PROMPT_CHANGETOLOCKED && data < 0x100)
@@ -1054,13 +1059,16 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 		{
 			/* data >= 0x100: pre locked bouquet -> remember unlock time */
 			chanlist[selected]->last_unlocked_time = time_monotonic();
+			chanlist[selected]->last_fsk = data;
 			int bnum = bouquetList->getActiveBouquetNumber();
 			if (bnum >= 0)
 			{
 				/* unlock the whole bouquet */
 				int i;
-				for (i = 0; i < bouquetList->Bouquets[bnum]->channelList->getSize(); i++)
+				for (i = 0; i < bouquetList->Bouquets[bnum]->channelList->getSize(); i++) {
 					bouquetList->Bouquets[bnum]->channelList->getChannelFromIndex(i)->last_unlocked_time = chanlist[selected]->last_unlocked_time;
+					bouquetList->Bouquets[bnum]->channelList->getChannelFromIndex(i)->last_fsk = chanlist[selected]->last_fsk;
+				}
 			}
 		}
 	}

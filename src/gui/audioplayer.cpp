@@ -71,6 +71,7 @@
 #include <system/settings.h>
 #include <system/helpers.h>
 #include <driver/screen_max.h>
+#include <zapit/zapit.h>
 
 #include <algorithm>
 #include <sys/time.h>
@@ -338,7 +339,7 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 	if (my_system(AUDIOPLAYER_END_SCRIPT) != 0)
 		perror(AUDIOPLAYER_END_SCRIPT " failed");
 
-	g_Zapit->unlockPlayBack();
+	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 	// Start Sectionsd
 	g_Sectionsd->setPauseScanning(false);
 	videoDecoder->StopPicture();

@@ -215,7 +215,7 @@ int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 
 	if (!audioplayer) { // !!! why? !!!
 		//g_Zapit->setStandby(false);
-		g_Zapit->unlockPlayBack();
+		CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 
 		// Start Sectionsd
 		g_Sectionsd->setPauseScanning(false);
