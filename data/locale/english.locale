@@ -1630,7 +1630,8 @@ parentallock.lockedprogram Locked program (from %d years up)
 parentallock.never never
 parentallock.onsignal on broadcasted lock
 parentallock.parentallock Youth protection
-parentallock.prompt prompt for PIN
+parentallock.prompt Prompt for PIN
+parentallock.zaptime Zap time for locked bouquets (minutes)
 personalize.access Access options
 personalize.apply_settings Apply changes?
 personalize.button_auto auto

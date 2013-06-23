@@ -2072,6 +2072,7 @@ int CMenuSeparator::paint(bool selected)
 
 bool CPINProtection::check()
 {
+	hint = NONEXISTANT_LOCALE;
 	std::string cPIN;
 	do
 	{
@@ -2087,6 +2088,7 @@ bool CPINProtection::check()
 
 bool CZapProtection::check()
 {
+	hint = NONEXISTANT_LOCALE;
 	int res;
 	std::string cPIN;
 	do
@@ -2097,8 +2099,10 @@ bool CZapProtection::check()
 
 		res = PINInput->exec(getParent(), "");
 		delete PINInput;
-		std::string systemstr = CONFIGDIR "/pinentered.sh " + cPIN;
-		system(systemstr.c_str());
+		if (!access(CONFIGDIR "/pinentered.sh", X_OK)) {
+			std::string systemstr = CONFIGDIR "/pinentered.sh " + cPIN;
+			system(systemstr.c_str());
+		}
 		hint = LOCALE_PINPROTECTION_WRONGCODE;
 	} while ( (cPIN != *validPIN) && !cPIN.empty() &&
 		  ( res == menu_return::RETURN_REPAINT ) &&

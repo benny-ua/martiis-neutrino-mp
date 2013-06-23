@@ -1658,6 +1658,7 @@ const char * locale_real_names[] =
 	"parentallock.onsignal",
 	"parentallock.parentallock",
 	"parentallock.prompt",
+	"parentallock.zaptime",
 	"personalize.access",
 	"personalize.apply_settings",
 	"personalize.button_auto",
