@@ -1063,7 +1063,7 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 			if(restore)
 				FileTime.show(position);
-		} else if ((neutrino_msg_t) g_settings.key_screenshot) {
+		} else if (msg == (neutrino_msg_t) g_settings.key_screenshot) {
 
 			char ending[(sizeof(int)*2) + 6] = ".png";
 			if(!g_settings.screenshot_cover)
