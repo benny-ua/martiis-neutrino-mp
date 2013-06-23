@@ -63,9 +63,9 @@ CScreenShot::CScreenShot(const std::string fname, screenshot_format_t fmt)
 #endif
 	xres = 0;
 	yres = 0;
-	get_video = g_settings.screenshot_video;
-	get_osd = g_settings.screenshot_mode;
-	scale_to_video = g_settings.screenshot_scale;
+	get_video = g_settings.screenshot_mode & 1;
+	get_osd = g_settings.screenshot_mode & 2;
+	scale_to_video = (g_settings.screenshot_mode == 3) & (g_settings.screenshot_res & 1);
 }
 
 CScreenShot::~CScreenShot()

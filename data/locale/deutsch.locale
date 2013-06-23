@@ -1162,6 +1162,7 @@ menu.hint_screenshot_count Wählen Sie, wie viele Screenshots erstellt werden so
 menu.hint_screenshot_cover Während der Wiedergabe von Aufnahmen kann ein Screenshot für die Vorschau im Moviebrowser erstellt werden
 menu.hint_screenshot_dir Wählen Sie das Verzeichnis zum Speichern der Screenshots
 menu.hint_screenshot_format Wählen Sie das Dateiformat zum Speichern der Screenshots
+menu.hint_screenshot_planes Wählen Sie den Inhalt des Screenshots.
 menu.hint_screenshot_res Screenshot Größe: aktuelle TV-Auflösung oder OSD-Auflösung (1280x720)
 menu.hint_screenshot_scale Skalierung auf TV-Auflösung, wenn OSD aktiviert ist
 menu.hint_screenshot_setup Konfigurieren Sie die Optionen zum Erstellen von Screenshots
@@ -1869,11 +1870,17 @@ screenshot.defdir Ziel-Verzeichnis
 screenshot.format Format
 screenshot.info Screenshot Taste ist nicht belegt
 screenshot.menu Screenshot
-screenshot.osd OSD-Auflösung
+screenshot.osd OSD
+screenshot.plane.all OSD und Video
+screenshot.plane.osd nur OSD
+screenshot.plane.video nur Video
+screenshot.planes Screenshot-Art
+screenshot.please_wait Erzeuge Video-Screenshot, bitte warten ...
+screenshot.please_wait_cover Erzeuge Video-Cover, bitte warten ...
 screenshot.png_compression PNG-Komprimierungsstärke
 screenshot.res Auflösung
 screenshot.scale Skalierung
-screenshot.tv TV-Auflösung
+screenshot.tv Video
 screenshot.video Video im Hintergrund
 screenshot.web yWeb
 servicemenu.boot_params_ask Soll wirklich SPARK gebootet werden?

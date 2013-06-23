@@ -1063,7 +1063,7 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 			if(restore)
 				FileTime.show(position);
-		} else if (/*msg == (neutrino_msg_t) g_settings.key_screenshot ||*/ msg == CRCInput::RC_record) {
+		} else if ((neutrino_msg_t) g_settings.key_screenshot) {
 
 			char ending[(sizeof(int)*2) + 6] = ".png";
 			if(!g_settings.screenshot_cover)
@@ -1087,17 +1087,28 @@ void CMoviePlayerGui::PlayFile(void)
 			if(!access(fname.c_str(), F_OK)) {
 			}
 #endif
-#if HAVE_SPARK_HARDWARE
-			unlink(fname.c_str());
-			CVFD::getInstance()->ShowText("SCREENSHOT");
-			CScreenShot sc(fname, CScreenShot::FORMAT_PNG);
-			sc.Start();
-#else
-			CScreenShot * sc = new CScreenShot(fname, CScreenShot::FORMAT_PNG);
-			if(g_settings.screenshot_cover && !g_settings.screenshot_video)
-				sc->EnableVideo(true);
-			sc->Start();
-#endif
+			if (g_settings.screenshot_cover) {
+				unlink(fname.c_str());
+				CVFD::getInstance()->ShowText("SCREENSHOT");
+				CHintBox hintbox(LOCALE_SCREENSHOT_MENU, g_Locale->getText(LOCALE_SCREENSHOT_PLEASE_WAIT_COVER), 450, NEUTRINO_ICON_MOVIEPLAYER);
+				hintbox.paint();
+				CScreenShot sc(fname, CScreenShot::FORMAT_PNG);
+				sc.EnableVideo(true);
+				sc.EnableOSD(false);
+				sc.Start();
+				hintbox.hide();
+			} else {
+				CVFD::getInstance()->ShowText("SCREENSHOT");
+				CHintBox *hintbox = NULL;
+				if (g_settings.screenshot_mode == 1) {
+					hintbox = new CHintBox(LOCALE_SCREENSHOT_MENU, g_Locale->getText(LOCALE_SCREENSHOT_PLEASE_WAIT), 450, NEUTRINO_ICON_MOVIEPLAYER);
+					hintbox->paint();
+				}
+				CScreenShot sc(fname, CScreenShot::FORMAT_PNG);
+				sc.Start();
+				if (hintbox)
+					hintbox->hide();
+			}
 
 		} else if ( msg == NeutrinoMessages::EVT_SUBT_MESSAGE) {
 #if 0

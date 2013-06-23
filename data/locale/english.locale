@@ -1163,6 +1163,7 @@ menu.hint_screenshot_count When no GUI on screen, you can save 1-5\nscreenshot s
 menu.hint_screenshot_cover ON: When playing record, overwrite single\nscreenshot to show inside MovieBrowser
 menu.hint_screenshot_dir Select directory to save screenshots
 menu.hint_screenshot_format File format to save screenshot
+menu.hint_screenshot_planes Select what the screenshot should cover.
 menu.hint_screenshot_res Screenshot size: current channel's video size\nor OSD size (1280x720)
 menu.hint_screenshot_scale For video+OSD screenshots, scale to video size
 menu.hint_screenshot_setup Configure screenshots options
@@ -1871,11 +1872,17 @@ screenshot.defdir Destination directory
 screenshot.format Format
 screenshot.info Screenshot key is unused
 screenshot.menu Screenshot
-screenshot.osd OSD resolution
+screenshot.osd OSD
+screenshot.plane.all OSD and Video
+screenshot.plane.osd OSD only
+screenshot.plane.video Video only
+screenshot.planes Screenshot mode
+screenshot.please_wait Creating video screenshot, please wait ...
+screenshot.please_wait_cover Creating video cover, please wait ...
 screenshot.png_compression PNG compression level
 screenshot.res Resolution
 screenshot.scale Scale
-screenshot.tv TV resolution
+screenshot.tv Video
 screenshot.video Video in the background
 screenshot.web yWeb
 servicemenu.boot_params_ask Do you really want to boot SPARK?

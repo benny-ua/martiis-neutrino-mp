@@ -517,8 +517,7 @@ struct SNeutrinoSettings
 	int screenshot_format;
 	int screenshot_cover;
 	int screenshot_mode;
-	int screenshot_video;
-	int screenshot_scale;
+	int screenshot_res;
 #ifdef MARTII
 	int screenshot_png_compression;
 	int screenshot_backbuffer;
