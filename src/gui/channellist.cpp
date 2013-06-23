@@ -1044,6 +1044,10 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	if (data >= 0x100 && chanlist[selected]->last_unlocked_time + g_settings.parentallock_zaptime * 60 > time_monotonic())
 		goto out;
 
+	/* if a non-pre-locked channel was just unlocked, open it. */
+	if (data >= 0x100 && chanlist[selected]->last_unlocked_time +  10 > time_monotonic())
+		goto out;
+
 	/* OK, let's ask for a PIN */
 	g_RemoteControl->stopvideo();
 	//printf("stopped video\n");
@@ -1053,8 +1057,11 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	{
 		// remember it for the next time
 		/* data < 0x100: lock age -> remember EPG ID */
-		if (data < 0x100)
+		if (data < 0x100) {
 			chanlist[selected]->last_unlocked_EPGid = g_RemoteControl->current_EPGid;
+			chanlist[selected]->last_unlocked_time = time_monotonic();
+			chanlist[selected]->last_fsk = data;
+		}
 		else
 		{
 			/* data >= 0x100: pre locked bouquet -> remember unlock time */
