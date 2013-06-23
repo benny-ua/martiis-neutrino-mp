@@ -1022,6 +1022,11 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	}
 #endif
 
+	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
+		data = chanlist[selected]->last_fsk;
+	else
+		chanlist[selected]->last_fsk = data;
+
 	// require password if either
 	// CHANGETOLOCK mode and channel/bouquet is pre locked (0x100)
 	// ONSIGNAL mode and fsk(data) is beyond configured value
@@ -1033,9 +1038,6 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	if (chanlist[selected]->last_unlocked_EPGid == g_RemoteControl->current_EPGid && g_RemoteControl->current_EPGid != 0)
 		goto out;
 
-	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
-		data = chanlist[selected]->last_fsk;
-
 	/* PARENTALLOCK_PROMPT_CHANGETOLOCKED: only pre-locked channels, don't care for fsk sent in SI */
 	if (g_settings.parentallock_prompt == PARENTALLOCK_PROMPT_CHANGETOLOCKED && data < 0x100)
 		goto out;
@@ -1045,7 +1047,7 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 		goto out;
 
 	/* if a non-pre-locked channel was just unlocked, open it. */
-	if (data >= 0x100 && chanlist[selected]->last_unlocked_time +  10 > time_monotonic())
+	if (data < 0x100 && chanlist[selected]->last_unlocked_time +  10 > time_monotonic())
 		goto out;
 
 	/* OK, let's ask for a PIN */
@@ -1060,13 +1062,11 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 		if (data < 0x100) {
 			chanlist[selected]->last_unlocked_EPGid = g_RemoteControl->current_EPGid;
 			chanlist[selected]->last_unlocked_time = time_monotonic();
-			chanlist[selected]->last_fsk = data;
 		}
 		else
 		{
 			/* data >= 0x100: pre locked bouquet -> remember unlock time */
 			chanlist[selected]->last_unlocked_time = time_monotonic();
-			chanlist[selected]->last_fsk = data;
 			int bnum = bouquetList->getActiveBouquetNumber();
 			if (bnum >= 0)
 			{
@@ -1090,8 +1090,10 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	zapProtection = NULL;
 
 out:
-	if (startvideo)
+	if (startvideo) {
+		g_RemoteControl->is_video_started = false;
 		g_RemoteControl->startvideo();
+	}
 
 	return messages_return::handled;
 }
