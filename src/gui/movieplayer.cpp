@@ -1089,6 +1089,7 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 #if HAVE_SPARK_HARDWARE
 			unlink(fname.c_str());
+			CVFD::getInstance()->ShowText("SCREENSHOT");
 			CScreenShot sc(fname, CScreenShot::FORMAT_PNG);
 			sc.Start();
 #else
