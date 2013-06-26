@@ -186,7 +186,7 @@ bool CPlugins::overrideType(plugin *plugin_data, std::string &setting, p_type ty
 {
 	if (!setting.empty()) {
 		char s[setting.length() + 1];
-		strncpy(s, setting.c_str(), setting.length() + 1);
+		cstrncpy(s, setting, setting.length() + 1);
 		char *t, *p = s;
 		while ((t = strsep(&p, ",")))
 			if (!strcmp(t, plugin_data->filename.c_str())) {

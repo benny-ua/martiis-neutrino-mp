@@ -23,6 +23,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <string>
 #include <sstream>
 
@@ -32,7 +33,7 @@ int my_system(int argc, const char *arg, ...); /* argc is number of arguments in
 FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type);
 #ifdef MARTII
 int safe_mkdir(const char * path);
-int inline safe_mkdir(std::string path) { return safe_mkdir(path.c_str()); }
+inline int safe_mkdir(std::string path) { return safe_mkdir(path.c_str()); }
 #else
 int safe_mkdir(char * path);
 #endif
@@ -67,7 +68,9 @@ template<class C> std::string to_string(C i)
 	return s.str();
 }
 
-int inline atoi(std::string &s) { return atoi(s.c_str()); }
-int inline atoi(const std::string &s) { return atoi(s.c_str()); }
+inline int atoi(std::string &s) { return atoi(s.c_str()); }
+inline int atoi(const std::string &s) { return atoi(s.c_str()); }
 
+inline void cstrncpy(char *dest, const char * const src, size_t n) { n--; strncpy(dest, src, n); dest[n] = 0; }
+inline void cstrncpy(char *dest, const std::string &src, size_t n) { n--; strncpy(dest, src.c_str(), n); dest[n] = 0; }
 #endif

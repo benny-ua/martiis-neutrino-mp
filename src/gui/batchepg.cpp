@@ -362,7 +362,7 @@ void CBatchEPG_Menu::Settings()
 	CMenuWidget* menu = new CMenuWidget(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS, "settings");
 	menu->addItem(GenericMenuSeparator);
 	menu->addItem(GenericMenuBack);
-	menu->addItem(new CMenuForwarder(LOCALE_BATCHEPG_SAVE, true, "", this,
+	menu->addItem(new CMenuForwarder(LOCALE_BATCHEPG_SAVE, true, NULL, this,
 		"save", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 
 	Load();
@@ -384,8 +384,8 @@ void CBatchEPG_Menu::Settings()
 	for (unsigned int i = 0; i < epgChannels.size(); i++) {
 		char actionKey[80];
 		snprintf(actionKey, sizeof(actionKey), "%llx", (long long unsigned) epgChannels[i].channel_id);
-		menu->addItem(new CMenuForwarder(epgChannels[i].name.c_str(),
-			true, "", this, actionKey, CRCInput::convertDigitToKey (shortcut++)),
+		menu->addItem(new CMenuForwarder(epgChannels[i].name,
+			true, NULL, this, actionKey, CRCInput::convertDigitToKey (shortcut++)),
 			epgChannels[i].channel_id == live_channel_id);
 	}
 
@@ -399,7 +399,7 @@ void CBatchEPG_Menu::Settings()
 
 	menu->addItem(GenericMenuSeparatorLine);
 
-	menu->addItem(new CMenuForwarder(LOCALE_BATCHEPG_REFRESHALL, true, "", this,
+	menu->addItem(new CMenuForwarder(LOCALE_BATCHEPG_REFRESHALL, true, NULL, this,
 		"run", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
 	menu->exec (NULL, "");
 

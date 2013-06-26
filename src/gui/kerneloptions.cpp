@@ -272,11 +272,11 @@ void KernelOptions_Menu::Settings()
 
 	menu->addItem(GenericMenuSeparatorLine);
 
-	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_RESET, true, "", this,
+	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_RESET, true, NULL, this,
 		"reset", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_APPLY, true, "", this,
+	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_APPLY, true, NULL, this,
 		"apply", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
-	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_LSMOD, true, "", this,
+	menu->addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_LSMOD, true, NULL, this,
 		"lsmod", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
 	menu->exec (NULL, "");
 	menu->hide ();

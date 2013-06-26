@@ -23,7 +23,6 @@
 
 #include <zapit/client/zapittools.h>
 #include <string.h>
-#include <alloca.h>
 
 namespace ZapitTools {
 
@@ -140,7 +139,7 @@ namespace ZapitTools {
 
 	void replace_char (std::string &s)
 	{
-		char *p = (char *) alloca(s.length() + 1);
+		char p[s.length() + 1];
 		strcpy(p, s.c_str());
 		replace_char(p);
 		s = std::string(p);

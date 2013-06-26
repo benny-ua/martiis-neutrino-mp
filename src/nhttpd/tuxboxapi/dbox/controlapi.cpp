@@ -1663,12 +1663,12 @@ void CControlAPI::SendTimers(CyhookHandler *hh)
 		case CTimerd::TIMER_RECORD:
 			if (!send_id)
 			{
-				strncpy(zAddData, NeutrinoAPI->Zapit->getChannelName(timer->channel_id).c_str(), 22);
+				cstrncpy(zAddData, NeutrinoAPI->Zapit->getChannelName(timer->channel_id), sizeof(zAddData));
 				if (zAddData[0] == 0)
 					strcpy(zAddData, NeutrinoAPI->Zapit->isChannelTVChannel(timer->channel_id) ? "Unbekannter TV-Kanal" : "Unbekannter Radiokanal");
 			}
 			else
-				sprintf(zAddData, PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS, timer->channel_id);
+				snprintf(zAddData, sizeof(zAddData), PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS, timer->channel_id);
 
 			zAddData[22]=0;
 
@@ -1676,12 +1676,12 @@ void CControlAPI::SendTimers(CyhookHandler *hh)
 
 		case CTimerd::TIMER_STANDBY:
 			if (!send_id)
-				sprintf(zAddData,"Standby: %s",(timer->standby_on ? "ON" : "OFF"));
+				snprintf(zAddData,sizeof(zAddData), "Standby: %s",(timer->standby_on ? "ON" : "OFF"));
 			break;
 
 		case CTimerd::TIMER_REMIND :
 			if (!send_id)
-				strncpy(zAddData, timer->message, 22);
+				cstrncpy(zAddData, timer->message, sizeof(zAddData));
 			zAddData[22]=0;
 			break;
 
@@ -2009,21 +2009,19 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 		if(changeApids)
 			eventinfo.apids = apids;
 		recinfo = eventinfo;
-		strncpy(recinfo.recordingDir, _rec_dir.c_str(), RECORD_DIR_MAXLEN-1);
+		cstrncpy(recinfo.recordingDir, _rec_dir, sizeof(recinfo.recordingDir));
 		data = &recinfo;
 	}
 	else if(type==CTimerd::TIMER_REMIND)
 	{
 		char msg[REMINDER_MESSAGE_MAXLEN];
-		memset(msg, 0, sizeof(msg));
-		strncpy(msg, hh->ParamList["msg"].c_str(),REMINDER_MESSAGE_MAXLEN-1);
+		cstrncpy(msg, hh->ParamList["msg"], sizeof(msg));
 		data=msg;
 	}
 	else if(type==CTimerd::TIMER_EXEC_PLUGIN)
 	{
 		char msg[EXEC_PLUGIN_NAME_MAXLEN];
-		memset(msg, 0, sizeof(msg));
-		strncpy(msg, hh->ParamList["PluginName"].c_str(),EXEC_PLUGIN_NAME_MAXLEN-1);
+		cstrncpy(msg, hh->ParamList["PluginName"], sizeof(msg));
 		data=msg;
 	}
 	// update or add timer

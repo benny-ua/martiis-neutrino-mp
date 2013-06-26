@@ -174,13 +174,11 @@ bool CFlashTool::program( const std::string & filename, int globalProgressEndEra
 	}
 
 	char buf1[1024];
-	memset(buf1, 0, sizeof(buf1));
-	strncpy(buf1, filename.c_str(), sizeof(buf1)-1);
+	cstrncpy(buf1, filename, sizeof(buf1));
 	char* dn = dirname(buf1);
 	std::string flashfile;
 	if (strcmp(dn, "/tmp") != 0) {
-		memset(buf1, 0, sizeof(buf1));
-		strncpy(buf1, filename.c_str(), sizeof(buf1)-1);
+		cstrncpy(buf1, filename, sizeof(buf1));
 		flashfile = (std::string)"/tmp/" + basename(buf1);
 		CFileHelpers fh;
 		printf("##### [CFlashTool::program] copy flashfile to %s\n", flashfile.c_str());

@@ -48,6 +48,7 @@
 #include <dmx.h>
 #include <zapit/satconfig.h>
 #include <string>
+#include <system/helpers.h>
 
 extern cVideo * videoDecoder;
 extern cAudio * audioDecoder;
@@ -519,8 +520,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 			snprintf (buf, sizeof(buf), "20:9");
 			break;
 		default:
-			strncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_ARATIO_UNKNOWN), sizeof (buf)-1);
-			buf[sizeof(buf) - 1] = 0;
+			cstrncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_ARATIO_UNKNOWN), sizeof (buf));
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8
 
@@ -554,8 +554,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 			snprintf (buf,sizeof(buf), "60fps");
 			break;
 		default:
-			strncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN), sizeof (buf)-1);
-			buf[sizeof(buf) - 1] = 0;
+			cstrncpy (buf, g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN), sizeof (buf));
 			break;
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR, 0, true);	// UTF-8

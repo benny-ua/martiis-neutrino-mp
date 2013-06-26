@@ -75,8 +75,10 @@ CLCD::CLCD()
 
 #if HAVE_SPARK_HARDWARE
 	if (0 < ioctl(fd, VFDGETVERSION, &vfd_version))
-		vfd_version = 4; // fallback to 4-digit LED
 #endif
+		vfd_version = 4; // fallback to 4-digit LED
+
+	showclock = true;
 
 	if (pthread_create (&thrTime, NULL, TimeThread, NULL))
 		perror("[lcdd]: pthread_create(TimeThread)");

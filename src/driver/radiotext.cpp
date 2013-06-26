@@ -662,8 +662,7 @@ void CRadioText::RadioStatusMsg(void)
 	if (S_RtMsgItems >= 2) {
 		char temp[100];
 		int ind = (RT_Index == 0) ? S_RtOsdRows - 1 : RT_Index - 1;
-		strncpy(temp, RT_Text[ind], sizeof(temp) - 1);
-		temp[sizeof(temp) - 1] = 0;
+		cstrncpy(temp, RT_Text[ind], sizeof(temp));
 		printf("RadioStatusMsg = %s\n", temp);
 //		cStatus::MsgOsdTextItem(rtrim(temp), false);
 	}

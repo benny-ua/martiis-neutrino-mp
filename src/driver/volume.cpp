@@ -243,8 +243,8 @@ bool CVolume::changeNotify(const neutrino_locale_t OptionName, void * data)
 	bool ret = false;
 	if (ARE_LOCALES_EQUAL(OptionName, NONEXISTANT_LOCALE)) {
 		int percent = *(int *) data;
-		int vol =  CZapit::getInstance()->GetVolume();
 #ifndef HAVE_SPARK_HARDWARE
+		int vol =  CZapit::getInstance()->GetVolume();
 		/* keep resulting volume = (vol * percent)/100 not more than 115 */
 		if (vol * percent > 11500)
 			percent = 11500 / vol;

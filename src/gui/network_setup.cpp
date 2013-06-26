@@ -230,7 +230,7 @@ int CNetworkSetup::showNetworkSetup()
 	bool found = false;
 
 	for(int i = 0; i < ifcount; i++) {
-		ifSelect->addOption(namelist[i]->d_name);
+		ifSelect->addOption(std::string(namelist[i]->d_name));
 		if(strcmp(g_settings.ifname.c_str(), namelist[i]->d_name) == 0)
 			found = true;
 		free(namelist[i]);
@@ -255,7 +255,7 @@ int CNetworkSetup::showNetworkSetup()
 	m0->setHint("", LOCALE_MENU_HINT_NET_SETUPNOW);
 
 	//eth id
-	CMenuForwarder *mac = new CMenuForwarder("MAC", false, mac_addr);
+	CMenuForwarder *mac = new CMenuForwarder("MAC", false, &mac_addr);
 
 	//prepare input entries
 	CIPInput networkSettings_NetworkIP(LOCALE_NETWORKMENU_IPADDRESS  , &network_address   , LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, this);
@@ -276,7 +276,7 @@ int CNetworkSetup::showNetworkSetup()
 	CMenuForwarder *m1 = new CMenuForwarder(LOCALE_NETWORKMENU_IPADDRESS , networkConfig->inet_static, NULL, &networkSettings_NetworkIP );
 	CMenuForwarder *m2 = new CMenuForwarder(LOCALE_NETWORKMENU_NETMASK   , networkConfig->inet_static, NULL, &networkSettings_NetMask   );
 	setBroadcast();
-	CMenuForwarder *m3 = new CMenuForwarder(LOCALE_NETWORKMENU_BROADCAST , false, network_broadcast);
+	CMenuForwarder *m3 = new CMenuForwarder(LOCALE_NETWORKMENU_BROADCAST , false, &network_broadcast);
 	CMenuForwarder *m4 = new CMenuForwarder(LOCALE_NETWORKMENU_GATEWAY   , networkConfig->inet_static, NULL, &networkSettings_Gateway   );
 	CMenuForwarder *m5 = new CMenuForwarder(LOCALE_NETWORKMENU_NAMESERVER, networkConfig->inet_static, NULL, &networkSettings_NameServer);
 	CMenuForwarder *m8 = new CMenuForwarder(LOCALE_NETWORKMENU_HOSTNAME  , true,			   NULL, &networkSettings_Hostname  );
@@ -423,8 +423,8 @@ void CNetworkSetup::showNetworkNTPSetup(CMenuWidget *menu_ntp)
 	CStringInput * networkSettings_NtpRefresh = new CStringInput(LOCALE_NETWORKMENU_NTPREFRESH, &g_settings.network_ntprefresh, 3,LOCALE_NETWORKMENU_NTPREFRESH_HINT1, LOCALE_NETWORKMENU_NTPREFRESH_HINT2 , "0123456789 ", sectionsdConfigNotifier);
 
 	CMenuOptionChooser *ntp1 = new CMenuOptionChooser(LOCALE_NETWORKMENU_NTPENABLE, &g_settings.network_ntpenable, OPTIONS_NTPENABLE_OPTIONS, OPTIONS_NTPENABLE_OPTION_COUNT, true, sectionsdConfigNotifier);
-	CMenuForwarder *ntp2 = new CMenuDForwarder( LOCALE_NETWORKMENU_NTPSERVER, true , g_settings.network_ntpserver, networkSettings_NtpServer );
-	CMenuForwarder *ntp3 = new CMenuDForwarder( LOCALE_NETWORKMENU_NTPREFRESH, true , g_settings.network_ntprefresh, networkSettings_NtpRefresh );
+	CMenuForwarder *ntp2 = new CMenuDForwarder( LOCALE_NETWORKMENU_NTPSERVER, true , &g_settings.network_ntpserver, networkSettings_NtpServer );
+	CMenuForwarder *ntp3 = new CMenuDForwarder( LOCALE_NETWORKMENU_NTPREFRESH, true , &g_settings.network_ntprefresh, networkSettings_NtpRefresh );
 
 	ntp1->setHint("", LOCALE_MENU_HINT_NET_NTPENABLE);
 	ntp2->setHint("", LOCALE_MENU_HINT_NET_NTPSERVER);

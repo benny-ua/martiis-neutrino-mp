@@ -419,8 +419,7 @@ long CNetAdapter::mac_addr_sys ( u_char *addr) //only for function getMacAddr()
 	IFR = ifc.ifc_req;
 	for (i = ifc.ifc_len / sizeof(struct ifreq); --i >= 0; IFR++)
 	{
-		strncpy(ifr.ifr_name, IFR->ifr_name, sizeof(ifr.ifr_name) - 1);
-		ifr.ifr_name[sizeof(ifr.ifr_name) - 1] = 0;
+		cstrncpy(ifr.ifr_name, IFR->ifr_name, sizeof(ifr.ifr_name));
 		if (ioctl(s, SIOCGIFFLAGS, &ifr) == 0) 
 		{
 			if (! (ifr.ifr_flags & IFF_LOOPBACK)) 

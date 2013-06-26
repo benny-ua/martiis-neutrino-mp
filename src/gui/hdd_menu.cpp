@@ -174,7 +174,7 @@ int CHDDMenuHandler::doMenu ()
 	CHDDChkExec chkexec;
 
 	CHDDDestExec hddexec;
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_HDD_ACTIVATE, true, "", &hddexec, NULL, CRCInput::RC_red,NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_HDD_ACTIVATE, true, NULL, &hddexec, NULL, CRCInput::RC_red,NEUTRINO_ICON_BUTTON_RED);
 	mf->setHint("", LOCALE_MENU_HINT_HDD_APPLY);
 	hddmenu->addItem(mf);
 
@@ -280,16 +280,16 @@ int CHDDMenuHandler::doMenu ()
 		tempMenu[i]->addIntroItems();
 		//tempMenu->addItem( new CMenuOptionChooser(LOCALE_HDD_FS, &g_settings.hdd_fs, HDD_FILESYS_OPTIONS, HDD_FILESYS_OPTION_COUNT, true));
 
-		mf = new CMenuForwarder(LOCALE_HDD_FORMAT, true, "", &fmtexec, namelist[i]->d_name);
+		mf = new CMenuForwarder(LOCALE_HDD_FORMAT, true, NULL, &fmtexec, namelist[i]->d_name);
 		mf->setHint("", LOCALE_MENU_HINT_HDD_FORMAT);
 		tempMenu[i]->addItem(mf);
 
-		mf = new CMenuForwarder(LOCALE_HDD_CHECK, true, "", &chkexec, namelist[i]->d_name);
+		mf = new CMenuForwarder(LOCALE_HDD_CHECK, true, NULL, &chkexec, namelist[i]->d_name);
 		mf->setHint("", LOCALE_MENU_HINT_HDD_CHECK);
 		tempMenu[i]->addItem(mf);
 
 		snprintf(sstr, sizeof(sstr), "%s (%s)", g_Locale->getText(LOCALE_HDD_REMOVABLE_DEVICE),  namelist[i]->d_name);
-		mf = new CMenuForwarder((removable ? sstr : namelist[i]->d_name), enabled, tmp_str[i], tempMenu[i]);
+		mf = new CMenuForwarder((removable ? sstr : namelist[i]->d_name), enabled, &tmp_str[i], tempMenu[i]);
 		mf->setHint("", LOCALE_MENU_HINT_HDD_TOOLS);
 		hddmenu->addItem(mf);
 
@@ -324,8 +324,8 @@ int CHDDMenuHandler::doMenu ()
 			int shortcut = 1;
 			hddmenu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_HDD_MOUNT_UMOUNT));
 			for (std::vector<hdd_s>::iterator it = hdd_list.begin(); it != hdd_list.end(); ++it) {
-				it->cmf = new CMenuForwarder(it->devname.c_str(), true,
-					g_Locale->getText(it->mounted ?  LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT), this,
+				std::string tmp(g_Locale->getText(it->mounted ?  LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
+				it->cmf = new CMenuForwarder(it->devname, true, &tmp, this,
 					it->devname.c_str(), CRCInput::convertDigitToKey(shortcut++));
 				hddmenu->addItem(it->cmf);
 			}

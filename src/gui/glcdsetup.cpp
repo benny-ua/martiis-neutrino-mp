@@ -199,7 +199,7 @@ void GLCD_Menu::GLCD_Menu_Settings()
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BAR, &color_bar,
 				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
 				CRCInput::convertDigitToKey(shortcut++)));
-	m.addItem(new CMenuForwarder(LOCALE_GLCD_FONT, true, g_settings.glcd_font, this, "select_font",
+	m.addItem(new CMenuForwarder(LOCALE_GLCD_FONT, true, &g_settings.glcd_font, this, "select_font",
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_CHANNEL,
 				&g_settings.glcd_percent_channel, true, 0, 100, notifier));
@@ -232,7 +232,7 @@ void GLCD_Menu::GLCD_Menu_Settings()
 				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
 				CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 	m.addItem(GenericMenuSeparatorLine);
-	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, "", this, "rescan",
+	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, NULL, this, "rescan",
 				CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 	m.exec(NULL, "");
 	nGLCD::getInstance()->StandbyMode(false);

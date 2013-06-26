@@ -56,7 +56,7 @@ class CScreenSetup : public CMenuTarget
     int x_coord[2];
     int y_coord[2];
 #ifdef MARTII
-    char coord[2][20];
+    std::string coord[2];
     int x_coord_bak[2];
     int y_coord_bak[2];
     int startX;

@@ -150,7 +150,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		fd = socket(AF_INET, SOCK_DGRAM, 0);
 
 		ifr.ifr_addr.sa_family = AF_INET;
-		strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);
+		cstrncpy(ifr.ifr_name, "eth0", sizeof(ifr.ifr_name));
 
 		ret = ioctl(fd, SIOCGIFHWADDR, &ifr);
 		if (ret < 0)

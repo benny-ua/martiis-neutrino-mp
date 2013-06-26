@@ -713,7 +713,7 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 
 	// select gui font file
 #ifdef MARTII
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, g_settings.font_file, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, &g_settings.font_file, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 #else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, NULL, this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 #endif
@@ -722,7 +722,7 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 
 	// select teletext font file
 #ifdef MARTII
-	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, g_settings.ttx_font_file, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, &g_settings.ttx_font_file, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 #else
 	mf = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, NULL, this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 #endif
@@ -837,7 +837,7 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	menu_infobar->addItem(mc);
 
 	// logo directory
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_MISCSETTINGS_INFOBAR_LOGO_HDD_DIR, true, g_settings.logo_hdd_dir, this, "logo_dir");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_MISCSETTINGS_INFOBAR_LOGO_HDD_DIR, true, &g_settings.logo_hdd_dir, this, "logo_dir");
 	mf->setHint("", LOCALE_MENU_HINT_INFOBAR_LOGO_DIR);
 	menu_infobar->addItem(mf);
 
@@ -1126,7 +1126,7 @@ void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
 	if((uint)g_settings.key_screenshot == CRCInput::RC_nokey)
 		menu_screenshot->addItem( new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCREENSHOT_INFO));
 
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, g_settings.screenshot_dir, this, "screenshot_dir");
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCREENSHOT_DEFDIR, true, &g_settings.screenshot_dir, this, "screenshot_dir");
 	mf->setHint("", LOCALE_MENU_HINT_SCREENSHOT_DIR);
 	menu_screenshot->addItem(mf);
 

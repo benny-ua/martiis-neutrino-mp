@@ -36,9 +36,8 @@
 
 #include "debug.h"
 #include "timermanager.h"
-#ifdef MARTII
+#include <system/helpers.h>
 #include <system/set_threadname.h>
-#endif
 
 int timerd_debug = 0;
 
@@ -111,10 +110,8 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						resp.epg_starttime = ev->eventInfo.epg_starttime;
 						resp.channel_id = ev->eventInfo.channel_id;
 						resp.apids = ev->eventInfo.apids;
-						strncpy(resp.recordingDir, ev->recordingDir.c_str(), sizeof(resp.recordingDir)-1);
-						resp.recordingDir[sizeof(resp.recordingDir)-1] = 0;
-						strncpy(resp.epgTitle, ev->epgTitle.c_str(), sizeof(resp.epgTitle)-1);
-						resp.epgTitle[sizeof(resp.epgTitle)-1] = 0;
+						cstrncpy(resp.recordingDir, ev->recordingDir.c_str(), sizeof(resp.recordingDir));
+						cstrncpy(resp.epgTitle, ev->epgTitle, sizeof(resp.epgTitle));
 					}
 					else if(event->eventType == CTimerd::TIMER_ZAPTO)
 					{
@@ -123,17 +120,15 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						resp.epg_starttime = ev->eventInfo.epg_starttime;
 						resp.channel_id = ev->eventInfo.channel_id;
 						resp.apids = ev->eventInfo.apids;
-						strncpy(resp.epgTitle, ev->epgTitle.c_str(), sizeof(resp.epgTitle) - 1);
+						cstrncpy(resp.epgTitle, ev->epgTitle, sizeof(resp.epgTitle));
 					}
 					else if(event->eventType == CTimerd::TIMER_REMIND)
 					{
-						memset(resp.message, 0, sizeof(resp.message));
-						strncpy(resp.message, static_cast<CTimerEvent_Remind*>(event)->message, sizeof(resp.message)-1);
+						cstrncpy(resp.message, static_cast<CTimerEvent_Remind*>(event)->message, sizeof(resp.message));
 					}
 					else if (event->eventType == CTimerd::TIMER_EXEC_PLUGIN)
 					{
-						memset(resp.pluginName, 0, sizeof(resp.pluginName));
-						strncpy(resp.pluginName, static_cast<CTimerEvent_ExecPlugin*>(event)->name, sizeof(resp.message)-1);
+						cstrncpy(resp.pluginName, static_cast<CTimerEvent_ExecPlugin*>(event)->name, sizeof(resp.message));
 					}
 				}
 			}
@@ -177,10 +172,8 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						lresp.epg_starttime = ev->eventInfo.epg_starttime;
 						lresp.channel_id = ev->eventInfo.channel_id;
 						lresp.apids = ev->eventInfo.apids;
-						strncpy(lresp.recordingDir, ev->recordingDir.c_str(), sizeof(lresp.recordingDir)-1);
-						lresp.recordingDir[sizeof(lresp.recordingDir)-1] = 0;
-						strncpy(lresp.epgTitle, ev->epgTitle.c_str(), sizeof(lresp.epgTitle)-1);
-						lresp.epgTitle[sizeof(lresp.epgTitle)-1] = 0;
+						cstrncpy(lresp.recordingDir, ev->recordingDir, sizeof(lresp.recordingDir));
+						cstrncpy(lresp.epgTitle, ev->epgTitle, sizeof(lresp.epgTitle));
 					}
 					else if(event->eventType == CTimerd::TIMER_ZAPTO)
 					{
@@ -189,18 +182,15 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						lresp.epg_starttime = ev->eventInfo.epg_starttime;
 						lresp.channel_id = ev->eventInfo.channel_id;
 						lresp.apids = ev->eventInfo.apids;
-						strncpy(lresp.epgTitle, ev->epgTitle.c_str(), sizeof(lresp.epgTitle)-1);
-						lresp.epgTitle[sizeof(lresp.epgTitle)-1] = 0;
+						cstrncpy(lresp.epgTitle, ev->epgTitle, sizeof(lresp.epgTitle));
 					}
 					else if(event->eventType == CTimerd::TIMER_REMIND)
 					{
-						strncpy(lresp.message, static_cast<CTimerEvent_Remind*>(event)->message, sizeof(lresp.message) - 1);
-						lresp.message[sizeof(lresp.message) - 1] = 0;
+						cstrncpy(lresp.message, static_cast<CTimerEvent_Remind*>(event)->message, sizeof(lresp.message));
 					}
 					else if(event->eventType == CTimerd::TIMER_EXEC_PLUGIN)
 					{
-						strncpy(lresp.pluginName, static_cast<CTimerEvent_ExecPlugin*>(event)->name, sizeof(lresp.pluginName) - 1);
-						lresp.pluginName[sizeof(lresp.pluginName) - 1] = 0;
+						cstrncpy(lresp.pluginName, static_cast<CTimerEvent_ExecPlugin*>(event)->name, sizeof(lresp.pluginName));
 					}
 					CBasicServer::send_data(connfd, &lresp, sizeof(CTimerd::responseGetTimer));
 				}
@@ -243,8 +233,7 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						{
 							CTimerdMsg::commandRecordDir rdir;
 							CBasicServer::receive_data(connfd,&rdir, sizeof(CTimerdMsg::commandRecordDir));
-							strncpy(data.recordingDir,rdir.recDir, sizeof(data.recordingDir) - 1);
-							data.recordingDir[sizeof(data.recordingDir) - 1] = 0;
+							cstrncpy(data.recordingDir,rdir.recDir, sizeof(data.recordingDir));
 							break;
 						}
 						default:

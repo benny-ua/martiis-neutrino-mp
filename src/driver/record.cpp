@@ -416,8 +416,7 @@ void CRecordInstance::GetPids(CZapitChannel * channel)
 	for (uint32_t  i = 0; i < channel->getAudioChannelCount(); i++) {
 		CZapitClient::responseGetAPIDs response;
 		response.pid = channel->getAudioPid(i);
-		strncpy(response.desc, channel->getAudioChannel(i)->description.c_str(), sizeof(response.desc) - 1);
-		response.desc[sizeof(response.desc) - 1] = 0;
+		cstrncpy(response.desc, channel->getAudioChannel(i)->description, sizeof(response.desc));
 		response.is_ac3 = response.is_aac = 0;
 		if (channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::AC3) {
 			response.is_ac3 = 1;
@@ -440,7 +439,7 @@ void CRecordInstance::ProcessAPIDnames()
 			has_unresolved_ctags= true;
 
 		if ( strlen( allpids.APIDs[count].desc ) == 3 )
-			strncpy( allpids.APIDs[count].desc, getISO639Description( allpids.APIDs[count].desc ),DESC_MAX_LEN -1 );
+			cstrncpy( allpids.APIDs[count].desc, getISO639Description( allpids.APIDs[count].desc ),DESC_MAX_LEN);
 
 		if ( allpids.APIDs[count].is_ac3 && !strstr(allpids.APIDs[count].desc, " (AC3)"))
 			strncat(allpids.APIDs[count].desc, " (AC3)", DESC_MAX_LEN - strlen(allpids.APIDs[count].desc) -1);
@@ -455,7 +454,7 @@ void CRecordInstance::ProcessAPIDnames()
 				for(unsigned int j=0; j< allpids.APIDs.size(); j++) {
 					if(allpids.APIDs[j].component_tag == tags[i].componentTag) {
 						if(!tags[i].component.empty()) {
-							strncpy(allpids.APIDs[j].desc, tags[i].component.c_str(), DESC_MAX_LEN -1);
+							cstrncpy(allpids.APIDs[j].desc, tags[i].component, DESC_MAX_LEN);
 							if (allpids.APIDs[j].is_ac3 && !strstr(allpids.APIDs[j].desc, " (AC3)"))
 								strncat(allpids.APIDs[j].desc, " (AC3)", DESC_MAX_LEN - strlen(allpids.APIDs[j].desc)-1);
 							else if (allpids.APIDs[j].is_aac && !strstr(allpids.APIDs[j].desc, " (AAC)"))
@@ -910,7 +909,7 @@ bool CRecordManager::Record(const t_channel_id channel_id, const char * dir, boo
 	if (CEitManager::getInstance()->getActualEPGServiceKey(channel_id, &epgData )) {
 		eventinfo.epgID = epgData.eventID;
 		eventinfo.epg_starttime = epgData.epg_times.startzeit;
-		strncpy(eventinfo.epgTitle, epgData.title.c_str(), EPG_TITLE_MAXLEN-1);
+		cstrncpy(eventinfo.epgTitle, epgData.title, EPG_TITLE_MAXLEN);
 		eventinfo.epgTitle[EPG_TITLE_MAXLEN-1]=0;
 	}
 	else {
@@ -1106,7 +1105,7 @@ void CRecordManager::StartNextRecording()
 			bool ret = Record(eventinfo);
 			if(ret) {
 				delete[] (unsigned char *) eventinfo;
-				it = nextmap.erase(it++);
+				it = nextmap.erase(it);
 				if (it == nextmap.end())
 					break;
 			}
@@ -1536,7 +1535,7 @@ bool CRecordManager::ShowMenu(void)
 				rc_key = CRCInput::RC_stop;
 				btn_icon = NEUTRINO_ICON_BUTTON_STOP;
 			}
-			item = new CMenuForwarder(title.c_str(), true, NULL, selector, cnt, rc_key, NULL, mode_icon);
+			item = new CMenuForwarder(title, true, NULL, selector, cnt, rc_key, NULL, mode_icon);
 			item->setItemButton(btn_icon, true);
 
 			//if only one recording is running, set the focus to this menu item

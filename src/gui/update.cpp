@@ -227,10 +227,10 @@ bool CFlashUpdate::selectHttpImage(void)
 
 				descriptions.push_back(description); /* workaround since CMenuForwarder does not store the Option String itself */
 
-				//SelectionWidget.addItem(new CMenuForwarder(names[i].c_str(), enabled, descriptions[i].c_str(), new CUpdateMenuTarget(i, &selected)));
+				//SelectionWidget.addItem(new CMenuForwarder(names[i], enabled, descriptions[i].c_str(), new CUpdateMenuTarget(i, &selected)));
 				CUpdateMenuTarget * up = new CUpdateMenuTarget(i, &selected);
 				update_t_list.push_back(up);
-				SelectionWidget.addItem(new CMenuForwarder(descriptions[i].c_str(), enabled, names[i].c_str(), up));
+				SelectionWidget.addItem(new CMenuForwarder(descriptions[i], enabled, &names[i], up));
 				i++;
 			}
 		}
@@ -637,7 +637,7 @@ void CFlashExpert::showMTDSelector(const std::string & actionkey)
 			enabled = false;
 #endif
 		sprintf(sActionKey, "%s%d", actionkey.c_str(), lx);
-		mtdselector->addItem(new CMenuForwarder(mtdInfo->getMTDName(lx).c_str(), enabled, NULL, this, sActionKey, CRCInput::convertDigitToKey(shortcut++)));
+		mtdselector->addItem(new CMenuForwarder(mtdInfo->getMTDName(lx), enabled, NULL, this, sActionKey, CRCInput::convertDigitToKey(shortcut++)));
 	}
 #if ENABLE_EXTUPDATE
 	if (actionkey == "writemtd")
@@ -667,7 +667,7 @@ void CFlashExpert::showFileSelector(const std::string & actionkey)
 			int pos = filen.find(".img");
 			if(pos!=-1)
 			{
-				fileselector->addItem(new CMenuForwarder(filen.c_str(), true, NULL, this, (actionkey + filen).c_str()));
+				fileselector->addItem(new CMenuForwarder(filen, true, NULL, this, (actionkey + filen).c_str()));
 				//TODO  make sure filen is UTF-8 encoded
 			}
 			free(namelist[count]);

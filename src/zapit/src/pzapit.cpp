@@ -25,6 +25,7 @@
 #include <cstring>
 #include <iostream>
 #include <unistd.h> /* sleep */
+#include <system/helpers.h>
 
 #include <zapit/client/zapitclient.h>
 
@@ -554,8 +555,7 @@ int main (int argc, char** argv)
 			{
 				std::cout << "diseqc " << diseqc[0] << ": " << satelliteList[j].satName << std::endl;
 
-				strncpy(item.satName, satelliteList[j].satName, sizeof(item.satName) - 1);
-				item.satName[sizeof(item.satName) - 1] = 0;
+				cstrncpy(item.satName, satelliteList[j].satName, sizeof(item.satName) - 1);
 				item.position = diseqc[0];
 				newSatelliteList.push_back(item);
 				break;

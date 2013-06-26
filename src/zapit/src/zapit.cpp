@@ -34,6 +34,8 @@
 
 #include <pthread.h>
 
+#include <system/helpers.h>
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -563,7 +565,8 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
  again:
 	if(!TuneChannel(live_fe, newchannel, transponder_change)) {
 		if (retry < 1) {
-			t_channel_id chid = 0;
+			// t_channel_id chid = 0;
+			chid = 0;
 			SendEvent(CZapitClient::EVT_TUNE_COMPLETE, &chid, sizeof(t_channel_id));
 			return false;
 		}
@@ -1211,8 +1214,7 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 		CZapitChannel * channel = (requested_channel_id == 0) ? current_channel :
 			CServiceManager::getInstance()->FindChannel(requested_channel_id);
 		if(channel) {
-			strncpy(response.name, channel->getName().c_str(), CHANNEL_NAME_SIZE-1);
-			response.name[CHANNEL_NAME_SIZE-1] = 0;
+			cstrncpy(response.name, channel->getName().c_str(), sizeof(response.name));
 		}
                 CBasicServer::send_data(connfd, &response, sizeof(response));
                 break;
@@ -1356,7 +1358,7 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 
 		satellite_map_t satmap = CServiceManager::getInstance()->SatelliteList();
 		for(sat_iterator_t sit = satmap.begin(); sit != satmap.end(); sit++) {
-			strncpy(sat.satName, sit->second.name.c_str(), 49);
+			cstrncpy(sat.satName, sit->second.name, sizeof(sat.satName));
 			sat.satName[49] = 0;
 			sat.satPosition = sit->first;
 			sat.motorPosition = sit->second.motor_position;
@@ -1918,7 +1920,7 @@ void CZapit::sendAPIDs(int connfd)
 		CZapitClient::responseGetAPIDs response;
 		VALGRIND_PARANOIA(response);
 		response.pid = current_channel->getAudioPid(i);
-		strncpy(response.desc, current_channel->getAudioChannel(i)->description.c_str(), DESC_MAX_LEN-1);
+		cstrncpy(response.desc, current_channel->getAudioChannel(i)->description, sizeof(response.desc));
 		response.is_ac3 = response.is_aac = 0;
 		if (current_channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::AC3) {
 			response.is_ac3 = 1;
@@ -1956,8 +1958,7 @@ void CZapit::internalSendChannels(int connfd, ZapitChannelList* channels, const 
 		} else {
 			CZapitClient::responseGetBouquetChannels response;
 			VALGRIND_PARANOIA(response);
-			strncpy(response.name, ((*channels)[i]->getName()).c_str(), CHANNEL_NAME_SIZE-1);
-			response.name[CHANNEL_NAME_SIZE-1] = 0;
+			cstrncpy(response.name, ((*channels)[i]->getName()), CHANNEL_NAME_SIZE);
 			//printf("internalSendChannels: name %s\n", response.name);
 			response.satellitePosition = (*channels)[i]->getSatellitePosition();
 			response.channel_id = (*channels)[i]->getChannelID();
@@ -2000,7 +2001,7 @@ void CZapit::sendBouquets(int connfd, const bool emptyBouquetsToo, CZapitClient:
                       ((curMode & TV_MODE) && !g_bouquetManager->Bouquets[i]->tvChannels.empty()))))
 		{
 			msgBouquet.bouquet_nr = i;
-			strncpy(msgBouquet.name, g_bouquetManager->Bouquets[i]->Name.c_str(), 29);
+			cstrncpy(msgBouquet.name, g_bouquetManager->Bouquets[i]->Name, sizeof(msgBouquet.name));
 			msgBouquet.name[29] = 0;
 			msgBouquet.locked     = g_bouquetManager->Bouquets[i]->bLocked;
 			msgBouquet.hidden     = g_bouquetManager->Bouquets[i]->bHidden;

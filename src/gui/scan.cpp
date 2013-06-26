@@ -285,16 +285,14 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 	}
 	else if(manual || !scan_all) {
 		sat.position = CServiceManager::getInstance()->GetSatellitePosition(pname);
-		sat.satName[sizeof(sat.satName) - 1] = 0;
-		strncpy(sat.satName, pname.c_str(), sizeof(sat.satName) - 1);
+		cstrncpy(sat.satName, pname, sizeof(sat.satName));
 		satList.push_back(sat);
 	} else {
 		satellite_map_t & satmap = CServiceManager::getInstance()->SatelliteList();
 		for(sit = satmap.begin(); sit != satmap.end(); ++sit) {
 			if(sit->second.use_in_scan) {
 				sat.position = sit->first;
-				sat.satName[sizeof(sat.satName) - 1] = 0;
-				strncpy(sat.satName, sit->second.name.c_str(), sizeof(sat.satName - 1));
+				cstrncpy(sat.satName, sit->second.name, sizeof(sat.satName));
 				satList.push_back(sat);
 			}
 		}

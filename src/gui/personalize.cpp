@@ -305,7 +305,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		string s(i_str.str());
 		string action_key = s;
 		string mn_name = v_widget[i]->getName();
-		p_mn[i] = new CMenuForwarder(mn_name.c_str(), true, NULL, this, action_key.c_str(), CRCInput::convertDigitToKey(i+1));
+		p_mn[i] = new CMenuForwarder(mn_name, true, NULL, this, action_key.c_str(), CRCInput::convertDigitToKey(i+1));
 		pMenu->addItem(p_mn[i]);
 	}
 	
@@ -450,7 +450,7 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 		if (v_umenu[i]->getUsedItemsCount() > 0)
 			g_settings.usermenu_text[i] = g_settings.usermenu_text[i].empty() ? g_Locale->getText(usermenu[i].def_name) : g_settings.usermenu_text[i].c_str();
 		
-		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
+		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, &g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
 	}
 #if 0		
 	//feature keys

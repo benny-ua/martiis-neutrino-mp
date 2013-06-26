@@ -181,14 +181,14 @@ int C3DSetup::show3DSetup()
 	int shortcut = 1;
 
 	for (int i = 0; i < THREE_D_OPTIONS_COUNT; i++) {
-		tdl[i].cmf = new CMenuForwarder(THREE_D_OPTIONS[i].value, true,
-			g_Locale->getText((mode3d == i) ? LOCALE_OPTIONS_ON : LOCALE_OPTIONS_OFF),
+		std::string tmp(g_Locale->getText((mode3d == i) ? LOCALE_OPTIONS_ON : LOCALE_OPTIONS_OFF));
+		tdl[i].cmf = new CMenuForwarder(THREE_D_OPTIONS[i].value, true, &tmp,
 			this, tdl[i].actionKey.c_str(), CRCInput::convertDigitToKey(shortcut++));
 		m->addItem(tdl[i].cmf, selected == i);
 	}
 
 	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuForwarder(LOCALE_THREE_D_SAVE, true, "", this, "save", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+	m->addItem(new CMenuForwarder(LOCALE_THREE_D_SAVE, true, NULL, this, "save", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 
 	int res = m->exec (NULL, "");
 

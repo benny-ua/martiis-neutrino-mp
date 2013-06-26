@@ -36,9 +36,8 @@
 #include <timerdclient/timerdmsg.h>
 #include <sectionsdclient/sectionsdclient.h>
 #include <eitd/sectionsd.h>
-#ifdef MARTII
+#include <system/helpers.h>
 #include <system/set_threadname.h>
-#endif
 
 #include <vector>
 #include <cstdlib>
@@ -1236,10 +1235,8 @@ void CTimerEvent_Record::fireEvent()
 	Refresh();
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
-	strncpy(ri.recordingDir, recordingDir.c_str(), sizeof(ri.recordingDir) - 1);
-	ri.recordingDir[sizeof(ri.recordingDir) - 1] = 0;
-	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle) - 1);
-	ri.epgTitle[sizeof(ri.epgTitle) - 1] = 0;
+	cstrncpy(ri.recordingDir, recordingDir, sizeof(ri.recordingDir));
+	cstrncpy(ri.epgTitle, epgTitle, sizeof(ri.epgTitle));
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_RECORD_START,
 								  CEventServer::INITID_TIMERD,
 								  &ri,
@@ -1252,9 +1249,8 @@ void CTimerEvent_Record::announceEvent()
 	Refresh();
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
-	strncpy(ri.recordingDir, recordingDir.c_str(), sizeof(ri.recordingDir) - 1);
-	ri.recordingDir[sizeof(ri.recordingDir) - 1] = 0;
-	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle) - 1);
+	cstrncpy(ri.recordingDir, recordingDir, sizeof(ri.recordingDir));
+	cstrncpy(ri.epgTitle, epgTitle, sizeof(ri.epgTitle));
 	ri.epgTitle[sizeof(ri.epgTitle) - 1] = 0;
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_ANNOUNCE_RECORD, CEventServer::INITID_TIMERD,
 								  &ri,sizeof(CTimerd::RecordingInfo));
@@ -1349,8 +1345,7 @@ void CTimerEvent_Zapto::announceEvent()
 	CTimerd::RecordingInfo ri=eventInfo;
 	ri.eventID=eventID;
 	ri.recordingDir[0] = 0;
-	strncpy(ri.epgTitle, epgTitle.c_str(), sizeof(ri.epgTitle)-1);
-	ri.epgTitle[sizeof(ri.epgTitle)-1] = 0;
+	cstrncpy(ri.epgTitle, epgTitle, sizeof(ri.epgTitle));
 
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_ANNOUNCE_ZAPTO,
 								  CEventServer::INITID_TIMERD,
@@ -1479,8 +1474,7 @@ CTimerEvent_Remind::CTimerEvent_Remind(time_t announce_Time,
 				       uint32_t repeatcount) :
 	CTimerEvent(CTimerd::TIMER_REMIND, announce_Time, alarm_Time, (time_t) 0, evrepeat,repeatcount)
 {
-	memset(message, 0, sizeof(message));
-	strncpy(message, msg, sizeof(message)-1);
+	cstrncpy(message, msg, sizeof(message));
 }
 //------------------------------------------------------------
 CTimerEvent_Remind::CTimerEvent_Remind(CConfigFile *config, int iId):
@@ -1489,8 +1483,7 @@ CTimerEvent(CTimerd::TIMER_REMIND, config, iId)
 	std::stringstream ostr;
 	ostr << iId;
 	std::string id=ostr.str();
-	strncpy(message, config->getString("MESSAGE_"+id).c_str(), sizeof(message) - 1);
-	message[sizeof(message) - 1] = 0;
+	cstrncpy(message, config->getString("MESSAGE_"+id), sizeof(message));
 	dprintf("read MESSAGE_%s %s (%p)\n",id.c_str(),message,message);
 }
 //------------------------------------------------------------
@@ -1523,8 +1516,7 @@ CTimerEvent_ExecPlugin::CTimerEvent_ExecPlugin(time_t announce_Time,
 					       uint32_t repeatcount) :
 	CTimerEvent(CTimerd::TIMER_EXEC_PLUGIN, announce_Time, alarm_Time, (time_t) 0, evrepeat,repeatcount)
 {
-	memset(name, 0, sizeof(name));
-	strncpy(name, plugin, sizeof(name)-1);
+	cstrncpy(name, plugin, sizeof(name));
 }
 //------------------------------------------------------------
 CTimerEvent_ExecPlugin::CTimerEvent_ExecPlugin(CConfigFile *config, int iId):
@@ -1533,8 +1525,7 @@ CTimerEvent(CTimerd::TIMER_EXEC_PLUGIN, config, iId)
 	std::stringstream ostr;
 	ostr << iId;
 	std::string id=ostr.str();
-	strncpy(name, config->getString("NAME_"+id).c_str(), sizeof(name) - 1);
-	name[sizeof(name) - 1] = 0;
+	cstrncpy(name, config->getString("NAME_"+id), sizeof(name));
 	dprintf("read NAME_%s %s (%p)\n",id.c_str(),name,name);
 }
 //------------------------------------------------------------

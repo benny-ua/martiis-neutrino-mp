@@ -143,7 +143,7 @@ CMenuOptionStringChooser* COsdLangSetup::getTzItems()
 					printf("[neutrino] timezone file '%s' not installed\n", zone.c_str());
 				else
 				{
-					tzSelect->addOption(name.c_str());
+					tzSelect->addOption(name);
 					found = true;
 				}
 			}
@@ -217,7 +217,7 @@ void COsdLangSetup::showPrefMenu(CMenuWidget *prefMenu, CLangSelectNotifier *lan
 		langSelect->addOption("none");
 		std::map<std::string, std::string>::const_iterator it;
 		for(it = iso639rev.begin(); it != iso639rev.end(); ++it)
-			langSelect->addOption(it->first.c_str());
+			langSelect->addOption(it->first);
 
 		prefMenu->addItem(langSelect);
 	}
@@ -233,7 +233,7 @@ void COsdLangSetup::showPrefMenu(CMenuWidget *prefMenu, CLangSelectNotifier *lan
 		std::map<std::string, std::string>::const_iterator it;
 		langSelect->addOption("none");
 		for(it = iso639rev.begin(); it != iso639rev.end(); ++it)
-			langSelect->addOption(it->first.c_str());
+			langSelect->addOption(it->first);
 
 		prefMenu->addItem(langSelect);
 	}

@@ -2071,6 +2071,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	/* set service manager options before starting zapit */
 	CServiceManager::getInstance()->KeepNumbers(g_settings.keep_channel_numbers);
+fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	//zapit start parameters
 	Z_start_arg ZapStart_arg;
 	ZapStart_arg.startchanneltv_id = g_settings.startchanneltv_id;
@@ -2081,6 +2082,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	ZapStart_arg.volume = g_settings.current_volume;
 
 	/* create decoders, read channels */
+fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	bool zapit_init = CZapit::getInstance()->Start(&ZapStart_arg);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 

@@ -239,7 +239,7 @@ void CAdZapMenu::Settings()
 	actionKey[1] = 0;
 	bool selected = g_settings.adzap_zapBackPeriod == 60 * shortcut;
 	forwarders[shortcut - 1] =
-	    new CMenuForwarder(minute, true, "", this, actionKey,
+	    new CMenuForwarder(minute, true, NULL, this, actionKey,
 			       CRCInput::convertDigitToKey(shortcut));
 	if (selected)
 	    forwarders[shortcut - 1]->iconName_Info_right =
@@ -251,11 +251,11 @@ void CAdZapMenu::Settings()
     menu->addItem(GenericMenuSeparatorLine);
 
     menu->addItem(new
-		  CMenuForwarder(LOCALE_ADZAP_DISABLE, true, "", this,
+		  CMenuForwarder(LOCALE_ADZAP_DISABLE, true, NULL, this,
 				 "disable", CRCInput::RC_red,
 				 NEUTRINO_ICON_BUTTON_RED));
     menu->addItem(new
-		  CMenuForwarder(LOCALE_ADZAP_ENABLE, true, "", this,
+		  CMenuForwarder(LOCALE_ADZAP_ENABLE, true, NULL, this,
 				 "enable", CRCInput::RC_green,
 				 NEUTRINO_ICON_BUTTON_GREEN));
 
@@ -283,7 +283,7 @@ void CAdZapMenu::Settings()
 
     menu->addItem(new
 		  CMenuForwarder(LOCALE_ADZAP_MONITOR,
-				 azm->monitorLifeTime.tv_sec, "", this,
+				 azm->monitorLifeTime.tv_sec, NULL, this,
 				 "monitor", CRCInput::RC_blue,
 				 NEUTRINO_ICON_BUTTON_BLUE));
 

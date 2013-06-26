@@ -172,7 +172,7 @@ void CFollowScreenings::show()
 			strftime(tmpstr, sizeof(tmpstr), ". %H:%M", tmStartZeit );
 			screening_date += tmpstr;
 			snprintf(actionstr, sizeof(actionstr), "%lu", e->startTime);
-			forwarders.push_back(new CMenuForwarder(screening_date.c_str(), true, NULL, this, actionstr, directKey, icon));
+			forwarders.push_back(new CMenuForwarder(screening_date, true, NULL, this, actionstr, directKey, icon));
 			updateRightIcon(i, e->startTime, e->duration);
 			m.addItem(forwarders[i]);
 			directKey = CRCInput::convertDigitToKey(1 + i);

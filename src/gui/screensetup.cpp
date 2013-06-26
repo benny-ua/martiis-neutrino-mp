@@ -45,6 +45,7 @@
 #include <driver/screen_max.h>
 #endif
 #include <system/settings.h>
+#include <system/helpers.h>
 
 #include <global.h>
 #include <neutrino.h>
@@ -97,8 +98,8 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &action)
 		frameBuffer->paintIcon(NEUTRINO_ICON_BORDER_LR, screenwidth - 1 - 96, screenheight - 1 - 96 );
 
 		m = new CMenuWidget(channel_id ? LOCALE_VIDEOMENU_MASKSETUP : LOCALE_VIDEOMENU_SCREENSETUP, NEUTRINO_ICON_SETTINGS, w_max (40, 10));
-		m->addItem(new CMenuForwarder(LOCALE_SCREENSETUP_UPPERLEFT, true, coord[0], this, "ul", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-		m->addItem(new CMenuForwarder(LOCALE_SCREENSETUP_LOWERRIGHT, true, coord[1], this, "lr", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+		m->addItem(new CMenuForwarder(LOCALE_SCREENSETUP_UPPERLEFT, true, &coord[0], this, "ul", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+		m->addItem(new CMenuForwarder(LOCALE_SCREENSETUP_LOWERRIGHT, true, &coord[1], this, "lr", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 		if (channel_id)
 			m->addItem(new CMenuForwarder(LOCALE_SCREENSETUP_REMOVE, true, NULL, this, "rm", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
 		m->addKey(CRCInput::RC_home, this, "ex");
@@ -486,11 +487,11 @@ void CScreenSetup::saveBorders()
 
 void CScreenSetup::updateCoords()
 {
-	snprintf(coord[0], sizeof(coord[0]), "(%d,%d)", x_coord[0], y_coord[0]);
+	coord[0] = "(" + to_string(x_coord[0]) + "," + to_string(y_coord[0]) + ")";
 	if (coord_abs)
-		snprintf(coord[1], sizeof(coord[1]), "(%d,%d)", x_coord[1], y_coord[1]);
+		coord[1] = "(" + to_string(x_coord[1]) + "," + to_string(y_coord[1]);
 	else
-		snprintf(coord[1], sizeof(coord[1]), "(%d,%d)", screenwidth - x_coord[1], screenheight - y_coord[1]);
+		coord[1] = "(" + to_string(screenwidth - x_coord[1]) + "," + to_string(screenheight - y_coord[1]);
 }
 #else
 void CScreenSetup::paintBorder( int pselected )

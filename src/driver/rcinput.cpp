@@ -29,6 +29,7 @@
 
 #include <driver/rcinput.h>
 #include <driver/abstime.h>
+#include <system/helpers.h>
 
 #include <stdio.h>
 #include <asm/types.h>
@@ -126,8 +127,7 @@ CRCInput::CRCInput()
 	int    clilen;
 	memset(&servaddr, 0, sizeof(struct sockaddr_un));
 	servaddr.sun_family = AF_UNIX;
-	strncpy(servaddr.sun_path, NEUTRINO_UDS_NAME, sizeof(servaddr.sun_path) - 1);
-	servaddr.sun_path[sizeof(servaddr.sun_path) - 1] = 0;
+	cstrncpy(servaddr.sun_path, NEUTRINO_UDS_NAME, sizeof(servaddr.sun_path));
 	clilen = sizeof(servaddr.sun_family) + strlen(servaddr.sun_path);
 	unlink(NEUTRINO_UDS_NAME);
 

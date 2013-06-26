@@ -674,7 +674,7 @@ int CScanSetup::showScanMenuFrontendSetup()
 		}
 
 		modestr[i] = g_Locale->getText(getModeLocale(fe->getMode()));
-		mf = new CMenuForwarder(name, true, modestr[i], this, tmp, key, icon);
+		mf = new CMenuForwarder(name, true, &modestr[i], this, tmp, key, icon);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_SETUP_FE);
 		setupMenu->addItem(mf);
 		if(i != 0)
@@ -955,11 +955,11 @@ int CScanSetup::showScanMenuLnbSetup()
 		if(sit->second.motor_position > 0) {
 			char mpos[10];
 			sprintf(mpos, "%d", sit->second.motor_position);
-			sat_setup->addItem(new CMenuForwarder(satname.c_str(), true, mpos, tempsat));
+			sat_setup->addItem(new CMenuForwarder(satname, true, mpos, tempsat));
 		} else
 #endif
 		{
-			CMenuForwarder * mf = new CMenuForwarder(satname.c_str(), true, NULL, tempsat);
+			CMenuForwarder * mf = new CMenuForwarder(satname, true, NULL, tempsat);
 			mf->setHint("", LOCALE_MENU_HINT_SCAN_LNBCONFIG);
 			sat_setup->addItem(mf);
 		}
@@ -998,7 +998,7 @@ void CScanSetup::fillSatSelect(CMenuOptionStringChooser * select)
 			tmpit = satpos.find(sit->first);
 			if(sit->second.configured && tmpit == satpos.end()) {
 				std::string satname = CServiceManager::getInstance()->GetSatelliteName(sit->first);
-				select->addOption(satname.c_str());
+				select->addOption(satname);
 				satpos.insert(sit->first);
 
 				if (!sfound && scansettings.satName == satname)
@@ -1043,7 +1043,7 @@ void CScanSetup::fillCableSelect(CMenuOptionStringChooser * select)
 			continue;
 
 		printf("Adding %s menu for %s position %d\n", what, sit->second.name.c_str(), sit->first);
-		select->addOption(sit->second.name.c_str());
+		select->addOption(sit->second.name);
 
 		if (fname.empty())
 			fname = sit->second.name;
@@ -1086,7 +1086,7 @@ int CScanSetup::showScanMenuSatFind()
 		if(!sit->second.configured)
 			continue;
 		std::string satname = CServiceManager::getInstance()->GetSatelliteName(sit->first);
-		feSatSelect->addOption(satname.c_str());
+		feSatSelect->addOption(satname);
 		if (!sfound && (scansettings.satName == satname))
 			sfound = true;
 		if (!sfound && firstname.empty())
@@ -1690,7 +1690,7 @@ int CTPSelectHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 			}
 		}
 #endif
-		CMenuForwarder * ts_item = new CMenuForwarder(tname.c_str(), true, NULL, selector, cnt, CRCInput::RC_nokey, NULL)/*, false*/;
+		CMenuForwarder * ts_item = new CMenuForwarder(tname, true, NULL, selector, cnt, CRCInput::RC_nokey, NULL)/*, false*/;
 
 		ts_item->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
 		menu.addItem(ts_item, old_selected == i);

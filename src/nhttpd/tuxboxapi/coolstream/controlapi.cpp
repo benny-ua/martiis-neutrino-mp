@@ -1776,7 +1776,7 @@ void CControlAPI::SendAllCurrentVAPid(CyhookHandler *hh)
 					{
 						if(!(init_iso))
 						{
-							strncpy( pids.APIDs[j].desc, _getISO639Description( pids.APIDs[j].desc ),DESC_MAX_LEN );
+							cstrncpy( pids.APIDs[j].desc, _getISO639Description( pids.APIDs[j].desc ),sizeof(pids.APIDs[j].desc));
 						}
 						hh->printf("%05u %s %s\n",pids.APIDs[j].pid,pids.APIDs[j].desc,pids.APIDs[j].is_ac3 ? " (AC3)": " ");
 					}
@@ -1793,7 +1793,7 @@ void CControlAPI::SendAllCurrentVAPid(CyhookHandler *hh)
 		{
 			if(!(init_iso))
 			{
-				strncpy( pids.APIDs[i].desc, _getISO639Description( pids.APIDs[i].desc ),DESC_MAX_LEN );
+				cstrncpy( pids.APIDs[i].desc, _getISO639Description( pids.APIDs[i].desc ),sizeof(pids.APIDs[i].desc) );
 			}
 			hh->printf("%05u %s %s\n",it->pid,pids.APIDs[i].desc,pids.APIDs[i].is_ac3 ? " (AC3)": " ");
 			i++;
@@ -1838,7 +1838,7 @@ void CControlAPI::SendTimers(CyhookHandler *hh)
 		case CTimerd::TIMER_RECORD:
 			if (!send_id)
 			{
-				strncpy(zAddData, NeutrinoAPI->GetServiceName(timer->channel_id).c_str(), 22);
+				cstrncpy(zAddData, NeutrinoAPI->GetServiceName(timer->channel_id).c_str(), sizeof(zAddData));
 				if (zAddData[0] == 0)
 					strcpy(zAddData, CServiceManager::getInstance()->IsChannelTVChannel(timer->channel_id) ?
 							"Unknown TV-Channel" : "Unknown Radio-Channel");
@@ -1857,7 +1857,7 @@ void CControlAPI::SendTimers(CyhookHandler *hh)
 
 		case CTimerd::TIMER_REMIND :
 			if (!send_id)
-				strncpy(zAddData, timer->message, 22);
+				cstrncpy(zAddData, timer->message, sizeof(zAddData));
 			zAddData[22]=0;
 			break;
 
@@ -2405,21 +2405,21 @@ void CControlAPI::doNewTimer(CyhookHandler *hh)
 		if(changeApids)
 			eventinfo.apids = apids;
 		recinfo = eventinfo;
-		strncpy(recinfo.recordingDir, _rec_dir.c_str(), RECORD_DIR_MAXLEN-1);
+		cstrncpy(recinfo.recordingDir, _rec_dir, sizeof(recinfo.recordingDir));
 		data = &recinfo;
 	}
 	else if(type==CTimerd::TIMER_REMIND)
 	{
 		char msg[REMINDER_MESSAGE_MAXLEN];
 		memset(msg, 0, sizeof(msg));
-		strncpy(msg, hh->ParamList["msg"].c_str(),REMINDER_MESSAGE_MAXLEN-1);
+		cstrncpy(msg, hh->ParamList["msg"],sizeof(msg));
 		data=msg;
 	}
 	else if(type==CTimerd::TIMER_EXEC_PLUGIN)
 	{
 		char msg[EXEC_PLUGIN_NAME_MAXLEN];
 		memset(msg, 0, sizeof(msg));
-		strncpy(msg, hh->ParamList["PluginName"].c_str(),EXEC_PLUGIN_NAME_MAXLEN-1);
+		cstrncpy(msg, hh->ParamList["PluginName"], sizeof(msg));
 		data=msg;
 	}
 	// update or add timer
