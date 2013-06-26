@@ -59,6 +59,7 @@
 
 //#define DEBUG_SDT_THREAD
 //#define DEBUG_TIME_THREAD
+#define DEBUG_TIME_THREAD
 
 //#define DEBUG_SECTION_THREADS
 //#define DEBUG_CN_THREAD
@@ -1422,6 +1423,7 @@ void CTimeThread::run()
 #ifdef MARTII
 	set_threadname(name.c_str());
 #endif
+fprintf(stderr, "CTimeThread::run: dmx=%p\n", dmx);
 	time_t dvb_time = 0;
 	xprintf("%s::run:: starting, pid %d (%lu)\n", name.c_str(), getpid(), pthread_self());
 
@@ -1469,7 +1471,9 @@ void CTimeThread::run()
 			time_t start = time_monotonic_ms();
 			/* speed up shutdown by looping around Read() */
 			do {
+				DMX::lock();
 				rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, timeoutInMSeconds / 12);
+				DMX::unlock();
 #if HAVE_COOL_HARDWARE
 				if (rc < 0)	/* libcoolstream returns -1 on timeout ??? ... */
 					rc = 0;	/* ...and does not set a useful errno (EINVAL) */
