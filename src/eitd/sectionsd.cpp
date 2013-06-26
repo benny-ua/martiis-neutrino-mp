@@ -1423,7 +1423,6 @@ void CTimeThread::run()
 #ifdef MARTII
 	set_threadname(name.c_str());
 #endif
-fprintf(stderr, "CTimeThread::run: dmx=%p\n", dmx);
 	time_t dvb_time = 0;
 	xprintf("%s::run:: starting, pid %d (%lu)\n", name.c_str(), getpid(), pthread_self());
 
