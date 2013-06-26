@@ -1472,7 +1472,7 @@ fprintf(stderr, "CTimeThread::run: dmx=%p\n", dmx);
 			/* speed up shutdown by looping around Read() */
 			do {
 				DMX::lock();
-				rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, timeoutInMSeconds / 12);
+				rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, timeoutInMSeconds / 72);
 				DMX::unlock();
 #if HAVE_COOL_HARDWARE
 				if (rc < 0)	/* libcoolstream returns -1 on timeout ??? ... */
