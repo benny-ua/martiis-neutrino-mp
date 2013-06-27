@@ -720,9 +720,9 @@ int CScanSetup::showScanMenuFrontendSetup()
 	int res = setupMenu->exec(NULL, "");
 
 	if (zapit_lat_str != std::string(zapit_lat))
-		strcpy(zapit_lat, zapit_lat_str.c_str());
+		cstrncpy(zapit_lat, zapit_lat_str, sizeof(zapit_lat));
 	if (zapit_long_str != std::string(zapit_long))
-		strcpy(zapit_long, zapit_long_str.c_str());
+		cstrncpy(zapit_long, zapit_long_str, sizeof(zapit_long));
 
 	delete setupMenu;
 	if (fe_restart) {
