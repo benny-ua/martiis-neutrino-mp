@@ -36,6 +36,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <signal.h>
+#include <poll.h>
 #include <sys/time.h>
 
 #include <connection/basicsocket.h>
@@ -1469,10 +1470,21 @@ void CTimeThread::run()
 			int rc;
 			time_t start = time_monotonic_ms();
 			/* speed up shutdown by looping around Read() */
+
+			struct pollfd ufds;
+			ufds.events = POLLIN|POLLPRI|POLLERR;
+			DMX::lock();
+			ufds.fd = dmx->getFD();
+			DMX::unlock();
 			do {
-				DMX::lock();
-				rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, timeoutInMSeconds / 72);
-				DMX::unlock();
+				ufds.revents = 0;
+				rc = ::poll(&ufds, 1, timeoutInMSeconds / 36);
+				if (running && rc == 1) {
+					DMX::lock();
+					if (ufds.fd == dmx->getFD())
+						rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, 10);
+					DMX::unlock();
+				}
 #if HAVE_COOL_HARDWARE
 				if (rc < 0)	/* libcoolstream returns -1 on timeout ??? ... */
 					rc = 0;	/* ...and does not set a useful errno (EINVAL) */
