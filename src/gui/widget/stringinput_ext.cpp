@@ -611,7 +611,7 @@ void CMACInput::onAfterExec()
 	int mac[6];
 	sscanf(valueString->c_str(), "%x:%x:%x:%x:%x:%x", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5] );
 	char s[20];
-	sscanf(valueString->c_str(), "%x:%x:%x:%x:%x:%x", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5] );
+	snprintf(s, sizeof(s), "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	*valueString = std::string(s);
 	if(*valueString == "00:00:00:00:00:00")
 		*valueString = "";
