@@ -1000,6 +1000,9 @@ bool CChannelList::showInfo(int number, int epgpos)
 
 int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 {
+	if (zapProtection)
+		return messages_return::handled;
+
 	bool startvideo = true;
 
 	if (msg != NeutrinoMessages::EVT_PROGRAMLOCKSTATUS) // right now the only message handled here.
@@ -1013,14 +1016,6 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	// 0x100 als FSK-Status zeigt an, dass (noch) kein EPG zu einem Kanal der NICHT angezeigt
 	// werden sollte (vorgesperrt) da ist
 	// oder das bouquet des Kanals ist vorgesperrt
-
-#if 0 // zapProtection is ALWAYS NULL here ... --martii
-	if (zapProtection != NULL) {
-		zapProtection->fsk = data;
-		startvideo = false;
-		goto out;
-	}
-#endif
 
 	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
 		data = chanlist[selected]->last_fsk;
