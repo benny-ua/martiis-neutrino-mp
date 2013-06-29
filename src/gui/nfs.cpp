@@ -55,6 +55,8 @@
 #include <neutrino.h>
 #include <zapit/client/zapittools.h>
 
+extern int pinghost (const std::string &hostname, std::string *ip = NULL);
+
 CNFSMountGui::CNFSMountGui()
 {
 	// FIXME #warning move probing from exec() to fsmounter
@@ -126,6 +128,27 @@ int CNFSMountGui::exec( CMenuTarget* parent, const std::string & actionKey )
 			m_entry[i] = getEntryString(i);
 			ISO_8859_1_entry[i] = ZapitTools::UTF8_to_Latin1(m_entry[i]);
 			mountMenuEntry[i]->setOptionValue(ISO_8859_1_entry[i]);
+		}
+	}
+	else if(actionKey.substr(0,10)=="refreshMAC")
+	{
+		int nr=atoi(actionKey.substr(10,1));
+		std::string h;
+		pinghost(g_settings.network_nfs[nr].ip, &h);
+		if (!h.empty()) {
+			FILE *arptable = fopen("/proc/net/arp", "r");
+			if (arptable) {
+				char line[120], ip[120], mac[120];
+				while (fgets(line, sizeof(line), arptable)) {
+					if (2 == sscanf(line, "%s %*s %*s %s %*[^\n]", ip, mac)) {
+						if (!strcmp(ip, h.c_str())) {
+							g_settings.network_nfs[nr].mac = std::string(mac);
+							break;
+						}
+					}
+				}
+				fclose(arptable);
+			}
 		}
 	}
 	else if(actionKey.substr(0,10)=="mountentry")
@@ -250,7 +273,9 @@ int CNFSMountGui::menuEntry(int nr)
 	CMenuForwarder *password_fwd = new CMenuForwarder(LOCALE_NFS_PASSWORD, (type != (int)CFSMounter::NFS), NULL, &passInput);
 
 	CMACInput macInput(LOCALE_RECORDINGMENU_SERVER_MAC, &g_settings.network_nfs[nr].mac, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
-	CMenuForwarder * macInput_fwd = new CMenuForwarder(LOCALE_RECORDINGMENU_SERVER_MAC, true, NULL, &macInput);
+	CMenuForwarder *macInput_fwd = new CMenuForwarder(LOCALE_RECORDINGMENU_SERVER_MAC, true, NULL, &macInput);
+
+	CMenuForwarder *refreshMAC_fwd = new CMenuForwarder(LOCALE_NFS_REFRESH_MAC, true, NULL, this, ("refreshMAC" + to_string(nr)).c_str(), CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
 
 	CMenuForwarder *mountnow_fwd = new CMenuForwarder(LOCALE_NFS_MOUNTNOW, !(CFSMounter::isMounted(g_settings.network_nfs[nr].local_dir)), NULL, this, ("domount" + to_string(nr)).c_str(), CRCInput::RC_red,NEUTRINO_ICON_BUTTON_RED);
 
@@ -269,6 +294,7 @@ int CNFSMountGui::menuEntry(int nr)
 	mountMenuEntryW.addItem(username_fwd);
 	mountMenuEntryW.addItem(password_fwd);
 	mountMenuEntryW.addItem(macInput_fwd);
+	mountMenuEntryW.addItem(refreshMAC_fwd);
 	mountMenuEntryW.addItem(GenericMenuSeparatorLine);
 	mountMenuEntryW.addItem(mountnow_fwd);
 
