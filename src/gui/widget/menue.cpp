@@ -1878,21 +1878,6 @@ int CMenuForwarder::paint(bool selected)
 	return y+ height;
 }
 
-CMenuDForwarder::CMenuDForwarder(const neutrino_locale_t Text, const bool Active, const std::string *Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right)
-	: CMenuForwarder(Text, Active, Option, Target, ActionKey, DirectKey, IconName, IconName_Info_right)
-{
-}
-
-CMenuDForwarder::CMenuDForwarder(const std::string &Text, const bool Active, const std::string *Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right)
-	: CMenuForwarder(Text, Active, Option, Target, ActionKey, DirectKey, IconName, IconName_Info_right)
-{
-}
-
-CMenuDForwarder::~CMenuDForwarder()
-{
-	delete jumpTarget;
-}
-
 //-------------------------------------------------------------------------------------------------------------------------------
 CMenuSeparator::CMenuSeparator(const int Type, const neutrino_locale_t Text, bool IsStatic)
 {

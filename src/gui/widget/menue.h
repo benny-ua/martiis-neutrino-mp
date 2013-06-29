@@ -224,11 +224,9 @@ class CMenuForwarder : public CMenuItem
 	int paint(bool selected=false);
 	int getHeight(void) const;
 	int getWidth(void);
-	// void setOption(const char *Option);
-	// void setTextLocale(const neutrino_locale_t Text);
-	neutrino_locale_t getTextLocale(){return name;};
-	CMenuTarget* getTarget(){return jumpTarget;};
-	std::string getActionKey(){return actionKey;};
+	neutrino_locale_t getTextLocale(){return name;}
+	CMenuTarget* getTarget(){return jumpTarget;}
+	std::string getActionKey(){return actionKey;}
 
 	int exec(CMenuTarget* parent);
 	bool isSelectable(void) const
@@ -241,10 +239,10 @@ class CMenuForwarder : public CMenuItem
 class CMenuDForwarder : public CMenuForwarder
 {
  public:
-	CMenuDForwarder(const neutrino_locale_t Text, const bool Active, const std::string *Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL);
-	CMenuDForwarder(const std::string & Text, const bool Active, const std::string *Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL);
+	CMenuDForwarder(const neutrino_locale_t Text, const bool Active, const std::string *Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL) : CMenuForwarder(Text, Active, Option, Target, ActionKey, DirectKey, IconName, IconName_Info_right) { };
+	CMenuDForwarder(const std::string & Text, const bool Active, const std::string *Option, CMenuTarget* Target=NULL, const char * const ActionKey = NULL, const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL, const char * const IconName_Info_right = NULL) : CMenuForwarder(Text, Active, Option, Target, ActionKey, DirectKey, IconName, IconName_Info_right) { };
 
-	~CMenuDForwarder();
+	~CMenuDForwarder() { delete jumpTarget; }
 };
 
 class CAbstractMenuOptionChooser : public CMenuItem
