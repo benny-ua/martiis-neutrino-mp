@@ -138,7 +138,7 @@ int CAudioPlayerSetup::showAudioPlayerSetup()
 	if (CVFD::getInstance()->has_lcd) //FIXME
 		audioplayerSetup->addItem(new CMenuOptionChooser(LOCALE_AUDIOPLAYER_SPECTRUM     , &g_settings.spectrum    , MESSAGEBOX_NO_YES_OPTIONS      , MESSAGEBOX_NO_YES_OPTION_COUNT      , true ));
 #endif
-	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_DEFDIR, true, &g_settings.network_nfs_audioplayerdir, this, "audioplayerdir");
+	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_DEFDIR, true, g_settings.network_nfs_audioplayerdir, this, "audioplayerdir");
 	mf->setHint("", LOCALE_MENU_HINT_AUDIOPLAYER_DEFDIR);
 	audioplayerSetup->addItem(mf);
 

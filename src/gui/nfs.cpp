@@ -127,7 +127,6 @@ int CNFSMountGui::exec( CMenuTarget* parent, const std::string & actionKey )
 			g_settings.network_nfs[i].mac = "11:22:33:44:55:66";
 			m_entry[i] = getEntryString(i);
 			ISO_8859_1_entry[i] = ZapitTools::UTF8_to_Latin1(m_entry[i]);
-			mountMenuEntry[i]->setOptionValue(ISO_8859_1_entry[i]);
 		}
 	}
 	else if(actionKey.substr(0,10)=="refreshMAC")
@@ -159,7 +158,6 @@ int CNFSMountGui::exec( CMenuTarget* parent, const std::string & actionKey )
 		{
 			m_entry[i] = getEntryString(i);
 			ISO_8859_1_entry[i] = ZapitTools::UTF8_to_Latin1(m_entry[i]);
-			mountMenuEntry[i]->setOptionValue(ISO_8859_1_entry[i]);
 		}
 	}
 	else if(actionKey.substr(0,7)=="domount")
@@ -201,7 +199,7 @@ int CNFSMountGui::menu()
 	{
 		sprintf(s2,"mountentry%d",i);
 		ISO_8859_1_entry[i] = ZapitTools::UTF8_to_Latin1(m_entry[i]);
-		mountMenuEntry[i] = new CMenuForwarder("", true, &ISO_8859_1_entry[i], this, s2);
+		mountMenuEntry[i] = new CMenuForwarder("", true, ISO_8859_1_entry[i], this, s2);
 		if (!i)
 			menu_offset = mountMenuW.getItemsCount();
 		
@@ -285,9 +283,9 @@ int CNFSMountGui::menuEntry(int nr)
 	notifier.addItem(password_fwd);
 
 	mountMenuEntryW.addItem(new CMenuOptionChooser(LOCALE_NFS_TYPE, &type, NFS_TYPE_OPTIONS, NFS_TYPE_OPTION_COUNT, typeEnabled, &notifier));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_IP      , true, &g_settings.network_nfs[nr].ip,        &ipInput       ));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_DIR     , true, &g_settings.network_nfs[nr].dir,       &dirInput      ));
-	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_LOCALDIR, true, &g_settings.network_nfs[nr].local_dir, this, ("dir" + to_string(nr)).c_str()));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_IP      , true, g_settings.network_nfs[nr].ip,        &ipInput       ));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_DIR     , true, g_settings.network_nfs[nr].dir,       &dirInput      ));
+	mountMenuEntryW.addItem(new CMenuForwarder(LOCALE_NFS_LOCALDIR, true, g_settings.network_nfs[nr].local_dir, this, ("dir" + to_string(nr)).c_str()));
 	mountMenuEntryW.addItem(automountInput);
 	mountMenuEntryW.addItem(options1_fwd);
 	mountMenuEntryW.addItem(options2_fwd);

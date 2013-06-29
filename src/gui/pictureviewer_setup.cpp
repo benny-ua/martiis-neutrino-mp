@@ -110,7 +110,7 @@ int CPictureViewerSetup::showPictureViewerSetup()
 	mf->setHint("", LOCALE_MENU_HINT_PICTUREVIEWER_SLIDE_TIME);
 	picviewsetup->addItem(mf);
 
-	mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_DEFDIR, true, &g_settings.network_nfs_picturedir, this, "picturedir");
+	mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_DEFDIR, true, g_settings.network_nfs_picturedir, this, "picturedir");
 	mf->setHint("", LOCALE_MENU_HINT_PICTUREVIEWER_DEFDIR);
 	picviewsetup->addItem(mf);
 

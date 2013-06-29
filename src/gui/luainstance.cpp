@@ -954,7 +954,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 		if (type == "forwarder") {
 			b->str_val = value;
 			CLuaMenueForwarder *forwarder = new CLuaMenueForwarder(L, action, id);
-			CMenuItem *mi = new CMenuForwarder(b->name, enabled, &b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
+			CMenuItem *mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			mi->setLua(L, action, id);
 			m->m->addItem(mi);
 			m->targets.push_back(forwarder);
@@ -1010,7 +1010,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 			int sms = 0;	tableLookup(L, "sms", sms);
 			int size = 30;	tableLookup(L, "size", size);
 			CLuaMenueStringinput *stringinput = new CLuaMenueStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon.c_str(), sms);
-			CMenuItem *mi = new CMenuForwarder(b->name, enabled, &b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
+			CMenuItem *mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			mi->setLua(L, action, id);
 			m->m->addItem(mi);
 			m->targets.push_back(stringinput);
@@ -1028,7 +1028,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 				}
 			lua_pop(L, 1);
 
-			CMenuItem *mi = new CMenuForwarder(b->name, enabled, &b->str_val, filebrowser, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
+			CMenuItem *mi = new CMenuForwarder(b->name, enabled, b->str_val, filebrowser, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			mi->setLua(L, action, id);
 			m->m->addItem(mi);
 			m->targets.push_back(filebrowser);

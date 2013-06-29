@@ -76,7 +76,7 @@ CKeyChooser::CKeyChooser(int * const Key, const neutrino_locale_t title, const s
 	addItem(GenericMenuSeparatorLine);
 	addItem(GenericMenuBack);
 	addItem(GenericMenuSeparatorLine);
-	addItem(new CMenuForwarder(LOCALE_KEYCHOOSERMENU_SETNEW , true, NULL, keyChooser));
+	addItem(new CMenuForwarder(LOCALE_KEYCHOOSERMENU_SETNEW, true, NULL, keyChooser));
 	addItem(new CMenuForwarder(LOCALE_KEYCHOOSERMENU_SETNONE, true, NULL, keyDeleter));
 }
 

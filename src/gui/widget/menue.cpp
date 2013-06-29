@@ -1761,9 +1761,9 @@ int CMenuOptionLanguageChooser::paint( bool selected )
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------
-CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string *Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
+CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
 {
-	option_string = Option ? *Option : "";
+	option_string_ptr = &Option;
 	name = Text;
 	nameString = "";
 	active = Active;
@@ -1775,9 +1775,39 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	isStatic = IsStatic;
 }
 
-CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const std::string *Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
+CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
 {
-	option_string = Option ? *Option : "";
+	option_string_ptr = &Option;
+	name = NONEXISTANT_LOCALE;
+	nameString = Text;
+	active = Active;
+	jumpTarget = Target;
+	actionKey = ActionKey ? ActionKey : "";
+	directKey = DirectKey;
+	iconName = IconName ? IconName : "";
+	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	isStatic = IsStatic;
+}
+
+CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
+{
+	option_string = Option ? Option : "";
+	option_string_ptr = &option_string;
+	name = Text;
+	nameString = "";
+	active = Active;
+	jumpTarget = Target;
+	actionKey = ActionKey ? ActionKey : "";
+	directKey = DirectKey;
+	iconName = IconName ? IconName : "";
+	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	isStatic = IsStatic;
+}
+
+CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
+{
+	option_string = Option ? Option : "";
+	option_string_ptr = &option_string;
 	name = NONEXISTANT_LOCALE;
 	nameString = Text;
 	active = Active;
@@ -1798,28 +1828,6 @@ int CMenuForwarder::getHeight(void) const
 {
 	return g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 }
-
-#if 0 // unused --martii
-// used gets set by the addItem() function. This is for set to paint Option string by just not calling the addItem() function.
-// Without this, the changeNotifiers would become machine-dependent.
-void CMenuForwarder::setOption(const char *Option)
-{
-	option = Option;
-
-	if (used && x != -1)
-		paint();
-}
-
-// used gets set by the addItem() function. This is for set to paint Text from locales by just not calling the addItem() function.
-// Without this, the changeNotifiers would become machine-dependent.
-void CMenuForwarder::setTextLocale(const neutrino_locale_t Text)
-{
-	name=Text;
-
-	if (used && x != -1)
-		paint();
-}
-#endif
 
 int CMenuForwarder::getWidth(void)
 {
@@ -1851,8 +1859,8 @@ int CMenuForwarder::exec(CMenuTarget* parent)
 
 std::string CMenuForwarder::getOption(fb_pixel_t *bgcol)
 {
-	if (!option_string.empty())
-		return option_string;
+	if (!option_string_ptr->empty())
+		return *option_string_ptr;
 	if (jumpTarget)
 		return jumpTarget->getValueString(bgcol);
 	return "";

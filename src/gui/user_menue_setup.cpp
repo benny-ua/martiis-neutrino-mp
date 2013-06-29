@@ -126,7 +126,7 @@ int CUserMenuSetup::showSetup()
 	//CUserMenuNotifier *notify = new CUserMenuNotifier();
 	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 11, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
 
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, &g_settings.usermenu_text[button],&name);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, g_settings.usermenu_text[button],&name);
 	
 	//-------------------------------------
 	ums->addIntroItems();
