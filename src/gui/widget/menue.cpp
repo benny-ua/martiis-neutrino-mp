@@ -219,17 +219,8 @@ void CMenuItem::paintItemButton(const bool select_mode, const int &item_height, 
 	int icon_h = 0;
 
 	//define icon name depends of numeric value
-#ifdef MARTII
 	if (g_settings.menu_numbers_as_icons && icon_name.empty() && CRCInput::isNumeric(directKey))
-#else
-	if (icon_name.empty() && CRCInput::isNumeric(directKey))
-#endif
-	{
-		char i_name[6]; /* X +'\0' */
-		snprintf(i_name, 6, "%d", CRCInput::getNumericValue(directKey));
-		i_name[5] = '\0'; /* even if snprintf truncated the string, ensure termination */
-		icon_name = i_name;
-	}
+		icon_name = to_string(CRCInput::getNumericValue(directKey));
 
 	//define select icon
 	if  (selected && offx > 0)
@@ -1307,9 +1298,7 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 #ifdef MARTII
 	if(observ && !luaAction.empty()) {
 		// optionValue is int*
-		char tmp[80];
-		snprintf(tmp, sizeof(tmp), "%d", *optionValue);
-		observ->changeNotify(luaState, luaAction, luaId, tmp);
+		observ->changeNotify(luaState, luaAction, luaId, (void *) to_string(*optionValue).c_str());
 	} else
 #endif
 	if(observ)
@@ -1473,7 +1462,6 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 
 	if((msg == CRCInput::RC_ok) && pulldown) {
 		int select = -1;
-		char cnt[5];
 		CMenuWidget* menu = new CMenuWidget(getName(), NEUTRINO_ICON_SETTINGS);
 		/* FIXME: BACK button with hints enabled - parent menu getting holes, possible solution
 		 * to hide parent, or add hints ? */
@@ -1491,8 +1479,7 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 				l_option = options[count].valname;
 			else
 				l_option = g_Locale->getText(options[count].value);
-			sprintf(cnt, "%d", count);
-			CMenuForwarder *mn_option = new CMenuForwarder(l_option, true, NULL, selector, cnt);
+			CMenuForwarder *mn_option = new CMenuForwarder(l_option, true, NULL, selector, to_string(count).c_str());
 			mn_option->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true /*for selected item*/);
 			menu->addItem(mn_option, selected);
 		}
@@ -1659,7 +1646,6 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 
 	if((!parent || msg == CRCInput::RC_ok) && pulldown) {
 		int select = -1;
-		char cnt[5];
 
 		if (parent)
 			parent->hide();
@@ -1672,8 +1658,7 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 		for(unsigned int count = 0; count < options.size(); count++) 
 		{
 			bool selected = optionValueString && (options[count] == *optionValueString);
-			sprintf(cnt, "%d", count);
-			CMenuForwarder *mn_option = new CMenuForwarder(options[count], true, NULL, selector, cnt);
+			CMenuForwarder *mn_option = new CMenuForwarder(options[count], true, NULL, selector, to_string(count).c_str());
 			mn_option->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true /*for selected item*/);
 			menu->addItem(mn_option, selected);
 		}

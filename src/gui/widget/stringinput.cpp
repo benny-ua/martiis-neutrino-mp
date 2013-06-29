@@ -45,53 +45,6 @@
 #include <global.h>
 #include <neutrino.h>
 
-#if 0
-CStringInput::CStringInput(const neutrino_locale_t Name, char* Value, const int min_value, const int max_value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
-{
-	name =  Name;
-	head = NULL;
-	value = Value;
-	valueString = NULL;
-	lower_bound = min_value - 1;
-	upper_bound = max_value + 1;
-	size =  Size;
-
-	hint_1 = Hint_1;
-	hint_2 = Hint_2;
-	validchars = Valid_Chars;
-	iconfile = Icon ? Icon : "";
-
-	observ = Observ;
-	init();
-}
-
-CStringInput::CStringInput(const neutrino_locale_t Name, char* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
-{
-	name =  Name;
-	head = NULL;
-	value = Value;
-	valueString = NULL;
-	lower_bound = -1;
-	upper_bound = -1;
-
-	size =  Size;
-
-	hint_1 = Hint_1;
-	hint_2 = Hint_2;
-	validchars = Valid_Chars;
-	iconfile = Icon ? Icon : "";
-
-	observ = Observ;
-	init();
-}
-#endif
-
-void CStringInput::setMinMax(const int min_value, const int max_value)
-{
-	lower_bound = min_value - 1;
-	upper_bound = max_value + 1;
-}
-
 CStringInput::CStringInput(const neutrino_locale_t Name, std::string* Value, int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, const char * const Valid_Chars, CChangeObserver* Observ, const char * const Icon)
 {
         name =  Name;
@@ -130,6 +83,12 @@ CStringInput::CStringInput(const std::string &Name, std::string *Value, int Size
 
 CStringInput::~CStringInput()
 {
+}
+
+void CStringInput::setMinMax(const int min_value, const int max_value)
+{
+	lower_bound = min_value - 1;
+	upper_bound = max_value + 1;
 }
 
 #define CStringInputSMSButtonsCount 2
