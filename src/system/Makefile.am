@@ -36,7 +36,7 @@ libneutrino_system_a_SOURCES = \
 	lastchannel.cpp \
 	localize.cpp \
 	helpers.cpp \
-	ping.c \
+	ping.cpp \
 	settings.cpp \
 	ytcache.cpp \
 	ytparser.cpp \
