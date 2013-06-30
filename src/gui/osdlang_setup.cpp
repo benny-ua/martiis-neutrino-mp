@@ -139,7 +139,7 @@ CMenuOptionStringChooser* COsdLangSetup::getTzItems()
 				std::string name = xmlGetAttribute(search, "name");
 				std::string zone = xmlGetAttribute(search, "zone");
 				//printf("Timezone: %s -> %s\n", name.c_str(), zone.c_str());
-				if (access(("/usr/share/zoneinfo/" + zone).c_str(), R_OK))
+				if (access("/usr/share/zoneinfo/" + zone, R_OK))
 					printf("[neutrino] timezone file '%s' not installed\n", zone.c_str());
 				else
 				{

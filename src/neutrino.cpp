@@ -1746,7 +1746,7 @@ void CNeutrinoApp::SetupFonts()
 
 	printf("[neutrino] settings font file %s\n", g_settings.font_file.c_str());
 
-	if(access(g_settings.font_file.c_str(), F_OK)) {
+	if(access(g_settings.font_file, F_OK)) {
 		if(!access(FONTDIR"/neutrino.ttf", F_OK)){
 			font.filename = strdup(FONTDIR"/neutrino.ttf");
 			g_settings.font_file = std::string(font.filename);

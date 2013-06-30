@@ -676,7 +676,7 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	printf("Starting %s\n", plugin_list[number].pluginfile.c_str());
 #ifdef MARTII
 	// workaround for manually messed up permissions
-	if (access(plugin_list[number].pluginfile.c_str(), X_OK))
+	if (access(plugin_list[number].pluginfile, X_OK))
 		chmod(plugin_list[number].pluginfile.c_str(), 0755);
 #endif
 	my_system(2, plugin_list[number].pluginfile.c_str(), NULL);

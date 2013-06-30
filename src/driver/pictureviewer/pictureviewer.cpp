@@ -585,14 +585,14 @@ bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, s
 		for (int i = 0; i < 2; i++)
 			for (int j = 0; j < 3; j++) {
 				tmp = dirs[k] + "/" + strLogoName[i] + strLogoExt[j];
-				if (!access(tmp.c_str(), R_OK))
+				if (!access(tmp, R_OK))
 					goto found;
 			}
 		if (!cc)
 			continue;
 		for (int i = 0; i < 2; i++) {
 			tmp = dirs[k] + "/" + strLogoE2[i];
-			if (!access(tmp.c_str(), R_OK))
+			if (!access(tmp, R_OK))
 				goto found;
 		}
 	}
@@ -629,7 +629,7 @@ bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, s
 		for (j = 0; j < 3; j++)
 		{
 			std::string tmp(g_settings.logo_hdd_dir + "/" + strLogoName[i] + strLogoExt[j]);
-			if (access(tmp.c_str(), R_OK) != -1)
+			if (access(tmp, R_OK) != -1)
 			{
 				if(width && height)
 					getSize(tmp.c_str(), width, height);
@@ -643,7 +643,7 @@ bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, s
                 for (j = 0; j < 3; j++)
                 {
 			std::string tmp(LOGO_DIR1 "/" + strLogoName[i] + strLogoExt[j]);
-                        if (access(tmp.c_str(), R_OK) != -1)
+                        if (access(tmp, R_OK) != -1)
                         {
 				if(width && height)
 					getSize(tmp.c_str(), width, height);

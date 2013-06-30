@@ -465,7 +465,7 @@ void Cyhttpd::ReadConfig(void) {
 	log_level_printf(3, "ReadConfig Start\n");
 	CConfigFile *Config = new CConfigFile(',');
 	bool have_config = false;
-	if (access(HTTPD_CONFIGFILE, 4) == 0)
+	if (access(HTTPD_CONFIGFILE, R_OK) == 0)
 		have_config = true;
 	Config->loadConfig(HTTPD_CONFIGFILE);
 	// convert old config files
@@ -553,16 +553,16 @@ void Cyhttpd::ReadConfig(void) {
 
 	// Check location of logos
 	if (Config->getString("Tuxbox.LogosURL", "") == "") {
-		if (access(std::string(ConfigList["WebsiteMain.override_directory"] + "/logos").c_str(), 4) == 0) {
+		if (access(ConfigList["WebsiteMain.override_directory"] + "/logos", R_OK) == 0) {
 			Config->setString("Tuxbox.LogosURL", ConfigList["WebsiteMain.override_directory"] + "/logos");
 			have_config = false; //save config
 		}
-		else if (access(std::string(ConfigList["WebsiteMain.directory"] + "/logos").c_str(), 4) == 0){
+		else if (access(ConfigList["WebsiteMain.directory"] + "/logos", R_OK) == 0){
 			Config->setString("Tuxbox.LogosURL", ConfigList["WebsiteMain.directory"] + "/logos");
 			have_config = false; //save config
 		}
 #ifdef Y_CONFIG_USE_HOSTEDWEB
-		else if (access(std::string(ConfigList["WebsiteMain.hosted_directory"] + "/logos").c_str(), 4) == 0){
+		else if (access(ConfigList["WebsiteMain.hosted_directory"] + "/logos", R_OK) == 0){
 			Config->setString("Tuxbox.LogosURL", ConfigList["WebsiteMain.hosted_directory"] + "/logos");
 			have_config = false; //save config
 		}

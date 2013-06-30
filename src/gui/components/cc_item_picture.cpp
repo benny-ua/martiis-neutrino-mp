@@ -117,7 +117,7 @@ void CComponentsPicture::initVarPicture()
 	//set the image mode depends of name syntax, icon names contains no path,
 	//so we can detect the required image mode
 	if (pic_paint_mode == CC_PIC_IMAGE_MODE_AUTO){
-		if (!access(pic_name.c_str(), F_OK ))
+		if (!access(pic_name, F_OK ))
 			pic_paint_mode = CC_PIC_IMAGE_MODE_ON;
 		else
 			pic_paint_mode = CC_PIC_IMAGE_MODE_OFF;

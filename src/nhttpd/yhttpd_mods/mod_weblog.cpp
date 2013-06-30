@@ -68,7 +68,7 @@ bool CmWebLog::OpenLogFile() {
 	if (WebLogFile == NULL) {
 		bool isNew = false;
 		pthread_mutex_lock(&WebLog_mutex); // yeah, its mine
-		if (access(WebLogFilename.c_str(), 4) != 0)
+		if (access(WebLogFilename, R_OK) != 0)
 			isNew = true;
 		WebLogFile = fopen(WebLogFilename.c_str(), "a");
 		if (isNew) {

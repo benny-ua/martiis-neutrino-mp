@@ -1084,7 +1084,7 @@ void CMoviePlayerGui::PlayFile(void)
 			}
 
 #if 0 // TODO disable overwrite ?
-			if(!access(fname.c_str(), F_OK)) {
+			if(!access(fname, F_OK)) {
 			}
 #endif
 			if (g_settings.screenshot_cover) {
