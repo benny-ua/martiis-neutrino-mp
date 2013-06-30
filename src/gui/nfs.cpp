@@ -75,7 +75,7 @@ std::string CNFSMountGui::getEntryString(int i)
 		case CFSMounter::CIFS: res = "CIFS //" + g_settings.network_nfs[i].ip + "/"; break;
 		case CFSMounter::LUFS: res = "FTPS "   + g_settings.network_nfs[i].ip + "/"; break;
 	}
-	if (g_settings.network_nfs[i].dir.empty() && g_settings.network_nfs[i].local_dir.empty())
+	if (g_settings.network_nfs[i].dir.empty() || g_settings.network_nfs[i].local_dir.empty() || g_settings.network_nfs[i].ip.empty())
 		return "";
 	return res
 		+ FILESYSTEM_ENCODING_TO_UTF8(g_settings.network_nfs[i].dir)
