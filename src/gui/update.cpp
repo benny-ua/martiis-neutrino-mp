@@ -230,7 +230,7 @@ bool CFlashUpdate::selectHttpImage(void)
 				//SelectionWidget.addItem(new CMenuForwarder(names[i], enabled, descriptions[i].c_str(), new CUpdateMenuTarget(i, &selected)));
 				CUpdateMenuTarget * up = new CUpdateMenuTarget(i, &selected);
 				update_t_list.push_back(up);
-				SelectionWidget.addItem(new CMenuForwarder(descriptions[i], enabled, &names[i], up));
+				SelectionWidget.addItem(new CMenuForwarder(descriptions[i], enabled, names[i], up));
 				i++;
 			}
 		}
