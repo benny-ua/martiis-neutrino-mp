@@ -45,6 +45,8 @@ int check_dir(const char * dir);
 bool get_fs_usage(const char * dir, long &total, long &used, long *bsize=NULL);
 bool get_mem_usage(unsigned long &total, unsigned long &free);
 
+std::string getPathName(std::string &path);
+std::string getBaseName(std::string &path);
 std::string trim(std::string &str, const std::string &trimChars = " \n\r\t");
 
 class CFileHelpers

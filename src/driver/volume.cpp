@@ -99,19 +99,9 @@ void CVolume::setVolume(const neutrino_msg_t key)
 		}
 	}
 
-	if (volscale){
-		volscale->hide();
-		delete volscale;
-		volscale = NULL;
-	}
-
-	if (volscale == NULL){
-		volscale = new CVolumeBar();
-#ifdef MARTII
-		if (g_settings.volume_pos != 7) // off
-#endif
-		volscale->paint();
-	}
+	hideVolscale();
+	if (g_settings.volume_pos !=  CVolumeBar::VOLUMEBAR_POS_OFF)
+		showVolscale();
 
 	neutrino_msg_data_t data;
 	uint64_t timeoutEnd;
@@ -122,15 +112,9 @@ void CVolume::setVolume(const neutrino_msg_t key)
 		{
 			bool sub_chan_keybind = g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME
 						&& g_RemoteControl && g_RemoteControl->subChannels.size() < 1;
-#ifdef MARTII
 			if ((msg == (neutrino_msg_t) g_settings.key_volumeup || msg == (neutrino_msg_t) g_settings.key_volumedown) ||
 			    (sub_chan_keybind && (msg == CRCInput::RC_right || msg == CRCInput::RC_left))) {
 				int dir = (msg == (neutrino_msg_t) g_settings.key_volumeup || msg == CRCInput::RC_right) ? 1 : -1;
-#else
-			if ((msg == CRCInput::RC_plus || msg == CRCInput::RC_minus) ||
-			    (sub_chan_keybind && (msg == CRCInput::RC_right || msg == CRCInput::RC_left))) {
-				int dir = (msg == CRCInput::RC_plus || msg == CRCInput::RC_right) ? 1 : -1;
-#endif
 				if (my_system(2, VOLUME_SCRIPT, dir > 0 ? "up" : "down") == 0)
 				{
 					do_vol = false;
@@ -143,12 +127,7 @@ void CVolume::setVolume(const neutrino_msg_t key)
 				} else
 					do_vol = true;
 				if (CNeutrinoApp::getInstance()->isMuted() && (dir > 0 || g_settings.current_volume > 0)) {
-					if (volscale){
-						if (volscale->isPainted())
-							volscale->hide();
-						delete volscale;
-						volscale = NULL;
-					}
+					hideVolscale();
 					if (do_vol) {
 						CAudioMute::getInstance()->AudioMute(false, true);
 						if (mode == CNeutrinoApp::mode_audio) {
@@ -171,12 +150,7 @@ void CVolume::setVolume(const neutrino_msg_t key)
 						v = 0;
 						g_settings.current_volume = 0;
 						if (g_settings.show_mute_icon) {
-							if (volscale) {
-								if (volscale->isPainted())
-									volscale->hide();
-								delete volscale;
-								volscale = NULL;
-							}
+							hideVolscale();
 							CAudioMute::getInstance()->AudioMute(true, true);
 							if (mode == CNeutrinoApp::mode_audio) {
 								CAudioPlayerGui *cap = CMediaPlayerMenu::getInstance()->getPlayerInstance();
@@ -214,10 +188,8 @@ void CVolume::setVolume(const neutrino_msg_t key)
 		if (volscale) {
 			if(vol != g_settings.current_volume) {
 				vol = g_settings.current_volume;
-#ifdef MARTII
-				if (g_settings.volume_pos != 7) // off
-#endif
-				volscale->repaintVolScale();
+				if (g_settings.volume_pos !=  CVolumeBar::VOLUMEBAR_POS_OFF)
+					volscale->repaintVolScale();
 			}
 		}
 
@@ -230,11 +202,28 @@ void CVolume::setVolume(const neutrino_msg_t key)
 #ifdef ENABLE_GRAPHLCD // MARTII
 	nGLCD::ShowVolume(false);
 #endif
+	hideVolscale();
+}
+
+bool CVolume::hideVolscale()
+{
+	bool ret = false;
 	if (volscale) {
-		if (volscale->isPainted())
+		if (volscale->isPainted()) {
 			volscale->hide();
+			ret = true;
+		}
 		delete volscale;
 		volscale = NULL;
+	}
+	return ret;
+}
+
+void CVolume::showVolscale()
+{
+	if (volscale == NULL){
+		volscale = new CVolumeBar();
+		volscale->paint();
 	}
 }
 
