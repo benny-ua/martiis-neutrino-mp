@@ -1442,12 +1442,12 @@ CMenuOptionChooser::~CMenuOptionChooser()
 	options.clear();
 }
 
-void CMenuOptionChooser::setOptionValue(const int newvalue)
+void CMenuOptionChooser::setOption(const int newvalue)
 {
 	*optionValue = newvalue;
 }
 
-int CMenuOptionChooser::getOptionValue(void) const
+int CMenuOptionChooser::getOption(void) const
 {
 	return *optionValue;
 }
@@ -1820,7 +1820,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	isStatic = IsStatic;
 }
 
-void CMenuForwarder::setOptionValue(const std::string &Option)
+void CMenuForwarder::setOption(const std::string &Option)
 {
 	option_string = Option;
 }

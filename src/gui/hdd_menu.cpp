@@ -137,7 +137,7 @@ int CHDDMenuHandler::exec(CMenuTarget* parent, const std::string &/*actionkey*/)
 			+ " MOUNTBASE=/tmp MDEV=" + it->devname + " /etc/mdev/mdev-mount.sh";
 			system(cmd.c_str());
 			it->mounted = is_mounted(it->devname.c_str());
-                	it->cmf->setOptionValue(g_Locale->getText(it->mounted ? LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
+                	it->cmf->setOption(g_Locale->getText(it->mounted ? LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
 			return menu_return::RETURN_REPAINT;
 		}
 #endif

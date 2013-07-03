@@ -201,7 +201,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			printf("[neutrino] new font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();
 			osdFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
-			mfFontFile->setOptionValue(osdFontFile);
+			mfFontFile->setOption(osdFontFile);
 		}
 		return menu_return::RETURN_REPAINT;
 	}
@@ -218,7 +218,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			printf("[neutrino] ttx font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();
 			osdTtxFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
-			mfTtxFontFile->setOptionValue(osdTtxFontFile);
+			mfTtxFontFile->setOption(osdTtxFontFile);
 		}
 		return menu_return::RETURN_REPAINT;
 	}

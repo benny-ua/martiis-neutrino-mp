@@ -236,7 +236,7 @@ class CMenuForwarder : public CMenuItem
 		{
 			return active;
 		}
-	void setOptionValue(const std::string &Option);
+	void setOption(const std::string &Option);
 };
 
 class CMenuDForwarder : public CMenuForwarder
@@ -335,8 +335,8 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 			   bool Pulldown = false);
 	~CMenuOptionChooser();
 
-	void setOptionValue(const int newvalue);
-	int getOptionValue(void) const;
+	void setOption(const int newvalue);
+	int getOption(void) const;
 	int getWidth(void);
 
 	int paint(bool selected);
