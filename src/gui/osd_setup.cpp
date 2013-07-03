@@ -200,7 +200,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			g_settings.font_file = fileBrowser.getSelectedFile()->Name;
 			printf("[neutrino] new font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();
-			osdFontFile = "(" + getBaseName(fileBrowser.getSelectedFile()->Name) + ")";
+			osdFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
 			mfFontFile->setOptionValue(osdFontFile);
 		}
 		return menu_return::RETURN_REPAINT;
@@ -217,7 +217,7 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			ttx_font_file = fileBrowser.getSelectedFile()->Name;
 			printf("[neutrino] ttx font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
 			CNeutrinoApp::getInstance()->SetupFonts();
-			osdTtxFontFile = "(" + getBaseName(fileBrowser.getSelectedFile()->Name) + ")";
+			osdTtxFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
 			mfTtxFontFile->setOptionValue(osdTtxFontFile);
 		}
 		return menu_return::RETURN_REPAINT;
@@ -719,14 +719,14 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 
 	// select gui font file
 	osdFontFile = g_settings.font_file;
-	osdFontFile = "(" + getBaseName(osdFontFile) + ")";
+	osdFontFile = getBaseName(osdFontFile);
 	mfFontFile = new CMenuForwarder(LOCALE_COLORMENU_FONT, true, osdFontFile.c_str(), this, "select_font", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	mfFontFile->setHint("", LOCALE_MENU_HINT_FONT_GUI);
 	fontSettings->addItem(mfFontFile);
 
 	// select teletext font file
 	osdTtxFontFile = g_settings.ttx_font_file;
-	osdTtxFontFile = "(" + getBaseName(osdTtxFontFile) + ")";
+	osdTtxFontFile = getBaseName(osdTtxFontFile);
 	mfTtxFontFile = new CMenuForwarder(LOCALE_COLORMENU_FONT_TTX, true, osdTtxFontFile.c_str(), this, "ttx_font",  CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 	mfTtxFontFile->setHint("", LOCALE_MENU_HINT_FONT_TTX);
 	fontSettings->addItem(mfTtxFontFile);
