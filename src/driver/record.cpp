@@ -729,7 +729,7 @@ record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 	return RECORD_OK;
 }
 
-void CRecordInstance::GetRecordString(std::string &str)
+void CRecordInstance::GetRecordString(std::string &str, std::string &dur)
 {
 	CZapitChannel * channel = CServiceManager::getInstance()->FindChannel(channel_id);
 	if(channel == NULL) {
@@ -740,12 +740,14 @@ void CRecordInstance::GetRecordString(std::string &str)
 	char stime[15];
 	int err = GetStatus();
 	strftime(stime, sizeof(stime), "%H:%M:%S ", localtime(&start_time));
-	time_t duration = time(0) - start_time;
+	time_t duration = (time(0) - start_time) / 60;
 	char dtime[20];
-	int h = duration/3600;
-	int m = duration/60;
-	snprintf(dtime, sizeof(dtime), " (%02d %s %02d min)", h, h == 1 ? "hour" : "hours", m);
-	str = stime + channel->getName() + ": " + GetEpgTitle() + ((err & REC_STATUS_OVERFLOW) ? "  [!]" : "") + dtime;
+	int h = duration / 60;
+	int m = duration - (h * 60);
+	snprintf(dtime, sizeof(dtime), "(%d %s %02d %s)", h, h == 1 ? g_Locale->getText(LOCALE_RECORDING_TIME_HOUR) : g_Locale->getText(LOCALE_RECORDING_TIME_HOURS), 
+							  m, g_Locale->getText(LOCALE_RECORDING_TIME_MIN));
+	str = stime + channel->getName() + ": " + GetEpgTitle() + ((err & REC_STATUS_OVERFLOW) ? "  [!] " : " ");
+	dur = dtime;
 }
 
 //-------------------------------------------------------------------------
@@ -761,6 +763,7 @@ CRecordManager::CRecordManager()
 	//recordingstatus = 0;
 	recmap.clear();
 	nextmap.clear();
+	durations.clear();
 	autoshift = false;
 	shift_timer = 0;
 	check_timer = 0;
@@ -781,6 +784,7 @@ CRecordManager::~CRecordManager()
 		delete[] (unsigned char *) (*it);
 	}
 	nextmap.clear();
+	durations.clear();
 }
 
 CRecordManager * CRecordManager::getInstance()
@@ -1442,8 +1446,9 @@ int CRecordManager::exec(CMenuTarget* parent, const std::string & actionKey )
 		bool tostart = true;
 		CRecordInstance * inst = FindInstance(live_channel_id);
 		if (inst) {
-			std::string title;
-			inst->GetRecordString(title);
+			std::string title, duration;
+			inst->GetRecordString(title, duration);
+			title += duration;
 			tostart = (ShowMsg(LOCALE_RECORDING_IS_RUNNING, title.c_str(),
 						CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, false) == CMessageBox::mbrYes);
 		}
@@ -1483,6 +1488,7 @@ bool CRecordManager::ShowMenu(void)
 	CMenuForwarder * iteml;
 	t_channel_id channel_ids[RECORD_MAX_COUNT] = { 0 };	/* initialization avoids false "might */
 	int recording_ids[RECORD_MAX_COUNT] = { 0 };		/* be used uninitialized" warning */
+	durations.clear();
 
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
@@ -1519,8 +1525,9 @@ bool CRecordManager::ShowMenu(void)
 			channel_ids[i] = inst->GetChannelId();
 			recording_ids[i] = inst->GetRecordingId();
 
-			std::string title;
-			inst->GetRecordString(title);
+			std::string title, duration;
+			inst->GetRecordString(title, duration);
+			durations.push_back(duration);
 
 			const char* mode_icon = NULL;
 			//if (inst->tshift_mode)
@@ -1535,7 +1542,7 @@ bool CRecordManager::ShowMenu(void)
 				rc_key = CRCInput::RC_stop;
 				btn_icon = NEUTRINO_ICON_BUTTON_STOP;
 			}
-			item = new CMenuForwarder(title, true, NULL, selector, cnt, rc_key, NULL, mode_icon);
+			item = new CMenuForwarder(title, true, durations[i].c_str(), selector, cnt, rc_key, NULL, mode_icon);
 			item->setItemButton(btn_icon, true);
 
 			//if only one recording is running, set the focus to this menu item
@@ -1578,7 +1585,7 @@ bool CRecordManager::ShowMenu(void)
 bool CRecordManager::AskToStop(const t_channel_id channel_id, const int recid)
 {
 	//int recording_id = 0;
-	std::string title;
+	std::string title, duration;
 	CRecordInstance * inst;
 
 	mutex.lock();
@@ -1589,7 +1596,8 @@ bool CRecordManager::AskToStop(const t_channel_id channel_id, const int recid)
 
 	if(inst) {
 		//recording_id = inst->GetRecordingId();
-		inst->GetRecordString(title);
+		inst->GetRecordString(title, duration);
+		title += duration;
 	}
 	mutex.unlock();
 	if(inst == NULL)
