@@ -216,8 +216,7 @@ class CIntInput : public CExtendedInput
 {
 #define MAX_CINTINPUT_SIZE 16
 
-	std::string myValueStringInput;
-	std::string myValueStringOutput;
+	std::string tmpString;
 
  	int* myValue;
 	unsigned int m_size;

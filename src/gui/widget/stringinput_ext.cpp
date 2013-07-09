@@ -681,7 +681,7 @@ void CTimeInput::onAfterExec()
 //-----------------------------#################################-------------------------------------------------------
 
 CIntInput::CIntInput(const neutrino_locale_t Name, int *Value, const unsigned int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ)
-	: CExtendedInput(Name, &myValueStringInput, Hint_1, Hint_2, Observ)
+	: CExtendedInput(Name, &tmpString, Hint_1, Hint_2, Observ)
 {
 	myValue = Value;
 
@@ -689,28 +689,12 @@ CIntInput::CIntInput(const neutrino_locale_t Name, int *Value, const unsigned in
 		m_size = Size;
 	else
 		m_size = MAX_CINTINPUT_SIZE-1;
- 	if (*myValue == 0) {
-		char tmp[MAX_CINTINPUT_SIZE];
-		snprintf(tmp, sizeof(tmp) - 1,"%-7d",0);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringInput = std::string(tmp);
-		snprintf(tmp, sizeof(tmp) - 1,"%7d",0);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringOutput = std::string(tmp);
- 	} else {
-		char tmp[MAX_CINTINPUT_SIZE];
-		snprintf(tmp, sizeof(tmp) - 1,"%-*d",m_size,*myValue);
-		myValueStringInput = std::string(tmp);
-		snprintf(tmp, sizeof(tmp) - 1,"%*d",m_size,*myValue);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringOutput = std::string(tmp);
-	}
+
+	onBeforeExec();
 
 	frameBuffer = CFrameBuffer::getInstance();
 	for (unsigned int i=0;i<Size;i++)
-	{
 		addInputField( new CExtendedInput_Item_Char("0123456789 ") );
-	}
 	addInputField( new CExtendedInput_Item_newLiner(30) );
 }
 
@@ -721,27 +705,15 @@ std::string CIntInput::getValueString(fb_pixel_t *)
 
 void CIntInput::onBeforeExec()
 {
- 	if (*myValue == 0) {
-		char tmp[MAX_CINTINPUT_SIZE];
-		snprintf(tmp, sizeof(tmp) - 1,"%-7d",0);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringInput = std::string(tmp);
-		snprintf(tmp, sizeof(tmp) - 1,"%7d",0);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringOutput = std::string(tmp);
- 	} else {
-		char tmp[MAX_CINTINPUT_SIZE];
-		snprintf(tmp, sizeof(tmp) - 1,"%-*d",m_size,*myValue);
-		myValueStringInput = std::string(tmp);
-		snprintf(tmp, sizeof(tmp) - 1,"%*d",m_size,*myValue);
-		tmp[sizeof(tmp) - 1] = 0;
-		myValueStringOutput = std::string(tmp);
-	}
+	char tmp[MAX_CINTINPUT_SIZE];
+	snprintf(tmp, sizeof(tmp) - 1,"%*d", m_size, *myValue);
+	tmp[sizeof(tmp) - 1] = 0;
+	*valueString = std::string(tmp);
 }
 
 void CIntInput::onAfterExec()
 {
-	*myValue = atoi(myValueStringOutput);
+	*myValue = atoi(*valueString);
 }
 
 //-----------------------------#################################-------------------------------------------------------
