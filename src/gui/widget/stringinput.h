@@ -56,7 +56,6 @@ class CStringInput : public CMenuTarget
 		neutrino_locale_t hint_1, hint_2;
 		std::string iconfile;
 		const char * validchars;
-		std::string  *valueString;
 		int          size;
 		int          selected;
 		CChangeObserver * observ;
@@ -89,7 +88,7 @@ class CStringInput : public CMenuTarget
 		void hide();
 		int exec( CMenuTarget* parent, const std::string & actionKey );
 		void setMinMax(const int min_value, const int max_value);
-		std::string getValueString(fb_pixel_t *);
+		virtual std::string &getValueString(fb_pixel_t *bgcol = NULL);
 };
 
 class CStringInputSMS : public CStringInput

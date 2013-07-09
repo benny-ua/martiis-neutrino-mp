@@ -55,16 +55,6 @@ CExtendedInput::CExtendedInput(const neutrino_locale_t Name, std::string *Value,
 	Init();
 }
 
-std::string CExtendedInput::getValueString(fb_pixel_t *)
-{
-	if (valueString) {
-		std::string res = *valueString;
-		res = trim(res);
-		return res;
-	}
-	return "";
-}
-
 void CExtendedInput::Init(void)
 {
 	frameBuffer = CFrameBuffer::getInstance();
@@ -432,7 +422,6 @@ void CExtendedInput_Item_Char::keyPressed(const int key)
 
 CIPInput::CIPInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ) : CExtendedInput(Name, Value, Hint_1, Hint_2, Observ)
 {
-	frameBuffer = CFrameBuffer::getInstance();
 	addInputField( new CExtendedInput_Item_Char("012") );
 	addInputField( new CExtendedInput_Item_Char("0123456789") );
 	addInputField( new CExtendedInput_Item_Char("0123456789") );
@@ -488,7 +477,6 @@ CDateInput::CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrin
 				tmTime->tm_hour, tmTime->tm_min);
 	*valueString = std::string(value);
 
-	frameBuffer = CFrameBuffer::getInstance();
 	addInputField( new CExtendedInput_Item_Char("0123") );
 	addInputField( new CExtendedInput_Item_Char("0123456789") );
 	addInputField( new CExtendedInput_Item_Char(".",false) );
@@ -506,10 +494,6 @@ CDateInput::CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrin
 	addInputField( new CExtendedInput_Item_Char("012345") );
 	addInputField( new CExtendedInput_Item_Char("0123456789") );
 	addInputField( new CExtendedInput_Item_newLiner(30) );
-}
-
-CDateInput::~CDateInput()
-{
 }
 
 void CDateInput::onBeforeExec()
@@ -696,11 +680,6 @@ CIntInput::CIntInput(const neutrino_locale_t Name, int *Value, const unsigned in
 	for (unsigned int i=0;i<Size;i++)
 		addInputField( new CExtendedInput_Item_Char("0123456789 ") );
 	addInputField( new CExtendedInput_Item_newLiner(30) );
-}
-
-std::string CIntInput::getValueString(fb_pixel_t *)
-{
-	return to_string(*myValue);
 }
 
 void CIntInput::onBeforeExec()

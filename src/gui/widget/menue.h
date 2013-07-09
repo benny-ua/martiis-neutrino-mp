@@ -88,12 +88,15 @@ class CChangeObserver
 
 class CMenuTarget
 {
+	protected:
+		std::string *valueString;
+		std::string valueStringTmp;
 	public:
-		CMenuTarget(){}
+		CMenuTarget(){ valueString = &valueStringTmp; }
 		virtual ~CMenuTarget(){}
 		virtual void hide(){}
 		virtual int exec(CMenuTarget* parent, const std::string & actionKey) = 0;
-		virtual std::string getValueString(fb_pixel_t *);
+		virtual std::string &getValueString(fb_pixel_t *bgcol = NULL);
 };
 
 class CMenuItem

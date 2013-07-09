@@ -57,9 +57,9 @@ CMenuForwarder * const GenericMenuBack = &CGenericMenuBack;
 CMenuForwarder * const GenericMenuCancel = &CGenericMenuCancel;
 CMenuForwarder * const GenericMenuNext = &CGenericMenuNext;
 
-std::string CMenuTarget::getValueString(fb_pixel_t *)
+std::string &CMenuTarget::getValueString(fb_pixel_t *)
 {
-	return "";
+	return *valueString;
 }
 
 CMenuItem::CMenuItem()
