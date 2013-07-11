@@ -237,6 +237,9 @@ void CMoviePlayerGui::restoreNeutrino()
 	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 
 	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::CHANGEMODE, m_LastMode);
+	CZapitChannel *channel = CZapit::getInstance()->GetCurrentChannel();
+	if (channel && channel->scrambled)
+		 g_Zapit->Rezap();
 }
 
 #ifdef MARTII
