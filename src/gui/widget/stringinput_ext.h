@@ -169,7 +169,6 @@ class CIPInput : public CExtendedInput
 class CDateInput : public CExtendedInput
 {
 	private:
-		std::string timeValue;
 		time_t* time;
 
 	protected:
@@ -196,8 +195,6 @@ class CMACInput : public CExtendedInput
 
 class CTimeInput : public CExtendedInput
 {
-	private:
-		std::string timeValue;
 	protected:
 		virtual void onBeforeExec();
 		virtual void onAfterExec();
@@ -210,8 +207,6 @@ class CTimeInput : public CExtendedInput
 class CIntInput : public CExtendedInput
 {
 #define MAX_CINTINPUT_SIZE 16
-
-	std::string tmpString;
 
  	int* myValue;
 	unsigned int m_size;
