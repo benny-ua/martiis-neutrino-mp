@@ -1207,7 +1207,11 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		bool defpid = currentapid ? (currentapid == apids[count]) : (count == 0);
 
 		if (p_movie_info) {
-			apidtitle[count] = p_movie_info->audioPids[count].epgAudioPidName;
+			for (int i = 0; i < p_movie_info->audioPids.size(); i++)
+				if (apids[count] == p_movie_info->audioPids[i].epgAudioPid) {
+					apidtitle[count] = p_movie_info->audioPids[i].epgAudioPidName;
+					break;
+				}
 			if (!apidtitle[count].empty())
 				name_ok = true;
 		}
