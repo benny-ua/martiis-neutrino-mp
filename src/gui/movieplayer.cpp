@@ -1340,7 +1340,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
 
 	if(numpida)
-		currentapid = apids[0];
+		currentapid = playback->GetAPid();
 
 	std::string apidtitles[numpida];
 #else
@@ -1356,28 +1356,24 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		bool defpid = currentapid ? (currentapid == apids[count]) : (count == 0);
 		std::string apidtitle;
 
-		if(!file_player){
+		if (p_movie_info) {
+			apidtitle = p_movie_info->audioPids[count].epgAudioPidName;
+			name_ok = true;
+		} else if(!file_player) {
 			name_ok = getAudioName(apids[count], apidtitle);
-		}
-		else if (!language[count].empty()){
+		} else if (!language[count].empty()){
 			apidtitle = language[count];
 			name_ok = true;
 		}
-#ifdef MARTII
 		char apidnumber[20];
-#endif
 		if (!name_ok) {
-#ifndef MARTII
-			char apidnumber[20];
-#endif
 			sprintf(apidnumber, "Stream %d %X", count + 1, apids[count]);
 			apidtitle = apidnumber;
 		}
-#ifdef MARTII // ?!?
-		if (p_movie_info && p_movie_info->epgId)
-			apidtitles[count] = std::string(apidtitle);
-#endif
 		addAudioFormat(count, apidtitle, enabled);
+
+		apidtitles[count] = std::string(apidtitle);
+
 		if(defpid && !enabled && (count < numpida)){
 			currentapid = apids[count+1];
 			defpid = false;
@@ -1385,7 +1381,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 
 		char cnt[5];
 		sprintf(cnt, "%d", count);
-		CMenuForwarder * item = new CMenuForwarder(apidtitle, enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
+		CMenuForwarder * item = new CMenuForwarder(apidtitles[count], enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
 		APIDSelector.addItem(item, defpid);
 	}
 
