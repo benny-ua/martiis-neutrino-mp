@@ -58,6 +58,7 @@
 #include <zapit/femanager.h>
 #include <system/debug.h>
 #include <system/helpers.h>
+#include "cs_api.h"
 
 extern CRemoteControl * g_RemoteControl;
 

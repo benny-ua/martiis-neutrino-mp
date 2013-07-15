@@ -90,7 +90,9 @@ int CStartUpWizard::exec(CMenuTarget* parent, const string & /*actionKey*/)
 	languageSettings.showLanguageSetup(&osdl_setup);
 	osdl_setup.exec(NULL, "");
 
+#if 0
 	if(ShowMsg (LOCALE_WIZARD_WELCOME_HEAD, LOCALE_WIZARD_WELCOME_TEXT, CMessageBox::mbrYes, CMessageBox::mbYes | CMessageBox::mbrCancel) == CMessageBox::mbrYes)
+#endif
 	{
 		int advanced = 1;
 #ifdef ENABLE_FASTSCAN
@@ -143,10 +145,12 @@ int CStartUpWizard::exec(CMenuTarget* parent, const string & /*actionKey*/)
 			} else {
 				CZapit::getInstance()->GetConfig(zapitCfg);
 				if (CFEManager::getInstance()->haveSat()) {
+#ifdef ENABLE_FASTSCAN
 					CMenuWidget fastScanMenu(LOCALE_SATSETUP_FASTSCAN_HEAD, NEUTRINO_ICON_SETTINGS, 45, MN_WIDGET_ID_SCAN_FAST_SCAN);
 					fastScanMenu.setWizardMode(true);
 					CScanSetup::getInstance()->addScanMenuFastScan(&fastScanMenu);
 					res = fastScanMenu.exec(NULL, "");
+#endif
 				}
 				if (CFEManager::getInstance()->haveCable()) {
 					CMenuWidget cableScan(LOCALE_SATSETUP_CABLE, NEUTRINO_ICON_SETTINGS, 45, MN_WIDGET_ID_SCAN_CABLE_SCAN);
