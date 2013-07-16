@@ -3145,23 +3145,15 @@ _repeat:
 		audioDecoder->EnableAnalogOut(false);
 		return messages_return::handled;
 	}
-	else if( msg == CRCInput::RC_mode ) {
+	else if(( msg == CRCInput::RC_mode ) && g_settings.key_format_mode_active ) {
 		g_videoSettings->nextMode();
 		return messages_return::handled;
 	}
-#ifdef MARTII
-	else if( msg == (neutrino_msg_t) g_settings.key_next43mode) {
-#else
-	else if( msg == CRCInput::RC_next ) {
-#endif
+	else if(( msg == (neutrino_msg_t) g_settings.key_next43mode) && g_settings.key_pic_size_active) {
 		g_videoSettings->next43Mode();
 		return messages_return::handled;
 	}
-#ifdef MARTII
-	else if( msg == (neutrino_msg_t) g_settings.key_switchformat) {
-#else
-	else if( msg == CRCInput::RC_prev ) {
-#endif
+	else if(( msg == (neutrino_msg_t) g_settings.key_switchformat) && g_settings.key_pic_mode_active) {
 		g_videoSettings->SwitchFormat();
 		return messages_return::handled;
 	}
@@ -4550,6 +4542,10 @@ void CNeutrinoApp::loadKeys(const char * fname)
 #endif
 	g_settings.mpkey_subtitle = tconfig.getInt32( "mpkey.subtitle", CRCInput::RC_sub );
 
+	g_settings.key_format_mode_active = tconfig.getInt32( "key_format_mode_active", 1 );
+	g_settings.key_pic_mode_active = tconfig.getInt32( "key_pic_mode_active", 1 );
+	g_settings.key_pic_size_active = tconfig.getInt32( "key_pic_size_active", 1 );
+
 	/* options */
 	g_settings.menu_left_exit = tconfig.getInt32( "menu_left_exit", 0 );
 	g_settings.audio_run_player = tconfig.getInt32( "audio_run_player", 1 );
@@ -4641,6 +4637,10 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "mpkey.goto", g_settings.mpkey_goto );
 #endif
 	tconfig.setInt32( "mpkey.subtitle", g_settings.mpkey_subtitle );
+
+	tconfig.setInt32( "key_format_mode_active", g_settings.key_format_mode_active );
+	tconfig.setInt32( "key_pic_mode_active", g_settings.key_pic_mode_active );
+	tconfig.setInt32( "key_pic_size_active", g_settings.key_pic_size_active );
 
 	tconfig.setInt32( "menu_left_exit", g_settings.menu_left_exit );
 	tconfig.setInt32( "audio_run_player", g_settings.audio_run_player );

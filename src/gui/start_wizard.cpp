@@ -144,6 +144,7 @@ int CStartUpWizard::exec(CMenuTarget* parent, const string & /*actionKey*/)
 				res = CScanSetup::getInstance()->exec(NULL, "");
 			} else {
 				CZapit::getInstance()->GetConfig(zapitCfg);
+#ifdef ENABLE_FASTSCAN
 				if (CFEManager::getInstance()->haveSat()) {
 #ifdef ENABLE_FASTSCAN
 					CMenuWidget fastScanMenu(LOCALE_SATSETUP_FASTSCAN_HEAD, NEUTRINO_ICON_SETTINGS, 45, MN_WIDGET_ID_SCAN_FAST_SCAN);
@@ -152,6 +153,7 @@ int CStartUpWizard::exec(CMenuTarget* parent, const string & /*actionKey*/)
 					res = fastScanMenu.exec(NULL, "");
 #endif
 				}
+#endif
 				if (CFEManager::getInstance()->haveCable()) {
 					CMenuWidget cableScan(LOCALE_SATSETUP_CABLE, NEUTRINO_ICON_SETTINGS, 45, MN_WIDGET_ID_SCAN_CABLE_SCAN);
 					cableScan.setWizardMode(true);
