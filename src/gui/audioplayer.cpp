@@ -2369,7 +2369,8 @@ void CAudioPlayerGui::screensaver(bool on)
 		m_screensaver = false;
 		videoDecoder->StopPicture();
 		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
-		paint();
+		if (!m_shairport)
+			paint();
 		m_idletime = time(NULL);
 	}
 }
