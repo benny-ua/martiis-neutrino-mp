@@ -57,7 +57,6 @@
 #include <sstream>
 #include <libdvbsub/dvbsub.h>
 #include <audio.h>
-#include <driver/volume.h>
 #include <driver/nglcd.h>
 #include <gui/widget/stringinput_ext.h>
 #include <gui/screensetup.h>

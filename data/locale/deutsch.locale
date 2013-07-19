@@ -807,6 +807,7 @@ mainmenu.recording_stop Stopp
 mainmenu.scripts Skripte
 mainmenu.service Service
 mainmenu.settings Einstellungen
+mainmenu.shairport ShairPort
 mainmenu.shutdown Ausschalten
 mainmenu.sleeptimer SleepTimer
 mainmenu.tvmode TV-Modus
@@ -1181,6 +1182,7 @@ menu.hint_selected_text Ändern Sie die Textfarbe für ausgewählte Fensterinhal
 menu.hint_service Sendersuchlauf, Bouquet-Verwaltung, Software-Aktualisierung und mehr
 menu.hint_service_scan Tuner-Einstellungen und Service-Suchlauf
 menu.hint_settings Konfigurieren von Neutrino-HD,\nNetzwerk, Video, Audio, OSD und mehr
+menu.hint_shairport ShairPort
 menu.hint_show_mute_icon Definiert, ob bei einem Lautstärkewert von 0 das Stumm-Symbol eingeblendet werden soll
 menu.hint_shutdown Setzen Sie Ihre Box in den Standby-Modus oder schalten Sie die Box komplett aus
 menu.hint_shutdown_count Die Zeit zum Herunterfahren in den Deep-Standby, wenn die Box im Standby-Modus ist

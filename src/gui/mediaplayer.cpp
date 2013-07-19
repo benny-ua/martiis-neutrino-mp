@@ -94,11 +94,20 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(false);
 		if (audioPlayer == NULL)
 			audioPlayer = new CAudioPlayerGui();
-#ifdef MARTII
 		if (!g_settings.show_background_picture)
 			videoDecoder->setBlank(true);
-#endif
 		int res = audioPlayer->exec(NULL, "init");
+		audiomute->enableMuteIcon(true);
+		return res /*menu_return::RETURN_REPAINT*/;
+	}
+	else if (actionKey == "shairport")
+	{
+		audiomute->enableMuteIcon(false);
+		if (audioPlayer == NULL)
+			audioPlayer = new CAudioPlayerGui();
+		if (!g_settings.show_background_picture)
+			videoDecoder->setBlank(true);
+		int res = audioPlayer->exec(NULL, "shairport");
 		audiomute->enableMuteIcon(true);
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
@@ -107,10 +116,8 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(false);
 		if (inetPlayer == NULL)
 			inetPlayer = new CAudioPlayerGui(true);
-#ifdef MARTII
 		if (!g_settings.show_background_picture)
 			videoDecoder->setBlank(true);
-#endif
 		int res = inetPlayer->exec(NULL, "init");
 		audiomute->enableMuteIcon(true);
 		return res; //menu_return::RETURN_REPAINT;
@@ -153,17 +160,12 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	
 	CMenuForwarder *fw_audio = NULL;
 	CMenuForwarder *fw_inet = NULL;
-#ifndef MARTII
-	CMenuForwarder *fw_mp = NULL;
-#endif
 	CMenuForwarder *fw_pviewer = NULL;
+	CMenuForwarder *fw_shairport = NULL;
 	CPictureViewerGui *pictureviewergui = NULL;
 #if ENABLE_UPNP
 	CUpnpBrowserGui *upnpbrowsergui = NULL;
 	CMenuForwarder *fw_upnp = NULL;
-#endif
-#ifndef MARTII
-	CMenuWidget *moviePlayer = NULL;
 #endif
 
 	if (usage_mode != MODE_VIDEO)
@@ -173,26 +175,25 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		const char* audio_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_RED;
 		fw_audio = new CMenuForwarder(LOCALE_MAINMENU_AUDIOPLAYER, true, NULL, this, "audioplayer", audio_rc, audio_btn);
 		fw_audio->setHint(NEUTRINO_ICON_HINT_APLAY, LOCALE_MENU_HINT_APLAY);
-		
+
 		//internet player
 		neutrino_msg_t inet_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_www : CRCInput::RC_green;
 		const char* inet_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_GREEN;
 		fw_inet = new CMenuForwarder(LOCALE_INETRADIO_NAME, true, NULL, this, "inetplayer", inet_rc, inet_btn);
 		fw_inet->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_INET_RADIO);
+
+		//shairport
+		if (!access("/etc/init.d/shairport", X_OK)) {
+		neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_nokey : CRCInput::RC_blue;
+		const char* shairport_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_BLUE;
+			fw_shairport = new CMenuForwarder(LOCALE_MAINMENU_SHAIRPORT, true, NULL, this, "shairport");
+			fw_shairport->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPORT);
+		}
+
 	}
 
 	if (usage_mode == MODE_DEFAULT)
 	{
-#ifndef MARTII
-		//movieplayer
-		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF) {
-			moviePlayer = new CMenuWidget(LOCALE_MAINMENU_MOVIEPLAYER, NEUTRINO_ICON_MULTIMEDIA, width, MN_WIDGET_ID_MEDIA_MOVIEPLAYER);
-			personalize->addWidget(moviePlayer);
-			fw_mp = new CMenuForwarder(LOCALE_MAINMENU_MOVIEPLAYER, true, NULL, moviePlayer, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
-			fw_mp->setHint(NEUTRINO_ICON_HINT_MOVIE, LOCALE_MENU_HINT_MOVIE);
-		}
-#endif
-
  		//pictureviewer
 		pictureviewergui = new CPictureViewerGui();
  		fw_pviewer = new CMenuForwarder(LOCALE_MAINMENU_PICTUREVIEWER, true, NULL, pictureviewergui, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
@@ -200,11 +201,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 #if ENABLE_UPNP
 		//upnp browser
 		upnpbrowsergui = new CUpnpBrowserGui();
-#ifdef MARTII
 		fw_upnp = new CMenuForwarder(LOCALE_UPNPBROWSER_HEAD, true, NULL, upnpbrowsergui, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
-#else
-		fw_upnp = new CMenuForwarder(LOCALE_UPNPBROWSER_HEAD, true, NULL, upnpbrowsergui, NULL, CRCInput::RC_0, NEUTRINO_ICON_BUTTON_0);
-#endif
 #endif
 //  		media->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, usage_mode == MODE_AUDIO ? CMenuWidget::BTN_TYPE_CANCEL : CMenuWidget::BTN_TYPE_BACK);
 	}
@@ -213,9 +210,12 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	{
  		//audio player	
 		personalize->addItem(media, fw_audio, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_AUDIO]);
- 		
+
  		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+ 		
+ 		//shairport
+		personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 	}
 	else if (usage_mode == MODE_VIDEO)
 	{
@@ -226,10 +226,13 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		//audio player
 		personalize->addItem(media, fw_audio, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_AUDIO]);
 		
+ 		//shairport
+		personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+		personalize->addSeparator(0);
+ 		
 		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 		
-#ifdef MARTII
 #if ENABLE_UPNP
 		//upnp browser
 		personalize->addItem(media, fw_upnp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_UPNP]);
@@ -240,22 +243,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 
 		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 			showMoviePlayer(media, personalize);
-#else
-		//movieplayer
-		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF) {
-			showMoviePlayer(moviePlayer,  personalize);
-			personalize->addItem(media, fw_mp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_MPLAYER], false, CPersonalizeGui::PERSONALIZE_SHOW_AS_ACCESS_OPTION);
-		}
-#endif
 		
-#ifndef MARTII
-		//picture viewer
-		personalize->addItem(media, fw_pviewer, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_PVIEWER]);
-#if ENABLE_UPNP		
-		//upnp browser
-		personalize->addItem(media, fw_upnp, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_UPNP]);
-#endif
-#endif
 	}
 	
 	int res = menu_return::RETURN_NONE;
@@ -281,34 +269,22 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 //show movieplayer submenu with selectable items for moviebrowser or filebrowser
 void CMediaPlayerMenu::showMoviePlayer(CMenuWidget *moviePlayer, CPersonalizeGui *p)
 { 
-#ifdef MARTII
 	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "movieplayer");
 	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback");
 	
 	p->addSeparator(*moviePlayer, LOCALE_MAINMENU_MOVIEPLAYER, true);
-#else
-	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "movieplayer", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-	fw_mbrowser->setHint(NEUTRINO_ICON_HINT_MB, LOCALE_MENU_HINT_MB);
-	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
-	fw_file->setHint(NEUTRINO_ICON_HINT_FILEPLAY, LOCALE_MENU_HINT_FILEPLAY);
-#endif
 	CMenuForwarder *fw_yt = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "ytplayback");
 	fw_yt->setHint(NEUTRINO_ICON_HINT_YTPLAY, LOCALE_MENU_HINT_YTPLAY);
 
-#ifndef MARTII	
-	p->addIntroItems(moviePlayer);
-#endif
-	
 	//moviebrowser
 	p->addItem(moviePlayer, fw_mbrowser, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_MBROWSER]);
 	
 	//fileplayback
 	p->addItem(moviePlayer, fw_file, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_FILEPLAY]);
-#ifdef MARTII
+
 	//webtv
 	CMenuForwarder *fw_network = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, &CMoviePlayerGui::getInstance(), "webtv");
 	p->addItem(moviePlayer, fw_network, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_INETPLAY]);
-#endif
 
 	p->addItem(moviePlayer, fw_yt, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_YTPLAY]);
 
