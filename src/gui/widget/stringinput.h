@@ -88,7 +88,7 @@ class CStringInput : public CMenuTarget
 		void hide();
 		int exec( CMenuTarget* parent, const std::string & actionKey );
 		void setMinMax(const int min_value, const int max_value);
-		virtual std::string &getValueString(fb_pixel_t *bgcol = NULL);
+		virtual std::string &getValueString(void);
 };
 
 class CStringInputSMS : public CStringInput

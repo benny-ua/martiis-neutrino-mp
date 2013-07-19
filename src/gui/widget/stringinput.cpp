@@ -372,7 +372,7 @@ void CStringInput::keyPlusPressed()
 	}
 }
 
-std::string &CStringInput::getValueString(fb_pixel_t *)
+std::string &CStringInput::getValueString(void)
 {
 	return *valueString;
 }

@@ -68,7 +68,7 @@ extern char zapit_long[20];
 /* ugly */
 extern CHintBox *reloadhintBox;
 
-static int all_usals = 1;
+//static int all_usals = 1;
 //sat_iterator_t sit;
 
 #define SCANTS_BOUQUET_OPTION_COUNT 3
@@ -874,7 +874,7 @@ int CScanSetup::showFrontendSetup(int number)
 		mc->setHint("", LOCALE_MENU_HINT_SCAN_MOTOR_18V);
 		setupMenu->addItem(mc);
 
-		mc = new CMenuOptionChooser(LOCALE_SATSETUP_USE_USALS,  &all_usals, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+		mc = new CMenuOptionChooser(LOCALE_SATSETUP_USE_USALS,  &fe_config.use_usals, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 		mc->setHint("", LOCALE_MENU_HINT_SCAN_USALSALL);
 		setupMenu->addItem(mc);
 
@@ -956,20 +956,16 @@ int CScanSetup::showScanMenuLnbSetup()
 		std::string satname = CServiceManager::getInstance()->GetSatelliteName(sit->first);
 
 		//sub menu for sat settings to selectable sat item
- 		CMenuWidget *tempsat = new CMenuWidget(satname.c_str(), NEUTRINO_ICON_SETTINGS, width);
- 		addScanMenuTempSat(tempsat, sit->second);
-#if 0 // option not refreshed.
-		if(sit->second.motor_position > 0) {
-			char mpos[10];
-			sprintf(mpos, "%d", sit->second.motor_position);
-			sat_setup->addItem(new CMenuForwarder(satname, true, mpos, tempsat));
-		} else
-#endif
-		{
-			CMenuForwarder * mf = new CMenuForwarder(satname, true, NULL, tempsat);
-			mf->setHint("", LOCALE_MENU_HINT_SCAN_LNBCONFIG);
-			sat_setup->addItem(mf);
-		}
+		CMenuWidget *tempsat = new CMenuWidget(satname.c_str(), NEUTRINO_ICON_SETTINGS, width);
+		addScanMenuTempSat(tempsat, sit->second);
+
+		char opt[100];
+		sprintf(opt, "diseqc %2d / rotor %2d", sit->second.diseqc+1, sit->second.motor_position);
+		satoptions.push_back(opt);
+		CMenuForwarder * mf = new CMenuForwarder(satname, true, satoptions[count], tempsat);
+		mf->setHint("", LOCALE_MENU_HINT_SCAN_LNBCONFIG);
+		sat_setup->addItem(mf);
+		satmf.push_back(mf);
 		tmp[count] = tempsat;
 		count++;
 	}
@@ -979,6 +975,8 @@ int CScanSetup::showScanMenuLnbSetup()
 			delete tmp[i];
 	}
 	delete sat_setup;
+	satmf.clear();
+	satoptions.clear();
 	return res;
 }
 
@@ -1139,13 +1137,13 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 	CMenuForwarder			*mf;
 
 	if (!unicable) {
-		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, (dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED), -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
+		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, ((dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED)), -1, 15, this, 1, -1, LOCALE_OPTIONS_OFF);
 		diseqc->setHint("", LOCALE_MENU_HINT_SCAN_DISEQC);
 		comm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_COMM_INPUT, &satconfig.commited, dmode == DISEQC_ADVANCED, -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		comm->setHint("", LOCALE_MENU_HINT_SCAN_COMMITED);
 		uncomm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_UNCOMM_INPUT, &satconfig.uncommited, dmode == DISEQC_ADVANCED, -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		uncomm->setHint("", LOCALE_MENU_HINT_SCAN_UNCOMMITED);
-		motor	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_MOTOR_POS, &satconfig.motor_position, true /*dmode == DISEQC_ADVANCED*/, 0, 64, NULL, 0, 0, LOCALE_OPTIONS_OFF);
+		motor	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_MOTOR_POS, &satconfig.motor_position, true /*dmode == DISEQC_ADVANCED*/, 0, 64, this, 0, 0, LOCALE_OPTIONS_OFF);
 		motor->setHint("", LOCALE_MENU_HINT_SCAN_MOTORPOS);
 		usals	= new CMenuOptionChooser(LOCALE_EXTRA_USE_GOTOXX,  &satconfig.use_usals, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true /*dmode == DISEQC_ADVANCED*/);
 		usals->setHint("", LOCALE_MENU_HINT_SCAN_USEUSALS);
@@ -1154,9 +1152,10 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 			satconfig.diseqc = 0;
 		unilnb = new CMenuOptionNumberChooser(LOCALE_UNICABLE_LNB, &satconfig.diseqc, true, 0, 1);
 	}
-
+#if 0
 	if(!satconfig.use_usals)
 		all_usals = 0;
+#endif
 
 	CIntInput* lofL = new CIntInput(LOCALE_SATSETUP_LOFL, (int*) &satconfig.lnbOffsetLow, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
 	CIntInput* lofH = new CIntInput(LOCALE_SATSETUP_LOFH, (int*) &satconfig.lnbOffsetHigh, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
@@ -1498,12 +1497,14 @@ bool CScanSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*
 	bool ret = false;
 
 	if(ARE_LOCALES_EQUAL(OptionName, LOCALE_SATSETUP_USE_USALS)) {
+#if 0
 		CFrontend * fe = CFEManager::getInstance()->getFE(fenumber);
 		printf("[neutrino] CScanSetup::%s: all usals %d \n", __FUNCTION__, all_usals);
 		satellite_map_t & satmap = fe->getSatellites();
 		for (sat_iterator_t sit = satmap.begin(); sit != satmap.end(); sit++) {
 			sit->second.use_usals = all_usals;
 		}
+#endif
 	}
 	else if(ARE_LOCALES_EQUAL(OptionName, LOCALE_SATSETUP_DISEQC)) {
 		printf("[neutrino] CScanSetup::%s: diseqc %d fenumber %d\n", __FUNCTION__, dmode, fenumber);
@@ -1594,6 +1595,21 @@ bool CScanSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*
 
 				break;
 			}
+		}
+	}
+	else if(ARE_LOCALES_EQUAL(OptionName, LOCALE_SATSETUP_MOTOR_POS) ||
+			ARE_LOCALES_EQUAL(OptionName, LOCALE_SATSETUP_DISEQC_INPUT)) {
+		CFrontend * fe = CFEManager::getInstance()->getFE(fenumber);
+		satellite_map_t & satmap = fe->getSatellites();
+		int count = 0;
+		for (sat_iterator_t sit = satmap.begin(); sit != satmap.end(); ++sit) {
+			if(!sit->second.configured)
+				continue;
+			char opt[100];
+			sprintf(opt, "diseqc %d / rotor %d", sit->second.diseqc+1, sit->second.motor_position);
+			satoptions[count] = opt;
+			satmf[count]->setOption(satoptions[count]);
+			count++;
 		}
 	}
 	else if(ARE_LOCALES_EQUAL(OptionName, LOCALE_SATSETUP_LOGICAL_NUMBERS)) {

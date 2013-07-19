@@ -57,7 +57,7 @@ CMenuForwarder * const GenericMenuBack = &CGenericMenuBack;
 CMenuForwarder * const GenericMenuCancel = &CGenericMenuCancel;
 CMenuForwarder * const GenericMenuNext = &CGenericMenuNext;
 
-std::string &CMenuTarget::getValueString(fb_pixel_t *)
+std::string &CMenuTarget::getValueString(void)
 {
 	return *valueString;
 }
@@ -73,6 +73,7 @@ CMenuItem::CMenuItem()
 	hint = NONEXISTANT_LOCALE;
 	name = NONEXISTANT_LOCALE;
 	nameString = "";
+	isStatic = false;
 }
 
 void CMenuItem::init(const int X, const int Y, const int DX, const int OFFX)
@@ -426,21 +427,10 @@ void CMenuWidget::resetWidget(bool delete_items)
 {
 	for(unsigned int count=0;count<items.size();count++) {
 		CMenuItem * item = items[count];
-#ifdef MARTII
 		if (!item->isStatic && delete_items) {
 			delete item;
 			item = NULL;
 		}
-#else
-		if ((item != GenericMenuSeparator) &&
-		    (item != GenericMenuSeparatorLine) &&
-		    (item != GenericMenuBack) &&
-		    (item != GenericMenuCancel)){
-			if(delete_items)
-				delete item;
-			item = NULL;
-		}
-#endif
 	}
 	
 	items.clear();
@@ -1836,7 +1826,9 @@ int CMenuForwarder::getWidth(void)
 	int tw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(_name, true);
 
 	fb_pixel_t bgcol = 0;
-	std::string option_name = getOption(&bgcol);
+	std::string option_name = getOption();
+	if (jumpTarget)
+		bgcol = jumpTarget->getColor();
 
         if (!option_name.empty())
                 tw += 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(option_name.c_str(), true);
@@ -1858,12 +1850,12 @@ int CMenuForwarder::exec(CMenuTarget* parent)
 	}
 }
 
-std::string CMenuForwarder::getOption(fb_pixel_t *bgcol)
+std::string CMenuForwarder::getOption(void)
 {
 	if (!option_string_ptr->empty())
 		return *option_string_ptr;
 	if (jumpTarget)
-		return jumpTarget->getValueString(bgcol);
+		return jumpTarget->getValueString();
 	return "";
 }
 
@@ -1872,8 +1864,10 @@ int CMenuForwarder::paint(bool selected)
 	int height = getHeight();
  	const char * l_name = getName();
  
+ 	std::string option_name = getOption();
 	fb_pixel_t bgcol = 0;
- 	std::string option_name = getOption(&bgcol);
+	if (jumpTarget)
+		bgcol = jumpTarget->getColor();
 	
 	//paint item
 	prepareItem(selected, height);

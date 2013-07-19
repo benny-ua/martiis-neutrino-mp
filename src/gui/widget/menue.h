@@ -96,7 +96,8 @@ class CMenuTarget
 		virtual ~CMenuTarget(){}
 		virtual void hide(){}
 		virtual int exec(CMenuTarget* parent, const std::string & actionKey) = 0;
-		virtual std::string &getValueString(fb_pixel_t *bgcol = NULL);
+		virtual std::string &getValueString(void);
+		virtual fb_pixel_t getColor(void) { return 0; }
 };
 
 class CMenuItem
@@ -116,9 +117,7 @@ class CMenuItem
 		std::string nameString;
 	public:
 		bool           	active;
-#ifdef MARTII
 		bool		isStatic;
-#endif
 		neutrino_msg_t 	directKey;
 		neutrino_msg_t 	msg;
 		std::string    	iconName;
@@ -216,7 +215,7 @@ class CMenuForwarder : public CMenuItem
 	const std::string	*option_string_ptr;
 	CMenuTarget *       jumpTarget;
 
-	virtual std::string getOption(fb_pixel_t *bg_color = NULL);
+	virtual std::string getOption(void);
 
  public:
 

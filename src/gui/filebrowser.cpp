@@ -855,11 +855,13 @@ bool CFileBrowser::exec(const char * const dirname)
 	std::replace(name.begin(), name.end(), '\\', '/');
 
 	paintHead();
-#ifdef MARTII
-	if (name != Path)
-#endif
-	ChangeDir(name);
-	paint();
+	int selection = -1;
+	if (name == Path)
+		selection = selected;
+		
+	ChangeDir(name, selection);
+	//paint();
+
 	paintFoot();
 	frameBuffer->blit();
 
@@ -1093,7 +1095,10 @@ bool CFileBrowser::exec(const char * const dirname)
 								ChangeDir(filelist[selected].Url);
 							else
 #endif
+							{
+								selections.push_back(selected);
 								ChangeDir(filelist[selected].Name);
+							}
 						}
 						else
 						{

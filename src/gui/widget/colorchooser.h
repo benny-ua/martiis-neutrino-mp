@@ -67,7 +67,8 @@ class CColorChooser : public CMenuTarget
 
 		void hide();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
-		std::string &getValueString(fb_pixel_t *bgcol = NULL);
+		std::string &getValueString();
+		fb_pixel_t getColor(void);
 };
 
 
