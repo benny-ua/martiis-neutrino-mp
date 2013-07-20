@@ -2036,11 +2036,11 @@ bool CMovieBrowser::onButtonPressLastPlayList(neutrino_msg_t msg)
 	{
 		m_pcLastPlay->scrollLineDown(1);
 	}
-	else if (msg == CRCInput::RC_left)
+	else if (msg == CRCInput::RC_left || msg == (neutrino_msg_t)g_settings.key_channelList_pageup)
 	{
 		m_pcLastPlay->scrollPageUp(1);
 	}
-	else if (msg == CRCInput::RC_right)
+	else if (msg == CRCInput::RC_right || msg == (neutrino_msg_t)g_settings.key_channelList_pagedown)
 	{
 		m_pcLastPlay->scrollPageDown(1);
 	}
@@ -2068,11 +2068,11 @@ bool CMovieBrowser::onButtonPressLastRecordList(neutrino_msg_t msg)
 	{
 		m_pcLastRecord->scrollLineDown(1);
 	}
-	else if (msg == CRCInput::RC_left)
+	else if (msg == CRCInput::RC_left || msg == (neutrino_msg_t)g_settings.key_channelList_pageup)
 	{
 		m_pcLastRecord->scrollPageUp(1);
 	}
-	else if (msg == CRCInput::RC_right)
+	else if (msg == CRCInput::RC_right || msg == (neutrino_msg_t)g_settings.key_channelList_pagedown)
 	{
 		m_pcLastRecord->scrollPageDown(1);
 	}
