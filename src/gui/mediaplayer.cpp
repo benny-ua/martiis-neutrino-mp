@@ -184,10 +184,10 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 
 		//shairport
 		if (!access("/etc/init.d/shairport", X_OK)) {
-		neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_nokey : CRCInput::RC_blue;
-		const char* shairport_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_BLUE;
-			fw_shairport = new CMenuForwarder(LOCALE_MAINMENU_SHAIRPORT, true, NULL, this, "shairport");
-			fw_shairport->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPORT);
+				neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_nokey : CRCInput::RC_blue;
+				const char* shairport_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_BLUE;
+				fw_shairport = new CMenuForwarder(LOCALE_MAINMENU_SHAIRPORT, true, NULL, this, "shairport");
+				fw_shairport->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPORT);
 		}
 
 	}
@@ -215,7 +215,8 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
  		
  		//shairport
-		personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+		if (fw_shairport)
+				personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 	}
 	else if (usage_mode == MODE_VIDEO)
 	{
@@ -227,8 +228,10 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		personalize->addItem(media, fw_audio, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_AUDIO]);
 		
  		//shairport
-		personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
-		personalize->addSeparator(0);
+		if (fw_shairport) {
+				personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+				personalize->addSeparator(0);
+		}
  		
 		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
