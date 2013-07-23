@@ -882,8 +882,7 @@ bool CFileBrowser::exec(const char * const dirname)
 		{
 			m_SMSKeyInput.resetOldKey();
 		}
-
-		if (msg == CRCInput::RC_yellow)
+		else if (msg == CRCInput::RC_yellow)
 		{
 			if ((Multi_Select) && (selected < filelist.size()))
 			{
@@ -897,36 +896,6 @@ bool CFileBrowser::exec(const char * const dirname)
 				}
 				msg_repeatok = CRCInput::RC_down;	// jump to next item
 			}
-		}
-
-#ifdef MARTII
-		if ((msg == CRCInput::RC_red) || msg == (neutrino_msg_t) g_settings.key_channelList_pagedown)
-#else
-		if ((msg == CRCInput::RC_red) || msg == CRCInput::RC_page_down)
-#endif
-		{
-			selected += listmaxshow;
-			if (selected >= filelist.size()) {
-				if (((filelist.size() / listmaxshow) + 1) * listmaxshow == filelist.size() + listmaxshow) // last page has full entries
-					selected = 0;
-				else
-					selected = selected < (((filelist.size() / listmaxshow) + 1) * listmaxshow) ? (filelist.size() - 1) : 0;
-			}
-			liststart = (selected / listmaxshow) * listmaxshow;
-			paint();
-		}
-#ifdef MARTII
-		else if (msg == CRCInput::RC_green || msg == (neutrino_msg_t) g_settings.key_channelList_pageup)
-#else
-		else if ((msg == CRCInput::RC_green) || (msg == CRCInput::RC_page_up) )
-#endif
-		{
-			if ((int(selected)-int(listmaxshow))<0)
-				selected=filelist.size()-1;
-			else
-				selected -= listmaxshow;
-			liststart = (selected/listmaxshow)*listmaxshow;
-			paint();
 		}
 		else if (msg_repeatok == CRCInput::RC_up)
 		{
@@ -1011,6 +980,27 @@ bool CFileBrowser::exec(const char * const dirname)
 			{
 				ChangeDir("..");
 			}
+		}
+		else if ((msg == CRCInput::RC_red) || msg == (neutrino_msg_t) g_settings.key_channelList_pagedown)
+		{
+			selected += listmaxshow;
+			if (selected >= filelist.size()) {
+				if (((filelist.size() / listmaxshow) + 1) * listmaxshow == filelist.size() + listmaxshow) // last page has full entries
+					selected = 0;
+				else
+					selected = selected < (((filelist.size() / listmaxshow) + 1) * listmaxshow) ? (filelist.size() - 1) : 0;
+			}
+			liststart = (selected / listmaxshow) * listmaxshow;
+			paint();
+		}
+		else if (msg == CRCInput::RC_green || msg == (neutrino_msg_t) g_settings.key_channelList_pageup)
+		{
+			if ((int(selected)-int(listmaxshow))<0)
+				selected=filelist.size()-1;
+			else
+				selected -= listmaxshow;
+			liststart = (selected/listmaxshow)*listmaxshow;
+			paint();
 		}
 		else if ( msg == CRCInput::RC_blue )
 		{
@@ -1110,11 +1100,7 @@ bool CFileBrowser::exec(const char * const dirname)
 				}
 			}
 		}
-#ifdef MARTII
 		else if (msg==(uint32_t)g_settings.key_help)
-#else
-		else if (msg==CRCInput::RC_help)
-#endif
 		{
 			if (++g_settings.filebrowser_sortmethod >= FILEBROWSER_NUMBER_OF_SORT_VARIANTS)
 				g_settings.filebrowser_sortmethod = 0;
