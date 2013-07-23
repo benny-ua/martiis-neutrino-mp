@@ -50,6 +50,7 @@
 #include <gui/widget/colorchooser.h>
 #include <gui/widget/stringinput.h>
 
+#include <driver/neutrinofonts.h>
 #include <driver/screen_max.h>
 #include <driver/screenshot.h>
 #include <driver/volume.h>
@@ -149,37 +150,33 @@ font_sizes_groups font_sizes_groups[6] =
 	{LOCALE_FONTMENU_GAMELIST   , 2, gamelist_font_sizes   , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS }
 };
 
-#define FONT_STYLE_REGULAR 0
-#define FONT_STYLE_BOLD    1
-#define FONT_STYLE_ITALIC  2
-
 font_sizes_struct neutrino_font[SNeutrinoSettings::FONT_TYPE_COUNT] =
 {
-	{LOCALE_FONTSIZE_MENU               ,  20, FONT_STYLE_BOLD   , 0},
-	{LOCALE_FONTSIZE_MENU_TITLE         ,  30, FONT_STYLE_BOLD   , 0},
-	{LOCALE_FONTSIZE_MENU_INFO          ,  16, FONT_STYLE_REGULAR, 0},
-	{LOCALE_FONTSIZE_EPG_TITLE          ,  25, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_EPG_INFO1          ,  17, FONT_STYLE_ITALIC , 2},
-	{LOCALE_FONTSIZE_EPG_INFO2          ,  17, FONT_STYLE_REGULAR, 2},
-	{LOCALE_FONTSIZE_EPG_DATE           ,  15, FONT_STYLE_REGULAR, 2},
-	{LOCALE_FONTSIZE_EVENTLIST_TITLE    ,  30, FONT_STYLE_REGULAR, 0},
-	{LOCALE_FONTSIZE_EVENTLIST_ITEMLARGE,  20, FONT_STYLE_BOLD   , 1},
-	{LOCALE_FONTSIZE_EVENTLIST_ITEMSMALL,  14, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_EVENTLIST_DATETIME ,  16, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_EVENTLIST_EVENT    ,  17, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_GAMELIST_ITEMLARGE ,  20, FONT_STYLE_BOLD   , 1},
-	{LOCALE_FONTSIZE_GAMELIST_ITEMSMALL ,  16, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_CHANNELLIST        ,  20, FONT_STYLE_BOLD   , 1},
-	{LOCALE_FONTSIZE_CHANNELLIST_DESCR  ,  20, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_CHANNELLIST_NUMBER ,  14, FONT_STYLE_BOLD   , 2},
-	{LOCALE_FONTSIZE_CHANNELLIST_EVENT  ,  17, FONT_STYLE_REGULAR, 2},
-	{LOCALE_FONTSIZE_CHANNEL_NUM_ZAP    ,  40, FONT_STYLE_BOLD   , 0},
-	{LOCALE_FONTSIZE_INFOBAR_NUMBER     ,  50, FONT_STYLE_BOLD   , 0},
-	{LOCALE_FONTSIZE_INFOBAR_CHANNAME   ,  30, FONT_STYLE_BOLD   , 0},
-	{LOCALE_FONTSIZE_INFOBAR_INFO       ,  20, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_INFOBAR_SMALL      ,  14, FONT_STYLE_REGULAR, 1},
-	{LOCALE_FONTSIZE_FILEBROWSER_ITEM   ,  16, FONT_STYLE_BOLD   , 1},
-	{LOCALE_FONTSIZE_MENU_HINT          ,  16, FONT_STYLE_REGULAR, 0}
+	{LOCALE_FONTSIZE_MENU               ,  20, CNeutrinoFonts::FONT_STYLE_BOLD   , 0},
+	{LOCALE_FONTSIZE_MENU_TITLE         ,  30, CNeutrinoFonts::FONT_STYLE_BOLD   , 0},
+	{LOCALE_FONTSIZE_MENU_INFO          ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 0},
+	{LOCALE_FONTSIZE_EPG_TITLE          ,  25, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_EPG_INFO1          ,  17, CNeutrinoFonts::FONT_STYLE_ITALIC , 2},
+	{LOCALE_FONTSIZE_EPG_INFO2          ,  17, CNeutrinoFonts::FONT_STYLE_REGULAR, 2},
+	{LOCALE_FONTSIZE_EPG_DATE           ,  15, CNeutrinoFonts::FONT_STYLE_REGULAR, 2},
+	{LOCALE_FONTSIZE_EVENTLIST_TITLE    ,  30, CNeutrinoFonts::FONT_STYLE_REGULAR, 0},
+	{LOCALE_FONTSIZE_EVENTLIST_ITEMLARGE,  20, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
+	{LOCALE_FONTSIZE_EVENTLIST_ITEMSMALL,  14, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_EVENTLIST_DATETIME ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_EVENTLIST_EVENT    ,  17, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_GAMELIST_ITEMLARGE ,  20, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
+	{LOCALE_FONTSIZE_GAMELIST_ITEMSMALL ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_CHANNELLIST        ,  20, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
+	{LOCALE_FONTSIZE_CHANNELLIST_DESCR  ,  20, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_CHANNELLIST_NUMBER ,  14, CNeutrinoFonts::FONT_STYLE_BOLD   , 2},
+	{LOCALE_FONTSIZE_CHANNELLIST_EVENT  ,  17, CNeutrinoFonts::FONT_STYLE_REGULAR, 2},
+	{LOCALE_FONTSIZE_CHANNEL_NUM_ZAP    ,  40, CNeutrinoFonts::FONT_STYLE_BOLD   , 0},
+	{LOCALE_FONTSIZE_INFOBAR_NUMBER     ,  50, CNeutrinoFonts::FONT_STYLE_BOLD   , 0},
+	{LOCALE_FONTSIZE_INFOBAR_CHANNAME   ,  30, CNeutrinoFonts::FONT_STYLE_BOLD   , 0},
+	{LOCALE_FONTSIZE_INFOBAR_INFO       ,  20, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_INFOBAR_SMALL      ,  14, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
+	{LOCALE_FONTSIZE_FILEBROWSER_ITEM   ,  16, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
+	{LOCALE_FONTSIZE_MENU_HINT          ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 0}
 };
 
 int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
@@ -556,7 +553,6 @@ int COsdSetup::showOsdSetup()
 	mc->setHint("", LOCALE_MENU_HINT_SUBCHANNEL_POS);
 	osd_menu->addItem(mc);
 
-
 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_MENU_NUMBERS_AS_ICONS, &g_settings.menu_numbers_as_icons, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_OPTIONS_SHOW_BACKGROUND_PICTURE, &g_settings.show_background_picture, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
@@ -566,7 +562,12 @@ int COsdSetup::showOsdSetup()
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_BLINKING_DOT, &g_settings.infoclock_blinking_dot, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_NO_BACKGROUND, &g_settings.infoclock_no_background, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
+	int oldVolumeSize = g_settings.volume_size;
+
 	int res = osd_menu->exec(NULL, "");
+
+	if (oldVolumeSize != g_settings.volume_size)
+		CVolumeHelper::getInstance()->refresh();
 
 	if (pb_color == -1)
 		g_settings.progressbar_color = 0;
@@ -959,6 +960,13 @@ void COsdSetup::showOsdVolumeSetup(CMenuWidget *menu_volume)
 	mc = new CMenuOptionChooser(LOCALE_EXTRA_VOLUME_POS, &g_settings.volume_pos, VOLUMEBAR_DISP_POS_OPTIONS, VOLUMEBAR_DISP_POS_OPTIONS_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_VOLUME_POS);
 	menu_volume->addItem(mc);
+
+	// volume size
+	int vMin = CVolumeHelper::getInstance()->getVolIconHeight();
+	g_settings.volume_size = max(g_settings.volume_size, vMin);
+	CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_EXTRA_VOLUME_SIZE, &g_settings.volume_size, true, vMin, 50);
+	nc->setHint("", LOCALE_MENU_HINT_VOLUME_SIZE);
+	menu_volume->addItem(nc);
 
 	// volume digits
 	mc = new CMenuOptionChooser(LOCALE_EXTRA_VOLUME_DIGITS, &g_settings.volume_digits, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);

@@ -268,7 +268,7 @@ void
 CPSISetup::paintSlider (int i)
 {
   Font *f = g_Font[SNeutrinoSettings::FONT_TYPE_MENU];
-  unsigned char fg_col[] = { COL_MENUCONTENT, COL_MENUHEAD };
+  fb_pixel_t fg_col[] = { COL_MENUCONTENT_TEXT, COL_MENUHEAD_TEXT };
 
   if (i < PSI_RESET)
     {

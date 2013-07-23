@@ -63,30 +63,6 @@
 *                                                                                     *
 **************************************************************************************/
 
-typedef struct neutrino_font_descr
-{
-	const char * name;
-	const char * filename;
-	int          size_offset;
-} neutrino_font_descr_struct;
-
-typedef struct font_sizes
-{
-	const neutrino_locale_t name;
-	const unsigned int      defaultsize;
-	const unsigned int      style;
-	const unsigned int      size_offset;
-} font_sizes_struct;
-
-typedef struct font_sizes_groups
-{
-	const neutrino_locale_t                     groupname;
-	const unsigned int                          count;
-	const SNeutrinoSettings::FONT_TYPES * const content;
-	const char * const                          actionkey;
-	const neutrino_locale_t hint;
-} font_sizes_groups_struct;
-
 extern const unsigned char genre_sub_classes[];            /* epgview.cpp */
 extern const neutrino_locale_t * genre_sub_classes_list[]; /* epgview.cpp */
 
@@ -115,8 +91,6 @@ private:
 #ifdef MARTII
 	CMenuWidget			*mainMenu;
 #endif
-
-	neutrino_font_descr_struct      font;
 
 	int				mode;
 	int				lastMode;

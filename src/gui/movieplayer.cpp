@@ -1206,7 +1206,7 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 		bool defpid = currentapid ? (currentapid == apids[count]) : (count == 0);
 
 		if (p_movie_info) {
-			for (int i = 0; i < p_movie_info->audioPids.size(); i++)
+			for (unsigned int i = 0; i < p_movie_info->audioPids.size(); i++)
 				if (apids[count] == p_movie_info->audioPids[i].epgAudioPid) {
 					apidtitle[count] = p_movie_info->audioPids[i].epgAudioPidName;
 					break;
@@ -1866,7 +1866,7 @@ void CMoviePlayerGui::showSubtitle(neutrino_msg_data_t data)
 		frameBuffer->paintBoxRel(min_x, min_y, max_x - min_x, max_y-min_y, COL_MENUCONTENT_PLUS_0);
 
 		for (unsigned i = 0; i < subtext.size(); i++)
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x[i], y[i], sw, subtext[i].c_str(), COL_MENUCONTENT, 0, true);
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x[i], y[i], sw, subtext[i].c_str(), COL_MENUCONTENT_TEXT, 0, true);
 
 		end_time = sub->end_display_time + time_monotonic_ms();
 	}
