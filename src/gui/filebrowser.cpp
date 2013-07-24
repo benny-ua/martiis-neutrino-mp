@@ -882,7 +882,8 @@ bool CFileBrowser::exec(const char * const dirname)
 		{
 			m_SMSKeyInput.resetOldKey();
 		}
-		else if (msg == CRCInput::RC_yellow)
+
+		if (msg == CRCInput::RC_yellow)
 		{
 			if ((Multi_Select) && (selected < filelist.size()))
 			{
