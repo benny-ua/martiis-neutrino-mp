@@ -211,6 +211,7 @@ bool CVolume::hideVolscale()
 	if (volscale) {
 		if (volscale->isPainted()) {
 			volscale->hide();
+			frameBuffer->blit();
 			ret = true;
 		}
 		delete volscale;

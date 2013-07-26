@@ -392,19 +392,21 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 	if (size > (int) valueString->length())
 		valueString->append(size - valueString->length(), ' ');
 
-	fb_pixel_t * pixbuf = new fb_pixel_t[(width + SHADOW_OFFSET) * (height + SHADOW_OFFSET)];
-
-	if (pixbuf != NULL)
-		frameBuffer->SaveScreen(x, y, width + SHADOW_OFFSET, height + SHADOW_OFFSET, pixbuf);
+	fb_pixel_t * pixbuf = NULL;
+	if (!parent) {
+		pixbuf = new fb_pixel_t[(width + SHADOW_OFFSET) * (height + SHADOW_OFFSET)];
+		if (pixbuf)
+			frameBuffer->SaveScreen(x, y, width + SHADOW_OFFSET, height + SHADOW_OFFSET, pixbuf);
+	}
 
 	paint();
-	frameBuffer->blit();
 
 	uint64_t timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_MENU]);
 
 	bool loop=true;
 	while (loop)
 	{
+		frameBuffer->blit();
 		if (*valueString != dispval)
 		{
 			CVFD::getInstance()->showMenuText(1,valueString->c_str() , selected+1);
@@ -512,16 +514,15 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 				}
 			}
 		}
-		frameBuffer->blit();
 	}
 
-	hide();
-
-	if (pixbuf != NULL)
+	if (pixbuf)
 	{
 		frameBuffer->RestoreScreen(x, y, width + SHADOW_OFFSET, height + SHADOW_OFFSET, pixbuf);
 		delete[] pixbuf;//Mismatching allocation and deallocation: pixbuf
-	}
+		frameBuffer->blit();
+	} else
+		hide();
 
 	trim (*valueString);
 
@@ -801,12 +802,12 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 		valueString->append(size - valueString->length(), ' ');
 
 	paint();
-	frameBuffer->blit();
 
 	bool loop = true;
 
 	while(loop)
 	{
+		frameBuffer->blit();
 		g_RCInput->getMsg( &msg, &data, 300 );
 
 		if (msg==CRCInput::RC_left)
@@ -852,7 +853,6 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 				}
 			}
 		}
-		frameBuffer->blit();
 	}
 
 	hide();
@@ -911,7 +911,7 @@ int CPLPINInput::exec( CMenuTarget* parent, const std::string & )
 {
 	fb_pixel_t * pixbuf = new fb_pixel_t[(width+ 2* borderwidth) * (height+ 2* borderwidth)];
 
-	if (pixbuf != NULL)
+	if (pixbuf)
 		frameBuffer->SaveScreen(x- borderwidth, y- borderwidth, width+ 2* borderwidth, height+ 2* borderwidth, pixbuf);
 
 	// clear border
@@ -922,9 +922,9 @@ int CPLPINInput::exec( CMenuTarget* parent, const std::string & )
 
 	int res = CPINInput::exec ( parent, "" );
 
-	if (pixbuf != NULL)
+	if (pixbuf)
 	{
-		frameBuffer->RestoreScreen(x- borderwidth, y- borderwidth, width+ 2* borderwidth, height+ 2* borderwidth, pixbuf);
+		frameBuffer->RestoreScreen(x - borderwidth, y- borderwidth, width+ 2* borderwidth, height+ 2* borderwidth, pixbuf);
 		delete[] pixbuf;//Mismatching allocation and deallocation: pixbuf
 	}
 

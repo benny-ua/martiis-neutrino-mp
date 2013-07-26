@@ -1193,7 +1193,6 @@ void CFrameBuffer::RestoreScreen(int x, int y, int dx, int dy, fb_pixel_t * cons
 		fbpos += stride;
 		bkpos += dx;
 	}
-	blit();
 	checkFbArea(x, y, dx, dy, false);
 }
 
