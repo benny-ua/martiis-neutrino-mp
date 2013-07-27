@@ -104,16 +104,29 @@ CMoviePlayerGui::~CMoviePlayerGui()
 }
 
 // for libeplayer3/libass subtitles
+static void framebuffer_blit(void)
+{
+	CFrameBuffer::getInstance()->blit();
+}
+
 static void framebuffer_callback(
 	unsigned char** destination,
 	unsigned int *screen_width,
 	unsigned int *screen_height,
 	unsigned int *destStride,
-	int *framebufferFD)
+	int *framebufferFD,
+	void (**framebufferBlit)(void))
 {
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
-	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer(true);
 	*framebufferFD = frameBuffer->getFileHandle();
+#if HAVE_SPARK_HARDWARE
+	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer();
+	*screen_width = DEFAULT_XRES;
+	*screen_height = DEFAULT_YRES;
+	*destStride = DEFAULT_XRES * sizeof(fb_pixel_t);
+	*framebufferBlit = framebuffer_blit;
+#else
+	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer(true);
 	fb_var_screeninfo s;
 	ioctl(*framebufferFD, FBIOGET_VSCREENINFO, &s);
 	*screen_width = s.xres;
@@ -121,6 +134,8 @@ static void framebuffer_callback(
 	fb_fix_screeninfo fix;
 	ioctl(*framebufferFD, FBIOGET_FSCREENINFO, &fix);
 	*destStride = fix.line_length;
+	*framebufferBlit = NULL;
+#endif
 }
 
 void CMoviePlayerGui::Init(void)
