@@ -110,7 +110,7 @@ static void framebuffer_blit(void)
 }
 
 static void framebuffer_callback(
-	unsigned char** destination,
+	uint32_t** destination,
 	unsigned int *screen_width,
 	unsigned int *screen_height,
 	unsigned int *destStride,
@@ -120,13 +120,13 @@ static void framebuffer_callback(
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
 	*framebufferFD = frameBuffer->getFileHandle();
 #if HAVE_SPARK_HARDWARE
-	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer();
+	*destination = frameBuffer->getFrameBufferPointer();
 	*screen_width = DEFAULT_XRES;
 	*screen_height = DEFAULT_YRES;
 	*destStride = DEFAULT_XRES * sizeof(fb_pixel_t);
 	*framebufferBlit = framebuffer_blit;
 #else
-	*destination = (unsigned char *) frameBuffer->getFrameBufferPointer(true);
+	*destination = frameBuffer->getFrameBufferPointer(true);
 	fb_var_screeninfo s;
 	ioctl(*framebufferFD, FBIOGET_VSCREENINFO, &s);
 	*screen_width = s.xres;
