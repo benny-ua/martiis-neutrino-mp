@@ -138,6 +138,22 @@ static void framebuffer_callback(
 #endif
 }
 
+void getPlayerPts(int64_t *pts)
+{
+	*pts = CMoviePlayerGui::getInstance().GetPts();
+}
+
+uint64_t CMoviePlayerGui::GetPts(void)
+{
+#ifndef INVALID_PTS_VALUE
+#define INVALID_PTS_VALUE 0x200000000ull
+#endif
+	uint64_t pts = INVALID_PTS_VALUE;
+	if (playback)
+		playback->GetPts(pts);
+	return pts;
+}
+
 void CMoviePlayerGui::Init(void)
 {
 	playing = false;

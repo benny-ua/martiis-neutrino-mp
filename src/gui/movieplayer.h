@@ -194,6 +194,7 @@ class CMoviePlayerGui : public CMenuTarget
 	bool Playing() { return playing; };
 	std::string CurrentAudioName() { return currentaudioname; };
 	int GetSpeed() { return speed; }
+	uint64_t GetPts();
 	int GetPosition() { return position; }
 	int GetDuration() { return duration; }
 	void UpdatePosition();

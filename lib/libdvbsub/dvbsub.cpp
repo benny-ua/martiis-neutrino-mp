@@ -245,16 +245,14 @@ void dvbsub_set_stc_offset(int64_t o) {
 }
 #endif
 
+extern void getPlayerPts(int64_t *);
+
 void dvbsub_get_stc(int64_t * STC)
 {
 #ifdef MARTII
 #ifdef HAVE_SPARK_HARDWARE // requires libeplayer3
 	if (isEplayer) {
-// FIXME. Should use
-//   player->playback->Command(player, PLAYBACK_PTS, STC);
-// below, but that probably isn't worth it.
-		extern long long int latestPts; // from libeplayer3/container/container_ffmpeg.c
-		*STC = (int64_t) latestPts;
+		getPlayerPts(STC);
 		*STC -= stc_offset;
 		return;
 	}
