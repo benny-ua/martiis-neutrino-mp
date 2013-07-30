@@ -212,9 +212,7 @@ class CTimerManager
 private:
 	void Init(void);
 	int					eventID;
-#ifdef MARTII
 	int					shutdown_eventID;
-#endif
 	CEventServer		*eventServer;
 	CTimerEventMap		events;
 	pthread_t			thrTimer;
@@ -228,9 +226,7 @@ private:
 	CTimerEvent			*nextEvent();
 public:
 
-#ifndef MARTII
 	bool 		  wakeup;
-#endif
 
 	static CTimerManager* getInstance();
 
@@ -249,16 +245,13 @@ public:
 	void loadEventsFromConfig();
 	bool shutdown();
 	void shutdownOnWakeup(int currEventId);
-#ifdef MARTII
-	void cancelShutdownOnWakeup();
 	void setWakeupTime();
-#endif
 	void getRecordingSafety(int &pre, int &post){pre=m_extraTimeStart;post=m_extraTimeEnd;}
 	void setRecordingSafety(int pre, int post);
 	void loadRecordingSafety();
+	void cancelShutdownOnWakeup();
 };
 
-#ifdef MARTII
 class CTimerEvent_BatchEPG : public CTimerEvent
 {
  public:
@@ -268,5 +261,4 @@ class CTimerEvent_BatchEPG : public CTimerEvent
 		CTimerEvent(CTimerd::TIMER_BATCHEPG, config, iId){};
 	virtual void fireEvent();
 };
-#endif
 #endif

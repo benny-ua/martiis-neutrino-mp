@@ -140,6 +140,7 @@ class CInfoViewer
 	void show_current_next(bool new_chan, int  epgpos);
 	void reset_allScala();
 	void check_channellogo_ca_SettingsChange();
+	void sendNoEpg(const t_channel_id channel_id);
  public:
 	bool     chanready;
 	bool	 is_visible;
@@ -167,8 +168,7 @@ class CInfoViewer
 	void	showTitle(t_channel_id channel_id, const bool calledFromNumZap = false, int epgpos = 0);
 	void lookAheadEPG(const int ChanNum, const std::string & Channel, const t_channel_id new_channel_id = 0, const bool calledFromNumZap = false); //alpha: fix for nvod subchannel update
 	void	killTitle();
-	void	getEPG(const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info);
-	CSectionsdClient::CurrentNextInfo getCurrentNextInfo() const { return info_CurrentNext; }
+	CSectionsdClient::CurrentNextInfo getEPG(const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info);
 	
 	void	showSubchan();
 	//void	Set_CA_Status(int Status);

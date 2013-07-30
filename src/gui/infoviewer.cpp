@@ -809,7 +809,6 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 			infoViewerBB->showIcon_RadioText(false);
 	}
 
-
 	if (!calledFromNumZap) {
 		//loop(fadeValue, show_dot , fadeIn);
 		loop(show_dot);
@@ -873,11 +872,7 @@ void CInfoViewer::loop(bool show_dot)
 			g_RCInput->postMsg (msg, 0);
 			res = messages_return::cancel_info;
 		}
-#ifdef MARTII
 		else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
-#else
-		else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
-#endif
 			g_RCInput->postMsg (NeutrinoMessages::SHOW_EPG, 0);
 			res = messages_return::cancel_info;
 		} else if ((msg == NeutrinoMessages::EVT_TIMER) && (data == fader.GetTimer())) {
@@ -1394,42 +1389,43 @@ int CInfoViewer::handleMsg (const neutrino_msg_t msg, neutrino_msg_data_t data)
 	return messages_return::unhandled;
 }
 
-void CInfoViewer::getEPG(const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
+void CInfoViewer::sendNoEpg(const t_channel_id for_channel_id)
 {
-	/* to clear the oldinfo for channels without epg, call getEPG() with for_channel_id = 0 */
-	if (for_channel_id == 0)
-	{
-		oldinfo.current_uniqueKey = 0;
-		return;
+	if (!virtual_zap_mode) {
+		char *p = new char[sizeof(t_channel_id)];
+		memcpy(p, &for_channel_id, sizeof(t_channel_id));
+		g_RCInput->postMsg (NeutrinoMessages::EVT_NOEPG_YET, (const neutrino_msg_data_t) p, false);
 	}
+}
+
+CSectionsdClient::CurrentNextInfo CInfoViewer::getEPG (const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
+{
 	CEitManager::getInstance()->getCurrentNextServiceKey(for_channel_id, info);
 
 	/* of there is no EPG, send an event so that parental lock can work */
 	if (info.current_uniqueKey == 0 && info.next_uniqueKey == 0) {
-		memcpy(&oldinfo, &info, sizeof(CSectionsdClient::CurrentNextInfo));
-		char *p = new char[sizeof(t_channel_id)];
-		memcpy(p, &for_channel_id, sizeof(t_channel_id));
-		g_RCInput->postMsg (NeutrinoMessages::EVT_NOEPG_YET, (const neutrino_msg_data_t) p, false);
-		return;
+		sendNoEpg(for_channel_id);
+		oldinfo = info;
+		return info;
 	}
 
-	if (info.current_uniqueKey != oldinfo.current_uniqueKey || info.next_uniqueKey != oldinfo.next_uniqueKey)
-	{
-		char *p = new char[sizeof(t_channel_id)];
-		memcpy(p, &for_channel_id, sizeof(t_channel_id));
-		neutrino_msg_t msg;
-		if (info.flags & (CSectionsdClient::epgflags::has_current | CSectionsdClient::epgflags::has_next))
-		{
+	if (info.current_uniqueKey != oldinfo.current_uniqueKey || info.next_uniqueKey != oldinfo.next_uniqueKey) {
+		if (info.flags & (CSectionsdClient::epgflags::has_current | CSectionsdClient::epgflags::has_next)) {
+			char *_info = new char[sizeof(CSectionsdClient::CurrentNextInfo)];
+			memcpy(_info, &info, sizeof(CSectionsdClient::CurrentNextInfo));
+			neutrino_msg_t msg;
 			if (info.flags & CSectionsdClient::epgflags::has_current)
 				msg = NeutrinoMessages::EVT_CURRENTEPG;
 			else
 				msg = NeutrinoMessages::EVT_NEXTEPG;
+			g_RCInput->postMsg(msg, (unsigned) _info, false );
+		} else {
+			sendNoEpg(for_channel_id);
 		}
-		else
-			msg = NeutrinoMessages::EVT_NOEPG_YET;
-		g_RCInput->postMsg(msg, (const neutrino_msg_data_t)p, false); // data is pointer to allocated memory
-		memcpy(&oldinfo, &info, sizeof(CSectionsdClient::CurrentNextInfo));
+		oldinfo = info;
 	}
+
+	return info;
 }
 
 void CInfoViewer::showSNR ()
@@ -1734,12 +1730,10 @@ void CInfoViewer::show_Data (bool calledFromEvent)
 		// no EPG available
 		display_Info(g_Locale->getText(gotTime ? LOCALE_INFOVIEWER_NOEPG : LOCALE_INFOVIEWER_WAITTIME), NULL);
 		/* send message. Parental pin check gets triggered on EPG events... */
-		char *p = new char[sizeof(t_channel_id)];
-		memmove(p, &channel_id, sizeof(t_channel_id));
 		/* clear old info in getEPG */
 		CSectionsdClient::CurrentNextInfo dummy;
 		getEPG(0, dummy);
-		g_RCInput->postMsg(NeutrinoMessages::EVT_NOEPG_YET, (const neutrino_msg_data_t)p, false); // data is pointer to allocated memory
+		sendNoEpg(channel_id);
 		return;
 	}
 
@@ -1956,11 +1950,7 @@ int CInfoViewer::showChannelLogo(const t_channel_id logo_channel_id, const int c
 
 	std::string strAbsIconPath;
 
-#ifdef MARTII
 	int logo_w = 0, logo_h = 0;
-#else
-	int logo_w, logo_h;
-#endif
 	int logo_x = 0, logo_y = 0;
 	int res = 0;
 	int start_x = ChanNameX;
@@ -1973,21 +1963,11 @@ int CInfoViewer::showChannelLogo(const t_channel_id logo_channel_id, const int c
 	if (! logo_available)
 		return 0;
 
-#ifdef MARTII
 	if ((logo_w < 1) || (logo_h < 1)) // corrupt logo size?
-#else
-	if ((logo_w == 0) || (logo_h == 0)) // corrupt logo size?
-#endif
 	{
-#ifdef MARTII
 		fprintf(stderr, "[infoviewer] channel logo:\n"
 		       " -> %s (%s) has no or invalid size (w=%d h=%d)\n"
 		       " -> please check logo file!\n", strAbsIconPath.c_str(), ChannelName.c_str(), logo_w, logo_h);
-#else
-		printf("[infoviewer] channel logo: \n"
-		       " -> %s (%s) has no size\n"
-		       " -> please check logo file!\n", strAbsIconPath.c_str(), ChannelName.c_str());
-#endif
 		return 0;
 	}
 	int y_mid;

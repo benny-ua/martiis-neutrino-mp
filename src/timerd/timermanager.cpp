@@ -64,11 +64,7 @@ void CTimerManager::Init(void)
 	m_saveEvents = false;
 	m_isTimeSet = false;
 	timer_is_rec = false;
-#ifdef MARTII
 	shutdown_eventID = -1;
-#else
-	wakeup = 0;
-#endif
 	loadRecordingSafety();
 
 	//thread starten
@@ -91,9 +87,7 @@ CTimerManager* CTimerManager::getInstance()
 //------------------------------------------------------------
 void* CTimerManager::timerThread(void *arg)
 {
-#ifdef MARTII
 	set_threadname(__func__);
-#endif
 	pthread_mutex_t dummy_mutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t dummy_cond = PTHREAD_COND_INITIALIZER;
 	struct timespec wait;
@@ -644,7 +638,7 @@ void CTimerManager::loadRecordingSafety()
 		m_extraTimeEnd  = config.getInt32 ("EXTRA_TIME_END",0);
 	}
 }
-#ifdef MARTII
+
 // -------------------------------------------------------------------------------------
 void CTimerManager::setWakeupTime()
 {
@@ -687,7 +681,7 @@ void CTimerManager::setWakeupTime()
 
 	pthread_mutex_unlock(&tm_eventsMutex);
 }
-#endif
+
 // -------------------------------------------------------------------------------------
 void CTimerManager::saveEventsToConfig()
 {
@@ -702,10 +696,8 @@ void CTimerManager::saveEventsToConfig()
 	{
 		CTimerEvent *event = pos->second;
 		dprintf("event #%d\n",event->eventID);
-#ifdef MARTII
 		if (event->eventType != CTimerd::TIMER_RECORD || event->eventState != CTimerd::TIMERSTATE_ISRUNNING)
-#endif
-		event->saveToConfig(&config);
+			event->saveToConfig(&config);
 	}
 	dprintf("\n");
 	config.setInt32 ("EXTRA_TIME_START", m_extraTimeStart);
@@ -719,17 +711,13 @@ void CTimerManager::saveEventsToConfig()
 
 	// Freigeben !!!
 	pthread_mutex_unlock(&tm_eventsMutex);
-#ifdef MARTII
 	setWakeupTime();
-#endif
 }
 //------------------------------------------------------------
 bool CTimerManager::shutdown()
 {
-#ifndef MARTII
 	timerd_debug = 1; //FIXME
-#endif
-	//time_t nextAnnounceTime=0;
+	time_t nextAnnounceTime=0;
 	bool status=false;
 	timer_is_rec = false;
 
@@ -746,9 +734,7 @@ bool CTimerManager::shutdown()
 		saveEventsToConfig();
 		dprintf("shutdown: saved config\n");
 	}
-#ifdef MARTII
 	setWakeupTime();
-#else
 	if (pthread_mutex_trylock(&tm_eventsMutex) == EBUSY)
 	{
 		dprintf("error: mutex is still LOCKED\n");
@@ -785,25 +771,20 @@ bool CTimerManager::shutdown()
 	dprintf("shutdown: timeset: %d timer_minutes %ld\n", timeset, timer_minutes);
 
 	pthread_mutex_unlock(&tm_eventsMutex);
-#endif
 	return status;
 }
 //------------------------------------------------------------
 void CTimerManager::shutdownOnWakeup(int currEventID)
 {
 	time_t nextAnnounceTime=0;
-#ifdef MARTII
 	extern long timer_wakeup;
 	if (timer_wakeup == 0)
-#else
-	if(wakeup == 0)
-#endif
 		return;
-
-#ifndef MARTII
-	wakeup = 0;
-#endif
 	pthread_mutex_lock(&tm_eventsMutex);
+	if(wakeup == 0) {
+		pthread_mutex_unlock(&tm_eventsMutex);
+		return;
+	}
 
 	CTimerEventMap::iterator pos = events.begin();
 	for(;pos != events.end();++pos)
@@ -828,22 +809,23 @@ void CTimerManager::shutdownOnWakeup(int currEventID)
 	{ // in den naechsten 10 min steht nix an
 		dprintf("Programming shutdown event\n");
 		CTimerEvent_Shutdown* event = new CTimerEvent_Shutdown(now+120, now+180);
-#ifdef MARTII
-		shutdown_eventID =
-#endif
-		addEvent(event);
+		shutdown_eventID = addEvent(event);
+		wakeup = 0;
 	}
 	pthread_mutex_unlock(&tm_eventsMutex);
 }
-#ifdef MARTII
+
 void CTimerManager::cancelShutdownOnWakeup()
 {
+	pthread_mutex_lock(&tm_eventsMutex);
 	if (shutdown_eventID > -1) {
 		removeEvent(shutdown_eventID);
 		shutdown_eventID = -1;
 	}
+	wakeup = 0;
+	pthread_mutex_unlock(&tm_eventsMutex);
 }
-#endif
+
 void CTimerManager::setRecordingSafety(int pre, int post)
 {
 	m_extraTimeStart=pre;
@@ -1548,7 +1530,7 @@ void CTimerEvent_ExecPlugin::saveToConfig(CConfigFile *config)
 	dprintf("set NAME_%s to %s (%p)\n",id.c_str(),name,name);
 
 }
-#ifdef MARTII
+
 //=============================================================
 // BatchEPG Event
 //=============================================================
@@ -1559,5 +1541,4 @@ void CTimerEvent_BatchEPG::fireEvent()
 	CTimerManager::getInstance()->getEventServer()->sendEvent(CTimerdClient::EVT_BATCHEPG,
 								  CEventServer::INITID_TIMERD);
 }
-#endif
 //=============================================================

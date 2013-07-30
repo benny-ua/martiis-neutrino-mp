@@ -54,12 +54,11 @@
 #include <global.h>
 #include <driver/shutdown_count.h>
 #include <neutrino.h>
+#include <timerd/timermanager.h>
 #include <cs_api.h>
 
-#ifdef MARTII
 #include <gui/cec_setup.h> // FIXME
 #include <timerd/timermanager.h> // FIXME
-#endif
 
 //#define RCDEBUG
 //#define USE_GETTIMEOFDAY
@@ -67,13 +66,7 @@
 #define ENABLE_REPEAT_CHECK
 
 #if HAVE_SPARK_HARDWARE
-#ifdef MARTII
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
-#else
-/* this relies on event0 being the AOTOM frontpanel driver device
- * TODO: what if another input device is present? */
-const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
-#endif
 #elif HAVE_GENERIC_HARDWARE
 /* the FIFO created by libstb-hal */
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/tmp/neutrino.input"};
@@ -158,6 +151,7 @@ CRCInput::CRCInput()
 	repeat_block = repeat_block_generic = 0;
 	open();
 	rc_last_key =  KEY_MAX;
+	firstKey = true;
 
 	//select and setup remote control hardware
 	set_rc_hw();
@@ -183,10 +177,8 @@ void CRCInput::open(int dev)
 	//+++++++++++++++++++++++++++++++++++++++
 #ifdef KEYBOARD_INSTEAD_OF_REMOTE_CONTROL
 	fd_keyb = STDIN_FILENO;
-#ifdef MARTII
 	if (fd_rc[0] < 0)
 		fd_rc[0] = fd_keyb;
-#endif
 #else
 	fd_keyb = 0;
 #endif /* KEYBOARD_INSTEAD_OF_REMOTE_CONTROL */
@@ -535,9 +527,6 @@ void CRCInput::getMsg_ms(neutrino_msg_t * msg, neutrino_msg_data_t * data, int T
 	getMsg_us(msg, data, (uint64_t) Timeout * 1000, bAllowRepeatLR);
 }
 
-#ifdef MARTII
-static bool firstKey = true;
-#endif
 void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint64_t Timeout, bool bAllowRepeatLR)
 {
 	static uint64_t last_keypress = 0ULL;
@@ -1182,12 +1171,10 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 								*data = (unsigned long) p;
 								dont_delete_p = true;
 								break;
-#ifdef MARTII
 							case CTimerdClient::EVT_BATCHEPG :
 								*msg = NeutrinoMessages::EVT_BATCHEPG;
 								*data = 0;
 								break;
-#endif
 
 							default :
 								printf("[neutrino] event INITID_TIMERD - unknown eventID 0x%x\n",  emsg.eventID );
@@ -1253,6 +1240,10 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 				if (ev.type == EV_SYN)
 					continue; /* ignore... */
 				SHTDCNT::getInstance()->resetSleepTimer();
+				if (firstKey) {
+					firstKey = false;
+					CTimerManager::getInstance()->cancelShutdownOnWakeup();
+				}
 				uint32_t trkey = translate(ev.code, i);
 #ifdef _DEBUG
 				printf("key: %04x value %d, translate: %04x -%s-\n", ev.code, ev.value, trkey, getKeyName(trkey).c_str());
@@ -1264,7 +1255,6 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					printf("got keydown native key: %04x %04x, translate: %04x -%s-\n", ev.code, ev.code&0x1f, translate(ev.code, 0), getKeyName(translate(ev.code, 0)).c_str());
 					printf("rc_last_key %04x rc_last_repeat_key %04x\n\n", rc_last_key, rc_last_repeat_key);
 #endif
-#ifdef MARTII
 					if (firstKey) {
 						extern long timer_wakeup; // neutrino.cpp
 						if (timer_wakeup) {
@@ -1275,7 +1265,6 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 							CTimerManager::getInstance()->cancelShutdownOnWakeup();
 						}
 					}
-#endif
 					uint64_t now_pressed;
 					bool keyok = true;
 
@@ -1560,7 +1549,7 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 			case RC_timeshift:
 				return "timeshift";
 			case RC_mode:
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 				return "v.format";
 #else
 				return "mode";
@@ -1595,7 +1584,7 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 				return "analog off";
 			case RC_www:
 				return "window print";
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 			case RC_find:
 				return "find";
 			case RC_pip:
@@ -1675,7 +1664,7 @@ int CRCInput::translate(int code, int /*num*/)
 {
 	switch(code)
 	{
-#ifdef HAVE_SPARK_HARDWARE // MARTII
+#ifdef HAVE_SPARK_HARDWARE
 		case KEY_EXIT:
 		case KEY_HOME:
 			return RC_home;

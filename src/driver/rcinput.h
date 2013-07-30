@@ -145,11 +145,7 @@ class CRCInput
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
 #ifdef HAVE_SPARK_HARDWARE
-#ifdef MARTII
 #define NUMBER_OF_EVENT_DEVICES 1
-#else
-#define NUMBER_OF_EVENT_DEVICES 2
-#endif
 #else
 #define NUMBER_OF_EVENT_DEVICES 1
 #endif
@@ -159,6 +155,7 @@ class CRCInput
 
 		int		fd_max;
 		int		clickfd;
+		bool		firstKey;
 		__u16 rc_last_key;
 		void set_dsp();
 
@@ -234,7 +231,7 @@ class CRCInput
 			RC_forward	= KEY_FORWARD,
 			RC_rewind	= KEY_REWIND,
 			RC_stop		= KEY_STOP,
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 			RC_timeshift	= KEY_T,
 #else
 			RC_timeshift	= KEY_TIME,
@@ -267,7 +264,7 @@ class CRCInput
 			RC_zoomin	= KEY_ZOOMIN,
 			RC_zoomout	= KEY_ZOOMOUT,
 
-#ifdef MARTII
+#ifdef HAVE_SPARK_HARDWARE
 			/* SPARK keys */
 			RC_find		= KEY_FIND,
 			RC_pip		= KEY_PRESENTATION,
