@@ -2638,7 +2638,7 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 			xpids += hh->WebserverConfigList["Tuxbox.PidSeparator"] + string(tmp);
 		}
 		if(pids.PIDs.pcrpid != pids.PIDs.vpid){
-			snprintf(tmp, sizeof(tmp), "0x%04x", pids.PIDs.vtxtpid);
+			snprintf(tmp, sizeof(tmp), "0x%04x", pids.PIDs.pcrpid);
 			xpids += hh->WebserverConfigList["Tuxbox.PidSeparator"] + string(tmp);
         	}
 #else
