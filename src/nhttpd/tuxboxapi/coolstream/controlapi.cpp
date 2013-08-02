@@ -2692,19 +2692,6 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 	url += xpids;
 
 	// response url
-#ifdef MARTII
-	// add a secondary VLC icon to use avcodec/avformat, which better cope with broken streams  --martii
-	if(hh->ParamList["vlc_link"] == "avcodec")
-	{
-		FILE *fd = fopen("/tmp/vlc.m3u" ,"w");
-		if(fd) {
-			fprintf(fd, "http/avformat,avcodec%s", url.c_str() + 4);
-			fclose(fd);
-        	}
-		hh->SendRedirect("/tmp/vlc.m3u");
-	}
-	else
-#endif
 	if(hh->ParamList["vlc_link"] !="")
 	{
 		write_to_file("/tmp/vlc.m3u", url);
