@@ -151,7 +151,7 @@ GLCD_Menu_Notifier::changeNotify (const neutrino_locale_t OptionName, void *Data
 		nglcd->MirrorOSD(g_settings.glcd_mirror_osd);
 		break;
 	case LOCALE_GLCD_MIRROR_VIDEO:
-		nglcd->MirrorVideo(g_settings.glcd_mirror_video);
+		nglcd->Update();
 		break;
 	case LOCALE_GLCD_BRIGHTNESS:
 	case LOCALE_GLCD_BRIGHTNESS_STANDBY:

@@ -699,11 +699,6 @@ void nGLCD::MirrorOSD(bool b) {
 	}
 }
 
-void nGLCD::MirrorVideo(bool b) {
-	if (nglcd)
-		nglcd->Update();
-}
-
 void nGLCD::Exit() {
 	if (nglcd) {
 		nglcd->doMirrorOSD = false;

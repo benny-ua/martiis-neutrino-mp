@@ -109,7 +109,6 @@ class nGLCD
 		static void unlockChannel();
 		static void* Run(void *);
 		static void MirrorOSD(bool b = true);
-		static void MirrorVideo(bool b = true);
 		static void Update();
 		static void Suspend();
 		static void StandbyMode(bool);
