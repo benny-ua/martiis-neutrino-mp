@@ -516,7 +516,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	const char *_framerate[8] = {"23.976fps", "24fps", "25fps", "29,976fps", "30fps", "50fps", "50,94fps", "60fps"};
 	p = (framerate < 8) ? _framerate[framerate] : g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN);
 
-	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR, 0, true);	// UTF-8
+	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true);	// UTF-8
 
 	// place for average bitrate
 	average_bitrate_pos = ypos += iheight;
@@ -568,7 +568,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 
 	p = g_Locale->getText (LOCALE_SCANTS_FREQDATA);
 	g_Font[font_info]->RenderString(xpos, ypos, box_width, p , COL_INFOBAR_TEXT, 0, true); // UTF-8
-	g_Font[font_info]->RenderString(xpos+spaceoffset, ypos, box_width, t.description().c_str(), COL_INFOBAR, 0, true); // UTF-8
+	g_Font[font_info]->RenderString(xpos+spaceoffset, ypos, box_width, t.description().c_str(), COL_INFOBAR_TEXT, 0, true); // UTF-8
 	
 	// paint labels
 	int fontW = g_Font[font_small]->getWidth();
@@ -614,7 +614,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	g_Font[font_small]->RenderString(xpos, ypos, box_width, "Apid(s):" , COL_INFOBAR_TEXT, 0, true); // UTF-8
 	if (g_RemoteControl->current_PIDs.APIDs.empty()){
 		p = g_Locale->getText(LOCALE_STREAMINFO_NOT_AVAILABLE);
-		g_Font[font_small]->RenderString(xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR, 0, true); // UTF-8
+		g_Font[font_small]->RenderString(xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true); // UTF-8
 	} else {
 		unsigned int sw=spaceoffset;
 		for (unsigned int li= 0; (li<g_RemoteControl->current_PIDs.APIDs.size()) && (li<10); li++)

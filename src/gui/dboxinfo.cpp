@@ -261,7 +261,7 @@ void CDBoxInfoWidget::paint()
 	int fw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getWidth();
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+(fw/3)+HeadiconOffset,y+hheight+1,
 		width-((fw/3)+HeadiconOffset), g_Locale->getText(LOCALE_EXTRA_DBOXINFO),
-		COL_MENUHEAD, 0, true); // UTF-8
+		COL_MENUHEAD_TEXT, 0, true); // UTF-8
 	frameBuffer->paintIcon(iconfile, x + fw/4, y, hheight);
 
 	ypos+= hheight + (mheight >>1);
@@ -375,7 +375,7 @@ void CDBoxInfoWidget::paint()
 				headOffset = nameOffset + (sizeOffset+10)*3+15;
 				break;
 			}
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE);
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
 		}
 		ypos+= mheight;
 		int m[2][4] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
@@ -428,7 +428,7 @@ void CDBoxInfoWidget::paint()
 						snprintf(ubuf, buf_size, "%4d%%", m[k][0] ? (m[k][1] * 100) / m[k][0] : 0);
 						break;
 				}
-				g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT);
+				g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
 			}
 			int pbw = width - offsetw - 10;
 			if (pbw > 8) /* smaller progressbar is not useful ;) */
