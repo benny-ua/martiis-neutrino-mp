@@ -598,6 +598,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.glcd_percent_time_standby = configfile.getInt32("glcd_percent_time_standby", 50);
 	g_settings.glcd_percent_logo = configfile.getInt32("glcd_percent_logo", 55);
 	g_settings.glcd_mirror_osd = configfile.getInt32("glcd_mirror_osd", 0);
+	g_settings.glcd_mirror_video = configfile.getInt32("glcd_mirror_video", 0);
 	g_settings.glcd_time_in_standby = configfile.getInt32("glcd_time_in_standby", 1);
 	g_settings.glcd_show_logo = configfile.getInt32("glcd_show_logo", 1);
 	g_settings.glcd_font = configfile.getString("glcd_font", FONTDIR "/neutrino.ttf");
@@ -1152,6 +1153,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("glcd_percent_time_standby", g_settings.glcd_percent_time_standby);
 	configfile.setInt32("glcd_percent_logo", g_settings.glcd_percent_logo);
 	configfile.setInt32("glcd_mirror_osd", g_settings.glcd_mirror_osd);
+	configfile.setInt32("glcd_mirror_video", g_settings.glcd_mirror_video);
 	configfile.setInt32("glcd_time_in_standby", g_settings.glcd_time_in_standby);
 	configfile.setInt32("glcd_show_logo", g_settings.glcd_show_logo);
 	configfile.setString("glcd_font", g_settings.glcd_font);

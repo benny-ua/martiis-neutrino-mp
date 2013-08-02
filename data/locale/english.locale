@@ -620,6 +620,7 @@ glcd.enable GraphLCD enabled
 glcd.font Font
 glcd.head GraphLCD
 glcd.mirror_osd Show OSD menue on GraphLCD
+glcd.mirror_video Show running video on GraphLCD
 glcd.restart Rescan
 glcd.scroll_speed Scrolling Speed
 glcd.select.bar Progress bar color

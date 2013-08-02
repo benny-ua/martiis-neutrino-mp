@@ -96,8 +96,8 @@ class nGLCD
 		bool showImage(const std::string & filename, uint32_t sw, uint32_t sh, uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh, bool transp = false, bool maximize = false);
 		bool showImage(uint64_t channel_id, std::string ChannelName, uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh, bool transp = false, bool maximize = false);
 		bool getBoundingBox(uint32_t *buffer, int width, int height, int &bb_x, int &bb_y, int &bb_width, int &bb_height);
-	public:
 		bool doMirrorOSD;
+	public:
 		nGLCD();
 		~nGLCD();
 		void DeInit();
@@ -109,6 +109,7 @@ class nGLCD
 		static void unlockChannel();
 		static void* Run(void *);
 		static void MirrorOSD(bool b = true);
+		static void MirrorVideo(bool b = true);
 		static void Update();
 		static void Suspend();
 		static void StandbyMode(bool);

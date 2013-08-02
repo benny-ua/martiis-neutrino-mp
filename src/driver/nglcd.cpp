@@ -503,6 +503,27 @@ void* nGLCD::Run(void *)
 					usleep(100000);
 				continue;
 			}
+			if (g_settings.glcd_mirror_video && !nglcd->doStandbyTime) {
+				char ws[10];
+				snprintf(ws, sizeof(ws), "%d", nglcd->bitmap->Width());
+				const char *bmpShot = "/tmp/nglcd-video.bmp";
+				my_system(4, "/bin/grab", "-vr", ws, bmpShot);
+				int bw = 0, bh = 0;
+				g_PicViewer->getSize(bmpShot, &bw, &bh);
+				if (bw > 0 && bh > 0) {
+					int lcd_width = nglcd->bitmap->Width();
+				    int lcd_height = nglcd->bitmap->Height();
+					if (!nglcd->showImage(bmpShot, (uint32_t) bw, (uint32_t) bh, 0, 0, (uint32_t) lcd_width, lcd_height, false, true))
+						usleep(1000000);
+					else {
+						nglcd->lcd->SetScreen(nglcd->bitmap->Data(), lcd_width, lcd_height);
+							nglcd->lcd->Refresh(false);
+					}
+				}
+				else
+						usleep(1000000);
+				continue;
+			}
 
 			clock_gettime(CLOCK_REALTIME, &ts);
 			nglcd->tm = localtime(&ts.tv_sec);
@@ -672,10 +693,15 @@ void nGLCD::ShowVolume(bool b) {
 }
 
 void nGLCD::MirrorOSD(bool b) {
-	if (nglcd && g_settings.glcd_mirror_osd) {
+	if (nglcd) {
 		nglcd->doMirrorOSD = b;
 		nglcd->Update();
 	}
+}
+
+void nGLCD::MirrorVideo(bool b) {
+	if (nglcd)
+		nglcd->Update();
 }
 
 void nGLCD::Exit() {

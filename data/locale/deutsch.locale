@@ -619,6 +619,7 @@ glcd.enable GraphLCD aktiv
 glcd.font Schrift
 glcd.head GraphLCD
 glcd.mirror_osd OSD-Menü auf GraphLCD anzeigen
+glcd.mirror_video Videobild auf GraphLCD anzeigen
 glcd.restart Neu erkennen
 glcd.scroll_speed Scroll-Geschwindigkeit
 glcd.select.bar Fortschrittsbalken-Farbe
