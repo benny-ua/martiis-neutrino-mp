@@ -1024,7 +1024,7 @@ void CScanSetup::fillSatSelect(CMenuOptionStringChooser * select)
 	if(!sfound && !satpos.empty()) {
 		tmpit = satpos.begin();
 		std::string satname = CServiceManager::getInstance()->GetSatelliteName(*tmpit);
-		scansettings.satName = satname.c_str();
+		scansettings.satName = satname;
 	}
 	satellite_map_t & satmap = CServiceManager::getInstance()->SatelliteList();
 	for (sat_iterator_t sit = satmap.begin(); sit != satmap.end(); sit++) {
