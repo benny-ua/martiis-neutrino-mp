@@ -267,6 +267,28 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 	
 	printf("COPKGManager: executing %s\n", pkg_types[pkg_content_id].c_str());
 	
+	switch (pkg_content_id) {
+		case OM_LIST:
+			pkg_map.clear();
+			list_installed_done = false;
+			list_upgradeable_done = false;
+			break;
+		case OM_LIST_INSTALLED:
+			if (list_installed_done)
+				return;
+			list_installed_done = true;
+			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+				it->second.installed = false;
+			break;
+		case OM_LIST_UPGRADEABLE:
+			if (list_upgradeable_done)
+				return;
+			list_upgradeable_done = true;
+			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
+				it->second.upgradable = false;
+			break;
+	}
+
 	FILE *f = popen(pkg_types[pkg_content_id].c_str(), "r");
 	if (!f) {
 		DisplayInfoMessage("Command failed");
@@ -275,34 +297,7 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 	
 	char buf[256];
 	setbuf(f, NULL);
-	int in, pos;
-	pos = 0;
-
-	switch (pkg_content_id) {
-		case OM_LIST:
-			pkg_map.clear();
-			list_installed_done = false;
-			list_upgradeable_done = false;
-			break;
-		case OM_LIST_INSTALLED:
-			if (list_installed_done) {
- 				pclose(f);
-				return;
-			}
-			list_installed_done = true;
-			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
-				it->second.installed = false;
-			break;
-		case OM_LIST_UPGRADEABLE:
-			if (list_upgradeable_done) {
- 				pclose(f);
-				return;
-			}
-			list_upgradeable_done = true;
-			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
-				it->second.upgradable = false;
-			break;
-	}
+	int in, pos = 0;
 
 	while (true)
 	{
@@ -310,8 +305,7 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 		if (in == EOF)
 			break;
 
-		buf[pos] = (char)in;
-		pos++;
+		buf[pos++] = (char)in;
 		buf[pos] = 0;
 		
 		if (in == '\b' || in == '\n')
