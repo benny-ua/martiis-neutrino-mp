@@ -184,7 +184,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 
 		//shairport
 		if (!access("/etc/init.d/shairport", X_OK)) {
-				neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_nokey : CRCInput::RC_blue;
+				neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_blue : CRCInput::RC_nokey;
 				const char* shairport_btn = usage_mode == MODE_AUDIO ? "" : NEUTRINO_ICON_BUTTON_BLUE;
 				fw_shairport = new CMenuForwarder(LOCALE_MAINMENU_SHAIRPORT, true, NULL, this, "shairport", shairport_rc, shairport_btn);
 				fw_shairport->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPORT);
