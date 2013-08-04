@@ -156,7 +156,6 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		if (parent)
 			parent->hide();
 		std::string force = "";
-		neutrino_locale_t loc = LOCALE_OPKG_FAILURE_INSTALL;
 		if (it->second.installed && !it->second.upgradable) {
 			char l[200];
 			snprintf(l, sizeof(l), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REINSTALL), actionKey.c_str());
@@ -286,15 +285,19 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 			list_upgradeable_done = false;
 			break;
 		case OM_LIST_INSTALLED:
-			if (list_installed_done)
+			if (list_installed_done) {
+ 				pclose(f);
 				return;
+			}
 			list_installed_done = true;
 			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
 				it->second.installed = false;
 			break;
 		case OM_LIST_UPGRADEABLE:
-			if (list_upgradeable_done)
+			if (list_upgradeable_done) {
+ 				pclose(f);
 				return;
+			}
 			list_upgradeable_done = true;
 			for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++)
 				it->second.upgradable = false;
