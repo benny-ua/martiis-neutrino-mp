@@ -4447,7 +4447,11 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_next43mode = tconfig.getInt32("key_next43mode", CRCInput::RC_next);
 	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", CRCInput::RC_tv );
 	g_settings.key_tsplayback = tconfig.getInt32( "key_tsplayback", CRCInput::RC_play );
+#if HAVE_SPARK_HARDWARE
 	g_settings.key_fileplayback = tconfig.getInt32( "key_fileplayback", CRCInput::RC_archive );
+#else
+	g_settings.key_fileplayback = tconfig.getInt32( "key_fileplayback", CRCInput::RC_nokey );
+#endif
 	g_settings.key_audioplayback = tconfig.getInt32( "key_audioplayback", CRCInput::RC_audio );
 	g_settings.key_volumeup = tconfig.getInt32( "key_volumeup",  CRCInput::RC_plus );
 	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
@@ -4489,7 +4493,11 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_timerlist = tconfig.getInt32( "key_timerlist", CRCInput::RC_timer);
 	g_settings.key_showclock = tconfig.getInt32( "key_showclock", CRCInput::RC_nokey );
 	g_settings.key_help = tconfig.getInt32( "key_help", CRCInput::RC_help );
+#if HAVE_SPARK_HARDWARE
 	g_settings.key_hddmenu = tconfig.getInt32("key_hddmenu", CRCInput::RC_usb);
+#else
+	g_settings.key_hddmenu = tconfig.getInt32("key_hddmenu", CRCInput::RC_nokey);
+#endif
 #endif
 
 	g_settings.mpkey_rewind = tconfig.getInt32( "mpkey.rewind", CRCInput::RC_rewind );

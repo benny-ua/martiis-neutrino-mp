@@ -124,7 +124,7 @@ static void set_lua_variables(lua_State *L)
 		{ "mute_off",		CRCInput::RC_mute_off },
 		{ "analog_on",		CRCInput::RC_analog_on },
 		{ "analog_off",		CRCInput::RC_analog_off },
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 /* SPARK keys */
 		{ "find",		CRCInput::RC_find },
 		{ "pip",		CRCInput::RC_pip },
