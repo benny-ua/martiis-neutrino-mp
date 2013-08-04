@@ -114,28 +114,25 @@ static void framebuffer_callback(
 	unsigned int *screen_width,
 	unsigned int *screen_height,
 	unsigned int *destStride,
-	int *framebufferFD,
 	void (**framebufferBlit)(void))
 {
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
-	*framebufferFD = frameBuffer->getFileHandle();
 #if HAVE_SPARK_HARDWARE
 	*destination = frameBuffer->getFrameBufferPointer();
 	*screen_width = DEFAULT_XRES;
 	*screen_height = DEFAULT_YRES;
 	*destStride = DEFAULT_XRES * sizeof(fb_pixel_t);
-	*framebufferBlit = framebuffer_blit;
 #else
 	*destination = frameBuffer->getFrameBufferPointer(true);
 	fb_var_screeninfo s;
-	ioctl(*framebufferFD, FBIOGET_VSCREENINFO, &s);
+	ioctl(frameBuffer->getFileHandle(), FBIOGET_VSCREENINFO, &s);
 	*screen_width = s.xres;
 	*screen_height = s.yres;
 	fb_fix_screeninfo fix;
-	ioctl(*framebufferFD, FBIOGET_FSCREENINFO, &fix);
+	ioctl(frameBuffer->getFileHandle(), FBIOGET_FSCREENINFO, &fix);
 	*destStride = fix.line_length;
-	*framebufferBlit = NULL;
 #endif
+	*framebufferBlit = framebuffer_blit;
 }
 
 void getPlayerPts(int64_t *pts)
