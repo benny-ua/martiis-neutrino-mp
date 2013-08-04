@@ -82,7 +82,6 @@ class CScanSetup : public CMenuTarget, public CChangeObserver
 		/* frontend link to number */
 		int femaster;
 
-		std::vector<std::string> satoptions;
 		std::vector<CMenuForwarder*> satmf;
 
 		/* flag to allow any operations which can damage recordings */

@@ -726,10 +726,8 @@ int CScanSetup::showScanMenuFrontendSetup()
 
 	int res = setupMenu->exec(NULL, "");
 
-	if (zapit_lat_str != std::string(zapit_lat))
-		cstrncpy(zapit_lat, zapit_lat_str, sizeof(zapit_lat));
-	if (zapit_long_str != std::string(zapit_long))
-		cstrncpy(zapit_long, zapit_long_str, sizeof(zapit_long));
+	cstrncpy(zapit_lat, zapit_lat_str, sizeof(zapit_lat));
+	cstrncpy(zapit_long, zapit_long_str, sizeof(zapit_long));
 
 	delete setupMenu;
 	if (fe_restart) {
@@ -967,8 +965,7 @@ int CScanSetup::showScanMenuLnbSetup()
 
 		char opt[100];
 		sprintf(opt, "diseqc %2d / rotor %2d", sit->second.diseqc+1, sit->second.motor_position);
-		satoptions.push_back(opt);
-		CMenuForwarder * mf = new CMenuForwarder(satname, true, satoptions[count], tempsat);
+		CMenuForwarder * mf = new CMenuForwarder(satname, true, opt, tempsat);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_LNBCONFIG);
 		sat_setup->addItem(mf);
 		satmf.push_back(mf);
@@ -982,7 +979,6 @@ int CScanSetup::showScanMenuLnbSetup()
 	}
 	delete sat_setup;
 	satmf.clear();
-	satoptions.clear();
 	return res;
 }
 
@@ -1617,8 +1613,7 @@ bool CScanSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*
 				continue;
 			char opt[100];
 			sprintf(opt, "diseqc %d / rotor %d", sit->second.diseqc+1, sit->second.motor_position);
-			satoptions[count] = opt;
-			satmf[count]->setOption(satoptions[count]);
+			satmf[count]->setOption(opt);
 			count++;
 		}
 	}
