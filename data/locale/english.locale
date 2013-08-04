@@ -1619,6 +1619,7 @@ nvodselector.subservice Select Subservice
 opkg.failure.install Install failed (%d)
 opkg.failure.update Update failed (%d)
 opkg.failure.upgrade Upgrade failed (%d)
+opkg.messagebox.reinstall Re-install %s?
 opkg.messagebox.remove Remove %s?
 opkg.success.install Install successful, restart of Neutrino might be required.
 opkg.title OPKG Manager

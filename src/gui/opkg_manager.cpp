@@ -107,7 +107,7 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 			parent->hide();
 		return showMenu(); 
 	}
-	if (actionKey == "rc_spkr") {
+	if (expert_mode && actionKey == "rc_spkr") {
 		int selected = menu->getSelected() - menu_offset;
 		if (selected < 0 || !pkg_arr[selected]->installed)
 			return menu_return::RETURN_NONE;
@@ -156,17 +156,18 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		if (parent)
 			parent->hide();
 		std::string force = "";
-		int mode = OM_INSTALL;
 		neutrino_locale_t loc = LOCALE_OPKG_FAILURE_INSTALL;
-		if (it->second.installed) {
-			if (expert_mode)
-				force = "--force-reinstall ";
-			else
-				loc = LOCALE_OPKG_FAILURE_UPGRADE, mode = OM_UPGRADE;
+		if (it->second.installed && !it->second.upgradable) {
+			char l[200];
+			snprintf(l, sizeof(l), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REINSTALL), actionKey.c_str());
+			l[sizeof(l) - 1] = 0;
+			if (ShowMsg(LOCALE_OPKG_TITLE, l, CMessageBox::mbrCancel, CMessageBox::mbYes | CMessageBox::mbCancel) == CMessageBox::mbrCancel)
+				return res;
+			force = "--force-reinstall ";
 		}
-		int r = execCmd(pkg_types[mode] + force + actionKey, true, true);
+		int r = execCmd(pkg_types[OM_INSTALL] + force + actionKey, true, true);
 		if (r) {
-			std::string err = g_Locale->getText(loc);
+			std::string err = g_Locale->getText(LOCALE_OPKG_FAILURE_INSTALL);
 			char rs[strlen(err.c_str()) + 20];
 			snprintf(rs, sizeof(rs), err.c_str(), r);
 			DisplayInfoMessage(rs);

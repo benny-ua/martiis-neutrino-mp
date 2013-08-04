@@ -1618,6 +1618,7 @@ nvodselector.subservice Perspektiven
 opkg.failure.install Installation fehlgeschlagen (%d)
 opkg.failure.update Update fehlgeschlagen (%d)
 opkg.failure.upgrade Upgrade fehlgeschlagen (%d)
+opkg.messagebox.reinstall %s erneut installieren?
 opkg.messagebox.remove %s entfernen?
 opkg.success.install Installation erfolgreich, Neustart von Neutrino kann erforderlich sein.
 opkg.title OPKG-Manager
