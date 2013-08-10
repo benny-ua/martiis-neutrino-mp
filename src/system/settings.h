@@ -112,7 +112,6 @@ struct SNeutrinoSettings
 	int infobar_show_dd_available;
 #ifdef MARTII
 	int show_background_picture;
-	int fe_offset;
 #endif
 	//audio
 	int audio_AnalogMode;
@@ -149,9 +148,6 @@ struct SNeutrinoSettings
 	int make_hd_list;
 	int make_new_list;
 	int make_removed_list;
-#ifdef MARTII
-	int make_others_list;
-#endif
 	int keep_channel_numbers;
 	int avsync;
 	int clockrec;

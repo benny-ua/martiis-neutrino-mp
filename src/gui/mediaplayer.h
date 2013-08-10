@@ -40,9 +40,6 @@ class CMediaPlayerMenu : public CMenuTarget
 	private:
 		int width, usage_mode;
 		neutrino_locale_t menu_title;
-#ifdef MARTII
-		char streaming_server_url[200];
-#endif
 		
 		CAudioPlayerGui *audioPlayer;
 		CAudioPlayerGui *inetPlayer;
