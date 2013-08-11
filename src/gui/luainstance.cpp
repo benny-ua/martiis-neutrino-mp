@@ -634,7 +634,7 @@ int CLuaInstance::Blit(lua_State *L)
 	CLuaData *W = CheckData(L, 1);
 	if (W && W->fbwin) {
 		if (lua_isnumber(L, 2))
-			W->fbwin->mayBlit = (int)lua_tonumber(L, 2); // enable/disable automatic blit
+			W->fbwin->blit((int)lua_tonumber(L, 2)); // enable/disable automatic blit
 		else
 			W->fbwin->blit();
 	}

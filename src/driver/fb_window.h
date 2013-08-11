@@ -34,13 +34,13 @@ class CFBWindow
  private:
 	CFrameBuffer	* frameBuffer;
 	fb_pixel_t	* Background;
+#ifdef MARTII
+	bool mayBlit;
+#endif
 
  public:
 	int x, y;   /* upper left corner */
 	int dx, dy; /* dimension         */
-#ifdef MARTII
-	bool mayBlit;
-#endif
 
 	CFBWindow(const int _x, const int _y, const int _dx, const int _dy);
 	~CFBWindow();
@@ -49,6 +49,7 @@ class CFBWindow
 	bool paintIcon(const char * const _filename, const int _x, const int _y, const int _h = 0, const color_t _offset = 1);
 	void RenderString(const font_t _font, const int _x, const int _y, const int _width, const char * const _text, const color_t _color, const int _boxheight = 0, const bool _utf8_encoded = false);
 #ifdef MARTII
+	void blit(bool b) { mayBlit = b; }
 	void blit(void) { if (frameBuffer) frameBuffer->blit(); }
 #endif
 };
