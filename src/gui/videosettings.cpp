@@ -123,6 +123,7 @@ const CMenuOptionChooser::keyval VIDEOMENU_VIDEOSIGNAL_TD_OPTIONS[VIDEOMENU_VIDE
 	{ ANALOG_SD_YPRPB_SCART, LOCALE_VIDEOMENU_ANALOG_SD_YPRPB_SCART }
 };
 
+#if HAVE_SPARK_HARDWARE
 #define VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT 4
 const CMenuOptionChooser::keyval VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTIONS[VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT] =
 {
@@ -139,6 +140,7 @@ const CMenuOptionChooser::keyval VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTIONS[VIDEOMEN
 	{ COLORFORMAT_HDMI_YCBCR444,	LOCALE_VIDEOMENU_COLORFORMAT_YCBCR444	},
 	{ COLORFORMAT_HDMI_YCBCR422,	LOCALE_VIDEOMENU_COLORFORMAT_YCBCR422	}
 };
+#endif
 
 #ifdef ANALOG_MODE
 #define VIDEOMENU_VIDEOSIGNAL_HD1_OPTION_COUNT 8
@@ -349,6 +351,10 @@ int CVideoSettings::showVideoSetup()
 	CMenuOptionChooser * vs_colorformat_analog = NULL;
 	CMenuOptionChooser * vs_colorformat_hdmi = NULL;
 
+#if HAVE_SPARK_HARDWARE
+	vs_colorformat_analog = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_ANALOG, &g_settings.analog_mode1, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT, true, this);
+	vs_colorformat_hdmi = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_HDMI, &g_settings.hdmi_mode, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTION_COUNT, true, this);
+#else
 	if (system_rev == 0x06)
 	{
 		vs_analg_ch = new CMenuOptionChooser(LOCALE_VIDEOMENU_ANALOG_MODE, &g_settings.analog_mode1, VIDEOMENU_VIDEOSIGNAL_HD1_OPTIONS, VIDEOMENU_VIDEOSIGNAL_HD1_OPTION_COUNT, true, this);
@@ -371,14 +377,11 @@ int CVideoSettings::showVideoSetup()
 			vs_chinch_ch->setHint("", LOCALE_MENU_HINT_VIDEO_CINCH_MODE);
 		}
 	}
-	else if (!strcmp(g_info.hw_caps->boxvendor, "SPARK")) {
-		vs_colorformat_analog = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_ANALOG, &g_settings.analog_mode1, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT, true, this);
-		vs_colorformat_hdmi = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_HDMI, &g_settings.hdmi_mode, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTION_COUNT, true, this);
-	}
 	else if (g_info.hw_caps->has_SCART) /* TRIPLEDRAGON hack... :-) */
 	{
 		vs_scart_ch = new CMenuOptionChooser(LOCALE_VIDEOMENU_SCART, &g_settings.analog_mode1, VIDEOMENU_VIDEOSIGNAL_TD_OPTIONS, VIDEOMENU_VIDEOSIGNAL_TD_OPTION_COUNT, true, this);
 	}
+#endif
 
 	//4:3 mode
 	CMenuOptionChooser * vs_43mode_ch = new CMenuOptionChooser(LOCALE_VIDEOMENU_43MODE, &g_settings.video_43mode, VIDEOMENU_43MODE_OPTIONS, VIDEOMENU_43MODE_OPTION_COUNT, true, this);
