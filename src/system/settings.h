@@ -62,6 +62,7 @@ struct SNeutrinoSettings
 	int analog_mode2;
 	int video_43mode;
 #ifdef MARTII
+	int hdmi_mode;
 	int psi_contrast;
 	int psi_saturation;
 	int psi_brightness;

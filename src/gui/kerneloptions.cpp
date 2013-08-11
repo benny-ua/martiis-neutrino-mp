@@ -86,7 +86,7 @@ int KernelOptions_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (f) {
 			char buf[200];
 			while (fgets(buf, sizeof(buf), f)) {
-				char name[200];
+				char name[sizeof(buf)];
 				if (1 == sscanf(buf, "%s", name))
 					for (unsigned int i = 0; i < modules.size(); i++) {
 						if (name == modules[i].moduleList.back().first) {
@@ -101,7 +101,6 @@ int KernelOptions_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		string text = "";
 		for (unsigned int i = 0; i < modules.size(); i++) {
 			text += modules[i].comment + " (" + modules[i].moduleList.back().first + "): ";
-			// FIXME, localizations are missing (but rather not worth adding)
 			text += g_Locale->getText(modules[i].active ? LOCALE_KERNELOPTIONS_ENABLED : LOCALE_KERNELOPTIONS_DISABLED);
 			text += ", ";
 			text += g_Locale->getText(modules[i].installed ? LOCALE_KERNELOPTIONS_LOADED : LOCALE_KERNELOPTIONS_NOT_LOADED);
