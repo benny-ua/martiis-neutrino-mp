@@ -144,11 +144,7 @@ class CRCInput
 		int 		fd_pipe_high_priority[2];
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
-#ifdef HAVE_SPARK_HARDWARE
-#define NUMBER_OF_EVENT_DEVICES 1
-#else
-#define NUMBER_OF_EVENT_DEVICES 1
-#endif
+#define NUMBER_OF_EVENT_DEVICES 1 // this is currently valid for all supported platforms
 		int         	fd_rc[NUMBER_OF_EVENT_DEVICES];
 		int		fd_keyb;
 		int		fd_event;
@@ -264,7 +260,6 @@ class CRCInput
 			RC_zoomin	= KEY_ZOOMIN,
 			RC_zoomout	= KEY_ZOOMOUT,
 
-#ifdef HAVE_SPARK_HARDWARE
 			/* SPARK keys */
 			RC_find		= KEY_FIND,
 			RC_pip		= KEY_PRESENTATION,
@@ -281,7 +276,7 @@ class CRCInput
 			RC_prog2	= KEY_PROG2,
 			RC_prog3	= KEY_PROG3,
 			RC_prog4	= KEY_PROG4,
-#endif
+
 			RC_timeout	= 0xFFFFFFFF,
 			RC_nokey	= 0xFFFFFFFE
 		};

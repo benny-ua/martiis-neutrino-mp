@@ -65,13 +65,12 @@
 
 #define ENABLE_REPEAT_CHECK
 
-#if HAVE_SPARK_HARDWARE
-const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
+#if HAVE_DUCKBOX_HARDWARE
+const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/event0"};
 #elif HAVE_GENERIC_HARDWARE
 /* the FIFO created by libstb-hal */
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/tmp/neutrino.input"};
 #else
-//const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir", "/dev/input/event0"};
 const char * const RC_EVENT_DEVICE[NUMBER_OF_EVENT_DEVICES] = {"/dev/input/nevis_ir"};
 #endif
 typedef struct input_event t_input_event;
@@ -1588,7 +1587,6 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 				return "analog off";
 			case RC_www:
 				return "window print";
-#if HAVE_SPARK_HARDWARE
 			case RC_find:
 				return "find";
 			case RC_pip:
@@ -1627,8 +1625,6 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 #endif
 			case RC_prog4:
 				return "prog4";
-#endif
-				return "www";
 			case RC_sub:
 				return "sub";
 			case RC_pos:
@@ -1668,14 +1664,14 @@ int CRCInput::translate(int code, int /*num*/)
 {
 	switch(code)
 	{
-#ifdef HAVE_SPARK_HARDWARE
+#if defined(HAVE_SPARK_HARDWARE) || defined(HAVE_DUCKBOX_HARDWARE)
 		case KEY_EXIT:
 		case KEY_HOME:
 			return RC_home;
 #endif
-		case 0x100:
+		case 0x100: // FIXME -- needed?
 			return RC_up;
-		case 0x101:
+		case 0x101: // FIXME -- needed?
 			return RC_down;
 #ifdef HAVE_AZBOX_HARDWARE
 		case KEY_HOME:
