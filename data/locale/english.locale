@@ -1501,6 +1501,8 @@ moviebrowser.yt_completed Completed downloads
 moviebrowser.yt_concurrent_connections Concurrent connections
 moviebrowser.yt_error Failed to load youtube feed
 moviebrowser.yt_failed Failed downloads
+moviebrowser.yt_history Search history
+moviebrowser.yt_max_history Max search history size
 moviebrowser.yt_max_results Max results to fetch
 moviebrowser.yt_most_discussed Most discussed
 moviebrowser.yt_most_popular Most popular
