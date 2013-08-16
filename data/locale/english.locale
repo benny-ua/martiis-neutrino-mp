@@ -1496,6 +1496,7 @@ moviebrowser.yt_cache Downloads
 moviebrowser.yt_cache_add Download of\n%s\nis scheduled.
 moviebrowser.yt_cancel Cancel all
 moviebrowser.yt_cancel_transfer Cancel download?
+moviebrowser.yt_charts Charts
 moviebrowser.yt_clear Clear
 moviebrowser.yt_completed Completed downloads
 moviebrowser.yt_concurrent_connections Concurrent connections

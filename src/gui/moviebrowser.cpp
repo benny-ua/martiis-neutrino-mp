@@ -3932,6 +3932,44 @@ int CYTHistory::exec(CMenuTarget* parent, const std::string &actionKey)
 	return menu_return::RETURN_EXIT;
 }
 
+class CYTChartsMenu : public CMenuTarget
+{
+	private:
+		int *selectp;
+		int ytmode;
+	public:
+		CYTChartsMenu(int &_select, int _ytmode);
+		int exec(CMenuTarget* parent, const std::string & actionKey);
+};
+
+CYTChartsMenu::CYTChartsMenu(int &_select, int _ytmode)
+{
+	selectp = &_select;
+	ytmode = _ytmode;
+}
+
+int CYTChartsMenu::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
+{
+	CMenuWidget m(LOCALE_MOVIEBROWSER_YT_CHARTS, NEUTRINO_ICON_MOVIEPLAYER);
+	m.addIntroItems();
+	int sel = -1;
+	CMenuSelectorTarget selector(&sel);
+
+	char cnt[5];
+	for (unsigned i = 0; i < YT_FEED_OPTION_COUNT; i++) {
+		sprintf(cnt, "%d", YT_FEED_OPTIONS[i].key);
+		m.addItem(new CMenuForwarder(YT_FEED_OPTIONS[i].value, true, NULL, &selector, cnt, CRCInput::convertDigitToKey(i + 1)), ytmode == (int) YT_FEED_OPTIONS[i].key);
+	}
+	int res = m.exec(NULL, "");
+
+	if (sel > 0) {
+		*selectp = sel;
+		g_RCInput->postMsg(CRCInput::RC_home, 0);
+	}
+
+	return menu_return::RETURN_REPAINT;
+}
+
 bool CMovieBrowser::showYTMenu()
 {
 	m_pcWindow->paintBackground();
@@ -3942,13 +3980,11 @@ bool CMovieBrowser::showYTMenu()
 	int select = -1;
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
-	char cnt[5];
-	for (unsigned i = 0; i < YT_FEED_OPTION_COUNT; i++) {
-		sprintf(cnt, "%d", YT_FEED_OPTIONS[i].key);
-		mainMenu.addItem(new CMenuForwarder(YT_FEED_OPTIONS[i].value, true, NULL, selector, cnt, CRCInput::convertDigitToKey(i + 1)), m_settings.ytmode == (int) YT_FEED_OPTIONS[i].key);
-	}
+	CYTChartsMenu ytChartsMenue(select, m_settings.ytmode);
+	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_YT_CHARTS, true, NULL, &ytChartsMenue));
 	mainMenu.addItem(GenericMenuSeparatorLine);
 
+	char cnt[5];
 	bool enabled = (!m_vMovieInfo.empty()) && (m_movieSelectionHandler != NULL);
 	sprintf(cnt, "%d", cYTFeedParser::RELATED);
 	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_YT_RELATED, enabled, NULL, selector, cnt, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));

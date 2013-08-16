@@ -1523,6 +1523,7 @@ const char * locale_real_names[] =
 	"moviebrowser.yt_cache_add",
 	"moviebrowser.yt_cancel",
 	"moviebrowser.yt_cancel_transfer",
+	"moviebrowser.yt_charts",
 	"moviebrowser.yt_clear",
 	"moviebrowser.yt_completed",
 	"moviebrowser.yt_concurrent_connections",

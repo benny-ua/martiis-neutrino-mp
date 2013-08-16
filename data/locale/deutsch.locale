@@ -1495,6 +1495,7 @@ moviebrowser.yt_cache Downloads
 moviebrowser.yt_cache_add Download von\n%s\nwird eingeplant.
 moviebrowser.yt_cancel Alle abbrechen
 moviebrowser.yt_cancel_transfer Download abbrechen?
+moviebrowser.yt_charts Charts
 moviebrowser.yt_clear Liste leeren
 moviebrowser.yt_completed Vollständige Downloads
 moviebrowser.yt_concurrent_connections Gleichzeitige Verbindungen 
