@@ -3960,7 +3960,7 @@ int CYTChartsMenu::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey
 		sprintf(cnt, "%d", YT_FEED_OPTIONS[i].key);
 		m.addItem(new CMenuForwarder(YT_FEED_OPTIONS[i].value, true, NULL, &selector, cnt, CRCInput::convertDigitToKey(i + 1)), ytmode == (int) YT_FEED_OPTIONS[i].key);
 	}
-	int res = m.exec(NULL, "");
+	m.exec(NULL, "");
 
 	if (sel > 0) {
 		*selectp = sel;
