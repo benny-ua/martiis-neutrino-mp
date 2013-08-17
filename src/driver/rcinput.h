@@ -227,11 +227,7 @@ class CRCInput
 			RC_forward	= KEY_FORWARD,
 			RC_rewind	= KEY_REWIND,
 			RC_stop		= KEY_STOP,
-#if HAVE_SPARK_HARDWARE
 			RC_timeshift	= KEY_T,
-#else
-			RC_timeshift	= KEY_TIME,
-#endif
 			RC_mode		= KEY_MODE,
 			RC_games	= KEY_GAMES,
 			RC_next		= KEY_NEXT,

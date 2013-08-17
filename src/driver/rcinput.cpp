@@ -1618,7 +1618,7 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 			case RC_prog3:
 				return "prog3";
 			case RC_aux:
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 				return "tv/sat";
 #else
 				return "aux";
