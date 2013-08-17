@@ -178,26 +178,6 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 						imx = (int) ((1.0 / m_aspect_ratio_correction) * x * (m_endy - m_starty) / y);
 						imy = (m_endy - m_starty);
 					}
-					x = imx, y = imy;
-					m_NextPic_X = x;
-					m_NextPic_Y = y;
-					if (x < (m_endx - m_startx))
-						m_NextPic_XPos = (m_endx - m_startx - x) / 2 + m_startx;
-					else
-						m_NextPic_XPos = m_startx;
-					if (y < (m_endy - m_starty))
-						m_NextPic_YPos = (m_endy - m_starty - y) / 2 + m_starty;
-					else
-						m_NextPic_YPos = m_starty;
-					if (x > (m_endx - m_startx))
-						m_NextPic_XPan = (x - (m_endx - m_startx)) / 2;
-					else
-						m_NextPic_XPan = 0;
-					if (y > (m_endy - m_starty))
-						m_NextPic_YPan = (y - (m_endy - m_starty)) / 2;
-					else
-						m_NextPic_YPan = 0;
-
 					fb_w = fb_w_initial = imx;
 					fb_h = fb_h_initial = imy;
 					fb_x = (DEFAULT_XRES - fb_w) >> 1;
