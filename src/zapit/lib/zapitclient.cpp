@@ -164,6 +164,7 @@ unsigned int CZapitClient::zapTo_serviceID(const t_channel_id channel_id)
 	msg.channel_id = channel_id;
 	msg.record = false;
 	msg.pip = false;
+	msg.epg = false;
 
 	send(CZapitMessages::CMD_ZAPTO_SERVICEID, (const char *) & msg, sizeof(msg));
 
@@ -239,6 +240,9 @@ unsigned int CZapitClient::zapTo_subServiceID(const t_channel_id channel_id)
 	VALGRIND_PARANOIA;
 
 	msg.channel_id = channel_id;
+	msg.record = false;
+	msg.pip = false;
+	msg.epg = false;
 
 	send(CZapitMessages::CMD_ZAPTO_SUBSERVICEID, (const char *) & msg, sizeof(msg));
 
@@ -257,6 +261,9 @@ void CZapitClient::zapTo_serviceID_NOWAIT(const t_channel_id channel_id)
 	VALGRIND_PARANOIA;
 
 	msg.channel_id = channel_id;
+	msg.record = false;
+	msg.pip = false;
+	msg.epg = false;
 
 	send(CZapitMessages::CMD_ZAPTO_SERVICEID_NOWAIT, (const char *) & msg, sizeof(msg));
 
@@ -270,6 +277,9 @@ void CZapitClient::zapTo_subServiceID_NOWAIT(const t_channel_id channel_id)
 	VALGRIND_PARANOIA;
 
 	msg.channel_id = channel_id;
+	msg.record = false;
+	msg.pip = false;
+	msg.epg = false;
 
 	send(CZapitMessages::CMD_ZAPTO_SUBSERVICEID_NOWAIT, (const char *) & msg, sizeof(msg));
 
