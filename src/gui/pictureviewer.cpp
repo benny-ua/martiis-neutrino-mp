@@ -559,6 +559,12 @@ int CPictureViewerGui::show()
 					update=true;
 				}
 			}
+#if HAVE_SPARK_HARDWARE
+			else
+			{
+				m_viewer->Zoom(0.0); // Reset original view
+			}
+#endif
 		}
 		else if ( msg == CRCInput::RC_6 )
 		{

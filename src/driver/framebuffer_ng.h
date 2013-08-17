@@ -61,11 +61,10 @@ typedef struct fb_var_screeninfo t_fb_var_screeninfo;
 #if HAVE_GENERIC_HARDWARE
 #define USE_OPENGL 1
 #endif
-#ifdef MARTII
-# ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
+#  include <linux/stmfb.h>
 #  define DEFAULT_XRES 1280
 #  define DEFAULT_YRES 720
-# endif
 #endif
 
 class CFrameBuffer;
@@ -98,7 +97,6 @@ class CFbAccel
 #ifdef USE_NEVIS_GXA
 		void setupGXA(void);
 #endif
-#ifdef MARTII
 		int sX, sY, eX, eY;
 		int startX, startY, endX, endY;
 		t_fb_var_screeninfo s;
@@ -113,6 +111,10 @@ class CFbAccel
 		void setBorderColor(fb_pixel_t col = 0);
 		fb_pixel_t getBorderColor(void) { return borderColor; };
 		void ClearFB(void);
+#if HAVE_SPARK_HARDWARE
+		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s);
+		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s);
+		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = 0, int fb_y = 0, int fb_w = -1, int fb_h = -1, int transp = false);
 #endif
 };
 
@@ -193,11 +195,7 @@ class CFrameBuffer
 		int getFileHandle() const; //only used for plugins (games) !!
 		t_fb_var_screeninfo *getScreenInfo();
 
-#ifdef MARTII
 		fb_pixel_t * getFrameBufferPointer(bool real = false); // pointer to framebuffer
-#else
-		fb_pixel_t * getFrameBufferPointer() const; // pointer to framebuffer
-#endif
 		fb_pixel_t * getBackBufferPointer() const;  // pointer to backbuffer
 		unsigned int getStride() const;             // size of a single line in the framebuffer (in bytes)
 		unsigned int getScreenWidth(bool real = false);
@@ -299,9 +297,7 @@ class CFrameBuffer
 			};
 		void SetTransparent(int t){ m_transparent = t; }
 		void SetTransparentDefault(){ m_transparent = m_transparent_default; }
-#ifdef MARTII
 		bool OSDShot(const std::string &name);
-//#if HAVE_SPARK_HARDWARE
 
 		enum Mode3D { Mode3D_off = 0, Mode3D_SideBySide, Mode3D_TopAndBottom, Mode3D_Tile, Mode3D_SIZE };
 		void set3DMode(Mode3D);
@@ -317,7 +313,11 @@ class CFrameBuffer
 		void getBorder(int &sx, int &sy, int &ex, int &ey);
 		void setBorderColor(fb_pixel_t col = 0);
 		fb_pixel_t getBorderColor(void);
-//# endif
+
+#if HAVE_SPARK_HARDWARE
+		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s) { return accel->allocBPAMem(bpa, mem, s); };
+		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s) { accel->freeBPAMem(bpa, mem, s); };
+		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = 0, int fb_y = 0, int fb_w = -1, int fb_h = -1, int transp = false) { accel->blitBPA2FB(mem, fmt, w, h, x, y, pan_x, pan_y, fb_x, fb_y, fb_w, fb_h, transp); };
 #endif
 
 // ## AudioMute / Clock ######################################

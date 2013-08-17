@@ -8,10 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#ifdef MARTII
 #include <sys/stat.h>
 #include <curl/curl.h>
-#endif
 
 #include <cs_api.h>
 
@@ -105,11 +103,7 @@ CPictureViewer::CFormathandler * CPictureViewer::fh_getsize (const char *name, i
 	return (NULL);
 }
 
-#ifdef MARTII
 bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, bool unscaled)
-#else
-bool CPictureViewer::DecodeImage (const std::string & name, bool showBusySign, bool unscaled)
-#endif
 {
 	// dbout("DecodeImage {\n"); 
 #if 0 // quick fix for issue #245. TODO more smart fix for this problem
@@ -126,7 +120,7 @@ bool CPictureViewer::DecodeImage (const std::string & name, bool showBusySign, b
 	// Show red block for "next ready" in view state
 	if (showBusySign)
 		showBusy (m_startx + 3, m_starty + 3, 10, 0xff, 00, 00);
-#ifdef MARTII
+
 	std::string name = _name;
 
 	if (strstr(name.c_str(), "://")) {
@@ -148,7 +142,6 @@ bool CPictureViewer::DecodeImage (const std::string & name, bool showBusySign, b
 		}
 		name = tmpname;
 	}
-#endif
 
 	CFormathandler *fh;
 	if (unscaled)
@@ -158,7 +151,66 @@ bool CPictureViewer::DecodeImage (const std::string & name, bool showBusySign, b
 	if (fh) {
 		if (m_NextPic_Buffer != NULL) {
 			free (m_NextPic_Buffer);
+			m_NextPic_Buffer = NULL;
 		}
+		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
+
+#if HAVE_SPARK_HARDWARE
+		size_t new_bpasize = x * y * 3;
+
+		if (!bpamem || bpasize < new_bpasize) {
+			frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
+			bpasize = new_bpasize;
+			frameBuffer->allocBPAMem(bpafd, bpamem, bpasize);
+		}
+
+		if (bpamem) {
+			bpa_pan_w = bpa_w = x;
+			bpa_pan_h = bpa_h = y;
+			bpa_x = bpa_y = 0;
+
+			if (fh->get_pic(name.c_str(), &bpamem, &x, &y) == FH_ERROR_OK) {
+				if ((x > (m_endx - m_startx) || y > (m_endy - m_starty)) && m_scaling != NONE && !unscaled) {
+					if ((m_aspect_ratio_correction * y * (m_endx - m_startx) / x) <= (m_endy - m_starty)) {
+						imx = (m_endx - m_startx);
+						imy = (int) (m_aspect_ratio_correction * y * (m_endx - m_startx) / x);
+					} else {
+						imx = (int) ((1.0 / m_aspect_ratio_correction) * x * (m_endy - m_starty) / y);
+						imy = (m_endy - m_starty);
+					}
+					x = imx, y = imy;
+					m_NextPic_X = x;
+					m_NextPic_Y = y;
+					if (x < (m_endx - m_startx))
+						m_NextPic_XPos = (m_endx - m_startx - x) / 2 + m_startx;
+					else
+						m_NextPic_XPos = m_startx;
+					if (y < (m_endy - m_starty))
+						m_NextPic_YPos = (m_endy - m_starty - y) / 2 + m_starty;
+					else
+						m_NextPic_YPos = m_starty;
+					if (x > (m_endx - m_startx))
+						m_NextPic_XPan = (x - (m_endx - m_startx)) / 2;
+					else
+						m_NextPic_XPan = 0;
+					if (y > (m_endy - m_starty))
+						m_NextPic_YPan = (y - (m_endy - m_starty)) / 2;
+					else
+						m_NextPic_YPan = 0;
+
+					fb_w = fb_w_initial = imx;
+					fb_h = fb_h_initial = imy;
+					fb_x = (DEFAULT_XRES - fb_w) >> 1;
+					fb_y = (DEFAULT_YRES - fb_h) >> 1;
+					frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
+					frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
+					frameBuffer->blit();
+				}
+			}
+			return false;
+		}
+#endif
+
 		m_NextPic_Buffer = (unsigned char *) malloc (x * y * 3);
 		if (m_NextPic_Buffer == NULL) {
 			printf ("DecodeImage: Error: malloc\n");
@@ -254,8 +306,8 @@ bool CPictureViewer::ShowImage (const std::string & filename, bool unscaled)
 		free (m_CurrentPic_Buffer);
 		m_CurrentPic_Buffer = NULL;
 	}
-	DecodeImage (filename, true, unscaled);
-	DisplayNextImage ();
+	if (DecodeImage (filename, true, unscaled))
+		DisplayNextImage ();
 	//  dbout("Show Image }\n");
 	return true;
 }
@@ -267,9 +319,11 @@ bool CPictureViewer::DisplayNextImage ()
 		free (m_CurrentPic_Buffer);
 		m_CurrentPic_Buffer = NULL;
 	}
-	if (m_NextPic_Buffer != NULL)
+	if (m_NextPic_Buffer != NULL) {
 		//fb_display (m_NextPic_Buffer, m_NextPic_X, m_NextPic_Y, m_NextPic_XPan, m_NextPic_YPan, m_NextPic_XPos, m_NextPic_YPos);
 		CFrameBuffer::getInstance()->displayRGB(m_NextPic_Buffer, m_NextPic_X, m_NextPic_Y, m_NextPic_XPan, m_NextPic_YPan, m_NextPic_XPos, m_NextPic_YPos);
+		CFrameBuffer::getInstance()->blit();
+	}
 	//  dbout("DisplayNextImage fb_disp done\n");
 	m_CurrentPic_Buffer = m_NextPic_Buffer;
 	m_NextPic_Buffer = NULL;
@@ -295,13 +349,17 @@ void CPictureViewer::Zoom (float factor)
 	m_CurrentPic_X = (int) (factor * m_CurrentPic_X);
 	m_CurrentPic_Y = (int) (factor * m_CurrentPic_Y);
 
-	m_CurrentPic_Buffer = Resize(m_CurrentPic_Buffer, oldx, oldy, m_CurrentPic_X, m_CurrentPic_Y, m_scaling);
+#if HAVE_SPARK_HARDWARE
+	if (!bpamem) {
+		m_CurrentPic_Buffer = Resize(m_CurrentPic_Buffer, oldx, oldy, m_CurrentPic_X, m_CurrentPic_Y, m_scaling);
 
-	if (m_CurrentPic_Buffer == oldBuf) {
-		// resize failed
-		hideBusy ();
-		return;
+		if (m_CurrentPic_Buffer == oldBuf) {
+			// resize failed
+			hideBusy ();
+			return;
+		}
 	}
+#endif
 
 	if (m_CurrentPic_X < (m_endx - m_startx))
 		m_CurrentPic_XPos = (m_endx - m_startx - m_CurrentPic_X) / 2 + m_startx;
@@ -320,7 +378,75 @@ void CPictureViewer::Zoom (float factor)
 	else
 		m_CurrentPic_YPan = 0;
 	//fb_display (m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
-	CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+#if HAVE_SPARK_HARDWARE
+	if (bpamem) {
+		int center_x = bpa_x + (bpa_pan_w >> 1);
+		int center_y = bpa_y + (bpa_pan_h >> 1);
+
+		if (factor > 0.0) {
+			bpa_pan_w = (int)(bpa_pan_w / factor);
+			bpa_pan_h = (int)(bpa_pan_h / factor);
+		}
+		if (factor <= 0.0 || bpa_pan_w >= bpa_w || bpa_pan_h >= bpa_h) {
+			factor = 1.0;
+			bpa_x = (bpa_w - bpa_pan_w) >> 1;
+			bpa_y = (bpa_h - bpa_pan_h) >> 1;
+			bpa_pan_w = bpa_w;
+			bpa_pan_h = bpa_h;
+			fb_w = fb_w_initial;
+			fb_h = fb_h_initial;
+		}
+		if (fb_w < DEFAULT_XRES) {
+			float f0 = (float) DEFAULT_XRES             /(float)fb_w;
+			float f1 = (float)(bpa_pan_w * DEFAULT_XRES)/(float)fb_w;
+			if (f1 * bpa_pan_w > bpa_w)
+				f1 = (float)bpa_w/(float)bpa_pan_w;
+			f0 = (f0 < f1) ? f0 : f1;
+			fb_w *= f0;
+			bpa_pan_w *= f0;
+		}
+		if (fb_h < DEFAULT_YRES) {
+			float f0 = (float) DEFAULT_YRES             /(float)fb_h;
+			float f1 = (float)(bpa_pan_h * DEFAULT_YRES)/(float)fb_h;
+			if (f1 * bpa_pan_h > bpa_h)
+				f1 = (float)bpa_h/(float)bpa_pan_h;
+			f0 = (f0 < f1) ? f0 : f1;
+			fb_h *= f0;
+			bpa_pan_h *= f0;
+		}
+		if (fb_w > DEFAULT_XRES) {
+			fb_h *= DEFAULT_XRES;
+			fb_h /= fb_w;
+			fb_w = DEFAULT_XRES;
+		}
+		if (fb_h > DEFAULT_YRES) {
+			fb_w *= DEFAULT_YRES;
+			fb_w /= fb_h;
+			fb_h = DEFAULT_YRES;
+		}
+		if (fb_w < DEFAULT_XRES && fb_h < DEFAULT_XRES) {
+			fb_w = fb_w_initial;
+			fb_h = fb_h_initial;
+		}
+		bpa_x = center_x - (bpa_pan_w >> 1);
+		bpa_y = center_y - (bpa_pan_h >> 1);
+		if (bpa_x < 0)
+			bpa_x = 0;
+		else if (bpa_x + bpa_pan_w > bpa_w)
+			bpa_x = bpa_w - bpa_pan_w;
+		if (bpa_y < 0)
+			bpa_y = 0;
+		else if (bpa_y + bpa_pan_h > bpa_h)
+			bpa_y = bpa_h - bpa_pan_h;
+		fb_x = (DEFAULT_XRES - fb_w) >> 1;
+		fb_y = (DEFAULT_YRES - fb_h) >> 1;
+		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
+		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
+		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
+	} else
+#endif
+		CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+	CFrameBuffer::getInstance()->blit();
 }
 
 void CPictureViewer::Move (int dx, int dy)
@@ -357,7 +483,29 @@ void CPictureViewer::Move (int dx, int dy)
 	//          m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
 
 	//fb_display (m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
-	CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+#if HAVE_SPARK_HARDWARE
+	if (bpamem) {
+		bpa_x += dx;
+
+		if (bpa_x < 0)
+			bpa_x = 0;
+		else if (bpa_x + bpa_pan_w >= bpa_w)
+			bpa_x = bpa_w - bpa_pan_w;
+
+		bpa_y += dy;
+
+		if (bpa_y < 0)
+			bpa_y = 0;
+		else if (bpa_y + bpa_pan_h >= bpa_h)
+			bpa_y = bpa_h - bpa_pan_h;
+
+		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
+		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
+		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
+	} else
+#endif
+		CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+	CFrameBuffer::getInstance()->blit();
 }
 
 CPictureViewer::CPictureViewer ()
@@ -395,7 +543,14 @@ CPictureViewer::CPictureViewer ()
 	m_aspect_ratio_correction = m_aspect / ((double) xs / ys);
 
 	m_busy_buffer = NULL;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
+	bpafd = -1;
+	bpamem = NULL;
+	bpasize = 0;
+	bpa_w = 0;
+	bpa_h = 0;
+#endif
+
 	logo_hdd_dir = string(g_settings.logo_hdd_dir);
 	logo_hdd_dir_2 = string(g_settings.logo_hdd_dir_2);
 
@@ -403,7 +558,6 @@ CPictureViewer::CPictureViewer ()
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
 	pthread_mutex_init(&logo_map_mutex, &attr);
-#endif
 
 	init_handlers ();
 }
@@ -499,6 +653,10 @@ void CPictureViewer::Cleanup ()
 		free (m_CurrentPic_Buffer);
 		m_CurrentPic_Buffer = NULL;
 	}
+#if HAVE_SPARK_HARDWARE
+	if (bpamem)
+		CFrameBuffer::getInstance()->freeBPAMem(bpafd, bpamem, bpasize);
+#endif
 }
 
 void CPictureViewer::getSize(const char* name, int* width, int *height)
@@ -515,7 +673,6 @@ void CPictureViewer::getSize(const char* name, int* width, int *height)
 #define LOGO_DIR1 DATADIR "/neutrino/icons/logo"
 #define LOGO_FMT ".jpg"
 
-#ifdef MARTII
 bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, std::string & name, int *width, int *height)
 {
 	char strChanId[16];
@@ -612,49 +769,6 @@ found:
 	pthread_mutex_unlock(&logo_map_mutex);
 	return true;
 }
-#else
-bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, std::string & name, int *width, int *height)
-{
-	int i, j;
-	char strChanId[16];
-
-	sprintf(strChanId, "%llx", channel_id & 0xFFFFFFFFFFFFULL);
-	/* first the channel-id, then the channelname */
-	std::string strLogoName[2] = { (std::string)strChanId, ChannelName };
-	/* first png, then jpg, then gif */
-	std::string strLogoExt[3] = { ".png", ".jpg" , ".gif" };
-
-	for (i = 0; i < 2; i++)
-	{
-		for (j = 0; j < 3; j++)
-		{
-			std::string tmp(g_settings.logo_hdd_dir + "/" + strLogoName[i] + strLogoExt[j]);
-			if (access(tmp, R_OK) != -1)
-			{
-				if(width && height)
-					getSize(tmp.c_str(), width, height);
-				name = tmp;
-				return true;
-			}
-		}
-	}
-        for (i = 0; i < 2; i++)
-        {
-                for (j = 0; j < 3; j++)
-                {
-			std::string tmp(LOGO_DIR1 "/" + strLogoName[i] + strLogoExt[j]);
-                        if (access(tmp, R_OK) != -1)
-                        {
-				if(width && height)
-					getSize(tmp.c_str(), width, height);
-                                name = tmp;
-                                return true;
-                        }
-                }
-        }
-	return false;
-}
-#endif
 
 bool CPictureViewer::DisplayLogo (uint64_t channel_id, int posx, int posy, int width, int height)
 {
