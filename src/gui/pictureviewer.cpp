@@ -257,8 +257,13 @@ int CPictureViewerGui::show()
 
 	CAudioMute::getInstance()->enableMuteIcon(false);
 
+	uint32_t repeatkeys[] = { CRCInput::RC_1, CRCInput::RC_2, CRCInput::RC_3, CRCInput::RC_4, CRCInput::RC_6, CRCInput::RC_8, CRCInput::RC_nokey };
+	uint32_t *old_repeatkeys = g_RCInput->setAllowRepeat(NULL);
+
 	while (loop)
 	{
+		g_RCInput->setAllowRepeat((m_state == MENU) ? old_repeatkeys : repeatkeys);
+
 		if (update)
 		{
 			hide();
@@ -658,6 +663,7 @@ int CPictureViewerGui::show()
 		frameBuffer->blit();
 	}
 	hide();
+	g_RCInput->setAllowRepeat(old_repeatkeys);
 
 	if (!audioplayer)
 		CAudioMute::getInstance()->enableMuteIcon(true);

@@ -141,6 +141,7 @@ class CRCInput
 		uint32_t               timerid;
 		std::vector<timer> timers;
 
+		uint32_t	*repeatkeys;
 		int 		fd_pipe_high_priority[2];
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
@@ -160,6 +161,7 @@ class CRCInput
 		int translate(int code, int num);
 		void calculateMaxFd(void);
 		int checkTimers();
+		bool mayRepeat(uint32_t key);
 #ifdef IOC_IR_SET_PRI_PROTOCOL
 		void set_rc_hw(ir_protocol_t ir_protocol, unsigned int ir_address);
 #endif
@@ -304,6 +306,7 @@ class CRCInput
 		static int getNumericValue(const neutrino_msg_t key);
 		static unsigned int convertDigitToKey(const unsigned int digit);
 		static int getUnicodeValue(const neutrino_msg_t key);
+		uint32_t *setAllowRepeat(uint32_t *);
 
 		static const char * getSpecialKeyName(const unsigned int key);
 		static const char *getKeyNameC(const unsigned int key);
