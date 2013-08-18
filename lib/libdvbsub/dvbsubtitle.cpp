@@ -119,7 +119,7 @@ fb_pixel_t * simple_resize32(uint8_t * orgin, uint32_t * colors, int nb_colors, 
 	fb_pixel_t  *cr,*l;
 	int i,j,k,ip;
 
-#ifndef HAVE_SPARK_HARDWARE
+#if !HAVE_SPARK_HARDWARE
 	cr = (fb_pixel_t *) malloc(dx*dy*sizeof(fb_pixel_t));
 
 	if(cr == NULL) {
@@ -193,7 +193,7 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 	dbgconverter("cDvbSubtitleBitmaps::%s: done\n", __func__);
 #else // MARTII
 	int i;
-#ifndef HAVE_SPARK_HARDWARE
+#if !HAVE_SPARK_HARDWARE
 	int stride = CFrameBuffer::getInstance()->getScreenWidth(true);
 #if 0
 	int wd = CFrameBuffer::getInstance()->getScreenWidth();
@@ -246,7 +246,7 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 
 		fb_pixel_t * newdata = simple_resize32 (sub.rects[i]->pict.data[0], colors, sub.rects[i]->nb_colors, width, height, nw, nh);
 
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 		// CFrameBuffer::getInstance()->waitForIdle();
 		CFrameBuffer::getInstance()->blit2FB(newdata, nw, nh, xoff, yoff, 0, 0);
 #else

@@ -353,7 +353,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.analog_mode1 = configfile.getInt32("analog_mode1", (int)ANALOG_SD_RGB_SCART); // default RGB
 	g_settings.analog_mode2 = configfile.getInt32("analog_mode2", (int)ANALOG_SD_YPRPB_CINCH); // default YPBPR
 #endif
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	g_settings.hdmi_mode = configfile.getInt32("hdmi_mode", (int)COLORFORMAT_HDMI_RGB);
 #endif
 	g_settings.hdmi_cec_mode = configfile.getInt32("hdmi_cec_mode", 0); // default off
@@ -756,7 +756,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.screen_StartY = g_settings.screen_preset ? g_settings.screen_StartY_lcd : g_settings.screen_StartY_crt;
 	g_settings.screen_EndX = g_settings.screen_preset ? g_settings.screen_EndX_lcd : g_settings.screen_EndX_crt;
 	g_settings.screen_EndY = g_settings.screen_preset ? g_settings.screen_EndY_lcd : g_settings.screen_EndY_crt;
-#ifdef HAVE_SPARK_HARDWARE // MARTII
+#if HAVE_SPARK_HARDWARE // MARTII
 	g_settings.screen_StartX_int = g_settings.screen_StartX;
 	g_settings.screen_StartY_int = g_settings.screen_StartY;
 	g_settings.screen_EndX_int = g_settings.screen_EndX;

@@ -23,7 +23,7 @@
         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 #define HAVE_GENERIC_HARDWARE 1
 #endif
 #include <lcddisplay/lcddisplay.h>

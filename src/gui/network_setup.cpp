@@ -386,7 +386,7 @@ int CNetworkSetup::showNetworkSetup()
 	mf->setHint("", LOCALE_MENU_HINT_NET_PROXY);
 	networkSettings->addItem(mf);
 
-#ifndef HAVE_SPARK_HARDWARE
+#if !HAVE_SPARK_HARDWARE
 	//services
 	CNetworkServiceSetup services;
 	mf = new CMenuForwarder(LOCALE_NETWORKMENU_SERVICES, true, NULL, &services, NULL, CRCInput::RC_1);

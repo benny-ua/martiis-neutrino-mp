@@ -32,7 +32,7 @@
 #define KEY_TTZOOM	KEY_FN_2
 #define KEY_REVEAL	KEY_FN_D
 
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 #ifdef MARTII
 #define MARK_FB(a, b, c, d) if ((fb_pixel_t *)p == lfb) CFrameBuffer::getInstance()->mark(a, b, (a) + (c), (b) + (d))
 #else
@@ -6319,7 +6319,7 @@ void CopyBB2FB()
 	unsigned char *src, *dst, *topsrc;
 #endif
 	int fillcolor, i, screenwidth, swtmp;
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	CFrameBuffer *f = CFrameBuffer::getInstance();
 #endif
 
@@ -6346,7 +6346,7 @@ void CopyBB2FB()
 		if (ioctl(fb, FBIOPAN_DISPLAY, &var_screeninfo) == -1)
 			perror("TuxTxt <FBIOPAN_DISPLAY>");
 #else
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 		f->blit2FB(lbb, var_screeninfo.xres, var_screeninfo.yres, 0, 0, 0, 0, true);
 		f->blit();
 #else
@@ -6417,7 +6417,7 @@ void CopyBB2FB()
 #endif
 	{
 		screenwidth = ( TV43STARTX ) * 4;
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 		int cx = var_screeninfo.xres - TV43STARTX;	/* x start */
 #ifdef MARTII
 		if (boxed)
@@ -6499,7 +6499,7 @@ void CopyBB2FB()
 #endif
 		}
 	}
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 #ifndef MARTII
 	f->mark(0, 0, var_screeninfo.xres, var_screeninfo.yres);
 #endif

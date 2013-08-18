@@ -250,7 +250,7 @@ extern void getPlayerPts(int64_t *);
 void dvbsub_get_stc(int64_t * STC)
 {
 #ifdef MARTII
-#ifdef HAVE_SPARK_HARDWARE // requires libeplayer3
+#if HAVE_SPARK_HARDWARE // requires libeplayer3
 	if (isEplayer) {
 		getPlayerPts(STC);
 		*STC -= stc_offset;

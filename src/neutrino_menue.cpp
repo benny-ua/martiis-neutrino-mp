@@ -437,7 +437,7 @@ void CNeutrinoApp::InitMenuService()
 		personalize.addSeparator(MENU_SERVICE);
 	}
 
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	//boot spark now
 	if (g_info.hw_caps->boxtype == 7111)
 		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);

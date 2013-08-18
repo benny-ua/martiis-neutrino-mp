@@ -294,7 +294,7 @@ bool CAudioSetupNotifier::changeNotify(const neutrino_locale_t OptionName, void 
 		//.Clock recovery enable/disable
 		// FIXME add code here.
 #ifdef MARTII
-# ifdef HAVE_SPARK_HARDWARE
+# if HAVE_SPARK_HARDWARE
 	} else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG)) {
 		static mixerVolume m("Analog", "1");
 		m.setVolume((long)(*((int *)(data))));

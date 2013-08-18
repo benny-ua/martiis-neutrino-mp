@@ -181,7 +181,7 @@ void CMoviePlayerGui::Init(void)
 	tsfilefilter.addFilter("mov");
 	tsfilefilter.addFilter("m3u");
 	tsfilefilter.addFilter("pls");
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	tsfilefilter.addFilter("vdr");
 	tsfilefilter.addFilter("flv");
 	tsfilefilter.addFilter("wmv");

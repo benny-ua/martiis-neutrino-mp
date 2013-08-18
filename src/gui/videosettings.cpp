@@ -543,7 +543,7 @@ void CVideoSettings::setupVideoSystem(bool do_ask)
 {
 	printf("[neutrino VideoSettings] %s setup videosystem...\n", __FUNCTION__);
 	videoDecoder->SetVideoSystem(g_settings.video_Mode); //FIXME
-#ifdef HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	frameBuffer->resChange();
 #endif
 
@@ -556,7 +556,7 @@ void CVideoSettings::setupVideoSystem(bool do_ask)
 			{
 				g_settings.video_Mode = prev_video_mode;
 				videoDecoder->SetVideoSystem(g_settings.video_Mode);
-#ifdef HAVE_SPARK_HARDWARE 
+#if HAVE_SPARK_HARDWARE 
 				frameBuffer->resChange();
 #endif
 			}

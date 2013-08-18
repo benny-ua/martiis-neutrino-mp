@@ -2674,7 +2674,7 @@ bool CMovieBrowser::loadTsFileNamesFromDir(const std::string & dirname)
 						    && strcasecmp(ext, "m2ts")
 						    && strcasecmp(ext, "mp4")
 						    && strcasecmp(ext, "mov")
-# ifdef HAVE_SPARK_HARDWARE
+# if HAVE_SPARK_HARDWARE
 						    && strcasecmp(ext, "vdr")
 						    && strcasecmp(ext, "flv")
 						    && strcasecmp(ext, "wmv")
