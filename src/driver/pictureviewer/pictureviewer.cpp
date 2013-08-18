@@ -404,7 +404,7 @@ void CPictureViewer::Zoom (float factor)
 			fb_w /= fb_h;
 			fb_h = DEFAULT_YRES;
 		}
-		if (fb_w < DEFAULT_XRES && fb_h < DEFAULT_XRES) {
+		if (fb_w < DEFAULT_XRES && fb_h < DEFAULT_YRES) {
 			fb_w = fb_w_initial;
 			fb_h = fb_h_initial;
 		}
