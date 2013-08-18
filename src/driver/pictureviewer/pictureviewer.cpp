@@ -114,8 +114,8 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 #endif
 	int x, y, imx, imy;
 
-// 	int xs = CFrameBuffer::getInstance()->getScreenWidth(true);
-// 	int ys = CFrameBuffer::getInstance()->getScreenHeight(true);
+// 	int xs = frameBuffer->getScreenWidth(true);
+// 	int ys = frameBuffer->getScreenHeight(true);
 
 	// Show red block for "next ready" in view state
 	if (showBusySign)
@@ -153,7 +153,6 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 			free (m_NextPic_Buffer);
 			m_NextPic_Buffer = NULL;
 		}
-		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
 
 #if HAVE_SPARK_HARDWARE
 		size_t new_bpasize = x * y * 3;
@@ -301,8 +300,8 @@ bool CPictureViewer::DisplayNextImage ()
 	}
 	if (m_NextPic_Buffer != NULL) {
 		//fb_display (m_NextPic_Buffer, m_NextPic_X, m_NextPic_Y, m_NextPic_XPan, m_NextPic_YPan, m_NextPic_XPos, m_NextPic_YPos);
-		CFrameBuffer::getInstance()->displayRGB(m_NextPic_Buffer, m_NextPic_X, m_NextPic_Y, m_NextPic_XPan, m_NextPic_YPan, m_NextPic_XPos, m_NextPic_YPos);
-		CFrameBuffer::getInstance()->blit();
+		frameBuffer->displayRGB(m_NextPic_Buffer, m_NextPic_X, m_NextPic_Y, m_NextPic_XPan, m_NextPic_YPan, m_NextPic_XPos, m_NextPic_YPos);
+		frameBuffer->blit();
 	}
 	//  dbout("DisplayNextImage fb_disp done\n");
 	m_CurrentPic_Buffer = m_NextPic_Buffer;
@@ -323,58 +322,25 @@ void CPictureViewer::Zoom (float factor)
 	//  dbout("Zoom %f\n",factor);
 	showBusy (m_startx + 3, m_starty + 3, 10, 0xff, 0xff, 00);
 
-	int oldx = m_CurrentPic_X;
-	int oldy = m_CurrentPic_Y;
-	unsigned char *oldBuf = m_CurrentPic_Buffer;
-	m_CurrentPic_X = (int) (factor * m_CurrentPic_X);
-	m_CurrentPic_Y = (int) (factor * m_CurrentPic_Y);
-
-#if HAVE_SPARK_HARDWARE
-	if (!bpamem) {
-		m_CurrentPic_Buffer = Resize(m_CurrentPic_Buffer, oldx, oldy, m_CurrentPic_X, m_CurrentPic_Y, m_scaling);
-
-		if (m_CurrentPic_Buffer == oldBuf) {
-			// resize failed
-			hideBusy ();
-			return;
-		}
-	}
-#endif
-
-	if (m_CurrentPic_X < (m_endx - m_startx))
-		m_CurrentPic_XPos = (m_endx - m_startx - m_CurrentPic_X) / 2 + m_startx;
-	else
-		m_CurrentPic_XPos = m_startx;
-	if (m_CurrentPic_Y < (m_endy - m_starty))
-		m_CurrentPic_YPos = (m_endy - m_starty - m_CurrentPic_Y) / 2 + m_starty;
-	else
-		m_CurrentPic_YPos = m_starty;
-	if (m_CurrentPic_X > (m_endx - m_startx))
-		m_CurrentPic_XPan = (m_CurrentPic_X - (m_endx - m_startx)) / 2;
-	else
-		m_CurrentPic_XPan = 0;
-	if (m_CurrentPic_Y > (m_endy - m_starty))
-		m_CurrentPic_YPan = (m_CurrentPic_Y - (m_endy - m_starty)) / 2;
-	else
-		m_CurrentPic_YPan = 0;
-	//fb_display (m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
 #if HAVE_SPARK_HARDWARE
 	if (bpamem) {
 		int center_x = bpa_x + (bpa_pan_w >> 1);
 		int center_y = bpa_y + (bpa_pan_h >> 1);
 
-		if (factor > 0.0) {
+		if (factor > 0.0 && bpa_pan_w/factor > 8.0 && bpa_pan_h/factor > 8.0) {
 			bpa_pan_w = (int)(bpa_pan_w / factor);
 			bpa_pan_h = (int)(bpa_pan_h / factor);
 		}
 		if (factor <= 0.0 || bpa_pan_w >= bpa_w || bpa_pan_h >= bpa_h) {
 			factor = 1.0;
-			bpa_x = (bpa_w - bpa_pan_w) >> 1;
-			bpa_y = (bpa_h - bpa_pan_h) >> 1;
 			bpa_pan_w = bpa_w;
 			bpa_pan_h = bpa_h;
 			fb_w = fb_w_initial;
 			fb_h = fb_h_initial;
+			bpa_x = (bpa_w - bpa_pan_w) >> 1;
+			bpa_y = (bpa_h - bpa_pan_h) >> 1;
+			center_x = bpa_x + (bpa_pan_w >> 1);
+			center_y = bpa_y + (bpa_pan_h >> 1);
 		}
 		if (fb_w < DEFAULT_XRES) {
 			float f0 = (float) DEFAULT_XRES             /(float)fb_w;
@@ -420,24 +386,78 @@ void CPictureViewer::Zoom (float factor)
 			bpa_y = bpa_h - bpa_pan_h;
 		fb_x = (DEFAULT_XRES - fb_w) >> 1;
 		fb_y = (DEFAULT_YRES - fb_h) >> 1;
-		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
 		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
 		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
-	} else
+		frameBuffer->blit();
+		return;
+	}
 #endif
-		CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
-	CFrameBuffer::getInstance()->blit();
+	int oldx = m_CurrentPic_X;
+	int oldy = m_CurrentPic_Y;
+	unsigned char *oldBuf = m_CurrentPic_Buffer;
+	m_CurrentPic_X = (int) (factor * m_CurrentPic_X);
+	m_CurrentPic_Y = (int) (factor * m_CurrentPic_Y);
+
+	m_CurrentPic_Buffer = Resize(m_CurrentPic_Buffer, oldx, oldy, m_CurrentPic_X, m_CurrentPic_Y, m_scaling);
+
+	if (m_CurrentPic_Buffer == oldBuf) {
+		// resize failed
+		hideBusy ();
+		return;
+	}
+
+	if (m_CurrentPic_X < (m_endx - m_startx))
+		m_CurrentPic_XPos = (m_endx - m_startx - m_CurrentPic_X) / 2 + m_startx;
+	else
+		m_CurrentPic_XPos = m_startx;
+	if (m_CurrentPic_Y < (m_endy - m_starty))
+		m_CurrentPic_YPos = (m_endy - m_starty - m_CurrentPic_Y) / 2 + m_starty;
+	else
+		m_CurrentPic_YPos = m_starty;
+	if (m_CurrentPic_X > (m_endx - m_startx))
+		m_CurrentPic_XPan = (m_CurrentPic_X - (m_endx - m_startx)) / 2;
+	else
+		m_CurrentPic_XPan = 0;
+	if (m_CurrentPic_Y > (m_endy - m_starty))
+		m_CurrentPic_YPan = (m_CurrentPic_Y - (m_endy - m_starty)) / 2;
+	else
+		m_CurrentPic_YPan = 0;
+	//fb_display (m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+	frameBuffer->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+	frameBuffer->blit();
 }
 
 void CPictureViewer::Move (int dx, int dy)
 {
-	int xs, ys;
-
 	//  dbout("Move %d %d\n",dx,dy);
 	showBusy (m_startx + 3, m_starty + 3, 10, 0x00, 0xff, 00);
 
-	xs = CFrameBuffer::getInstance()->getScreenWidth(true);
-	ys = CFrameBuffer::getInstance()->getScreenHeight(true);
+#if HAVE_SPARK_HARDWARE
+	if (bpamem) {
+		bpa_x += dx;
+
+		if (bpa_x < 0)
+			bpa_x = 0;
+		else if (bpa_x + bpa_pan_w >= bpa_w)
+			bpa_x = bpa_w - bpa_pan_w;
+
+		bpa_y += dy;
+
+		if (bpa_y < 0)
+			bpa_y = 0;
+		else if (bpa_y + bpa_pan_h >= bpa_h)
+			bpa_y = bpa_h - bpa_pan_h;
+
+		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
+		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
+		frameBuffer->blit();
+		return;
+	}
+#endif
+	int xs, ys;
+
+	xs = frameBuffer->getScreenWidth(true);
+	ys = frameBuffer->getScreenHeight(true);
 
 	m_CurrentPic_XPan += dx;
 	if (m_CurrentPic_XPan + xs >= m_CurrentPic_X)
@@ -463,29 +483,8 @@ void CPictureViewer::Move (int dx, int dy)
 	//          m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
 
 	//fb_display (m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
-#if HAVE_SPARK_HARDWARE
-	if (bpamem) {
-		bpa_x += dx;
-
-		if (bpa_x < 0)
-			bpa_x = 0;
-		else if (bpa_x + bpa_pan_w >= bpa_w)
-			bpa_x = bpa_w - bpa_pan_w;
-
-		bpa_y += dy;
-
-		if (bpa_y < 0)
-			bpa_y = 0;
-		else if (bpa_y + bpa_pan_h >= bpa_h)
-			bpa_y = bpa_h - bpa_pan_h;
-
-		CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
-		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
-		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
-	} else
-#endif
-		CFrameBuffer::getInstance()->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
-	CFrameBuffer::getInstance()->blit();
+	frameBuffer->displayRGB(m_CurrentPic_Buffer, m_CurrentPic_X, m_CurrentPic_Y, m_CurrentPic_XPan, m_CurrentPic_YPan, m_CurrentPic_XPos, m_CurrentPic_YPos);
+	frameBuffer->blit();
 }
 
 CPictureViewer::CPictureViewer ()
@@ -513,8 +512,9 @@ CPictureViewer::CPictureViewer ()
 	m_NextPic_XPan = 0;
 	m_NextPic_YPan = 0;
 
-	xs = CFrameBuffer::getInstance()->getScreenWidth(true);
-	ys = CFrameBuffer::getInstance()->getScreenHeight(true);
+	frameBuffer = CFrameBuffer::getInstance();
+	xs = frameBuffer->getScreenWidth(true);
+	ys = frameBuffer->getScreenHeight(true);
 
 	m_startx = 0;
 	m_endx = xs - 1;
@@ -565,7 +565,7 @@ void CPictureViewer::showBusy (int sx, int sy, int width, char r, char g, char b
 	rgb_buffer[1] = g;
 	rgb_buffer[2] = b;
 
-	fb_buffer = (unsigned char *) CFrameBuffer::getInstance()->convertRGB2FB (rgb_buffer, 1, 1);
+	fb_buffer = (unsigned char *) frameBuffer->convertRGB2FB (rgb_buffer, 1, 1);
 	if (fb_buffer == NULL) {
 		printf ("showBusy: Error: malloc 1\n");
 		return;
@@ -580,8 +580,8 @@ void CPictureViewer::showBusy (int sx, int sy, int width, char r, char g, char b
 		return;
 	}
 	busy_buffer_wrk = m_busy_buffer;
-	unsigned char *fb = (unsigned char *) CFrameBuffer::getInstance()->getFrameBufferPointer();
-	unsigned int stride = CFrameBuffer::getInstance ()->getStride ();
+	unsigned char *fb = (unsigned char *) frameBuffer->getFrameBufferPointer();
+	unsigned int stride = frameBuffer->getStride ();
 
 	for (int y = sy; y < sy + width; y++) {
 		for (int x = sx; x < sx + width; x++) {
@@ -595,7 +595,7 @@ void CPictureViewer::showBusy (int sx, int sy, int width, char r, char g, char b
 	m_busy_width = width;
 	m_busy_cpp = cpp;
 	cs_free_uncached (fb_buffer);
-	CFrameBuffer::getInstance()->blit();
+	frameBuffer->blit();
 	//  dbout("Show Busy}\n");
 }
 
@@ -603,8 +603,8 @@ void CPictureViewer::hideBusy ()
 {
 	//  dbout("Hide Busy{\n");
 	if (m_busy_buffer != NULL) {
-		unsigned char *fb = (unsigned char *) CFrameBuffer::getInstance ()->getFrameBufferPointer ();
-		unsigned int stride = CFrameBuffer::getInstance ()->getStride ();
+		unsigned char *fb = (unsigned char *) frameBuffer->getFrameBufferPointer ();
+		unsigned int stride = frameBuffer->getStride ();
 		unsigned char *busy_buffer_wrk = m_busy_buffer;
 
 		for (int y = m_busy_y; y < m_busy_y + m_busy_width; y++) {
@@ -616,7 +616,7 @@ void CPictureViewer::hideBusy ()
 		free (m_busy_buffer);
 		m_busy_buffer = NULL;
 	}
-	CFrameBuffer::getInstance()->blit();
+	frameBuffer->blit();
 	//  dbout("Hide Busy}\n");
 }
 void CPictureViewer::Cleanup ()
@@ -635,7 +635,7 @@ void CPictureViewer::Cleanup ()
 	}
 #if HAVE_SPARK_HARDWARE
 	if (bpamem)
-		CFrameBuffer::getInstance()->freeBPAMem(bpafd, bpamem, bpasize);
+		frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
 #endif
 }
 
@@ -767,7 +767,7 @@ bool CPictureViewer::DisplayLogo (uint64_t channel_id, int posx, int posy, int w
 		fb_pixel_t * data = getImage(fname, width, height);
 		//fb_pixel_t * data = getIcon(fname, &width, &height);
 		if(data) {
-			CFrameBuffer::getInstance()->blit2FB(data, width, height, posx, posy);
+			frameBuffer->blit2FB(data, width, height, posx, posy);
 			cs_free_uncached(data);
 		}
 #endif
@@ -794,7 +794,6 @@ void CPictureViewer::rescaleImageDimensions(int *width, int *height, const int m
 
 bool CPictureViewer::DisplayImage(const std::string & name, int posx, int posy, int width, int height, int transp)
 {
-	CFrameBuffer* frameBuffer = CFrameBuffer::getInstance();
 	if (transp > CFrameBuffer::TM_EMPTY)
 		frameBuffer->SetTransparent(transp);
 
@@ -855,9 +854,9 @@ fb_pixel_t * CPictureViewer::int_getImage(const std::string & name, int *width, 
 				y = *height;
 			}
 			if (bpp == 4)
-				ret = (fb_pixel_t *) CFrameBuffer::getInstance()->convertRGBA2FB(buffer, x, y);
+				ret = (fb_pixel_t *) frameBuffer->convertRGBA2FB(buffer, x, y);
 			else
-				ret = (fb_pixel_t *) CFrameBuffer::getInstance()->convertRGB2FB(buffer, x, y, convertSetupAlpha2Alpha(g_settings.infobar_alpha));
+				ret = (fb_pixel_t *) frameBuffer->convertRGB2FB(buffer, x, y, convertSetupAlpha2Alpha(g_settings.infobar_alpha));
 			*width = x;
 			*height = y;
 		}else

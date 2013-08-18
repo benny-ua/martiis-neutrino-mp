@@ -77,6 +77,7 @@ class CPictureViewer
 	void getSupportedImageFormats(std::vector<std::string>& erw);
 
  private:
+	CFrameBuffer* frameBuffer;
 	CFormathandler *fh_root;
 	ScalingMode m_scaling;
 	float m_aspect;
