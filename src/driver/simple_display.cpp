@@ -73,11 +73,6 @@ CLCD::CLCD()
 	time_notify_reader = fds[0];
 	time_notify_writer = fds[1];
 
-#if HAVE_SPARK_HARDWARE
-	if (0 < ioctl(fd, VFDGETVERSION, &vfd_version))
-#endif
-		vfd_version = 4; // fallback to 4-digit LED
-
 	showclock = true;
 
 	if (pthread_create (&thrTime, NULL, TimeThread, NULL))
@@ -196,17 +191,17 @@ void CLCD::showTime(bool)
 		case LCD_DISPLAYMODE_TIMEONLY:
 			break;
 		case LCD_DISPLAYMODE_ON:
-			if (vfd_version == 4)
+			if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
 				break;
 		case LCD_DISPLAYMODE_TIMEOFF:
 			ShowText(NULL);
 			waitSec = -1;
-			if (vfd_version == 4) // return for simple 4-digit LED display
+			if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
 				return;
 			break;
 		case LCD_DISPLAYMODE_OFF:
 			Clear();
-			if (vfd_version == 4) // return for simple 4-digit LED display
+			if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
 				return;
 			break;
 	}
@@ -217,7 +212,7 @@ void CLCD::showTime(bool)
 	now += tm.tm_gmtoff;
 
 #if HAVE_SPARK_HARDWARE
-	if (ioctl(fd, VFDSETTIME2, &now) < 0 && vfd_version == 4) {
+	if (ioctl(fd, VFDSETTIME2, &now) < 0 && g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM) {
 		char buf[10];
 		strftime(buf, sizeof(buf), "%H%M", &tm);
 		ShowText(buf, false);
@@ -433,7 +428,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 				break;
 			return;
 		case LCD_DISPLAYMODE_ON:
-			if (vfd_version == 4)
+			if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
 				break;
 		case LCD_DISPLAYMODE_TIMEOFF:
 			if (rescheduleTime)
@@ -455,7 +450,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			size_t end = s.find_last_not_of (" \t\n");
 			s = s.substr(start, end - start + 1);
 		}
-		if (s.length() > 0 && (vfd_version == 4 || lastOutput != s)) {
+		if (s.length() > 0 && (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM || lastOutput != s)) {
 			lastOutput = s;
 			if (write(fd , s.c_str(), s.length()) < 0)
 				perror("write to vfd failed");
