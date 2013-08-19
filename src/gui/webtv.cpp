@@ -79,7 +79,7 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 		std::string url = channels[selected].url;
 		if (url.substr(0, 6) == "mms://")
 			url = "mmst://" + url.substr(6);
-		CShellWindow(std::string("ffprobe ") + url, CShellWindow::VERBOSE | CShellWindow::ACKNOWLEDGE);
+		CShellWindow(std::string("ffprobe '") + url + "'", CShellWindow::VERBOSE | CShellWindow::ACKNOWLEDGE);
 		return res;
 	}
 
