@@ -32,6 +32,7 @@
 #include <gui/movieplayer.h>
 #include <gui/webtv.h>
 #include <gui/widget/hintbox.h>
+#include <gui/widget/shellwindow.h>
 
 CWebTV::CWebTV()
 {
@@ -68,6 +69,17 @@ int CWebTV::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (selected < 0)
 			return menu_return::RETURN_NONE;
 		ShowHint(channels[selected].name.c_str(), channels[selected].url);
+		return res;
+	}
+
+	if (actionKey == "rc_blue") {
+		int selected = m->getSelected() - menu_offset;
+		if (selected < 0)
+			return menu_return::RETURN_NONE;
+		std::string url = channels[selected].url;
+		if (url.substr(0, 6) == "mms://")
+			url = "mmst://" + url.substr(6);
+		CShellWindow(std::string("ffprobe ") + url, CShellWindow::VERBOSE | CShellWindow::ACKNOWLEDGE);
 		return res;
 	}
 
@@ -126,6 +138,7 @@ void CWebTV::Show()
 	m->addItem(GenericMenuBack);
 	m->addItem(GenericMenuSeparatorLine);
 	m->addKey(CRCInput::RC_info, this, "rc_info");
+	m->addKey(CRCInput::RC_blue, this, "rc_blue");
 	menu_offset = m->getItemsCount();
 
 	for (std::vector<web_channel>::iterator i = channels.begin(); i != channels.end(); i++)
