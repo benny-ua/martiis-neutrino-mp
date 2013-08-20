@@ -114,7 +114,7 @@ class CFbAccel
 #if HAVE_SPARK_HARDWARE
 		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s);
 		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s);
-		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = 0, int fb_y = 0, int fb_w = -1, int fb_h = -1, int transp = false);
+		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = 0, int fb_y = 0, int fb_w = -1, int fb_h = -1, bool transp = false);
 #endif
 };
 
