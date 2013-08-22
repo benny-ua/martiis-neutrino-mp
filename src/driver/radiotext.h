@@ -52,9 +52,7 @@
 #include <dmx.h>
 #include <OpenThreads/Thread>
 #include <OpenThreads/Condition>
-#ifdef MARTII
 #include <map>
-#endif
 
 #define ENABLE_RASS 1
 
@@ -143,10 +141,8 @@ public:
 
 	void radiotext_stop(void);
 	bool haveRadiotext(void) {return have_radiotext; }
-#ifdef MARTII
 	bool haveRASS(void) { return lastRassPid; }
 	void RASS_interactive_mode(void);
-#endif
 
 	cDemux *audioDemux;
 
