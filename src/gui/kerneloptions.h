@@ -36,7 +36,7 @@
 class KernelOptions_Menu : public CMenuTarget
 {
 	private:
-		int width, selected;
+		int width;
 		struct module {
 			std::string comment;
 			std::vector<std::pair <std::string,std::string> > moduleList;
@@ -47,6 +47,8 @@ class KernelOptions_Menu : public CMenuTarget
 		std::vector<module> modules;
 		void load();
 		void save();
+		void loadModule(int i);
+		void unloadModule(int i);
 	public:
 		KernelOptions_Menu();
 		void hide();

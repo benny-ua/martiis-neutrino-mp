@@ -1,23 +1,23 @@
 /*
-		KernelOptions Menu
+	KernelOptions Menu
 
-		Copyright (C) 2012 martii
+	Copyright (C) 2012 martii
 
-		License: GPL
+	License: GPL
 
-		This program is free software; you can redistribute it and/or modify
-		it under the terms of the GNU General Public License as published by
-		the Free Software Foundation; either version 2 of the License, or
-		(at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-		This program is distributed in the hope that it will be useful,
-		but WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-		GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+	GNU General Public License for more details.
 
-		You should have received a copy of the GNU General Public License
-		along with this program; if not, write to the Free Software
-		Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <config.h>
@@ -25,10 +25,10 @@
 #include <neutrino.h>
 #include <sys/stat.h>
 #include <system/debug.h>
-#include <system/safe_system.h>
+#include <system/helpers.h>
+#include <driver/screen_max.h>
 #include <gui/widget/messagebox.h>
 #include <gui/widget/menue.h>
-#include <driver/screen_max.h>
 #include <gui/kerneloptions.h>
 
 #define ONOFF_OPTION_COUNT 2
@@ -40,6 +40,36 @@ static const CMenuOptionChooser::keyval ONOFF_OPTIONS[ONOFF_OPTION_COUNT] = {
 KernelOptions_Menu::KernelOptions_Menu()
 {
 	width = w_max (40, 10);
+}
+
+void KernelOptions_Menu::loadModule(int i)
+{
+	// check whether there are dependencies with options specified
+	unsigned int j;
+	for (j = 0; j < modules[i].moduleList.size(); j++)
+		if (!modules[i].moduleList[j].second.empty())
+			break;
+
+	if (j >= modules[i].moduleList.size() - 1) {
+		// dependencies come without options
+		if (modules[i].moduleList.back().second.empty())
+			my_system(2, "modprobe",  modules[i].moduleList.back().first.c_str());
+		else
+			my_system(3, "modprobe",  modules[i].moduleList.back().first.c_str(), modules[i].moduleList.back().second.c_str());
+		return;
+	}
+
+	for (j = 0; j < modules[i].moduleList.size(); j++) {
+		if (modules[i].moduleList.back().second.empty())
+			my_system(2, "modprobe",  modules[i].moduleList[j].first.c_str());
+		else
+			my_system(3, "modprobe",  modules[i].moduleList[j].first.c_str(), modules[i].moduleList.back().second.c_str());
+	}
+}
+
+void KernelOptions_Menu::unloadModule(int i)
+{
+	my_system(3, "modprobe", "-r", modules[i].moduleList.back().first.c_str());
 }
 
 int KernelOptions_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
@@ -57,21 +87,11 @@ int KernelOptions_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		for (unsigned int i = 0; i < modules.size(); i++)
 			if (modules[i].active != modules[i].active_orig) {
 				needs_save = true;
-				char buf[80];
 				if (modules[i].active)
-					for (unsigned int j = 0; j < modules[i].moduleList.size(); j++) {
-						//snprintf(buf, sizeof(buf), "insmod /lib/modules/%s.ko %s",
-						snprintf(buf, sizeof(buf), "modprobe %s %s",
-							modules[i].moduleList[j].first.c_str(), modules[i].moduleList[j].second.c_str());
-						system(buf);
-					}
+					loadModule(i);
 				else
-					for (unsigned int j = 0; j < modules[i].moduleList.size(); j++) {
-						snprintf(buf, sizeof(buf), "rmmod %s", modules[i].moduleList[j].first.c_str());
-						system(buf);
-					}
+					unloadModule(i);
 				modules[i].active_orig = modules[i].active;
-				break;
 			}
 		if (needs_save)
 			save();
@@ -98,7 +118,7 @@ int KernelOptions_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 			fclose(f);
 		}
 
-		string text = "";
+		std::string text = "";
 		for (unsigned int i = 0; i < modules.size(); i++) {
 			text += modules[i].comment + " (" + modules[i].moduleList.back().first + "): ";
 			text += g_Locale->getText(modules[i].active ? LOCALE_KERNELOPTIONS_ENABLED : LOCALE_KERNELOPTIONS_DISABLED);
@@ -124,7 +144,7 @@ void KernelOptions_Menu::hide()
 {
 }
 
-bool KernelOptions_Menu::isEnabled(string name) {
+bool KernelOptions_Menu::isEnabled(std::string name) {
 	load();
 	for (unsigned int i = 0; i < modules.size(); i++)
 		if (name == modules[i].moduleList.back().first)
@@ -132,7 +152,7 @@ bool KernelOptions_Menu::isEnabled(string name) {
 	return false;
 }
 
-bool KernelOptions_Menu::Enable(string name, bool active) {
+bool KernelOptions_Menu::Enable(std::string name, bool active) {
 	load();
 	for (unsigned int i = 0; i < modules.size(); i++)
 		if (name == modules[i].moduleList.back().first) {
@@ -176,15 +196,15 @@ void KernelOptions_Menu::load() {
 			char *nl = strchr(comment, '\n');
 			if (nl)
 				*nl = 0;
-			m.comment = string(comment);
+			m.comment = std::string(comment);
 			char *b = buf;
 			while (*b) {
 				if (*b == ' ' || *b == '\t') {
 					b++;
 					continue;
 				}
-				string args = "";
-				string mod;
+				std::string args = "";
+				std::string mod;
 				char *e = b;
 				char *a = NULL;
 				while (*e && ((a && *e != ')') || (!a && *e != ' ' && *e != '\t'))) {
@@ -195,16 +215,16 @@ void KernelOptions_Menu::load() {
 				if (a && *e == ')') {
 					*a++ = 0;
 					*e++ = 0;
-					args = string (a);
+					args = std::string(a);
 					*a = 0;
-					mod = string(b);
+					mod = std::string(b);
 					b = e;
 				} else if (*e) {
 					*e++ = 0;
-					mod = string(b);
+					mod = std::string(b);
 					b = e;
 				} else {
-					mod = string(b);
+					mod = std::string(b);
 					b = e;
 				}
 				m.moduleList.push_back(make_pair(mod, args));
