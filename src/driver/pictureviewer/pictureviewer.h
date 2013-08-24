@@ -32,6 +32,7 @@
 #include <sys/time.h> /* gettimeofday */
 #include <driver/framebuffer.h>
 #include <pthread.h>
+#include <map>
 
 class CPictureViewer
 {
@@ -43,6 +44,28 @@ class CPictureViewer
 		int (*id_pic)(const char *);
 	};
 	typedef  struct cformathandler CFormathandler;
+
+	class cached_pic_key
+	{
+		public:
+			std::string name;
+			int height, width, transp;
+			bool operator()(cached_pic_key a, cached_pic_key b) const
+			{
+				return ( (a.height < b.height)
+				     || ((a.height == b.height) && (a.width < b.width))
+				     || ((a.height == b.height) && (a.width == b.width) && (a.transp < b.transp))
+				     || ((a.height == b.height) && (a.width == b.width) && (a.transp == b.transp) && (a.name < b.name)));
+			}
+	};
+	struct cached_pic_data
+	{
+		time_t last_used;
+		fb_pixel_t *data;
+	};
+	int pic_cache_size;
+	int pic_cache_maxsize;
+	std::map<cached_pic_key,cached_pic_data,cached_pic_key> pic_cache;
 
  public:
 	enum ScalingMode
@@ -75,6 +98,7 @@ class CPictureViewer
 	unsigned char * ResizeA(unsigned char *orgin, int ox, int oy, int dx, int dy);
 	void rescaleImageDimensions(int *width, int *height, const int max_width, const int max_height, bool upscale=false);
 	void getSupportedImageFormats(std::vector<std::string>& erw);
+	void cacheSetSize(size_t max);
 
  private:
 	CFrameBuffer* frameBuffer;
@@ -130,6 +154,11 @@ class CPictureViewer
 	void add_format(int (*picsize)(const char *,int *,int*,int,int),int (*picread)(const char *,unsigned char **,int*,int*), int (*id)(const char*));
 	unsigned char * int_Resize(unsigned char *orgin, int ox, int oy, int dx, int dy, ScalingMode type, unsigned char * dst, bool alpha);
 	fb_pixel_t * int_getImage(const std::string & name, int *width, int *height, bool GetImage);
+
+	fb_pixel_t *cacheGet(const std::string &name, int width, int height, int transp);
+	void cachePut(const std::string &name, int width, int height, int transp, fb_pixel_t *data);
+	void cacheClear(void);
+	void cacheClearLRU(void);
 };
 
 

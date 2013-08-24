@@ -530,6 +530,8 @@ CPictureViewer::CPictureViewer ()
 	bpa_w = 0;
 	bpa_h = 0;
 #endif
+	pic_cache_size = 0;
+	pic_cache_maxsize = 0x100000; // 1 MB default
 
 	logo_hdd_dir = string(g_settings.logo_hdd_dir);
 	logo_hdd_dir_2 = string(g_settings.logo_hdd_dir_2);
@@ -637,6 +639,7 @@ void CPictureViewer::Cleanup ()
 	if (bpamem)
 		frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
 #endif
+	cacheClear();
 }
 
 void CPictureViewer::getSize(const char* name, int* width, int *height)
@@ -794,18 +797,23 @@ void CPictureViewer::rescaleImageDimensions(int *width, int *height, const int m
 
 bool CPictureViewer::DisplayImage(const std::string & name, int posx, int posy, int width, int height, int transp)
 {
+	fb_pixel_t *data = cacheGet(name, width, height, transp);
+	if (data) {
+		frameBuffer->blit2FB(data, width, height, posx, posy);
+		return true;
+	}
+
 	if (transp > CFrameBuffer::TM_EMPTY)
 		frameBuffer->SetTransparent(transp);
 
-	/* TODO: cache or check for same */
-	fb_pixel_t * data = getImage(name, width, height);
+	data = getImage(name, width, height);
 
 	if (transp > CFrameBuffer::TM_EMPTY)
 		frameBuffer->SetTransparentDefault();
 
 	if(data) {
 		frameBuffer->blit2FB(data, width, height, posx, posy);
-		cs_free_uncached(data);
+		cachePut(name, width, height, transp, data);
 		return true;
 	}
 	return false;
@@ -845,7 +853,7 @@ fb_pixel_t * CPictureViewer::int_getImage(const std::string & name, int *width, 
 			// resize only getImage
 			if ((GetImage) && (x != *width || y != *height))
 			{
-				printf("%s: resize  %s to %d x %d \n", mode_str.c_str(), name.c_str(), *width, *height);
+//				printf("%s: resize  %s to %d x %d \n", mode_str.c_str(), name.c_str(), *width, *height);
 				if (bpp == 4)
 					buffer = ResizeA(buffer, x, y, *width, *height);
 				else
@@ -978,4 +986,67 @@ unsigned char * CPictureViewer::Resize(unsigned char *orgin, int ox, int oy, int
 unsigned char * CPictureViewer::ResizeA(unsigned char *orgin, int ox, int oy, int dx, int dy)
 {
 	return int_Resize(orgin, ox, oy, dx, dy, COLOR, NULL, true);
+}
+
+fb_pixel_t *CPictureViewer::cacheGet(const std::string &name, int width, int height, int transp)
+{
+	cached_pic_key k;
+	k.name = name;
+	k.width = width;
+	k.height = height;
+	k.transp = transp;
+
+	std::map<cached_pic_key,cached_pic_data>::iterator it = pic_cache.find(k);
+	if (it != pic_cache.end())
+		return (*it).second.data;
+
+	return NULL;
+}
+
+void CPictureViewer::cachePut(const std::string &name, int width, int height, int transp, fb_pixel_t *data)
+{
+	while (pic_cache_size > 0 && pic_cache_size + width * height * 4 > pic_cache_maxsize)
+		cacheClearLRU();
+
+	cached_pic_key k;
+	cached_pic_data d;
+	k.name = name;
+	k.width = width;
+	k.height = height;
+	k.transp = transp;
+	d.last_used = time(NULL);
+	d.data = data;
+	pic_cache[k] = d;
+	pic_cache_size += width * height * 4;
+}
+
+void CPictureViewer::cacheClear(void)
+{
+	std::map<cached_pic_key,cached_pic_data>::iterator it;
+	for (it = pic_cache.begin(); it != pic_cache.end(); ++it)
+		free((*it).second.data);
+	pic_cache.clear();
+	pic_cache_size = 0;
+}
+
+void CPictureViewer::cacheClearLRU(void)
+{
+	std::map<cached_pic_key,cached_pic_data>::iterator it = pic_cache.begin();
+	std::map<cached_pic_key,cached_pic_data>::iterator it_lru = it;
+	for (it = it_lru = pic_cache.begin(); it != pic_cache.end(); ++it) {
+		if ((*it).second.last_used < (*it_lru).second.last_used)
+			it_lru = it;
+	}
+	if (it_lru != pic_cache.end()) {
+		pic_cache_size -= (*it_lru).first.width * (*it_lru).first.height * 4;
+		free ((*it_lru).second.data);
+		pic_cache.erase(it_lru);
+	}
+}
+
+void CPictureViewer::cacheSetSize(size_t maxsize)
+{
+	pic_cache_maxsize = maxsize;
+	while (pic_cache_size > pic_cache_maxsize)
+		cacheClearLRU();
 }
