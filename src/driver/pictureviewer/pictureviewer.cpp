@@ -997,8 +997,10 @@ fb_pixel_t *CPictureViewer::cacheGet(const std::string &name, int width, int hei
 	k.transp = transp;
 
 	std::map<cached_pic_key,cached_pic_data>::iterator it = pic_cache.find(k);
-	if (it != pic_cache.end())
+	if (it != pic_cache.end()) {
+		(*it).second.last_used = time(NULL);
 		return (*it).second.data;
+	}
 
 	return NULL;
 }
