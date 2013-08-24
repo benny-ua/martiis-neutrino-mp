@@ -253,7 +253,7 @@ void CLCD::showAudioTrack(const std::string & artist __attribute__((unused)), co
 	if(!has_lcd) return;
 	if (mode != MODE_AUDIO) 
 		return;
-printf("CLCD::showAudioTrack: %s\n", title.c_str());
+//printf("CLCD::showAudioTrack: %s\n", title.c_str());
 	ShowText((char *) title.c_str());
 	wake_up();
 }
@@ -439,7 +439,9 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			return;
 	}
 
+#if HAVE_GENERIC_HARDWARE
         printf("CLCD::ShowText: [%s]\n", str);
+#endif
 
 	waitSec = 0;
 	if (str) {
