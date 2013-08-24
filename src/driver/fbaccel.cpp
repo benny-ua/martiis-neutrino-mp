@@ -1028,18 +1028,18 @@ void CFbAccel::blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x,
 {
 	if (w < 1 || h < 1)
 		return;
-	if (fb_x < 1)
+	if (fb_x < 0)
 		fb_x = x;
-	if (fb_y < 1)
+	if (fb_y < 0)
 		fb_y = y;
-	if (fb_w < 1)
-		fb_w = w;
-	if (fb_h < 1)
-		fb_h = h;
-	if (pan_x < 1 || pan_x > w - x)
+	if (pan_x < 0 || pan_x > w - x)
 		pan_x = w - x;
-	if (pan_y < 1 || pan_y > h - y)
+	if (pan_y < 0 || pan_y > h - y)
 		pan_y = h - y;
+	if (fb_w < 0)
+		fb_w = pan_x;
+	if (fb_h < 0)
+		fb_h = pan_y;
 
 	STMFBIO_BLT_EXTERN_DATA blt_data;
 	memset(&blt_data, 0, sizeof(STMFBIO_BLT_EXTERN_DATA));
