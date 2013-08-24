@@ -1028,6 +1028,10 @@ void CFbAccel::blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x,
 {
 	if (w < 1 || h < 1)
 		return;
+	if (fb_x < 1)
+		fb_x = x;
+	if (fb_y < 1)
+		fb_y = y;
 	if (fb_w < 1)
 		fb_w = w;
 	if (fb_h < 1)
