@@ -161,7 +161,11 @@ typedef enum dvb_fec {
 } dvb_fec_t;
 
 #define TIME_STEP 200
+#if HAVE_SPARK_HARDWARE
+#define TIMEOUT_MAX_MS (feTimeout*200)
+#else
 #define TIMEOUT_MAX_MS (feTimeout*100)
+#endif
 /*********************************************************************************************************/
 CFrontend::CFrontend(int Number, int Adapter)
 {
