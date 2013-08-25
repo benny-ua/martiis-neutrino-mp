@@ -830,24 +830,24 @@ void CFbAccel::blit()
 		switch(fb->mode3D) {
 		case CFrameBuffer::Mode3D_off:
 		default:
-			blitBoxFB(0, 0, s.xres - 1, sY - 1, borderColor);		// top
-			blitBoxFB(0, 0, sX, s.yres - 1, borderColor);	// left
-			blitBoxFB(eX, 0, s.xres - 1, s.yres - 1, borderColor);	// right
-			blitBoxFB(0, eY, s.xres - 1, s.yres - 1, borderColor);	// bottom
+			blitBoxFB(0, 0, s.xres, sY, borderColor);		// top
+			blitBoxFB(0, 0, sX, s.yres, borderColor);	// left
+			blitBoxFB(eX, 0, s.xres, s.yres, borderColor);	// right
+			blitBoxFB(0, eY, s.xres, s.yres, borderColor);	// bottom
 			break;
 		case CFrameBuffer::Mode3D_SideBySide:
-			blitBoxFB(0, 0, s.xres - 1, sY - 1, borderColor);			// top
-			blitBoxFB(0, 0, sX/2 - 1, s.yres - 1, borderColor);			// left
-			blitBoxFB(eX/2 + 1, 0, s.xres/2 + sX/2 - 1, s.yres - 1, borderColor);	// middle
-			blitBoxFB(s.xres/2 + eX/2 + 1, 0, s.xres - 1, s.yres - 1, borderColor);	// right
-			blitBoxFB(0, eY, s.xres - 1, s.yres - 1, borderColor);			// bottom
+			blitBoxFB(0, 0, s.xres, sY, borderColor);			// top
+			blitBoxFB(0, 0, sX/2, s.yres, borderColor);			// left
+			blitBoxFB(eX/2 + 1, 0, s.xres/2 + sX/2, s.yres, borderColor);	// middle
+			blitBoxFB(s.xres/2 + eX/2 + 1, 0, s.xres, s.yres, borderColor);	// right
+			blitBoxFB(0, eY, s.xres, s.yres, borderColor);			// bottom
 			break;
 		case CFrameBuffer::Mode3D_TopAndBottom:
-			blitBoxFB(0, 0, s.xres - 1, sY/2 - 1, borderColor); 			// top
-			blitBoxFB(0, eY/2 + 1, s.xres - 1, s.yres/2 + sY/2 - 1, borderColor); 	// middle
-			blitBoxFB(0, s.yres/2 + eY/2 + 1, s.xres - 1, s.yres - 1, borderColor); // bottom
-			blitBoxFB(0, 0, sX - 1, s.yres - 1, borderColor);			// left
-			blitBoxFB(eX, 0, s.xres - 1, s.yres - 1, borderColor);			// right
+			blitBoxFB(0, 0, s.xres, sY/2, borderColor); 			// top
+			blitBoxFB(0, eY/2 + 1, s.xres, s.yres/2 + sY/2, borderColor); 	// middle
+			blitBoxFB(0, s.yres/2 + eY/2 + 1, s.xres, s.yres, borderColor); // bottom
+			blitBoxFB(0, 0, sX, s.yres, borderColor);			// left
+			blitBoxFB(eX, 0, s.xres, s.yres, borderColor);			// right
 			break;
 		case CFrameBuffer::Mode3D_Tile:
 			blitBoxFB(0, 0, (s.xres * 2)/3, (sY * 2)/3, borderColor);		// top
@@ -860,21 +860,21 @@ void CFbAccel::blit()
 	switch(fb->mode3D) {
 	case CFrameBuffer::Mode3D_off:
 	default:
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, sX, sY, eX, eY);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, sX, sY, eX, eY);
 		break;
 	case CFrameBuffer::Mode3D_SideBySide:
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, sX/2, sY, eX/2, eY);
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, s.xres/2 + sX/2, sY, s.xres/2 + eX/2, eY);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, sX/2, sY, eX/2, eY);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, s.xres/2 + sX/2, sY, s.xres/2 + eX/2, eY);
 		break;
 	case CFrameBuffer::Mode3D_TopAndBottom:
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, sX, sY/2, eX, eY/2);
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, sX, s.yres/2 + sY/2, eX, s.yres/2 + eY/2);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, sX, sY/2, eX, eY/2);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, sX, s.yres/2 + sY/2, eX, s.yres/2 + eY/2);
 		break;
 	case CFrameBuffer::Mode3D_Tile:
-		blitBB2FB(0, 0, DEFAULT_XRES - 1, DEFAULT_YRES - 1, (sX * 2)/3, (sY * 2)/3, (eX * 2)/3, (eY * 2)/3);
-		blitFB2FB(0, 0, s.xres/3, (s.yres * 2)/3, (s.xres * 2)/3, 0, s.xres - 1, (s.yres * 2)/3);
-		blitFB2FB(s.xres/3, 0, (s.xres * 2)/3, s.yres/3, 0, (s.yres * 2)/3, s.xres/3, s.yres - 1);
-		blitFB2FB(s.xres/3, s.yres/3, (s.xres * 2)/3, (s.yres * 2)/3, s.xres/3, (s.yres * 2)/3, (s.xres * 2)/3, s.yres - 1);
+		blitBB2FB(0, 0, DEFAULT_XRES, DEFAULT_YRES, (sX * 2)/3, (sY * 2)/3, (eX * 2)/3, (eY * 2)/3);
+		blitFB2FB(0, 0, s.xres/3, (s.yres * 2)/3, (s.xres * 2)/3, 0, s.xres, (s.yres * 2)/3);
+		blitFB2FB(s.xres/3, 0, (s.xres * 2)/3, s.yres/3, 0, (s.yres * 2)/3, s.xres/3, s.yres);
+		blitFB2FB(s.xres/3, s.yres/3, (s.xres * 2)/3, (s.yres * 2)/3, s.xres/3, (s.yres * 2)/3, (s.xres * 2)/3, s.yres);
 		break;
 	}
 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
@@ -1146,13 +1146,13 @@ void CFbAccel::setBorder(int sx, int sy, int ex, int ey)
 void CFbAccel::setBorderColor(fb_pixel_t col)
 {
 	if (!col && borderColor)
-		blitBoxFB(0, 0, s.xres - 1, s.yres - 1, 0);
+		blitBoxFB(0, 0, s.xres, s.yres, 0);
 	borderColor = col;
 }
 
 void CFbAccel::ClearFB(void)
 {
-	blitBoxFB(0, 0, s.xres - 1, s.yres - 1, 0);
+	blitBoxFB(0, 0, s.xres, s.yres, 0);
 }
 #else
 void CFbAccel::resChange(void)
