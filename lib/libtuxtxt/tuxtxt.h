@@ -1770,38 +1770,38 @@ const char lcd_digits[] =
 };
 #endif
 /* functions */
-void ConfigMenu(int Init);
-void CleanUp();
-void PageInput(int Number);
-void ColorKey(int);
-void PageCatching();
-void CatchNextPage(int, int);
-void GetNextPageOne(int up);
-void GetNextSubPage(int offset);
-void SwitchZoomMode();
-void SwitchScreenMode(int newscreenmode);
-void SwitchTranspMode();
-void SwitchHintMode();
-void CreateLine25();
-void CopyBB2FB();
-void RenderCatchedPage();
-void RenderCharFB(int Char, tstPageAttr *Attribute);
-void RenderCharBB(int Char, tstPageAttr *Attribute);
-void RenderCharLCD(int Digit, int XPos, int YPos);
-void RenderMessage(int Message);
-void RenderPage();
-void DecodePage();
-void UpdateLCD();
-int  Init(int source);
-int  GetNationalSubset(const char *country_code);
-int  GetTeletextPIDs();
-int  GetRCCode();
-int  eval_triplet(int iOData, tstCachedPage *pstCachedPage,
+static void ConfigMenu(int Init);
+static void CleanUp();
+static void PageInput(int Number);
+static void ColorKey(int);
+static void PageCatching();
+static void CatchNextPage(int, int);
+static void GetNextPageOne(int up);
+static void GetNextSubPage(int offset);
+static void SwitchZoomMode();
+static void SwitchScreenMode(int newscreenmode);
+static void SwitchTranspMode();
+static void SwitchHintMode();
+static void CreateLine25();
+static void CopyBB2FB();
+static void RenderCatchedPage();
+static void RenderCharFB(int Char, tstPageAttr *Attribute);
+static void RenderCharBB(int Char, tstPageAttr *Attribute);
+static void RenderCharLCD(int Digit, int XPos, int YPos);
+static void RenderMessage(int Message);
+static void RenderPage();
+static void DecodePage();
+static void UpdateLCD();
+static int  Init(int source);
+static int  GetNationalSubset(const char *country_code);
+static int  GetTeletextPIDs();
+static int  GetRCCode();
+static int  eval_triplet(int iOData, tstCachedPage *pstCachedPage,
 						unsigned char *pAPx, unsigned char *pAPy,
 						unsigned char *pAPx0, unsigned char *pAPy0,
 						unsigned char *drcssubp, unsigned char *gdrcssubp,
 						signed char *endcol, tstPageAttr *attrPassive, unsigned char* pagedata);
-void eval_object(int iONr, tstCachedPage *pstCachedPage,
+static void eval_object(int iONr, tstCachedPage *pstCachedPage,
 					  unsigned char *pAPx, unsigned char *pAPy,
 					  unsigned char *pAPx0, unsigned char *pAPy0,
 					  tObjType ObjType, unsigned char* pagedata);

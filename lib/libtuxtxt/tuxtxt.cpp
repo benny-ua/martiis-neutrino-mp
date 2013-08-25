@@ -57,7 +57,7 @@ fb_pixel_t *getFBp(int *y)
 	return lbb;
 }
 
-void FillRect(int x, int y, int w, int h, int color)
+static void FillRect(int x, int y, int w, int h, int color)
 {
 	fb_pixel_t *p = getFBp(&y);
 	p += x + y * var_screeninfo.xres;
@@ -72,7 +72,7 @@ void FillRect(int x, int y, int w, int h, int color)
 }
 
 
-void FillBorder(int color)
+static void FillBorder(int color)
 {
 	int ys =  (var_screeninfo.yres-var_screeninfo.yoffset);
 	FillRect(0     , ys                     ,StartX      ,var_screeninfo.yres                       ,color);
@@ -83,7 +83,7 @@ void FillBorder(int color)
 		FillRect(StartX+displaywidth, ys,var_screeninfo.xres-(StartX+displaywidth),var_screeninfo.yres   ,color);
 }
 
-int getIndexOfPageInHotlist()
+static int getIndexOfPageInHotlist()
 {
 	int i;
 	for (i = 0; i <= maxhotlist; i++)
@@ -94,7 +94,7 @@ int getIndexOfPageInHotlist()
 	return -1;
 }
 
-void gethotlist()
+static void gethotlist()
 {
 	FILE *hl;
 	char line[100];
@@ -140,7 +140,7 @@ void gethotlist()
 	}
 }
 
-void savehotlist()
+static void savehotlist()
 {
 	FILE *hl;
 	char line[100];
@@ -179,7 +179,7 @@ void savehotlist()
 
 #define number2char(c) ((c) + (((c) <= 9) ? '0' : ('A' - 10)))
 /* print hex-number into string, s points to last digit, caller has to provide enough space, no termination */
-void hex2str(char *s, unsigned int n)
+static void hex2str(char *s, unsigned int n)
 {
 	do {
 		char c = (n & 0xF);
@@ -189,7 +189,7 @@ void hex2str(char *s, unsigned int n)
 }
 
 
-int toptext_getnext(int startpage, int up, int findgroup)
+static int toptext_getnext(int startpage, int up, int findgroup)
 {
 	int current, nextgrp, nextblk;
 
@@ -231,7 +231,7 @@ int toptext_getnext(int startpage, int up, int findgroup)
 		return startpage;
 }
 
-void RenderClearMenuLineBB(char *p, tstPageAttr *attrcol, tstPageAttr *attr)
+static void RenderClearMenuLineBB(char *p, tstPageAttr *attrcol, tstPageAttr *attr)
 {
 	int col;
 
@@ -255,19 +255,19 @@ void RenderClearMenuLineBB(char *p, tstPageAttr *attrcol, tstPageAttr *attr)
 	memset(p-TOPMENUCHARS, ' ', TOPMENUCHARS); /* init with spaces */
 }
 
-void ClearBB(int color)
+static void ClearBB(int color)
 {
 	FillRect(0, (var_screeninfo.yres - var_screeninfo.yoffset), var_screeninfo.xres, var_screeninfo.yres, color);
 }
 
-void ClearFB(int /*color*/)
+static void ClearFB(int /*color*/)
 {
 	//memset(lfb,0, var_screeninfo.yres*var_screeninfo.xres);
 	CFrameBuffer::getInstance()->paintBackground();
 }
 #if 0 
 //never used
-void ClearB(int color)
+static void ClearB(int color)
 {
 	FillRect(0,                   0, var_screeninfo.xres, var_screeninfo.yres, color); /* framebuffer */
 	FillRect(0, var_screeninfo.yres, var_screeninfo.xres, var_screeninfo.yres, color); /* backbuffer */
@@ -275,7 +275,7 @@ void ClearB(int color)
 }
 #endif
 
-int  GetCurFontWidth()
+static int  GetCurFontWidth()
 {
 	int mx = (displaywidth)%(40-nofirst); // # of unused pixels
 	int abx = (mx == 0 ? displaywidth+1 : (displaywidth)/(mx+1));// distance between 'inserted' pixels
@@ -284,7 +284,7 @@ int  GetCurFontWidth()
 	return fontwidth+(((PosX+fontwidth+1-sx) <= displaywidth && nx <= fontwidth+1) ? 1 : 0);
 }
 
-void SetPosX(int column)
+static void SetPosX(int column)
 {
 		PosX = StartX;
 		int i;
@@ -292,7 +292,7 @@ void SetPosX(int column)
 			PosX += GetCurFontWidth();
 }
 
-void setfontwidth(int newwidth)
+static void setfontwidth(int newwidth)
 {
 	if (fontwidth != newwidth)
 	{
@@ -315,7 +315,7 @@ void setfontwidth(int newwidth)
 	}
 }
 
-void setcolors(unsigned short *pcolormap, int offset, int number) {
+static void setcolors(unsigned short *pcolormap, int offset, int number) {
 	int j = offset; /* index in global color table */
 	int trans_tmp=25-trans_mode;
 
@@ -337,7 +337,7 @@ void setcolors(unsigned short *pcolormap, int offset, int number) {
 }
 
 /* hexdump of page contents to stdout for debugging */
-void dump_page()
+static void dump_page()
 {
 	int r, c;
 	char *p;
@@ -363,7 +363,7 @@ void dump_page()
 /* in: absolute triplet number (0..506, start at packet 3 byte 1) */
 /* in: pointer to cache struct of page data */
 /* out: 18 bit triplet data, <0 if invalid number, not cached, or hamming error */
-int iTripletNumber2Data(int iONr, tstCachedPage *pstCachedPage, unsigned char* pagedata)
+static int iTripletNumber2Data(int iONr, tstCachedPage *pstCachedPage, unsigned char* pagedata)
 {
 	if (iONr > 506 || 0 == pstCachedPage)
 		return -1;
@@ -397,7 +397,7 @@ int iTripletNumber2Data(int iONr, tstCachedPage *pstCachedPage, unsigned char* p
 /* dump interpreted object data to stdout */
 /* in: 18 bit object data */
 /* out: termination info, >0 if end of object */
-void eval_object(int iONr, tstCachedPage *pstCachedPage,
+static void eval_object(int iONr, tstCachedPage *pstCachedPage,
 					  unsigned char *pAPx, unsigned char *pAPy,
 					  unsigned char *pAPx0, unsigned char *pAPy0,
 					  tObjType ObjType, unsigned char* pagedata)
@@ -454,7 +454,7 @@ void eval_object(int iONr, tstCachedPage *pstCachedPage,
 			 || iONr1 == iONr); /* repeat until termination reached */
 }
 
-void eval_NumberedObject(int p, int s, int packet, int triplet, int high,
+static void eval_NumberedObject(int p, int s, int packet, int triplet, int high,
 								 unsigned char *pAPx, unsigned char *pAPy,
 								 unsigned char *pAPx0, unsigned char *pAPy0)
 {
@@ -485,7 +485,7 @@ void eval_NumberedObject(int p, int s, int packet, int triplet, int high,
 	}
 }
 
-int eval_triplet(int iOData, tstCachedPage *pstCachedPage,
+static int eval_triplet(int iOData, tstCachedPage *pstCachedPage,
 					  unsigned char *pAPx, unsigned char *pAPy,
 					  unsigned char *pAPx0, unsigned char *pAPy0,
 					  unsigned char *drcssubp, unsigned char *gdrcssubp,
@@ -1050,7 +1050,7 @@ int eval_triplet(int iOData, tstCachedPage *pstCachedPage,
 	return 0; /* normal exit, no termination */
 }
 
-int setnational(unsigned char sec)
+static int setnational(unsigned char sec)
 {
 	switch (sec)
 	{
@@ -1083,7 +1083,7 @@ int setnational(unsigned char sec)
 }
 
 /* evaluate level 2.5 information */
-void eval_l25()
+static void eval_l25()
 {
 	memset(FullRowColor, 0, sizeof(FullRowColor));
 	FullScrColor = black;
@@ -1915,7 +1915,7 @@ FT_Error MyFaceRequester(FTC_FaceID face_id, FT_Library plibrary, FT_Pointer /*r
 extern std::string ttx_font_file;
 static bool ft_init_done = false;
 static int oldfontheight = 0;
-int Init(int source)
+static int Init(int source)
 {
 	int error, i;
 	unsigned char magazine;
@@ -2268,7 +2268,7 @@ int Init(int source)
  * Cleanup                                                                    *
  ******************************************************************************/
 
-void CleanUp()
+static void CleanUp()
 {
 	int curscreenmode[2];
 	curscreenmode[0] = screenmode[0];
@@ -2346,7 +2346,7 @@ void CleanUp()
 /******************************************************************************
  * GetTeletextPIDs                                                           *
  ******************************************************************************/
-int GetTeletextPIDs()
+static int GetTeletextPIDs()
 {
 #ifdef MARTII
 	if (isTtxEplayer)
@@ -2571,7 +2571,7 @@ skip_pid:
 /******************************************************************************
  * GetNationalSubset                                                          *
  ******************************************************************************/
-int GetNationalSubset(const char *cc)
+static int GetNationalSubset(const char *cc)
 {
         if (memcmp(cc, "cze", 3) == 0 || memcmp(cc, "ces", 3) == 0 ||
             memcmp(cc, "slo", 3) == 0 || memcmp(cc, "slk", 3) == 0)
@@ -2625,7 +2625,7 @@ int GetNationalSubset(const char *cc)
  * ConfigMenu                                                                 *
  ******************************************************************************/
 #if TUXTXT_DEBUG
-void charpage()
+static void charpage()
 {
 	PosY = StartY;
 	PosX = StartX;
@@ -2713,7 +2713,7 @@ void charpage()
 	while (RCCode != RC_OK && RCCode != RC_HOME);
 }
 #endif
-void Menu_HighlightLine(char *menu, int line, int high)
+static void Menu_HighlightLine(char *menu, int line, int high)
 {
 	char hilitline[] = "0111111111111111111111111111102";
 	int itext = Menu_Width*line; /* index start menuline */
@@ -2735,7 +2735,7 @@ void Menu_HighlightLine(char *menu, int line, int high)
 	national_subset = national_subset_bak;
 }
 
-void Menu_UpdateHotlist(char *menu, int hotindex, int menuitem)
+static void Menu_UpdateHotlist(char *menu, int hotindex, int menuitem)
 {
 	int i, j, k;
 	tstPageAttr *attr;
@@ -2784,7 +2784,7 @@ void Menu_UpdateHotlist(char *menu, int hotindex, int menuitem)
 	Menu_HighlightLine(menu, MenuLine[M_HOT], (menuitem == M_HOT) ? 1 : 0);
 }
 
-void Menu_Init(char *menu, int current_pid, int menuitem, int hotindex)
+static void Menu_Init(char *menu, int current_pid, int menuitem, int hotindex)
 {
 	int byte, line;
 	int national_subset_bak = national_subset;
@@ -2852,7 +2852,7 @@ void Menu_Init(char *menu, int current_pid, int menuitem, int hotindex)
 	CFrameBuffer::getInstance()->blit();
 }
 
-void ConfigMenu(int Init)
+static void ConfigMenu(int Init)
 {
 	int val, menuitem = M_Start;
 	int current_pid = 0;
@@ -3462,7 +3462,7 @@ void ConfigMenu(int Init)
  * PageInput                                                                  *
  ******************************************************************************/
 
-void PageInput(int Number)
+static void PageInput(int Number)
 {
 	/* clear temp_page */
 	if (inputcounter == 2)
@@ -3561,7 +3561,7 @@ void PageInput(int Number)
  * GetNextPageOne                                                             *
  ******************************************************************************/
 
-void GetNextPageOne(int up)
+static void GetNextPageOne(int up)
 {
 	/* disable subpage zapping */
 	tuxtxt_cache.zap_subpage_manual = 0;
@@ -3599,7 +3599,7 @@ void GetNextPageOne(int up)
 /******************************************************************************
  * GetNextSubPage                                                             *
  ******************************************************************************/
-void GetNextSubPage(int offset)
+static void GetNextSubPage(int offset)
 {
 	int loop;
 
@@ -3642,7 +3642,7 @@ void GetNextSubPage(int offset)
  * ColorKey                                                                   *
  ******************************************************************************/
 
-void ColorKey(int target)
+static void ColorKey(int target)
 {
 	if (!target)
 		return;
@@ -3663,7 +3663,7 @@ void ColorKey(int target)
  * PageCatching                                                               *
  ******************************************************************************/
 
-void PageCatching()
+static void PageCatching()
 {
 	int val, byte;
 	int oldzoommode = zoommode[boxed];
@@ -3775,7 +3775,7 @@ void PageCatching()
  * CatchNextPage                                                              *
  ******************************************************************************/
 
-void CatchNextPage(int firstlineinc, int inc)
+static void CatchNextPage(int firstlineinc, int inc)
 {
 	int tmp_page, allowwrap = 1; /* allow first wrap around */
 
@@ -3875,7 +3875,7 @@ void CatchNextPage(int firstlineinc, int inc)
  * RenderCatchedPage                                                          *
  ******************************************************************************/
 
-void RenderCatchedPage()
+static void RenderCatchedPage()
 {
 	int zoom = 0;
 
@@ -3951,7 +3951,7 @@ void RenderCatchedPage()
  * SwitchZoomMode                                                             *
  ******************************************************************************/
 
-void SwitchZoomMode()
+static void SwitchZoomMode()
 {
 	if (tuxtxt_cache.subpagetable[tuxtxt_cache.page] != 0xFF)
 	{
@@ -3975,7 +3975,7 @@ void SwitchZoomMode()
  * SwitchScreenMode                                                           *
  ******************************************************************************/
 
-void SwitchScreenMode(int newscreenmode)
+static void SwitchScreenMode(int newscreenmode)
 {
 
 	//struct v4l2_format format;
@@ -4118,7 +4118,7 @@ void SwitchScreenMode(int newscreenmode)
  * SwitchTranspMode                                                           *
  ******************************************************************************/
 
-void SwitchTranspMode()
+static void SwitchTranspMode()
 {
 	if (screenmode[boxed])
 	{
@@ -4171,7 +4171,7 @@ void SwitchTranspMode()
  * SwitchHintMode                                                             *
  ******************************************************************************/
 
-void SwitchHintMode()
+static void SwitchHintMode()
 {
 	/* toggle mode */
 	hintmode ^= 1;
@@ -4190,7 +4190,7 @@ void SwitchHintMode()
 	tuxtxt_cache.pageupdate = 1;
 }
 
-void RenderDRCS( // FIXME
+static void RenderDRCS( // FIXME
 	unsigned char *s,	/* pointer to char data, parity undecoded */
 	fb_pixel_t *d,	/* pointer to frame buffer of top left pixel */
 	unsigned char *ax, /* array[0..12] of x-offsets, array[0..10] of y-offsets for each pixel */
@@ -4246,7 +4246,7 @@ void RenderDRCS( // FIXME
 }
 
 
-void DrawVLine(int x, int y, int l, int color)
+static void DrawVLine(int x, int y, int l, int color)
 {
 	fb_pixel_t *p = getFBp(&y);
 	fb_pixel_t col = argb[color];
@@ -4259,7 +4259,7 @@ void DrawVLine(int x, int y, int l, int color)
 	}
 }
 
-void DrawHLine(int x, int y, int l, int color)
+static void DrawHLine(int x, int y, int l, int color)
 {
 	fb_pixel_t *p = getFBp(&y);
 	fb_pixel_t col = argb[color];
@@ -4271,7 +4271,7 @@ void DrawHLine(int x, int y, int l, int color)
 	}
 }
 
-void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int bgcolor, int set)
+static void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int bgcolor, int set)
 {
 	FillRect(x, y, w, h, bgcolor);
 	if (set)
@@ -4280,7 +4280,7 @@ void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int bgcolo
 	}
 }
 
-void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
+static void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
 {
 	for (int yoffset = 0; yoffset < h; yoffset++) {
 		int l = l0 + ((l1-l0) * yoffset + h/2) / h;
@@ -4290,7 +4290,7 @@ void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
 	}
 }
 
-void FlipHorz(int x, int y, int w, int h)
+static void FlipHorz(int x, int y, int w, int h)
 {
 	uint32_t buf[w];
 	fb_pixel_t *p = getFBp(&y);
@@ -4307,7 +4307,7 @@ void FlipHorz(int x, int y, int w, int h)
 		p += var_screeninfo.xres;
 	}
 }
-void FlipVert(int x, int y, int w, int h)
+static void FlipVert(int x, int y, int w, int h)
 {
 	fb_pixel_t buf[w];
 	fb_pixel_t *p1, *p2;
@@ -4326,7 +4326,7 @@ void FlipVert(int x, int y, int w, int h)
 	}
 }
 
-int ShapeCoord(int param, int curfontwidth, int curfontheight)
+static int ShapeCoord(int param, int curfontwidth, int curfontheight)
 {
 	switch (param)
 	{
@@ -4353,7 +4353,7 @@ int ShapeCoord(int param, int curfontwidth, int curfontheight)
 	}
 }
 
-void DrawShape(int x, int y, int shapenumber, int curfontwidth, int curfontheight, int fgcolor, int bgcolor, int clear)
+static void DrawShape(int x, int y, int shapenumber, int curfontwidth, int curfontheight, int fgcolor, int bgcolor, int clear)
 {
 	if (shapenumber < 0x20 || shapenumber > 0x7e || (shapenumber == 0x7e && clear))
 		return;
@@ -4494,7 +4494,7 @@ static uint32_t *lookup_colors(uint32_t fgcolor, uint32_t bgcolor)
 	return cs->colors;
 }
 
-void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
+static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 {
 	int Row, Pitch, Bit;
 	int error, glyph;
@@ -5023,7 +5023,7 @@ void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
  * RenderCharFB                                                               *
  ******************************************************************************/
 
-void RenderCharFB(int Char, tstPageAttr *Attribute)
+static void RenderCharFB(int Char, tstPageAttr *Attribute)
 {
 #if HAVE_SPARK_HARDWARE
 	if (zoommode[boxed] != 2)
@@ -5037,7 +5037,7 @@ void RenderCharFB(int Char, tstPageAttr *Attribute)
  * RenderCharBB                                                               *
  ******************************************************************************/
 
-void RenderCharBB(int Char, tstPageAttr *Attribute)
+static void RenderCharBB(int Char, tstPageAttr *Attribute)
 {
 	RenderChar(Char, Attribute, 0, var_screeninfo.yres-var_screeninfo.yoffset);
 }
@@ -5046,7 +5046,7 @@ void RenderCharBB(int Char, tstPageAttr *Attribute)
  * RenderCharLCD                                                             *
  ******************************************************************************/
 
-void RenderCharLCD(int /*Digit*/, int /*XPos*/, int /*YPos*/)
+static void RenderCharLCD(int /*Digit*/, int /*XPos*/, int /*YPos*/)
 {
 #if 0
 	int x, y;
@@ -5066,7 +5066,7 @@ void RenderCharLCD(int /*Digit*/, int /*XPos*/, int /*YPos*/)
 }
 
 #if 0
-void RenderCharLCDsmall(int Char, int XPos, int YPos)
+static void RenderCharLCDsmall(int Char, int XPos, int YPos)
 {
 	int old_width = fontwidth;
 	int old_height = fontheight;
@@ -5082,7 +5082,7 @@ void RenderCharLCDsmall(int Char, int XPos, int YPos)
  * RenderMessage                                                              *
  ******************************************************************************/
 
-void RenderMessage(int Message)
+static void RenderMessage(int Message)
 {
 	int byte;
 	int fbcolor, imenuatr;
@@ -5192,7 +5192,7 @@ void RenderMessage(int Message)
  * RenderPage                                                                 *
  ******************************************************************************/
 
-void DoFlashing(int startrow)
+static void DoFlashing(int startrow)
 {
 	int row, col;
 	/* get national subset */
@@ -5304,7 +5304,7 @@ void DoFlashing(int startrow)
 #endif
 }
 
-void RenderPage()
+static void RenderPage()
 {
 	int row, col, byte, startrow = 0;;
 	int national_subset_bak = national_subset;
@@ -5528,7 +5528,7 @@ void RenderPage()
  * CreateLine25                                                               *
  ******************************************************************************/
 
-void showlink(int column, int linkpage)
+static void showlink(int column, int linkpage)
 {
 	unsigned char *p, line[] = "   >???   ";
 	int oldfontwidth = fontwidth;
@@ -5585,7 +5585,7 @@ void showlink(int column, int linkpage)
 	}
 }
 
-void CreateLine25()
+static void CreateLine25()
 {
 
 	if (!tuxtxt_cache.bttok)
@@ -5739,7 +5739,7 @@ void CreateLine25()
  * CopyBB2FB                                                                  *
  ******************************************************************************/
 
-void CopyBB2FB()
+static void CopyBB2FB()
 {
 #if HAVE_SPARK_HARDWARE
 	int fillcolor, screenwidth;
@@ -5906,7 +5906,7 @@ void CopyBB2FB()
  * UpdateLCD                                                                  *
  ******************************************************************************/
 
-void UpdateLCD()
+static void UpdateLCD()
 {
 #if 0
 	static int init_lcd = 1, old_cached_pages = -1, old_page = -1, old_subpage = -1, old_subpage_max = -1, old_hintmode = -1;
@@ -6074,7 +6074,7 @@ void UpdateLCD()
  * DecodePage                                                                 *
  ******************************************************************************/
 
-void DecodePage()
+static void DecodePage()
 {
 	int row, col;
 	int hold, dhset;
@@ -6589,7 +6589,7 @@ void DecodePage()
 /******************************************************************************
  * GetRCCode                                                                  *
  ******************************************************************************/
-int GetRCCode()
+static int GetRCCode()
 {
 	neutrino_msg_t msg;
 	neutrino_msg_data_t data;
