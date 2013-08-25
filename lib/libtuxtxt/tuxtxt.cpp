@@ -5742,6 +5742,10 @@ void CopyBB2FB()
 	fb_pixel_t *src, *dst, *topsrc;
 	int fillcolor, i, screenwidth, swtmp;
 #endif
+	if (transpmode[boxed])
+		fillcolor = transp;
+	else
+		fillcolor = FullScrColor;
 
 	/* line 25 */
 	if (!pagecatching && use_gui)
@@ -5763,6 +5767,7 @@ void CopyBB2FB()
 			perror("TuxTxt <FBIOPAN_DISPLAY>");
 #else
 #if HAVE_SPARK_HARDWARE
+		f->setBorderColor(argb[fillcolor]);
 		f->blitBPA2FB((unsigned char *)lbb, SURF_ARGB8888, var_screeninfo.xres, var_screeninfo.yres,
 			0, 0, -1, -1,
 			-1, -1, -1, -1, true);
@@ -5812,11 +5817,6 @@ void CopyBB2FB()
 #else
 		memmove(dst+(24*fontheight)*var_screeninfo.xres, src + (24*fontheight)*var_screeninfo.xres, var_screeninfo.xres*fontheight * sizeof(fb_pixel_t));
 #endif
-
-	if (transpmode[boxed])
-		fillcolor = transp;
-	else
-		fillcolor = FullScrColor;
 
 	/* copy topmenu in normal height (since PIG also keeps dimensions) */
 	if (screenmode[boxed] == 1)
