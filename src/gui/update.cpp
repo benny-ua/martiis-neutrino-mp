@@ -555,7 +555,7 @@ bool CFlashExpert::checkSize(int mtd, std::string &backupFile)
 	std::string path = getPathName(backupFile);
 	if (!file_exists(path.c_str()))  {
 		snprintf(errMsg, sizeof(errMsg)-1, g_Locale->getText(LOCALE_FLASHUPDATE_READ_DIRECTORY_NOT_EXIST), path.c_str());
-		ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, errMsg);
+		ShowHint(LOCALE_MESSAGEBOX_ERROR, errMsg);
 		return false;
 	}
 
@@ -564,7 +564,7 @@ bool CFlashExpert::checkSize(int mtd, std::string &backupFile)
 	long btotal = 0, bused = 0, bsize = 0;
 	if (!get_fs_usage(path.c_str(), btotal, bused, &bsize)) {
 		snprintf(errMsg, sizeof(errMsg)-1, g_Locale->getText(LOCALE_FLASHUPDATE_READ_VOLUME_ERROR), path.c_str());
-		ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, errMsg);
+		ShowHint(LOCALE_MESSAGEBOX_ERROR, errMsg);
 		return false;
 	}
 	int backupMaxSize = (int)((btotal - bused) * bsize);
@@ -572,7 +572,7 @@ bool CFlashExpert::checkSize(int mtd, std::string &backupFile)
 	backupMaxSize = (backupMaxSize - ((backupMaxSize * res) / 100)) / 1024;
 	if (backupMaxSize < mtdSize) {
 		snprintf(errMsg, sizeof(errMsg)-1, g_Locale->getText(LOCALE_FLASHUPDATE_READ_NO_AVAILABLE_SPACE), path.c_str(), backupMaxSize, mtdSize);
-		ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, errMsg);
+		ShowHint(LOCALE_MESSAGEBOX_ERROR, errMsg);
 		return false;
 	}
 
@@ -583,12 +583,15 @@ void CFlashExpert::readmtd(int preadmtd)
 {
 	std::string filename;
 	CMTDInfo* mtdInfo    = CMTDInfo::getInstance();
-	std::string hostName = netGetHostname();
+	std::string hostName;
+	netGetHostname(hostName);
 	std::string timeStr  = getNowTimeStr("_%Y%m%d_%H%M");
 
+#if ENABLE_EXTUPDATE
 	if (g_settings.softupdate_name_mode_backup == CExtUpdate::SOFTUPDATE_NAME_HOSTNAME_TIME)
 		filename = (std::string)g_settings.update_dir + "/" + mtdInfo->getMTDName(preadmtd) + timeStr + "_" + hostName + ".img";
 	else
+#endif
 		filename = (std::string)g_settings.update_dir + "/" + mtdInfo->getMTDName(preadmtd) + timeStr + ".img";
 
 	if (preadmtd == -1) {
