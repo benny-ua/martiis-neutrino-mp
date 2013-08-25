@@ -1673,6 +1673,9 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 	CFrameBuffer *fbp = CFrameBuffer::getInstance();
 	lfb = fbp->getFrameBufferPointer();
 	lbb = fbp->getBackBufferPointer();
+#if HAVE_SPARK_HARDWARE
+	fb_pixel_t old_border_color = fbp->getBorderColor();
+#endif
 
 	tuxtxt_cache.vtxtpid = pid;
 
@@ -1877,6 +1880,9 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 #if 1
 	if ( initialized )
 		tuxtxt_close();
+#endif
+#if HAVE_SPARK_HARDWARE
+	fbp->setBorderColor(old_border_color);
 #endif
 
 	printf("Tuxtxt: plugin ended\n");
