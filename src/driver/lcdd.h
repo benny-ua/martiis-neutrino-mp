@@ -191,9 +191,6 @@ class CLCD
 #endif
 #endif
 	public:
-#ifdef MARTII
-		int  vfd_version;
-#endif
 		bool has_lcd;
 		void wake_up();
 		void setled(void) { return; };

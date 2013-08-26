@@ -129,12 +129,10 @@ int CVfdSetup::showSetup()
 
 #ifdef MARTII
 	int displaymode_option_count = OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT;
-#if HAVE_SPARK_HARDWARE
-	if (CVFD::getInstance()->vfd_version != 4) {
+	if(g_info.hw_caps->display_type == HW_DISPLAY_LINE_TEXT) {
 		displaymode_option_count = 2;
 		g_settings.lcd_setting[SNeutrinoSettings::LCD_DISPLAYMODE] &= 1;
 	}
-#endif
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_RUNNING,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_DISPLAYMODE],
 		OPTIONS_LCD_DISPLAYMODE_OPTIONS, displaymode_option_count, true, this));
