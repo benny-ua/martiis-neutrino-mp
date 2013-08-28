@@ -875,7 +875,8 @@ int CZapit::SetVolumePercent(int percent)
 
 	if (volume_percent != percent) {
 		volume_percent = percent;
-		SetVolume(current_volume);
+		if (!audioDecoder->getMuteStatus())
+			SetVolume(current_volume);
 	}
 	return ret;
 }
