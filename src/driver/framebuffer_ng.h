@@ -112,7 +112,8 @@ class CFbAccel
 		fb_pixel_t getBorderColor(void) { return borderColor; };
 		void ClearFB(void);
 #if HAVE_SPARK_HARDWARE
-		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s);
+		enum BPApart { BPApart_vid = 0, BPApart_big = 2 };
+		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s, BPApart bpapart = BPApart_vid);
 		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s);
 		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = -1, int fb_y = -1, int fb_w = -1, int fb_h = -1, bool transp = false);
 #endif
@@ -315,7 +316,7 @@ class CFrameBuffer
 		fb_pixel_t getBorderColor(void);
 
 #if HAVE_SPARK_HARDWARE
-		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s) { return accel->allocBPAMem(bpa, mem, s); };
+		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s, CFbAccel::BPApart bpapart = CFbAccel::BPApart_vid) { return accel->allocBPAMem(bpa, mem, s, bpapart); };
 		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s) { accel->freeBPAMem(bpa, mem, s); };
 		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = -1, int fb_y = -1, int fb_w = -1, int fb_h = -1, int transp = false) { accel->blitBPA2FB(mem, fmt, w, h, x, y, pan_x, pan_y, fb_x, fb_y, fb_w, fb_h, transp); };
 #endif

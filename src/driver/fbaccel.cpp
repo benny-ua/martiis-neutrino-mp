@@ -177,7 +177,7 @@ void CFbAccel::waitForIdle(void)
 #endif
 
 #if HAVE_SPARK_HARDWARE
-bool CFbAccel::allocBPAMem(int &bpa, unsigned char * &mem, size_t sz)
+bool CFbAccel::allocBPAMem(int &bpa, unsigned char * &mem, size_t sz, BPApart bpapart)
 {
 	mem = 0;
 
@@ -188,7 +188,13 @@ bool CFbAccel::allocBPAMem(int &bpa, unsigned char * &mem, size_t sz)
 		return false;
 	}
 	BPAMemAllocMemData bpa_data;
-	bpa_data.bpa_part = (char *)"LMI_VID";
+	switch (bpapart) {
+	case BPApart_vid:
+		bpa_data.bpa_part = (char *)"LMI_IO";
+		break;
+	default:
+		bpa_data.bpa_part = (char *)"bigphysarea";
+	}
 	bpa_data.mem_size = sz;
 	int res;
 	res = ioctl(bpa, BPAMEMIO_ALLOCMEM, &bpa_data);
