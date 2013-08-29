@@ -124,8 +124,6 @@ static void set_lua_variables(lua_State *L)
 		{ "mute_off",		CRCInput::RC_mute_off },
 		{ "analog_on",		CRCInput::RC_analog_on },
 		{ "analog_off",		CRCInput::RC_analog_off },
-#if HAVE_SPARK_HARDWARE
-/* SPARK keys */
 		{ "find",		CRCInput::RC_find },
 		{ "pip",		CRCInput::RC_pip },
 		{ "folder",		CRCInput::RC_archive },
@@ -141,7 +139,6 @@ static void set_lua_variables(lua_State *L)
 		{ "prog2",		CRCInput::RC_prog2 },
 		{ "prog3",		CRCInput::RC_prog3 },
 		{ "prog4",		CRCInput::RC_prog4 },
-#endif
 		/* to check if it is in our range */
 		{ "MaxRC",		CRCInput::RC_MaxRC },
 		{ NULL, 0 }
@@ -173,6 +170,21 @@ static void set_lua_variables(lua_State *L)
 		{ "LIGHT_BLUE",			MAGIC_COLOR | (COL_LIGHT_BLUE0) },
 		{ "WHITE",			MAGIC_COLOR | (COL_WHITE0) },
 		{ "BLACK",			MAGIC_COLOR | (COL_BLACK0) },
+		{ "COLORED_EVENTS_TEXT",	(COL_COLORED_EVENTS_TEXT) },
+		{ "INFOBAR_TEXT",		(COL_INFOBAR_TEXT) },
+		{ "INFOBAR_SHADOW_TEXT",	(COL_INFOBAR_SHADOW_TEXT) },
+		{ "MENUHEAD_TEXT",		(COL_MENUHEAD_TEXT) },
+		{ "MENUCONTENT_TEXT",		(COL_MENUCONTENT_TEXT) },
+		{ "MENUCONTENT_TEXT_PLUS_1",	(COL_MENUCONTENT_TEXT_PLUS_1) },
+		{ "MENUCONTENT_TEXT_PLUS_2",	(COL_MENUCONTENT_TEXT_PLUS_2) },
+		{ "MENUCONTENT_TEXT_PLUS_3",	(COL_MENUCONTENT_TEXT_PLUS_3) },
+		{ "MENUCONTENTDARK_TEXT",	(COL_MENUCONTENTDARK_TEXT) },
+		{ "MENUCONTENTDARK_TEXT_PLUS_1",	(COL_MENUCONTENTDARK_TEXT_PLUS_1) },
+		{ "MENUCONTENTDARK_TEXT_PLUS_2",	(COL_MENUCONTENTDARK_TEXT_PLUS_2) },
+		{ "MENUCONTENTSELECTED_TEXT",		(COL_MENUCONTENTSELECTED_TEXT) },
+		{ "MENUCONTENTSELECTED_TEXT_PLUS_1",	(COL_MENUCONTENTSELECTED_TEXT_PLUS_1) },
+		{ "MENUCONTENTSELECTED_TEXT_PLUS_2",	(COL_MENUCONTENTSELECTED_TEXT_PLUS_2) },
+		{ "MENUCONTENTINACTIVE_TEXT",	(COL_MENUCONTENTINACTIVE_TEXT) },
 		{ NULL, 0 }
 	};
 
@@ -544,7 +556,7 @@ int CLuaInstance::RenderString(lua_State *L)
 	const char *text;
 	int numargs = lua_gettop(L);
 	DBG("CLuaInstance::%s %d\n", __func__, numargs);
-	c = COL_MENUCONTENT;
+	c = COL_MENUCONTENT_TEXT;
 	boxh = 0;
 	center = 0;
 
@@ -572,7 +584,8 @@ int CLuaInstance::RenderString(lua_State *L)
 		if (rwidth < w)
 			x += (w - rwidth) / 2;
 	}
-	c &= 0x000000FF; /* TODO: colors that are not in the palette? */
+	if ((c & MAGIC_MASK) == MAGIC_COLOR)
+		c = CFrameBuffer::getInstance()->realcolor[c & 0x000000ff];
 	if (boxh > -1) /* if boxh < 0, don't paint string */
 		W->fbwin->RenderString(g_Font[f], x, y, w, text, c, boxh, true);
 	lua_pushinteger(L, rwidth); /* return renderwidth */
@@ -648,40 +661,6 @@ int CLuaInstance::GetLanguage(lua_State *L)
 
 	return 1;
 }
-
-#if 0
-local m = menue.new{name="mytitle", icon="myicon", hide_parent=true}			       
-m:addItem{type="back"}									     
-m:addItem{type="separator"}									
-												   
-function talk(a, b)										   
-	print(">talk")									     
-	print(a .. " => " b)										   
-	print("<talk")									     
-	return MENU_RETURN["RETURN_REPAINT"]						       
-end												
-												   
-function anotherMenue()									    
-	print(">>anothermenue");								   
-	local m = menue.new{name="anothermenue", icon="settings"}				  
-	m:addItem{type="back"}								     
-	m:addItem{type="separator"}								
-	m:addItem{type="numeric", name="testnumeric"}					      
-	m:exec()										   
-	print("<<anothermenue");								   
-end												
-												   
-												   
-m:addItem{type="chooser", name="testchooser", action="talk", options={ "on", "off", "auto" }, icon=
-m:addItem{type="forwarder", name="testforwarder", action="anotherMenue", icon="network"}	   
-m:addItem{type="separator"}									
-m:addItem{type="numeric", name="testnumeric", id="a", action="talk"}				       
-m:addItem{type="separator"}									
-m:addItem{type="filebrowser", name="fbrowser", id="b", action="talk"}				      
-m:addItem{type="separator"}									
-m:addItem{type="stringinput", name="stringinput", id="c", action="talk"}				   
-m:exec()
-#endif
 
 bool CLuaInstance::tableLookup(lua_State *L, const char *what, std::string &value)
 {
@@ -806,7 +785,7 @@ int CLuaMenueFilebrowser::exec(CMenuTarget* /*parent*/, const std::string& /*act
 		fileBrowser.Filter = &fileFilter;
 
 	if (fileBrowser.exec(value->c_str()) == true)
-	    *value = fileBrowser.getSelectedFile()->Name;
+		*value = fileBrowser.getSelectedFile()->Name;
 
 	if (!luaAction.empty()){
 		lua_pushglobaltable(L);
