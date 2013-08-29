@@ -160,7 +160,10 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 		if (!bpamem || bpasize < new_bpasize) {
 			frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
 			bpasize = new_bpasize;
-			frameBuffer->allocBPAMem(bpafd, bpamem, bpasize);
+			// try bigphysarea first
+			frameBuffer->allocBPAMem(bpafd, bpamem, bpasize, CFbAccel::BPApart_big);
+			if (!bpamem) // but fallback to video
+				frameBuffer->allocBPAMem(bpafd, bpamem, bpasize, CFbAccel::BPApart_vid);
 		}
 
 		if (bpamem) {
