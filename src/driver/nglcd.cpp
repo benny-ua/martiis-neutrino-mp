@@ -354,41 +354,45 @@ bool nGLCD::getBoundingBox(uint32_t *buffer, int width, int height, int &bb_x, i
 
 	int y_min = height;
 	uint32_t *b = buffer;
-	for (int y = 0; y < height && y_min == height; y++)
+	for (int y = 0; y < height; y++)
 		for (int x = 0; x < width; x++, b++)
 			if (*b) {
 				y_min = y;
-				break;
+				goto out1;
 			}
+	out1:
 
 	int y_max = y_min;
 	b = buffer + height * width - 1;
-	for (int y = height - 1; y_min < y && y_max == y_min; y--)
+	for (int y = height - 1; y_min < y; y--)
 		for (int x = 0; x < width; x++, b--)
 			if (*b) { 
 				y_max = y;
-				break;
+				goto out2;
 			}
+	out2:
 
 	int x_min = width;
-	for (int x = 0; x < width && x_min == width; x++) {
+	for (int x = 0; x < width; x++) {
 		b = buffer + x + y_min * width;
 		for (int y = y_min; y < y_max; y++, b += width)
 			if (*b) {
 				x_min = x;
-				break;
+				goto out3;
 			}
 	}
+	out3:
 
 	int x_max = x_min;
-	for (int x = width - 1; x_min < x && x_max == x_min; x--) {
+	for (int x = width - 1; x_min < x; x--) {
 		b = buffer + x + y_min * width;
 		for (int y = y_min; y < y_max; y++, b += width)
 			if (*b) {
 				x_max = x;
-				break;
+				goto out4;
 			}
 	}
+	out4:
 
 	bb_x = x_min;
 	bb_y = y_min;
