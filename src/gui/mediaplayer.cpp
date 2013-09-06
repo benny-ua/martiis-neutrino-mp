@@ -50,6 +50,7 @@
 #include <driver/screen_max.h>
 
 #include <system/debug.h>
+#include <mymenu.h>
 #include <video.h>
 extern cVideo * videoDecoder;
 
@@ -100,6 +101,14 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(true);
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
+#ifdef ENABLE_SHAIRPLAY
+	else if (actionKey == "shairplay")
+	{
+		CNeutrinoApp::getInstance()->shairplay_enabled_cur = true;
+		CNeutrinoApp::getInstance()->shairPlay->restart();
+		return menu_return::RETURN_REPAINT;
+	}
+#else
 	else if (actionKey == "shairport")
 	{
 		audiomute->enableMuteIcon(false);
@@ -111,6 +120,7 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(true);
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
+#endif
 	else if	(actionKey == "inetplayer")
 	{
 		audiomute->enableMuteIcon(false);
@@ -161,6 +171,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	CMenuForwarder *fw_audio = NULL;
 	CMenuForwarder *fw_inet = NULL;
 	CMenuForwarder *fw_pviewer = NULL;
+	CMenuOptionChooser *ch_shairplay = NULL;
 	CMenuForwarder *fw_shairport = NULL;
 	CPictureViewerGui *pictureviewergui = NULL;
 #if ENABLE_UPNP
@@ -182,13 +193,21 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		fw_inet = new CMenuForwarder(LOCALE_INETRADIO_NAME, true, NULL, this, "inetplayer", inet_rc, inet_btn);
 		fw_inet->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_INET_RADIO);
 
+#ifdef ENABLE_SHAIRPLAY
+		neutrino_msg_t shairplay_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_blue : CRCInput::RC_nokey;
+		const char* shairplay_btn = usage_mode == MODE_AUDIO ? NEUTRINO_ICON_BUTTON_BLUE : "";
+		if (!CNeutrinoApp::getInstance()->shairplay_enabled_cur)
+			fw_shairport = new CMenuForwarder(LOCALE_SHAIRPLAY_REENABLE, true, NULL, this, "shairplay", shairplay_rc, shairplay_btn);
+		//fw_shairplay->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPLAY);
+#else
 		//shairport
 		if (!access("/etc/init.d/shairport", X_OK)) {
 				neutrino_msg_t shairport_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_blue : CRCInput::RC_nokey;
 				const char* shairport_btn = usage_mode == MODE_AUDIO ? NEUTRINO_ICON_BUTTON_BLUE : "";
 				fw_shairport = new CMenuForwarder(LOCALE_MAINMENU_SHAIRPORT, true, NULL, this, "shairport", shairport_rc, shairport_btn);
-				fw_shairport->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPORT);
+				//fw_shairport->setHint(NEUTRINO_ICON_HINT_SHAIRPORT, LOCALE_MENU_HINT_SHAIRPORT);
 		}
+#endif
 
 	}
 
@@ -213,10 +232,15 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 
  		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
- 		
+
+#ifdef ENABLE_SHAIRPLAY
+		if (ch_shairplay)
+			personalize->addItem(media, ch_shairplay, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+#else
  		//shairport
 		if (fw_shairport)
 				personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+#endif
 	}
 	else if (usage_mode == MODE_VIDEO)
 	{

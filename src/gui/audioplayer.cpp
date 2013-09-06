@@ -249,14 +249,18 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 	if (actionKey == "init")
 		Init();
 
+#ifndef ENABLE_SHAIRPLAY
 	m_shairport = (actionKey == "shairport");
+#endif
 
 	CNeutrinoApp::getInstance()->StopSubtitles();
 
 	CAudioPlayer::getInstance()->init();
 	m_state = CAudioPlayerGui::STOP;
 
+#ifndef ENABLE_SHAIRPLAY
 	if (!m_shairport) {
+#endif
 		m_show_playlist = g_settings.audioplayer_show_playlist==1;
 
 		if (m_select_title_by_name != (g_settings.audioplayer_select_title_by_name==1))
@@ -268,7 +272,9 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 			}
 			m_select_title_by_name = g_settings.audioplayer_select_title_by_name;
 		}
+#ifndef ENABLE_SHAIRPLAY
 	}
+#endif
 
 	if (m_playlist.empty())
 		m_current = -1;
@@ -377,14 +383,18 @@ int CAudioPlayerGui::show()
 	bool clear_before_update = false;
 	m_key_level = 0;
 
+#ifndef ENABLE_SHAIRPLAY
 	if (m_shairport)
 		my_system(2, "/etc/init.d/shairport", "start");
+#endif
 
 	while (loop)
 	{
 		updateMetaData(m_screensaver);
 
+#ifndef ENABLE_SHAIRPLAY
 		if (!m_shairport)
+#endif
 			updateTimes();
 
 		if (CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_audio)
@@ -392,7 +402,11 @@ int CAudioPlayerGui::show()
 			// stop if mode was changed in another thread
 			loop = false;
 		}
-		if (!m_shairport && (m_state != CAudioPlayerGui::STOP) &&
+		if (
+#ifndef ENABLE_SHAIRPLAY
+		    !m_shairport &&
+#endif
+				    (m_state != CAudioPlayerGui::STOP) &&
 				(CAudioPlayer::getInstance()->getState() == CBaseDec::STOP) &&
 				(!m_playlist.empty()))
 		{
@@ -400,7 +414,11 @@ int CAudioPlayerGui::show()
 				playNext();
 		}
 
-		if (!m_shairport && update)
+		if (
+#ifndef ENABLE_SHAIRPLAY
+		    !m_shairport &&
+#endif
+				    update)
 		{
 			if (clear_before_update)
 			{
@@ -453,6 +471,7 @@ int CAudioPlayerGui::show()
 			}
 		}
 
+#ifndef ENABLE_SHAIRPLAY
 		if (m_shairport) {
 			if (msg == CRCInput::RC_home || msg == CRCInput::RC_stop) {
 				loop=false;
@@ -465,6 +484,7 @@ int CAudioPlayerGui::show()
 			}
 			continue;
 		}
+#endif
 
 		if (msg == CRCInput::RC_home || msg == CRCInput::RC_stop)
 		{
@@ -944,12 +964,17 @@ int CAudioPlayerGui::show()
 		}
 		m_frameBuffer->blit();
 	}
+#ifndef ENABLE_SHAIRPLAY
 	if (!m_shairport)
+#endif
 		hide();
 
+#ifndef ENABLE_SHAIRPLAY
 	if (m_shairport)
 		my_system(2, "/etc/init.d/shairport", "stop");
-	else if (m_state != CAudioPlayerGui::STOP)
+	else
+#endif
+	if (m_state != CAudioPlayerGui::STOP)
 		stop();
 
 	return ret;
@@ -2369,7 +2394,9 @@ void CAudioPlayerGui::screensaver(bool on)
 		m_screensaver = false;
 		videoDecoder->StopPicture();
 		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+#ifndef ENABLE_SHAIRPLAY
 		if (!m_shairport)
+#endif
 			paint();
 		m_idletime = time(NULL);
 	}

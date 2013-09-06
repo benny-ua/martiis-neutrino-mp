@@ -103,6 +103,9 @@ neutrino_LDADD = \
 if ENABLE_GRAPHLCD
 neutrino_LDADD += -lglcddrivers -lglcdgraphics -lusb-1.0
 endif
+if ENABLE_SHAIRPLAY
+neutrino_LDADD += -lshairplay
+endif
 if ENABLE_GIFLIB
 neutrino_LDADD += -lgif
 else

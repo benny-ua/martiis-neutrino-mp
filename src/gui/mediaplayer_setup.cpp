@@ -46,9 +46,10 @@
 
 #include <gui/audioplayer_setup.h>
 #include <gui/pictureviewer_setup.h>
-#ifdef MARTII
-#include "gui/webtv_setup.h"
-#include "gui/moviebrowser.h"
+#include <gui/webtv_setup.h>
+#include <gui/moviebrowser.h>
+#ifdef ENABLE_SHAIRPLAY
+#include <gui/shairplay_setup.h>
 #endif
 
 
@@ -91,15 +92,14 @@ int CMediaPlayerSetup::showMediaPlayerSetup()
 	mediaSetup->setSelected(selected);
 
 	// intros
-#ifdef MARTII
 	mediaSetup->addIntroItems(LOCALE_MAINMENU_MEDIA);
-#else
-	mediaSetup->addIntroItems(LOCALE_AUDIOPLAYERPICSETTINGS_GENERAL);
-#endif
 
-#ifdef MARTII
 	CAudioPlayerSetup asetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, &asetup, "", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+#ifdef ENABLE_SHAIRPLAY
+	CShairPlaySetup isetup;
+	mediaSetup->addItem(new CMenuForwarder(LOCALE_SHAIRPLAY_HEAD, true, NULL, &isetup, "", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+#endif
 	CPictureViewerSetup psetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_PICTUREVIEWER_HEAD, true, NULL, &psetup, "", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
 	mediaSetup->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MAINMENU_MOVIEPLAYER));
@@ -107,12 +107,6 @@ int CMediaPlayerSetup::showMediaPlayerSetup()
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, &msetup, "show_menu", CRCInput::RC_1));
 	CWebTVSetup wsetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, &wsetup, "show_menu", CRCInput::RC_2));
-#else
-	CPictureViewerSetup psetup;
-	mediaSetup->addItem(new CMenuForwarder(LOCALE_PICTUREVIEWER_HEAD, true, NULL, &psetup, "", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-	CAudioPlayerSetup asetup;
-	mediaSetup->addItem(new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, &asetup, "", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
-#endif
 
 	int res = mediaSetup->exec (NULL, "");
 	selected = mediaSetup->getSelected();

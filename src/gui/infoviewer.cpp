@@ -481,6 +481,68 @@ void CInfoViewer::show_current_next(bool new_chan, int  epgpos)
 	}
 }
 
+#ifdef ENABLE_SHAIRPLAY
+void CInfoViewer::showShairPlay(const std::string &album, const std::string &artist, const std::string &title,
+				const std::string &/*comment*/, const std::string &/*composer*/, const std::string &/*genre*/,
+				const std::string &/*decription*/, const std::string &year, bool dot)
+{
+	if (g_settings.volume_pos == CVolumeBar::VOLUMEBAR_POS_BOTTOM_LEFT || 
+	    g_settings.volume_pos == CVolumeBar::VOLUMEBAR_POS_BOTTOM_RIGHT || 
+	    g_settings.volume_pos == CVolumeBar::VOLUMEBAR_POS_BOTTOM_CENTER || 
+	    g_settings.volume_pos == CVolumeBar::VOLUMEBAR_POS_HIGHER_CENTER)
+		isVolscale = CVolume::getInstance()->hideVolscale();
+	else
+		isVolscale = false;
+
+	aspectRatio = 0;
+	last_curr_id = last_next_id = 0;
+	showButtonBar = false;
+
+	fileplay = false;
+	reset_allScala();
+	if (!gotTime)
+		gotTime = timeset;
+
+	if(!is_visible)
+		fader.StartFadeIn();
+
+	is_visible = true;
+	infoViewerBB->is_visible = true;
+
+	/* showChannelLogo() changes this, so better reset it every time... */
+	ChanNameX = BoxStartX + ChanWidth + SHADOW_OFFSET;
+
+	paintBackground(COL_INFOBAR_PLUS_0);
+
+	paintTime (dot, true);
+
+	g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME]->RenderString(ChanNameX + 10 , ChanNameY + time_height,BoxEndX - (ChanNameX + 20) - time_width - LEFT_OFFSET - 5 , artist, COL_INFOBAR_TEXT, 0, true);	// UTF-8
+
+	std::string _n = album.c_str();
+	if (!_n.empty())
+		_n += " ";
+	if (!year.empty())
+		_n += "(" + year + ")";
+
+	display_Info(title.c_str(), _n.c_str(), true, false, 0, NULL, NULL, NULL, NULL, true, true);
+
+	const char *playicon = NEUTRINO_ICON_PLAY;
+
+	int icon_w = 0,icon_h = 0;
+	frameBuffer->getIconSize(playicon, &icon_w, &icon_h);
+
+	int icon_x = BoxStartX + ChanWidth / 2 - icon_w / 2;
+	int icon_y = BoxStartY + ChanHeight / 2 - icon_h / 2;
+	frameBuffer->paintIcon(playicon, icon_x, icon_y);
+
+	showLcdPercentOver ();
+	showInfoFile();
+
+	aspectRatio = 0;
+	fileplay = false;
+}
+#endif
+
 void CInfoViewer::showMovieTitle(const int playState, const std::string &Channel,
 				 const std::string &g_file_epg, const std::string &g_file_epg1,
 				 const int duration, const int curr_pos)

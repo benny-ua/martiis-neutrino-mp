@@ -379,6 +379,13 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.audio_volume_percent_ac3 = configfile.getInt32("audio_volume_percent_ac3", 100);
 	g_settings.audio_volume_percent_pcm = configfile.getInt32("audio_volume_percent_pcm", 100);
 #endif
+#ifdef ENABLE_SHAIRPLAY
+	g_settings.shairplay_enabled = configfile.getInt32("shairplay_enabled", 0);
+	shairplay_enabled_cur = g_settings.shairplay_enabled;
+	g_settings.shairplay_port = configfile.getInt32("shairplay_port", 5000);
+	g_settings.shairplay_apname = configfile.getString("shairplay_apname", "Shairplay");
+	g_settings.shairplay_password = configfile.getString("shairplay_password", "");
+#endif
 	g_settings.current_volume_step = configfile.getInt32("current_volume_step", 2);
 	g_settings.channel_mode = configfile.getInt32("channel_mode", LIST_MODE_PROV);
 	g_settings.channel_mode_radio = configfile.getInt32("channel_mode_radio", LIST_MODE_PROV);
@@ -973,6 +980,12 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("audio_mixer_volume_spdif", g_settings.audio_mixer_volume_spdif);
 	configfile.setInt32("audio_volume_percent_ac3", g_settings.audio_volume_percent_ac3);
 	configfile.setInt32("audio_volume_percent_pcm", g_settings.audio_volume_percent_pcm);
+#endif
+#ifdef ENABLE_SHAIRPLAY
+	configfile.setInt32("shairplay_enabled", g_settings.shairplay_enabled);
+	configfile.setInt32("shairplay_port", g_settings.shairplay_port);
+	configfile.setString("shairplay_apname", g_settings.shairplay_apname);
+	configfile.setString("shairplay_password", g_settings.shairplay_password);
 #endif
 	configfile.setInt32( "channel_mode", g_settings.channel_mode );
 	configfile.setInt32( "channel_mode_radio", g_settings.channel_mode_radio );
@@ -2283,7 +2296,11 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	if (!access("/etc/init.d/cam", X_OK))
 		safe_system("/etc/init.d/cam init >/dev/null 2>/dev/null&");
 #endif
+#ifdef ENABLE_SHAIRPLAY
+	shairPlay = g_settings.shairplay_enabled ? new CShairPlay(&shairplay_enabled_cur, &shairplay_active) : NULL;
+#endif
 	SHTDCNT::getInstance()->init();
+
 
 TIMER_STOP("################################## after all ##################################");
 	RealRun(personalize.getWidget(0)/**main**/);
@@ -2379,6 +2396,15 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 
 	while( true ) {
 		g_RCInput->getMsg(&msg, &data, 100, ((g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME) && (g_RemoteControl->subChannels.size() < 1)) ? true : false);	// 10 secs..
+
+#ifdef ENABLE_SHAIRPLAY
+		if (shairPlay && shairplay_enabled_cur && shairplay_active) {
+			StopSubtitles();
+			shairPlay->exec();
+			StartSubtitles();
+			continue;
+		}
+#endif
 
 		if( ( mode == mode_tv ) || ( ( mode == mode_radio ) ) ) {
 			if( (msg == NeutrinoMessages::SHOW_EPG) /* || (msg == CRCInput::RC_info) */ ) {
@@ -3676,6 +3702,10 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 				nGLCD::SetBrightness(0);
 #endif
 			}
+#endif
+#if 0 //#ifdef ENABLE_SHAIRPLAY
+			if (shairPlay)
+				delete shairPlay;
 #endif
 
 			printf("[neutrino] This is the end. exiting with code %d\n", retcode);

@@ -1958,6 +1958,12 @@ settings.pos_top_left top left
 settings.pos_top_right top right
 settings.restore Image-Settings: Restore
 settings.restore_warn This will replace all settings and reboot\nContinue ?
+shairplay.apname AP Name
+shairplay.enable Enabled at boot
+shairplay.head ShairPlay
+shairplay.password Password
+shairplay.port Port
+shairplay.reenable ShairPlay re-enable
 shutdown.recoding_query You really want to to stop record ?
 shutdowntimer.announce Box will shutdown in 1 min.\nCancel Shutdown ?
 sleeptimerbox.announce Box will standby in 1 min.\nCancel Standby ?

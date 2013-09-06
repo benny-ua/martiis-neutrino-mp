@@ -50,6 +50,9 @@
 #include <gui/adzap.h>
 #include <gui/psisetup.h>
 #include <gui/3dsetup.h>
+#if ENABLE_SHAIRPLAY
+#include <gui/shairplay.h>
+#endif
 #endif
 
 #include <string>
@@ -177,6 +180,11 @@ public:
 	CAdZapMenu			*AdZapChanger;
 	CPSISetup			*chPSISetup;
 	C3DSetup			*threeDSetup;
+#if ENABLE_SHAIRPLAY
+	CShairPlay			*shairPlay;
+	bool				shairplay_active;
+	bool				shairplay_enabled_cur;
+#endif
 #endif
 
 	static CNeutrinoApp* getInstance();

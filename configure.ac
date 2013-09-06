@@ -118,6 +118,15 @@ if test "$enable_graphlcd" = "yes"; then
 	AC_DEFINE(ENABLE_GRAPHLCD,1,[include GraphLCD support])
 fi
 
+AC_ARG_ENABLE(shairplay,
+	[  --enable-shairplay                    enable ShairPlay support],
+	[AC_DEFINE(ENABLE_SHAIRPLAY,1,[enable ShairPlay support])])
+
+AM_CONDITIONAL(ENABLE_SHAIRPLAY,test "$enable_shairplay" = "yes")
+if test "$enable_shairplay" = "yes"; then
+	AC_DEFINE(ENABLE_SHAIRPLAY,1,[include ShairPlay support])
+fi
+
 AC_ARG_ENABLE(giflib,
 	AS_HELP_STRING(--enable-giflib,use giflib instead of libungif),
 	,[enable_giflib=no])

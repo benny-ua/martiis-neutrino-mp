@@ -190,6 +190,12 @@ struct SNeutrinoSettings
 	std::string streaming_server_name;
 	std::string webtv_xml;
 #endif
+#ifdef ENABLE_SHAIRPLAY
+	int shairplay_enabled;
+	int shairplay_port;
+	std::string shairplay_apname;
+	std::string shairplay_password;
+#endif
 
 	//network
 	std::string network_ntpserver;
