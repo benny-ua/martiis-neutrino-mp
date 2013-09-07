@@ -33,18 +33,19 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <string>
+#include <list>
 
 class CShairPlay
 {
 	private:
 		char hwaddr[6];
-        	int buffering;
-		int buflen;
-		char buffer[8192];
 		float volume;
 		sem_t sem;
+		sem_t audioSem;
 		pthread_mutex_t mutex;
-		pthread_t thread;
+		pthread_mutex_t audioMutex;
+		pthread_t threadId;
+		pthread_t audioThreadId;
 		int lastMode;
 		bool *active;
 		bool *enabled;
@@ -69,13 +70,14 @@ class CShairPlay
 		std::string description;
 		std::string year;
 		unsigned char last_md5sum[16];
-		int audio_output(const void *buffer, int buflen);
-		static void *audio_init(void *cls, int bits, int channels, int samplerate);
-		static void audio_process(void *cls, void *, const void *_buffer, int _buflen);
-		static void audio_destroy(void *cls, void *);
-		static void audio_set_volume(void *cls, void *, float volume);
-		static void audio_set_metadata(void *cls, void *, const void *_buffer, int _buflen);
-		static void audio_set_coverart(void *cls, void *, const void *_buffer, int _buflen);
+		static void *audioThread(void *_this);
+		static void *audio_init(void *_this, int bits, int channels, int samplerate);
+		static void audio_flush(void *_this, void *);
+		static void audio_process(void *_this, void *, const void *_buffer, int _buflen);
+		static void audio_destroy(void *_this, void *);
+		static void audio_set_volume(void *_this, void *, float volume);
+		static void audio_set_metadata(void *_this, void *, const void *_buffer, int _buflen);
+		static void audio_set_coverart(void *_this, void *, const void *_buffer, int _buflen);
 		static void *run(void *);
 		static void *showPicThread(void *);
 		void parseDAAP(const void *_buffer, int _buflen);
@@ -83,12 +85,18 @@ class CShairPlay
 		void hideInfoViewer(void);
 		void showCoverArt(void);
 		void hideCoverArt(void);
+		struct audioQueueStruct {
+			int len;
+			short buf[1];
+		};
+		std::list<audioQueueStruct *> audioQueue;
+		int queuedFramesCount;
 	public:
 		CShairPlay(bool *_enabled, bool *_active);
 		~CShairPlay(void);
 		void exec(void);
-		void lock(void);
-		void unlock(void);
+		void lock(pthread_mutex_t *);
+		void unlock(pthread_mutex_t *);
 		void restart(void);
 };
 #endif

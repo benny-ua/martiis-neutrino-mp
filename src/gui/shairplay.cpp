@@ -72,7 +72,8 @@ extern cVideo * videoDecoder;
 CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 {
 	volume = 1.0f;
-	thread = 0;
+	threadId = 0;
+	audioThreadId = 0;
 	enabled = _enabled;
 	active = _active;
 	gotCoverArt = false;
@@ -80,6 +81,7 @@ CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 	secTimer = 0;
 	coverArtTimer = 0;
 	memset(last_md5sum, 0, 16);
+	queuedFramesCount = 0;
 
 	std::string interface = "eth0";
 	netGetMacAddr(interface, (unsigned char *) hwaddr);
@@ -104,28 +106,32 @@ CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
 	pthread_mutex_init(&mutex, &attr);
+	pthread_mutex_init(&audioMutex, &attr);
 
 	sem_init(&sem, 0, 0);
+	sem_init(&audioSem, 0, 0);
 
 	restart();
 
-	if (!thread)
+	if (!threadId) {
 		sem_destroy(&sem);
+		sem_destroy(&audioSem);
+	}
 }
 
 void CShairPlay::restart(void)
 {
-	if (!thread) {
-		if (pthread_create(&thread, NULL, run, this))
-			thread = 0;
+	if (!threadId) {
+		if (pthread_create(&threadId, NULL, run, this))
+			threadId = 0;
 	}
 }
 
 CShairPlay::~CShairPlay(void)
 {
-	if (thread) {
+	if (threadId) {
 		sem_post(&sem);
-		pthread_join(thread, NULL);
+		pthread_join(threadId, NULL);
 	}
 	g_RCInput->killTimer(secTimer);
 	g_RCInput->killTimer(coverArtTimer);
@@ -141,20 +147,70 @@ CShairPlay::audio_init(void *_this, int _bits, int _channels, int _samplerate)
 	T->samplerate = _samplerate;
 	T->volume = 1.0f;
 	T->initialized = false;
+	T->lock(&T->audioMutex);
+	while (!T->audioQueue.empty()) {
+		std::list<audioQueueStruct *>::iterator it = T->audioQueue.begin();
+		free(*it);
+		T->audioQueue.pop_front();
+	}
+	T->queuedFramesCount = 0;
+	T->unlock(&T->audioMutex);
 	return NULL;
 }
 
-int
-CShairPlay::audio_output(const void *_buffer, int _buflen)
+void
+CShairPlay::audio_flush(void *_this, void *)
 {
-	short *shortbuf = (short *)_buffer;
+	CShairPlay *T = (CShairPlay *) _this;
 
-	for (int i=0; i<_buflen/2; i++)
-		shortbuf[i] = shortbuf[i] * volume;
+	T->lock(&T->audioMutex);
+	while (!T->audioQueue.empty()) {
+		std::list<audioQueueStruct *>::iterator it = T->audioQueue.begin();
+		free(*it);
+		T->audioQueue.pop_front();
+	}
+	T->queuedFramesCount = 0;
+	T->unlock(&T->audioMutex);
+	sem_post(&T->audioSem);
+	while (T->audioThreadId)
+		usleep(100000);
+	while(sem_trywait(&T->audioSem));
+}
 
-	if(audioDecoder->WriteClip((unsigned char *)_buffer, _buflen) != _buflen)
-		fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, __func__);
-	return _buflen;
+void *
+CShairPlay::audioThread(void *_this)
+{
+	set_threadname("CShairPlay::audioThread");
+	CShairPlay *T = (CShairPlay *) _this;
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	audioDecoder->PrepareClipPlay(T->channels, T->samplerate, T->bits, 1);
+#else
+	audioDecoder->PrepareClipPlay(T->channels, T->samplerate, T->bits, 0);
+#endif
+	int running = true;
+
+	while (running) {
+		sem_wait(&T->audioSem);
+		T->lock(&T->audioMutex);
+		if (T->audioQueue.empty()) {
+			T->unlock(&T->audioMutex);
+			break;
+		}
+		audioQueueStruct *q = T->audioQueue.front();
+		T->audioQueue.pop_front();
+		T->unlock(&T->audioMutex);
+
+		for (int i=0; i<q->len/2; i++)
+			q->buf[i] = q->buf[i] * T->volume;
+
+		if (audioDecoder->WriteClip((unsigned char *)q->buf, q->len) != q->len) // probably shutting down
+			running = false;
+		free(q);
+	}
+	audioDecoder->StopClip();
+	T->audioThreadId = 0;
+	pthread_exit(NULL);
 }
 
 void
@@ -173,35 +229,32 @@ CShairPlay::audio_process(void *_this, void *, const void *_buffer, int _buflen)
 
 	T->pcount++;
 
-	int processed;
-
-	if (T->buffering) {
-		if (T->buflen+_buflen < (int)sizeof(T->buffer)) {
-			memcpy(T->buffer+T->buflen, _buffer, _buflen);
-			T->buflen += _buflen;
-			return;
-		}
-		T->buffering = 0;
-
-		processed = 0;
-		while (processed < T->buflen)
-			processed += T->audio_output(T->buffer+processed, T->buflen-processed);
-		T->buflen = 0;
+	audioQueueStruct *q = (audioQueueStruct *) malloc(sizeof(audioQueueStruct) + _buflen - sizeof(short));
+	if (q) {
+		q->len = _buflen;
+		memcpy(q->buf, _buffer, _buflen);
+		T->lock(&T->audioMutex);
+		if (*T->active) {
+			T->audioQueue.push_back(q);
+			sem_post(&T->audioSem);
+			T->queuedFramesCount++;
+			if (T->queuedFramesCount >= g_settings.shairplay_minqueue && !T->audioThreadId) {
+				if (!pthread_create(&T->audioThreadId, NULL, audioThread, T))
+					pthread_detach(T->audioThreadId);
+				else
+					T->audioThreadId = 0;
+			}
+		} else
+			free(q);
+		T->unlock(&T->audioMutex);
 	}
-
-	processed = 0;
-	while (processed < _buflen)
-		processed += T->audio_output((unsigned char *)_buffer+processed, _buflen-processed);
 }
 
 void
 CShairPlay::audio_destroy(void *_this, void *)
 {
 	CShairPlay *T = (CShairPlay *) _this;
-	if (T->initialized) {
-		audioDecoder->StopClip();
-		T->initialized = false;
-	}
+	T->initialized = false;
 }
 
 void
@@ -307,10 +360,10 @@ void *CShairPlay::showPicThread (void *_this)
 	set_threadname("CShairPlay::showPic");
 	CShairPlay *T = (CShairPlay *) _this;
 	unlink(COVERART_M2V);
-	T->lock();
+	T->lock(&T->mutex);
 	if (*T->active)
 		videoDecoder->ShowPicture(COVERART, COVERART_M2V);
-	T->unlock();
+	T->unlock(&T->mutex);
 	pthread_exit(NULL);
 }
 
@@ -329,10 +382,10 @@ CShairPlay::hideCoverArt(void)
 	memset(last_md5sum, 0, sizeof(last_md5sum));
 	if (showingCoverArt) {
 		showingCoverArt = false;
-		lock();
+		lock(&mutex);
 		if (*active)
 			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
-		unlock();
+		unlock(&mutex);
 	}
 }
 
@@ -374,6 +427,7 @@ CShairPlay::run(void* _this)
 	memset(&raop_cbs, 0, sizeof(raop_cbs));
 	raop_cbs.cls = T;
 	raop_cbs.audio_init = audio_init;
+	raop_cbs.audio_flush = audio_flush;
 	raop_cbs.audio_process = audio_process;
 	raop_cbs.audio_destroy = audio_destroy;
 	raop_cbs.audio_set_volume = audio_set_volume;
@@ -412,14 +466,14 @@ CShairPlay::run(void* _this)
 	pthread_exit(NULL);
 }
 
-void CShairPlay::lock(void)
+void CShairPlay::lock(pthread_mutex_t *_m)
 {
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(_m);
 }
 
-void CShairPlay::unlock(void)
+void CShairPlay::unlock(pthread_mutex_t *_m)
 {
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(_m);
 }
 
 void CShairPlay::exec(void)
@@ -431,13 +485,15 @@ void CShairPlay::exec(void)
         g_Sectionsd->setPauseScanning(true);
 
 	if (!initialized) {
-		buffering = 1;
-		buflen = 0;
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		audioDecoder->PrepareClipPlay(channels, samplerate, bits, 1);
-#else
-		audioDecoder->PrepareClipPlay(channels, samplerate, bits, 0);
-#endif
+		lock(&audioMutex);
+		while (!audioQueue.empty()) {
+			std::list<audioQueueStruct *>::iterator it = audioQueue.begin();
+			free(*it);
+			audioQueue.pop_front();
+		}
+		queuedFramesCount = 0;
+		unlock(&audioMutex);
+
 		initialized = true;
 	}
 
@@ -456,10 +512,11 @@ void CShairPlay::exec(void)
 		switch(msg) {
 			case CRCInput::RC_home:
 				*enabled = false;
-				if (thread) {
+				*active = false;
+				if (threadId) {
 					sem_post(&sem);
-					pthread_join(thread, NULL);
-					thread = 0;
+					pthread_join(threadId, NULL);
+					threadId = 0;
 				}
 				break;
 			case CRCInput::RC_plus:
@@ -475,10 +532,15 @@ void CShairPlay::exec(void)
 					showInfoViewer(true);
 				break;
 			case CRCInput::RC_timeout:
-				if (pcount == pcount_old) // no data received for 5 seconds;
+			{
+				lock(&audioMutex);
+				bool qe = audioQueue.empty();
+				unlock(&audioMutex);
+				if (qe && (pcount == pcount_old)) // queue empty and no data received for 5 seconds
 					*active = false;
 				hideInfoViewer();
 				break;
+			}
 			case CRCInput::RC_standby:
 				*enabled = false;
 				*active = false;
@@ -501,8 +563,8 @@ void CShairPlay::exec(void)
 		}
 		pcount = pcount_old;
 	}
+	audio_flush(this, NULL);
 	if (initialized) {
-		audioDecoder->StopClip();
 		initialized = false;
 	}
 	if (secTimer) {
@@ -510,11 +572,11 @@ void CShairPlay::exec(void)
 		secTimer = 0;
 	}
 	g_RCInput->killTimer(coverArtTimer);
-	lock();
+	lock(&mutex);
         CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
         g_Sectionsd->setPauseScanning(false);
         videoDecoder->StopPicture();
 	firstAudioPacket = true;
-	unlock();
+	unlock(&mutex);
 	g_Zapit->Rezap();
 }

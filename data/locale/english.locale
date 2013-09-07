@@ -1964,6 +1964,7 @@ shairplay.enable Enabled at boot
 shairplay.head ShairPlay
 shairplay.password Password
 shairplay.port Port
+shairplay.queuemin Frames to buffer
 shairplay.reenable ShairPlay re-enable
 shutdown.recoding_query You really want to to stop record ?
 shutdowntimer.announce Box will shutdown in 1 min.\nCancel Shutdown ?

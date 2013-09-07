@@ -1991,6 +1991,7 @@ const char * locale_real_names[] =
 	"shairplay.head",
 	"shairplay.password",
 	"shairplay.port",
+	"shairplay.queuemin",
 	"shairplay.reenable",
 	"shutdown.recoding_query",
 	"shutdowntimer.announce",
