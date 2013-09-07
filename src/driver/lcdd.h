@@ -194,11 +194,11 @@ class CLCD
 		bool has_lcd;
 		void wake_up();
 		void setled(void) { return; };
-		void setBacklight(bool /*on_off*/) { };
 		void setlcdparameter(void);
 #ifdef MARTII
 		void setlcdparameter(int, int);
 #endif
+		void setBacklight(bool) { return; };
 
 		static CLCD* getInstance();
 		void init(const char * fontfile, const char * fontname,

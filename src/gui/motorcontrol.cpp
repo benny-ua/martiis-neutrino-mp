@@ -319,6 +319,7 @@ int CMotorControl::exec(CMenuTarget* parent, const std::string &)
 			if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
 				delete[] (unsigned char*) data;
 		}
+		frameBuffer->blit();
 	}
 
 	hide();
@@ -455,7 +456,6 @@ void CMotorControl::paintStatus()
 	paintLine(xpos1, &ypos, width1, buf1);
 
 	paintSeparator(xpos1, &ypos, width, g_Locale->getText(LOCALE_MOTORCONTROL_SETTINGS));
-	frameBuffer->blit();
 }
 
 void CMotorControl::paintHead()

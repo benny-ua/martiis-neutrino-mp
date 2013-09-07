@@ -1460,34 +1460,40 @@ void CInfoViewer::sendNoEpg(const t_channel_id for_channel_id)
 	}
 }
 
-CSectionsdClient::CurrentNextInfo CInfoViewer::getEPG (const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
+void CInfoViewer::getEPG(const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
 {
+	/* to clear the oldinfo for channels without epg, call getEPG() with for_channel_id = 0 */
+	if (for_channel_id == 0)
+	{
+		oldinfo.current_uniqueKey = 0;
+		return;
+	}
 	CEitManager::getInstance()->getCurrentNextServiceKey(for_channel_id, info);
 
 	/* of there is no EPG, send an event so that parental lock can work */
 	if (info.current_uniqueKey == 0 && info.next_uniqueKey == 0) {
+		memcpy(&oldinfo, &info, sizeof(CSectionsdClient::CurrentNextInfo));
 		sendNoEpg(for_channel_id);
-		oldinfo = info;
-		return info;
+		return;
 	}
 
-	if (info.current_uniqueKey != oldinfo.current_uniqueKey || info.next_uniqueKey != oldinfo.next_uniqueKey) {
-		if (info.flags & (CSectionsdClient::epgflags::has_current | CSectionsdClient::epgflags::has_next)) {
-			char *_info = new char[sizeof(CSectionsdClient::CurrentNextInfo)];
-			memcpy(_info, &info, sizeof(CSectionsdClient::CurrentNextInfo));
+	if (info.current_uniqueKey != oldinfo.current_uniqueKey || info.next_uniqueKey != oldinfo.next_uniqueKey)
+	{
+		char *p = new char[sizeof(t_channel_id)];
+		memcpy(p, &for_channel_id, sizeof(t_channel_id));
 			neutrino_msg_t msg;
+		if (info.flags & (CSectionsdClient::epgflags::has_current | CSectionsdClient::epgflags::has_next))
+		{
 			if (info.flags & CSectionsdClient::epgflags::has_current)
 				msg = NeutrinoMessages::EVT_CURRENTEPG;
 			else
 				msg = NeutrinoMessages::EVT_NEXTEPG;
-			g_RCInput->postMsg(msg, (neutrino_msg_data_t) _info, false );
-		} else {
-			sendNoEpg(for_channel_id);
 		}
-		oldinfo = info;
+		else
+			msg = NeutrinoMessages::EVT_NOEPG_YET;
+		g_RCInput->postMsg(msg, (const neutrino_msg_data_t)p, false); // data is pointer to allocated memory
+		memcpy(&oldinfo, &info, sizeof(CSectionsdClient::CurrentNextInfo));
 	}
-
-	return info;
 }
 
 void CInfoViewer::showSNR ()

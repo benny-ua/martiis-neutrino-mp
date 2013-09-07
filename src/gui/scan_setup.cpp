@@ -1141,7 +1141,7 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 	CMenuForwarder			*mf;
 
 	if (!unicable) {
-		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, ((dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED)), -1, 15, this, 1, -1, LOCALE_OPTIONS_OFF);
+		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, (dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED), -1, 15, this, 1, -1, LOCALE_OPTIONS_OFF);
 		diseqc->setHint("", LOCALE_MENU_HINT_SCAN_DISEQC);
 		comm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_COMM_INPUT, &satconfig.commited, dmode == DISEQC_ADVANCED, -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		comm->setHint("", LOCALE_MENU_HINT_SCAN_COMMITED);

@@ -339,23 +339,16 @@ unsigned int CFrameBuffer::getScreenHeight(bool)
 	return DEFAULT_YRES;
 }
 
-unsigned int CFrameBuffer::getScreenPercentRel(bool force_small)
-{
-	if (force_small || !g_settings.big_windows)
-		return NON_BIG_WINDOWS;
-	return 100;
-}
-
 unsigned int CFrameBuffer::getScreenWidthRel(bool force_small)
 {
-	int percent = getScreenPercentRel(force_small);
+	int percent = force_small ? WINDOW_SIZE_MIN : g_settings.window_size;
 	// always reduce a possible detailline
 	return (DEFAULT_XRES - 2*ConnectLineBox_Width) * percent / 100;
 }
 
 unsigned int CFrameBuffer::getScreenHeightRel(bool force_small)
 {
-	int percent = getScreenPercentRel(force_small);
+	int percent = force_small ? WINDOW_SIZE_MIN : g_settings.window_size;
 	return DEFAULT_YRES * percent / 100;
 }
 
@@ -385,24 +378,16 @@ unsigned int CFrameBuffer::getScreenHeight(bool real)
 		return g_settings.screen_EndY - g_settings.screen_StartY;
 }
 
-
-unsigned int CFrameBuffer::getScreenPercentRel(bool force_small)
-{
-	if (force_small || !g_settings.big_windows)
-		return NON_BIG_WINDOWS;
-	return 100;
-}
-
 unsigned int CFrameBuffer::getScreenWidthRel(bool force_small)
 {
-	int percent = getScreenPercentRel(force_small);
+	int percent = force_small ? WINDOW_SIZE_MIN : g_settings.window_size;
 	// always reduce a possible detailline
 	return (g_settings.screen_EndX - g_settings.screen_StartX - 2*ConnectLineBox_Width) * percent / 100;
 }
 
 unsigned int CFrameBuffer::getScreenHeightRel(bool force_small)
 {
-	int percent = getScreenPercentRel(force_small);
+	int percent = force_small ? WINDOW_SIZE_MIN : g_settings.window_size;
 	return (g_settings.screen_EndY - g_settings.screen_StartY) * percent / 100;
 }
 
@@ -464,8 +449,8 @@ fprintf(stderr, "CFrameBuffer::setMode avail: %d active: %d\n", available, activ
 #define FBIO_SET_MANUAL_BLIT _IOW('F', 0x21, __u8)
 #define FBIO_BLIT 0x22
 #endif
-	// set manual blit
-	unsigned char tmp = 1;
+	// set manual blit if AZBOX_MANUAL_BLIT environment variable is set
+	unsigned char tmp = getenv("AZBOX_MANUAL_BLIT") ? 1 : 0;
 	if (ioctl(fd, FBIO_SET_MANUAL_BLIT, &tmp)<0)
 		perror("FBIO_SET_MANUAL_BLIT");
 

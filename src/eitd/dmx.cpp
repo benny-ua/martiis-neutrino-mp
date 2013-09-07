@@ -121,12 +121,16 @@ void DMX::closefd(void)
 #endif
 	if (isOpen())
 	{
-		//dmx->Stop();
 		if (dmx) {
+#if HAVE_TRIPLEDRAGON
+			/* not sure why, but we lose CN events if we do delete / new :-( */
+			dmx->Stop();
+#else
 			delete dmx;
 			dmx = NULL;
-			fd = -1;
+#endif
 		}
+		fd = -1;
 	}
 }
 

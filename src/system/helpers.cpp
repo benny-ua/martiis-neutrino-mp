@@ -35,6 +35,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/vfs.h>    /* or <sys/statfs.h> */
+#include <sys/time.h>	/* gettimeofday */
 #include <string.h>
 #include <fcntl.h>
 #include <dirent.h>

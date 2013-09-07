@@ -104,7 +104,7 @@ static bool sendEvent_needed = false;
 //NTP-Config
 #define CONF_FILE CONFIGDIR "/neutrino.conf"
 
-std::string ntp_system_cmd_prefix = "/sbin/ntpdate ";
+std::string ntp_system_cmd_prefix = "ntpdate ";
 
 std::string ntp_system_cmd;
 std::string ntpserver;
