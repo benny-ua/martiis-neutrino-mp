@@ -110,6 +110,7 @@ int my_system(int argc, const char *arg, ...)
 	argv[i] = NULL; /* sentinel */
 	//fprintf(stderr,"%s:", __func__);for(i=0;argv[i];i++)fprintf(stderr," '%s'",argv[i]);fprintf(stderr,"\n");
 
+	pid_t parent_pid = getpgrp();
 	pid_t pid;
 	int maxfd = getdtablesize();// sysconf(_SC_OPEN_MAX);
 	switch (pid = vfork())
@@ -121,8 +122,11 @@ int my_system(int argc, const char *arg, ...)
 		case 0: /* child process */
 			for(i = 3; i < maxfd; i++)
 				close(i);
+#if 0
 			if (setsid() == -1)
 				perror("my_system setsid");
+#endif
+			setpgid(getpid(), parent_pid);
 			if (execvp(argv[0], (char * const *)argv))
 			{
 				ret = -errno;
@@ -173,8 +177,10 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 		int maxfd = getdtablesize();
 		for(int i = 3; i < maxfd; i++)
 			close(i);
+#if 0
 		if (setsid() == -1)
 			perror("my_popen setsid");
+#endif
 		execl("/bin/sh", "sh", "-c", cmdstring, (char *)0);
 		exit(0);
 	 }

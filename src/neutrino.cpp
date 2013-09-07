@@ -3713,6 +3713,8 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 
 			printf("[neutrino] This is the end. exiting with code %d\n", retcode);
 			Cleanup();
+			signal(SIGTERM, SIG_IGN);
+			kill(0, SIGTERM);
 #ifdef __sh__
 			/* the sh4 gcc seems to dislike someting about openthreads... */
 			_exit(retcode);
@@ -4438,7 +4440,8 @@ void stop_video()
 
 void sighandler (int signum)
 {
-	signal (signum, SIG_IGN);
+	signal(signum, SIG_IGN);
+	signal(SIGTERM, SIG_IGN);
 	switch (signum) {
 	case SIGTERM:
 	case SIGINT:
@@ -4448,11 +4451,15 @@ void sighandler (int signum)
 		delete CVFD::getInstance();
 		delete SHTDCNT::getInstance();
 		stop_video();
+		kill(0, SIGTERM);
 #ifdef __sh__
 		_exit(0);
 #else
 		exit(0);
 #endif
+	case SIGSEGV:
+		kill(0, SIGTERM);
+		abort();
 	default:
 		break;
 	}
@@ -4460,6 +4467,10 @@ void sighandler (int signum)
 
 int main(int argc, char **argv)
 {
+	setsid();
+	setpgrp();
+	signal(SIGSEGV, sighandler);
+
 	g_Timerd = NULL;
 	g_Radiotext = NULL;
 	g_Zapit = NULL;
