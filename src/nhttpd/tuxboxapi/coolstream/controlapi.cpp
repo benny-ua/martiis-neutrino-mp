@@ -1002,12 +1002,24 @@ std::string CControlAPI::_GetBouquetWriteItem(CyhookHandler *hh, CZapitChannel *
 		result = hh->outArrayItem("channel", result, false);
 	}
 	else {
-		result += string_printf("%u "
-			   PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS
-			   " %s\n",
-			   nr,
-			   channel->channel_id,
-			   channel->getName().c_str());
+		CChannelEvent *event;
+		event = NeutrinoAPI->ChannelListEvents[channel->channel_id];
+
+		if (event && isEPGdetails) {
+			result += string_printf("%u "
+					PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS
+					" %s (%s)\n",
+					nr,
+					channel->channel_id,
+					channel->getName().c_str(), event->description.c_str());
+		} else {
+			result += string_printf("%u "
+					PRINTF_CHANNEL_ID_TYPE_NO_LEADING_ZEROS
+					" %s\n",
+					nr,
+					channel->channel_id,
+					channel->getName().c_str());
+		}
 	}
 	return result;
 }
@@ -1115,7 +1127,8 @@ void CControlAPI::GetBouquetCGI(CyhookHandler *hh) {
 				startBouquet = BouquetNr;
 				bsize = BouquetNr+1;
 			}
-			NeutrinoAPI->GetChannelEvents();
+			if (!(hh->ParamList["epg"].empty()))
+				NeutrinoAPI->GetChannelEvents();
 			for (int i = startBouquet; i < bsize; i++) {
 				channels = mode == CZapitClient::MODE_RADIO ? g_bouquetManager->Bouquets[i]->radioChannels : g_bouquetManager->Bouquets[i]->tvChannels;
 				int num = 1 + (mode == CZapitClient::MODE_RADIO ? g_bouquetManager->radioChannelsBegin().getNrofFirstChannelofBouquet(i)
@@ -1230,12 +1243,16 @@ void CControlAPI::GetBouquetsCGI(CyhookHandler *hh) {
 #ifdef MARTII
 	localizeBouquetNames();
 #endif
+	bool fav = false;
+	if (hh->ParamList["fav"] == "true")
+		fav = true;
+
 	int mode = NeutrinoAPI->Zapit->getMode();
 	std::string bouquet;
 	for (int i = 0, size = (int) g_bouquetManager->Bouquets.size(); i < size; i++) {
 		std::string item = "";
 		ZapitChannelList * channels = mode == CZapitClient::MODE_RADIO ? &g_bouquetManager->Bouquets[i]->radioChannels : &g_bouquetManager->Bouquets[i]->tvChannels;
-		if (!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || show_hidden)) {
+		if (!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || show_hidden) && (!fav || g_bouquetManager->Bouquets[i]->bUser)) {
 #ifdef MARTII
 			bouquet = std::string(g_bouquetManager->Bouquets[i]->lName.c_str());
 #else

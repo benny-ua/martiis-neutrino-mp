@@ -113,10 +113,6 @@ class CMoviePlayerGui : public CMenuTarget
 	unsigned short tpids[REC_MAX_TPIDS];
 	std::string currentttxsub;
 
-	bool isWebTV;
-	bool isYT;
-	bool showWebTVHint;
-
 	bool probePids;
 #endif
 
@@ -133,6 +129,11 @@ class CMoviePlayerGui : public CMenuTarget
 
 	/* playback from MB */
 	bool isMovieBrowser;
+	bool isHTTP;
+	bool isUPNP;
+	bool isWebTV;
+	bool isYT;
+	bool showStartingHint;
 	CMovieBrowser* moviebrowser;
 	CWebTV* webtv;
 	MI_MOVIE_INFO * p_movie_info;
@@ -182,6 +183,9 @@ class CMoviePlayerGui : public CMenuTarget
 	void selectChapter();
 #endif
 
+	void Cleanup();
+	static void *ShowStartHint(void *arg);
+
 	CMoviePlayerGui(const CMoviePlayerGui&) {};
 	CMoviePlayerGui();
 
@@ -200,6 +204,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void UpdatePosition();
 	int timeshift;
 	int file_prozent;
+	void SetFile(std::string &name, std::string &file) { file_name = name; full_name = file; }
 };
 
 #endif

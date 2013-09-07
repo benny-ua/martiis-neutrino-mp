@@ -114,14 +114,15 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 #endif
 	int x, y, imx, imy;
 
-// 	int xs = frameBuffer->getScreenWidth(true);
-// 	int ys = frameBuffer->getScreenHeight(true);
+	// 	int xs = CFrameBuffer::getInstance()->getScreenWidth(true);
+	// 	int ys = CFrameBuffer::getInstance()->getScreenHeight(true);
 
 	// Show red block for "next ready" in view state
 	if (showBusySign)
 		showBusy (m_startx + 3, m_starty + 3, 10, 0xff, 00, 00);
 
 	std::string name = _name;
+	bool url = false;
 
 	if (strstr(name.c_str(), "://")) {
 		std::string tmpname;
@@ -139,6 +140,7 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 			curl_easy_perform(ch);
 			curl_easy_cleanup(ch);
 			fclose(tmpFile);
+			url = true;
 		}
 		name = tmpname;
 	}
@@ -266,6 +268,8 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 		m_NextPic_YPan = 0;
 	}
 	m_NextPic_Name = name;
+	if (url)
+		unlink(name.c_str());
 	hideBusy ();
 	//   dbout("DecodeImage }\n"); 
 	return (m_NextPic_Buffer != NULL);
