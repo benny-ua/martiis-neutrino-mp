@@ -42,13 +42,14 @@ class CShairPlay
 		float volume;
 		sem_t sem;
 		sem_t audioSem;
-		pthread_mutex_t mutex;
+		pthread_mutex_t videoMutex;
 		pthread_mutex_t audioMutex;
 		pthread_t threadId;
 		pthread_t audioThreadId;
 		int lastMode;
 		bool *active;
 		bool *enabled;
+		bool playing;
 		bool initialized;
 		bool gotCoverArt;
 		bool showingCoverArt;
@@ -57,7 +58,6 @@ class CShairPlay
 		int infoViewerPeriod;
 		uint32_t secTimer;
 		uint32_t coverArtTimer;
-		int pcount;
 		int bits;
 		int channels;
 		int samplerate;

@@ -77,6 +77,7 @@ CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 	enabled = _enabled;
 	active = _active;
 	gotCoverArt = false;
+	playing = false;
 	firstAudioPacket = true;
 	secTimer = 0;
 	coverArtTimer = 0;
@@ -105,18 +106,13 @@ CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
-	pthread_mutex_init(&mutex, &attr);
+	pthread_mutex_init(&videoMutex, &attr);
 	pthread_mutex_init(&audioMutex, &attr);
 
 	sem_init(&sem, 0, 0);
 	sem_init(&audioSem, 0, 0);
 
 	restart();
-
-	if (!threadId) {
-		sem_destroy(&sem);
-		sem_destroy(&audioSem);
-	}
 }
 
 void CShairPlay::restart(void)
@@ -129,12 +125,17 @@ void CShairPlay::restart(void)
 
 CShairPlay::~CShairPlay(void)
 {
-	if (threadId) {
-		sem_post(&sem);
-		pthread_join(threadId, NULL);
-	}
+	audio_flush(this, NULL);
+	initialized = false;
+	*active = false;
+	sem_post(&sem);
+	sem_post(&audioSem);
+	while (threadId && audioThreadId)
+		usleep(100000);
 	g_RCInput->killTimer(secTimer);
 	g_RCInput->killTimer(coverArtTimer);
+	sem_destroy(&sem);
+	sem_destroy(&audioSem);
 	unlink(COVERART);
 }
 
@@ -154,6 +155,7 @@ CShairPlay::audio_init(void *_this, int _bits, int _channels, int _samplerate)
 		T->audioQueue.pop_front();
 	}
 	T->queuedFramesCount = 0;
+	while(!sem_trywait(&T->audioSem));
 	T->unlock(&T->audioMutex);
 	return NULL;
 }
@@ -162,7 +164,7 @@ void
 CShairPlay::audio_flush(void *_this, void *)
 {
 	CShairPlay *T = (CShairPlay *) _this;
-
+	T->playing = false;
 	T->lock(&T->audioMutex);
 	while (!T->audioQueue.empty()) {
 		std::list<audioQueueStruct *>::iterator it = T->audioQueue.begin();
@@ -170,17 +172,18 @@ CShairPlay::audio_flush(void *_this, void *)
 		T->audioQueue.pop_front();
 	}
 	T->queuedFramesCount = 0;
+	while(!sem_trywait(&T->audioSem));
 	T->unlock(&T->audioMutex);
 	sem_post(&T->audioSem);
 	while (T->audioThreadId)
 		usleep(100000);
-	while(sem_trywait(&T->audioSem));
 }
 
 void *
 CShairPlay::audioThread(void *_this)
 {
 	set_threadname("CShairPlay::audioThread");
+
 	CShairPlay *T = (CShairPlay *) _this;
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -204,7 +207,7 @@ CShairPlay::audioThread(void *_this)
 		for (int i=0; i<q->len/2; i++)
 			q->buf[i] = q->buf[i] * T->volume;
 
-		if (audioDecoder->WriteClip((unsigned char *)q->buf, q->len) != q->len) // probably shutting down
+		if (T->playing && audioDecoder->WriteClip((unsigned char *)q->buf, q->len) != q->len) // probably shutting down
 			running = false;
 		free(q);
 	}
@@ -227,7 +230,8 @@ CShairPlay::audio_process(void *_this, void *, const void *_buffer, int _buflen)
 		return;
 	}
 
-	T->pcount++;
+	if (!T->playing)
+		return;
 
 	audioQueueStruct *q = (audioQueueStruct *) malloc(sizeof(audioQueueStruct) + _buflen - sizeof(short));
 	if (q) {
@@ -338,6 +342,7 @@ CShairPlay::audio_set_coverart(void *_this, void *, const void *_buffer, int _bu
 
 	int orig = _buflen;
 	unlink(COVERART);
+	unlink(COVERART_M2V);
 	FILE *file = fopen(COVERART, "wb");
 	if (file) {
 		g_RCInput->killTimer(T->coverArtTimer);
@@ -358,34 +363,35 @@ CShairPlay::audio_set_coverart(void *_this, void *, const void *_buffer, int _bu
 void *CShairPlay::showPicThread (void *_this)
 {
 	set_threadname("CShairPlay::showPic");
+
 	CShairPlay *T = (CShairPlay *) _this;
 	unlink(COVERART_M2V);
-	T->lock(&T->mutex);
+	T->lock(&T->videoMutex);
 	if (*T->active)
 		videoDecoder->ShowPicture(COVERART, COVERART_M2V);
-	T->unlock(&T->mutex);
+	T->unlock(&T->videoMutex);
 	pthread_exit(NULL);
 }
 
 void
 CShairPlay::showCoverArt(void)
 {
+	showingCoverArt = true;
 	pthread_t p;
 	if (!pthread_create(&p, NULL, showPicThread, this))
 		pthread_detach(p);
-	showingCoverArt = true;
 }
 
 void
 CShairPlay::hideCoverArt(void)
 {
 	memset(last_md5sum, 0, sizeof(last_md5sum));
-	if (showingCoverArt) {
+	if (!gotCoverArt && showingCoverArt) {
 		showingCoverArt = false;
-		lock(&mutex);
+		lock(&videoMutex);
 		if (*active)
 			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
-		unlock(&mutex);
+		unlock(&videoMutex);
 	}
 }
 
@@ -415,14 +421,13 @@ CShairPlay::hideInfoViewer(void)
 void *
 CShairPlay::run(void* _this)
 {
-	CShairPlay *T = (CShairPlay *) _this;
 	set_threadname("CShairPlay::run");
+
+	CShairPlay *T = (CShairPlay *) _this;
 
 	dnssd_t *dnssd;
 	raop_t *raop;
 	raop_callbacks_t raop_cbs;
-
-	int error;
 
 	memset(&raop_cbs, 0, sizeof(raop_cbs));
 	raop_cbs.cls = T;
@@ -437,6 +442,7 @@ CShairPlay::run(void* _this)
 	raop = raop_init_from_keyfile(10, &raop_cbs, "/share/shairplay/airport.key", NULL);
 	if (raop == NULL) {
 		fprintf(stderr, "Could not initialize the RAOP service\n");
+		T->threadId = 0;
 		pthread_exit(NULL);
 	}
 
@@ -445,11 +451,12 @@ CShairPlay::run(void* _this)
 	short unsigned int port = g_settings.shairplay_port;
 	raop_start(raop, &port, T->hwaddr, sizeof(T->hwaddr), g_settings.shairplay_password.empty() ? NULL : g_settings.shairplay_password.c_str());
 
-	error = 0;
+	int error = 0;
 	dnssd = dnssd_init(&error);
 	if (error) {
 		fprintf(stderr, "ERROR: Could not initialize dnssd library!\n");
 		raop_destroy(raop);
+		T->threadId = 0;
 		pthread_exit(NULL);
 	}
 
@@ -463,6 +470,7 @@ CShairPlay::run(void* _this)
 	raop_stop(raop);
 	raop_destroy(raop);
 
+	T->threadId = 0;
 	pthread_exit(NULL);
 }
 
@@ -492,9 +500,10 @@ void CShairPlay::exec(void)
 			audioQueue.pop_front();
 		}
 		queuedFramesCount = 0;
+		while(!sem_trywait(&audioSem));
 		unlock(&audioMutex);
-
 		initialized = true;
+		playing = true;
 	}
 
 	showInfoViewer(true);
@@ -504,7 +513,6 @@ void CShairPlay::exec(void)
 		showCoverArt();
 	}
 
-	int pcount_old = pcount;
 	while (*active && *enabled) {
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
@@ -536,9 +544,8 @@ void CShairPlay::exec(void)
 				lock(&audioMutex);
 				bool qe = audioQueue.empty();
 				unlock(&audioMutex);
-				if (qe && (pcount == pcount_old)) // queue empty and no data received for 5 seconds
+				if (qe)
 					*active = false;
-				hideInfoViewer();
 				break;
 			}
 			case CRCInput::RC_standby:
@@ -561,7 +568,6 @@ void CShairPlay::exec(void)
 			default:
 				;
 		}
-		pcount = pcount_old;
 	}
 	audio_flush(this, NULL);
 	if (initialized) {
@@ -572,11 +578,11 @@ void CShairPlay::exec(void)
 		secTimer = 0;
 	}
 	g_RCInput->killTimer(coverArtTimer);
-	lock(&mutex);
+	lock(&videoMutex);
         CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
         g_Sectionsd->setPauseScanning(false);
         videoDecoder->StopPicture();
 	firstAudioPacket = true;
-	unlock(&mutex);
+	unlock(&videoMutex);
 	g_Zapit->Rezap();
 }
