@@ -66,9 +66,9 @@ void CShairPlaySetup::Show()
 	std::string shairplay_password_old = g_settings.shairplay_password;
 
 	CStringInputSMS si_apname(LOCALE_SHAIRPLAY_APNAME, &g_settings.shairplay_apname, 20,
-		NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789.-");
+		NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-");
 	CStringInputSMS si_password(LOCALE_SHAIRPLAY_PASSWORD, &g_settings.shairplay_password, 20,
-		NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789 -_/()<>=+.,:!?\\'");
+		NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -_/()<>=+.,:!?\\'");
 
 	m.addItem(new CMenuOptionChooser(LOCALE_SHAIRPLAY_ENABLE, &g_settings.shairplay_enabled,
 				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, NULL,
