@@ -90,7 +90,6 @@ class CShairPlay
 			short buf[1];
 		};
 		std::list<audioQueueStruct *> audioQueue;
-		int queuedFramesCount;
 	public:
 		CShairPlay(bool *_enabled, bool *_active);
 		~CShairPlay(void);

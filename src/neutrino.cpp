@@ -383,7 +383,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.shairplay_enabled = configfile.getInt32("shairplay_enabled", 0);
 	shairplay_enabled_cur = g_settings.shairplay_enabled;
 	g_settings.shairplay_port = configfile.getInt32("shairplay_port", 5000);
-	g_settings.shairplay_minqueue = configfile.getInt32("shairplay_minqueue", 255);
+	g_settings.shairplay_bufsize = configfile.getInt32("shairplay_bufsize", 255);
 	g_settings.shairplay_apname = configfile.getString("shairplay_apname", "Shairplay");
 	g_settings.shairplay_password = configfile.getString("shairplay_password", "");
 #endif
@@ -988,7 +988,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 #ifdef ENABLE_SHAIRPLAY
 	configfile.setInt32("shairplay_enabled", g_settings.shairplay_enabled);
 	configfile.setInt32("shairplay_port", g_settings.shairplay_port);
-	configfile.setInt32("shairplay_minqueue", g_settings.shairplay_minqueue);
+	configfile.setInt32("shairplay_bufsize", g_settings.shairplay_bufsize);
 	configfile.setString("shairplay_apname", g_settings.shairplay_apname);
 	configfile.setString("shairplay_password", g_settings.shairplay_password);
 #endif

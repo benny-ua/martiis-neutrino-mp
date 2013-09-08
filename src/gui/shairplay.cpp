@@ -82,7 +82,6 @@ CShairPlay::CShairPlay(bool *_enabled, bool *_active)
 	secTimer = 0;
 	coverArtTimer = 0;
 	memset(last_md5sum, 0, 16);
-	queuedFramesCount = 0;
 
 	std::string interface = "eth0";
 	netGetMacAddr(interface, (unsigned char *) hwaddr);
@@ -136,7 +135,6 @@ CShairPlay::~CShairPlay(void)
 	g_RCInput->killTimer(coverArtTimer);
 	sem_destroy(&sem);
 	sem_destroy(&audioSem);
-	unlink(COVERART);
 }
 
 void *
@@ -154,7 +152,6 @@ CShairPlay::audio_init(void *_this, int _bits, int _channels, int _samplerate)
 		free(*it);
 		T->audioQueue.pop_front();
 	}
-	T->queuedFramesCount = 0;
 	while(!sem_trywait(&T->audioSem));
 	T->unlock(&T->audioMutex);
 	return NULL;
@@ -171,12 +168,15 @@ CShairPlay::audio_flush(void *_this, void *)
 		free(*it);
 		T->audioQueue.pop_front();
 	}
-	T->queuedFramesCount = 0;
 	while(!sem_trywait(&T->audioSem));
 	T->unlock(&T->audioMutex);
 	sem_post(&T->audioSem);
+	T->gotCoverArt = false;
+	unlink(COVERART);
+	unlink(COVERART_M2V);
 	while (T->audioThreadId)
 		usleep(100000);
+	T->hideCoverArt();
 }
 
 void *
@@ -207,7 +207,7 @@ CShairPlay::audioThread(void *_this)
 		for (int i=0; i<q->len/2; i++)
 			q->buf[i] = q->buf[i] * T->volume;
 
-		if (T->playing && audioDecoder->WriteClip((unsigned char *)q->buf, q->len) != q->len) // probably shutting down
+		if (*T->active && audioDecoder->WriteClip((unsigned char *)q->buf, q->len) != q->len) // probably shutting down
 			running = false;
 		free(q);
 	}
@@ -222,35 +222,31 @@ CShairPlay::audio_process(void *_this, void *, const void *_buffer, int _buflen)
 	CShairPlay *T = (CShairPlay *) _this;
 	*T->active = true;
 
-	if (!T->initialized) {
-		if (T->firstAudioPacket) {
-			g_RCInput->postMsg(NeutrinoMessages::SHOW_INFOBAR, 0); // trigger exec in main loop
-			T->firstAudioPacket = false;
-		}
-		return;
+	if (T->firstAudioPacket) {
+		g_RCInput->postMsg(NeutrinoMessages::SHOW_INFOBAR, 0); // trigger exec in main loop
+		T->firstAudioPacket = false;
 	}
-
-	if (!T->playing)
-		return;
 
 	audioQueueStruct *q = (audioQueueStruct *) malloc(sizeof(audioQueueStruct) + _buflen - sizeof(short));
 	if (q) {
 		q->len = _buflen;
 		memcpy(q->buf, _buffer, _buflen);
-		T->lock(&T->audioMutex);
 		if (*T->active) {
+			T->lock(&T->audioMutex);
 			T->audioQueue.push_back(q);
-			sem_post(&T->audioSem);
-			T->queuedFramesCount++;
-			if (T->queuedFramesCount >= g_settings.shairplay_minqueue && !T->audioThreadId) {
+			if (T->audioQueue.size() <= (size_t) g_settings.shairplay_bufsize)
+				sem_post(&T->audioSem);
+			else
+				T->audioQueue.pop_front();
+			if (T->initialized && !T->audioThreadId && T->audioQueue.size() == (size_t) g_settings.shairplay_bufsize) {
 				if (!pthread_create(&T->audioThreadId, NULL, audioThread, T))
 					pthread_detach(T->audioThreadId);
 				else
 					T->audioThreadId = 0;
 			}
+			T->unlock(&T->audioMutex);
 		} else
 			free(q);
-		T->unlock(&T->audioMutex);
 	}
 }
 
@@ -331,8 +327,10 @@ CShairPlay::audio_set_metadata(void *_this, void *, const void *_buffer, int _bu
 	if (T->initialized)
 		T->showInfoViewer(true);
 	T->gotCoverArt = false;
-	if (!T->coverArtTimer)
-		T->coverArtTimer = g_RCInput->addTimer(5000000, false);
+	unlink(COVERART);
+	unlink(COVERART_M2V);
+	g_RCInput->killTimer(T->coverArtTimer);
+	T->coverArtTimer = g_RCInput->addTimer(5000000, false);
 }
 
 void
@@ -385,6 +383,7 @@ CShairPlay::showCoverArt(void)
 void
 CShairPlay::hideCoverArt(void)
 {
+	g_RCInput->killTimer(coverArtTimer);
 	memset(last_md5sum, 0, sizeof(last_md5sum));
 	if (!gotCoverArt && showingCoverArt) {
 		showingCoverArt = false;
@@ -499,20 +498,22 @@ void CShairPlay::exec(void)
 			free(*it);
 			audioQueue.pop_front();
 		}
-		queuedFramesCount = 0;
 		while(!sem_trywait(&audioSem));
 		unlock(&audioMutex);
 		initialized = true;
 		playing = true;
 	}
 
-	showInfoViewer(true);
 	if (!access(COVERART, R_OK)) {
 		g_RCInput->killTimer(coverArtTimer);
+		gotCoverArt = true;
 		md5_file(COVERART, 1, last_md5sum);
 		showCoverArt();
 	}
 
+	showInfoViewer(true);
+
+	int qe_count = 0;
 	while (*active && *enabled) {
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
@@ -539,15 +540,6 @@ void CShairPlay::exec(void)
 				else
 					showInfoViewer(true);
 				break;
-			case CRCInput::RC_timeout:
-			{
-				lock(&audioMutex);
-				bool qe = audioQueue.empty();
-				unlock(&audioMutex);
-				if (qe)
-					*active = false;
-				break;
-			}
 			case CRCInput::RC_standby:
 				*enabled = false;
 				*active = false;
@@ -564,6 +556,16 @@ void CShairPlay::exec(void)
 					hideCoverArt();
 					g_RCInput->killTimer(coverArtTimer);
 				}
+				// break;
+			case CRCInput::RC_timeout:
+				lock(&audioMutex);
+				if (audioQueue.empty()) {
+					qe_count++;
+					if (qe_count > 3)
+						*active = false;
+				} else
+					qe_count = 0;
+				unlock(&audioMutex);
 				break;
 			default:
 				;

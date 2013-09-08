@@ -61,7 +61,7 @@ void CShairPlaySetup::Show()
 
 	bool shairplay_enabled_old = g_settings.shairplay_enabled;
 	int shairplay_port_old = g_settings.shairplay_port;
-	int shairplay_minqueue_old = g_settings.shairplay_minqueue;
+	int shairplay_bufsize_old = g_settings.shairplay_bufsize;
 	std::string shairplay_apname_old = g_settings.shairplay_apname;
 	std::string shairplay_password_old = g_settings.shairplay_password;
 
@@ -76,13 +76,13 @@ void CShairPlaySetup::Show()
 	m.addItem(new CMenuForwarder(LOCALE_SHAIRPLAY_APNAME, true, g_settings.shairplay_apname, &si_apname));
 	m.addItem(new CMenuForwarder(LOCALE_SHAIRPLAY_PASSWORD, true, g_settings.shairplay_password, &si_password));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_SHAIRPLAY_PORT, &g_settings.shairplay_port, true, 1024, 65535));
-	m.addItem(new CMenuOptionNumberChooser(LOCALE_SHAIRPLAY_QUEUEMIN, &g_settings.shairplay_minqueue, true, 1, 999));
+	m.addItem(new CMenuOptionNumberChooser(LOCALE_SHAIRPLAY_BUFSIZE, &g_settings.shairplay_bufsize, true, 10, 999));
 	m.exec(NULL, "");
 	m.hide();
 
 	if (g_settings.shairplay_enabled != shairplay_enabled_old
 	 || shairplay_port_old != g_settings.shairplay_port
-	 || shairplay_minqueue_old != g_settings.shairplay_minqueue
+	 || shairplay_bufsize_old != g_settings.shairplay_bufsize
 	 || shairplay_apname_old != g_settings.shairplay_apname
 	 || shairplay_password_old != g_settings.shairplay_password) {
 			delete CNeutrinoApp::getInstance()->shairPlay;

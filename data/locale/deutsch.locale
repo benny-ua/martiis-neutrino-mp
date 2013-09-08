@@ -1958,11 +1958,11 @@ settings.pos_top_right oben rechts
 settings.restore Wiederherstellen
 settings.restore_warn Alle Settings werden ersetzt.\nDie Box wird neu gestartet.\nWeiter?
 shairplay.apname AP-Name
+shairplay.bufsize Zwischengespeicherte Pakete
 shairplay.enable Beim Start aktiv
 shairplay.head ShairPlay
 shairplay.password Passwort
 shairplay.port Port
-shairplay.queuemin Zwischengespeicherte Pakete
 shairplay.reenable ShairPlay reaktivieren
 shutdown.recoding_query Aufnahme läuft. Trotzdem beenden?
 shutdowntimer.announce Die Box wird in 1 Min. heruntergefahren.\nShutdown abbrechen?

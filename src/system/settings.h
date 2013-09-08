@@ -193,7 +193,7 @@ struct SNeutrinoSettings
 #ifdef ENABLE_SHAIRPLAY
 	int shairplay_enabled;
 	int shairplay_port;
-	int shairplay_minqueue;
+	int shairplay_bufsize;
 	std::string shairplay_apname;
 	std::string shairplay_password;
 #endif
