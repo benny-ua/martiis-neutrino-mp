@@ -171,7 +171,6 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	CMenuForwarder *fw_audio = NULL;
 	CMenuForwarder *fw_inet = NULL;
 	CMenuForwarder *fw_pviewer = NULL;
-	CMenuOptionChooser *ch_shairplay = NULL;
 	CMenuForwarder *fw_shairport = NULL;
 	CPictureViewerGui *pictureviewergui = NULL;
 #if ENABLE_UPNP
@@ -222,25 +221,20 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		upnpbrowsergui = new CUpnpBrowserGui();
 		fw_upnp = new CMenuForwarder(LOCALE_UPNPBROWSER_HEAD, true, NULL, upnpbrowsergui, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
 #endif
-//  		media->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, usage_mode == MODE_AUDIO ? CMenuWidget::BTN_TYPE_CANCEL : CMenuWidget::BTN_TYPE_BACK);
+//		media->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, usage_mode == MODE_AUDIO ? CMenuWidget::BTN_TYPE_CANCEL : CMenuWidget::BTN_TYPE_BACK);
 	}
 
 	if (usage_mode == MODE_AUDIO)
 	{
- 		//audio player	
+ 		//audio player
 		personalize->addItem(media, fw_audio, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_AUDIO]);
 
  		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 
-#ifdef ENABLE_SHAIRPLAY
-		if (ch_shairplay)
-			personalize->addItem(media, ch_shairplay, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
-#else
  		//shairport
 		if (fw_shairport)
 				personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
-#endif
 	}
 	else if (usage_mode == MODE_VIDEO)
 	{
@@ -250,12 +244,14 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	{
 		//audio player
 		personalize->addItem(media, fw_audio, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_AUDIO]);
-		
+
+#ifndef ENABLE_SHAIRPLAY
  		//shairport
 		if (fw_shairport) {
 				personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 				personalize->addSeparator(0);
 		}
+#endif
  		
 		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
@@ -271,6 +267,13 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 			showMoviePlayer(media, personalize);
 		
+#ifdef ENABLE_SHAIRPLAY
+ 		//shairplay
+		if (fw_shairport) {
+			personalize->addSeparator(0);
+			personalize->addItem(media, fw_shairport, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
+		}
+#endif
 	}
 	
 	int res = menu_return::RETURN_NONE;
