@@ -171,12 +171,10 @@ CShairPlay::audio_flush(void *_this, void *)
 	while(!sem_trywait(&T->audioSem));
 	T->unlock(&T->audioMutex);
 	sem_post(&T->audioSem);
-	T->gotCoverArt = false;
 	unlink(COVERART);
 	unlink(COVERART_M2V);
 	while (T->audioThreadId)
 		usleep(100000);
-	T->hideCoverArt();
 }
 
 void *
@@ -572,6 +570,8 @@ void CShairPlay::exec(void)
 		}
 	}
 	audio_flush(this, NULL);
+	gotCoverArt = false;
+	hideCoverArt();
 	if (initialized) {
 		initialized = false;
 	}
