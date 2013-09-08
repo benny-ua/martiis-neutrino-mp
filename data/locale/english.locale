@@ -821,7 +821,6 @@ mainmenu.recording_stop stop
 mainmenu.scripts Scripts
 mainmenu.service Service
 mainmenu.settings Settings
-mainmenu.shairport ShairPort
 mainmenu.shutdown Shutdown
 mainmenu.sleeptimer SleepTimer
 mainmenu.tvmode TV-Mode
@@ -1197,7 +1196,6 @@ menu.hint_selected_text Change selected item text color
 menu.hint_service Tuner setup, service scan,\nbouquet editor, software upgrade
 menu.hint_service_scan Tuner setup, service scan
 menu.hint_settings Configure Neutrino-HD\nNetwork, audio, video, OSD and more
-menu.hint_shairport ShairPort
 menu.hint_show_mute_icon Show mute icon, when volume set to 0
 menu.hint_shutdown Put your box in deep standby mode\nNo confirmation
 menu.hint_shutdown_count Time to put box in deep-standby\nfrom soft-standby mode

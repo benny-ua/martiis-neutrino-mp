@@ -123,10 +123,6 @@ class CAudioPlayerGui : public CMenuTarget
 
 	bool           m_playlistHasChanged;
 
-#ifndef ENABLE_SHAIRPLAY
-	bool           m_shairport;
-#endif
-
 	CAudioPlayList      m_playlist;
 	CAudioPlayList      m_radiolist;
 	CAudioPlayList      m_filelist;
