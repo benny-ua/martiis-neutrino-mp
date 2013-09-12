@@ -105,7 +105,7 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		CNeutrinoApp::getInstance()->shairplay_enabled_cur = true;
 		CNeutrinoApp::getInstance()->shairPlay->restart();
-		return menu_return::RETURN_REPAINT;
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if	(actionKey == "inetplayer")
 	{
