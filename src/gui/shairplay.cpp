@@ -503,6 +503,7 @@ void CShairPlay::exec(void)
 		showCoverArt();
 	}
 
+	g_InfoViewer->killTitle();
 	showInfoViewer(true);
 
 	int qe_count = 0;
