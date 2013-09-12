@@ -495,7 +495,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 	if (selected > 0 && selected < (int)items.size())
 		pos = selected;
 	else
-		selected = 0;
+		selected = -1;
 	exit_pressed = false;
 
 	frameBuffer->Lock();
