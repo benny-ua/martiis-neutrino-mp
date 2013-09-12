@@ -1668,8 +1668,10 @@ void CMovieBrowser::refreshTitle(void)
 	if (show_mode == MB_SHOW_YT) {
 		title = g_Locale->getText(LOCALE_MOVIEPLAYER_YTPLAYBACK);
 		title += " : ";
-		title += g_Locale->getText(getFeedLocale());
-		title += " \"" + m_settings.ytsearch + "\"";
+		neutrino_locale_t loc = getFeedLocale();
+		title += g_Locale->getText(loc);
+		if (loc == LOCALE_MOVIEBROWSER_YT_RELATED || loc == LOCALE_MOVIEBROWSER_YT_SEARCH)
+			title += " \"" + m_settings.ytsearch + "\"";
 	}
 	
 	TRACE("[mb]->refreshTitle : %s\r\n", title.c_str());
