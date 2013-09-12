@@ -448,21 +448,15 @@ CShairPlay::run(void* _this)
 	short unsigned int port = g_settings.shairplay_port;
 	raop_start(raop, &port, T->hwaddr, sizeof(T->hwaddr), g_settings.shairplay_password.empty() ? NULL : g_settings.shairplay_password.c_str());
 
-	int error = 0;
-	dnssd = dnssd_init(&error);
-	if (error) {
+	dnssd = dnssd_init(NULL);
+	if (dnssd) {
+		dnssd_register_raop(dnssd, g_settings.shairplay_apname.c_str(), port, T->hwaddr, sizeof(T->hwaddr), 0);
+		sem_wait(&T->sem);
+		dnssd_unregister_raop(dnssd);
+		dnssd_destroy(dnssd);
+	} else {
 		fprintf(stderr, "ERROR: Could not initialize dnssd library!\n");
-		raop_destroy(raop);
-		T->threadId = 0;
-		pthread_exit(NULL);
 	}
-
-	dnssd_register_raop(dnssd, g_settings.shairplay_apname.c_str(), port, T->hwaddr, sizeof(T->hwaddr), 0);
-
-	sem_wait(&T->sem);
-
-	dnssd_unregister_raop(dnssd);
-	dnssd_destroy(dnssd);
 
 	raop_stop(raop);
 	raop_destroy(raop);
