@@ -514,7 +514,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	g_Font[font_info]->RenderString (xpos, ypos, box_width, buf, COL_INFOBAR_TEXT, 0, true);	// UTF-8
 
 	const char *_framerate[8] = {"23.976fps", "24fps", "25fps", "29,976fps", "30fps", "50fps", "50,94fps", "60fps"};
-	p = (framerate < 8) ? _framerate[framerate] : g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN);
+	p = (framerate > -1 && framerate < 8) ? _framerate[framerate] : g_Locale->getText (LOCALE_STREAMINFO_FRAMERATE_UNKNOWN);
 
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true);	// UTF-8
 
