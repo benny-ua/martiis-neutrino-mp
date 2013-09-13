@@ -271,16 +271,9 @@ void deleteOldfileEvents(char *epgdir)
 	}
 }
 
-#ifdef MARTII
-static bool insertEventsfromFile_running = false;
-#endif
-
 void *insertEventsfromFile(void * data)
 {
-#ifdef MARTII
 	set_threadname(__func__);
-	insertEventsfromFile_running = true;
-#endif
 	reader_ready=false;
 	xmlDocPtr event_parser = NULL;
 	xmlNodePtr eventfile = NULL;
@@ -429,13 +422,10 @@ void *insertEventsfromFile(void * data)
 
 	xmlFreeDoc(index_parser);
 	printdate_ms(stdout);
-	printf("[sectionsd] Reading Information finished after %ld miliseconds (%d events)\n",
+	printf("[sectionsd] Reading Information finished after %ld milliseconds (%d events)\n",
 			time_monotonic_ms()-now, ev_count);
 
 	reader_ready = true;
-#ifdef MARTII
-	insertEventsfromFile_running = false;
-#endif
 
 	pthread_exit(NULL);
 }
@@ -496,10 +486,6 @@ void writeEventsToFile(char *epgdir)
 	}
 
 	printf("[sectionsd] Writing Information to file: %s\n", tmpname.c_str());
-#ifdef MARTII
-	while (insertEventsfromFile_running)
-		sleep(1);
-#endif
 
 	write_index_xml_header(indexfile);
 
