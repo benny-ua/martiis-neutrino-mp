@@ -54,8 +54,6 @@
 #include <driver/rcinput.h>
 #include <gui/audiomute.h>
 
-extern long timer_wakeup; // neutrino.cpp
-
 CBatchEPG_Menu::CBatchEPG_Menu()
 {
 	//frameBuffer = CFrameBuffer::getInstance();
@@ -229,7 +227,7 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		bool wakeup = true;
 		if (actionKey == "timer")
-			wakeup = timer_wakeup;
+			wakeup = CNeutrinoApp::getInstance()->timer_wakeup;
 
 		bool muted = false;
 

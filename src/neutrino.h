@@ -186,6 +186,7 @@ public:
 	bool				shairplay_enabled_cur;
 #endif
 #endif
+	bool                            timer_wakeup;
 
 	static CNeutrinoApp* getInstance();
 

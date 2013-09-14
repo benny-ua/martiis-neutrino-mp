@@ -53,12 +53,12 @@
 
 #include <global.h>
 #include <driver/shutdown_count.h>
-#include <neutrino.h>
+//#include <neutrino.h>
+#include <neutrinoMessages.h>
 #include <timerd/timermanager.h>
 #include <cs_api.h>
 
 #include <gui/cec_setup.h> // FIXME
-#include <timerd/timermanager.h> // FIXME
 
 //#define RCDEBUG
 //#define USE_GETTIMEOFDAY
@@ -85,10 +85,11 @@ static bool input_stopped = false;
 *	Constructor - opens rc-input device, selects rc-hardware and starts threads
 *
 *********************************************************************************/
-CRCInput::CRCInput()
+CRCInput::CRCInput(bool &_timer_wakeup)
 {
 	timerid= 1;
 	repeatkeys = NULL;
+	timer_wakeup = &_timer_wakeup;
 
 	// pipe for internal event-queue
 	// -----------------------------
@@ -1280,10 +1281,9 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					printf("rc_last_key %04x rc_last_repeat_key %04x\n\n", rc_last_key, rc_last_repeat_key);
 #endif
 					if (firstKey) {
-						extern long timer_wakeup; // neutrino.cpp
-						if (timer_wakeup) {
+						if (*timer_wakeup) {
 							unlink("/tmp/.timer_wakeup");
-							timer_wakeup = false;
+							*timer_wakeup = false;
 							CCECSetup cecsetup;
 							cecsetup.setCECSettings(true);
 							CTimerManager::getInstance()->cancelShutdownOnWakeup();

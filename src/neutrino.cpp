@@ -1937,7 +1937,7 @@ void CNeutrinoApp::InitSectiondClient()
 #include <cs_frontpanel.h>
 #endif
 
-void wake_up(long &wakeup)
+void wake_up(bool &wakeup)
 {
 #if HAVE_COOL_HARDWARE
 #ifndef FP_IOCTL_CLEAR_WAKEUP_TIMER
@@ -1962,7 +1962,7 @@ void wake_up(long &wakeup)
 #endif
 	/* not platform specific - this is created by the init process */
 	if (access("/tmp/.timer_wakeup", F_OK) == 0) {
-		wakeup = 1;
+		wakeup = true;
 #ifndef MARTII
 		unlink("/tmp/.timer_wakeup");
 #endif
@@ -1998,7 +1998,6 @@ static void *autodelete_thread(void *) {
 	return NULL;
 }
 
-long timer_wakeup = 0;
 #endif
 int CNeutrinoApp::run(int argc, char **argv)
 {
@@ -2105,7 +2104,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_videoSettings->setVideoSettings();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 
-	g_RCInput = new CRCInput();
+	g_RCInput = new CRCInput(timer_wakeup);
 
 	/* later on, we'll crash anyway, so tell about it. */
 	if (! zapit_init)
@@ -2118,7 +2117,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	//timer start
 #ifndef MARTII
-	long timer_wakeup = 0;
+	timer_wakeup = false;//init
 	wake_up( timer_wakeup );
 
 	init_cec_setting = true;
@@ -2129,14 +2128,18 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 		init_cec_setting = false;
 	}
 #endif
+	timer_wakeup = (timer_wakeup && g_settings.shutdown_timer_record_type);
 	g_settings.shutdown_timer_record_type = false;
 
 	/* todo: check if this is necessary
 	pthread_create (&timer_thread, NULL, timerd_main_thread, (void *) (timer_wakeup && g_settings.shutdown_timer_record_type));
 	 */
+	// The thread argument sets a pointer to Neutrinos timer_wakeup. *pointer is set to true
+	// when timerd is ready, so save the real timer_wakeup value and restore it later. --martii
+	bool timer_wakup_real = timer_wakeup;
+	timer_wakeup = false;
 	pthread_create (&timer_thread, NULL, timerd_main_thread, (void *)&timer_wakeup);
 	timerd_thread_started = true;
-	// timer_wakeup = false;
 
 #ifdef MARTII
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG, &g_settings.audio_mixer_volume_analog);
@@ -2257,9 +2260,10 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	/* wait until timerd is ready... */
 	time_t timerd_wait = time_monotonic_ms();
-	while (timer_wakeup >= 0)
+	while (!timer_wakeup)
 		usleep(100);
 	dprintf(DEBUG_NORMAL, "had to wait %ld ms for timerd start...\n", time_monotonic_ms() - timerd_wait);
+	timer_wakeup = timer_wakup_real;
 	InitTimerdClient();
 
 	g_volume = CVolume::getInstance();
@@ -3245,6 +3249,7 @@ _repeat:
 		return messages_return::handled;
 	}
 	else if (msg == NeutrinoMessages::RECORD_START) {
+
 		//FIXME better at announce ?
 		if( mode == mode_standby ) {
 			cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
@@ -3256,6 +3261,28 @@ _repeat:
 #ifdef MARTII
 		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
 #endif
+#if 0
+		//zap to rec channel if box start from deepstandby
+		if(timer_wakeup){
+			timer_wakeup=false;
+			dvbsub_stop();
+			CTimerd::RecordingInfo * eventinfo = (CTimerd::RecordingInfo *) data;
+			t_channel_id channel_id=eventinfo->channel_id;
+			g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
+		}
+#endif
+		//zap to rec channel in standby-mode
+		if(mode == mode_standby){
+			CTimerd::RecordingInfo * eventinfo = (CTimerd::RecordingInfo *) data;
+			bool recordingStatus = CRecordManager::getInstance()->RecordingStatus(eventinfo->channel_id);
+			t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+
+			if( !recordingStatus && (eventinfo->channel_id != live_channel_id) && channelList->SameTP(eventinfo->channel_id) && !(SAME_TRANSPONDER(live_channel_id, eventinfo->channel_id)) ){
+  				dvbsub_stop();
+				t_channel_id channel_id=eventinfo->channel_id;
+				g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
+			}
+		}
 		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF) {
 			CRecordManager::getInstance()->Record((CTimerd::RecordingInfo *) data);
 			autoshift = CRecordManager::getInstance()->TimeshiftOnly();
@@ -4917,7 +4944,13 @@ void CNeutrinoApp::Cleanup()
 	printf("cleanup 5\n");fflush(stdout);
 	delete CEitManager::getInstance();
 	printf("cleanup 6\n");fflush(stdout);
-	//delete CVFD::getInstance();
-	//malloc_stats();
+#ifndef MARTII
+	delete CVFD::getInstance();
+#ifdef __UCLIBC__
+	malloc_stats(NULL);
+#else
+	malloc_stats();
+#endif
+#endif
 #endif
 }
