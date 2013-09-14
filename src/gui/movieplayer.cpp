@@ -565,14 +565,14 @@ bool CMoviePlayerGui::SelectFile()
 						sscanf(cLine, "#EXTINF:%d,%[^\n]\n", &dur, name);
 						if (strlen(cLine) > 0 && cLine[0]!='#')
 						{
-							char *url = NULL;
-							if ( (url = strstr(cLine, "http://")) || (url = strstr(cLine, "rtmp://")) || (url = strstr(cLine, "rtsp://")) ){
-								if (url != NULL) {
-									printf("name %s [%d] url: %s\n", name, dur, url);
-									full_name = url;
-									if(strlen(name))
-										file_name = name;
-								}
+							char *url = strstr(cLine, "://");
+							if (url) {
+								while (url > cLine && isalpha(*(url - 1)))
+									url--;
+								printf("name %s [%d] url: %s\n", name, dur, url);
+								full_name = url;
+								if(strlen(name))
+									file_name = name;
 							}
 						}
 					}
