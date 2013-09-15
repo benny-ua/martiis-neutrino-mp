@@ -3979,8 +3979,11 @@ CYTChartsMenu::CYTChartsMenu(int &_select, int _ytmode)
 	ytmode = _ytmode;
 }
 
-int CYTChartsMenu::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
+int CYTChartsMenu::exec(CMenuTarget *parent, const std::string & /*actionKey*/)
 {
+	if(parent)
+		parent->hide();
+
 	CMenuWidget m(LOCALE_MOVIEBROWSER_YT_CHARTS, NEUTRINO_ICON_MOVIEPLAYER);
 	m.addIntroItems();
 	int sel = -1;
@@ -3993,7 +3996,7 @@ int CYTChartsMenu::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey
 	}
 	m.exec(NULL, "");
 
-	if (sel > 0) {
+	if (sel > -1) {
 		*selectp = sel;
 		g_RCInput->postMsg(CRCInput::RC_home, 0);
 	}
