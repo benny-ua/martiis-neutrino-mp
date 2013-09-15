@@ -28,19 +28,15 @@
 #include <config.h>
 #endif
 
-#include <driver/lcdd.h>
-#include <global.h>
-#include <neutrino.h>
-#include <system/settings.h>
-
 #include <fcntl.h>
 #include <sys/timeb.h>
 #include <time.h>
 #include <unistd.h>
-#include <poll.h>
-#include <math.h>
-
+#include <driver/lcdd.h>
+#include <global.h>
+#include <neutrino.h>
 #include <daemonc/remotecontrol.h>
+#include <system/settings.h>
 #include <system/set_threadname.h>
 
 #if HAVE_SPARK_HARDWARE
@@ -89,26 +85,32 @@ CLCD::~CLCD()
 CLCD* CLCD::getInstance()
 {
 	static CLCD* lcdd = NULL;
-	if(lcdd == NULL) {
+	if (lcdd == NULL)
 		lcdd = new CLCD();
-	}
 	return lcdd;
 }
 
-void CLCD::wake_up() {
+void CLCD::wake_up()
+{
 }
 
-void* CLCD::TimeThread(void *arg __attribute__((unused)))
+void* CLCD::TimeThread(void *)
 {
         set_threadname("CLCD::TimeThread");
 	CLCD *cvfd = CLCD::getInstance();
 	cvfd->timeThreadRunning = true;
 	cvfd->waitSec = 0;
 	while (cvfd->timeThreadRunning) {
-		struct timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts);
-		ts.tv_sec += cvfd->waitSec;
-		int res = sem_timedwait(&cvfd->sem, &ts);
+		int res;
+
+		if (cvfd->waitSec == -1)
+			res = sem_wait(&cvfd->sem);
+		else {
+			struct timespec ts;
+			clock_gettime(CLOCK_REALTIME, &ts);
+			ts.tv_sec += cvfd->waitSec;
+			res = sem_timedwait(&cvfd->sem, &ts);
+		}
 		if (!cvfd->showclock) {
 			cvfd->waitSec = -1; // forever
 			continue;
@@ -131,9 +133,14 @@ void* CLCD::TimeThread(void *arg __attribute__((unused)))
 	return NULL;
 }
 
+void CLCD::init(const char *, const char *, const char *, const char *, const char *, const char *)
+{
+}
+
 void CLCD::setlcdparameter(int dimm, const int power)
 {
-	if(!has_lcd) return;
+	if(fd < 0)
+		return;
 
 	if(dimm < 0)
 		dimm = 0;
@@ -154,7 +161,6 @@ void CLCD::setlcdparameter(int dimm, const int power)
 
 void CLCD::setlcdparameter(void)
 {
-	if(!has_lcd) return;
 	int last_toggle_state_power = g_settings.lcd_setting[SNeutrinoSettings::LCD_POWER];
 	setlcdparameter((mode == MODE_STANDBY)
 		? g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS]
@@ -170,7 +176,6 @@ void CLCD::showServicename(const std::string name, bool)
 		return;
 
 	ShowText((char *) name.c_str());
-	wake_up();
 }
 
 void CLCD::showTime(bool)
@@ -203,6 +208,9 @@ void CLCD::showTime(bool)
 	now += tm.tm_gmtoff;
 
 #if HAVE_SPARK_HARDWARE
+	if (fd < 0)
+		return;
+
 	if (ioctl(fd, VFDSETTIME2, &now) < 0 && g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM) {
 		char buf[10];
 		strftime(buf, sizeof(buf), "%H%M", &tm);
@@ -236,7 +244,6 @@ void CLCD::showMenuText(const int position __attribute__((unused)), const char *
 		return;
 
 	ShowText((char *) txt);
-	wake_up();
 }
 
 void CLCD::showAudioTrack(const std::string & artist __attribute__((unused)), const std::string & title, const std::string & album __attribute__((unused)))
@@ -246,7 +253,6 @@ void CLCD::showAudioTrack(const std::string & artist __attribute__((unused)), co
 		return;
 //printf("CLCD::showAudioTrack: %s\n", title.c_str());
 	ShowText((char *) title.c_str());
-	wake_up();
 }
 
 void CLCD::showAudioPlayMode(AUDIOMODES m __attribute__((unused)))
@@ -259,8 +265,6 @@ void CLCD::showAudioProgress(const char perc __attribute__((unused)), bool isMut
 
 void CLCD::setMode(const MODES m, const char * const title)
 {
-	if(!has_lcd) return;
-
 	MODES lastmode = mode;
 
 	if(mode == MODE_AUDIO)
@@ -291,40 +295,50 @@ void CLCD::setMode(const MODES m, const char * const title)
 	default:
 		;
 	}
-	wake_up();
 }
 
 
-void CLCD::setBrightness(int bright __attribute__((unused)))
+void CLCD::setBrightness(int bright)
 {
-	if(!has_lcd) return;
+	g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = bright;
 
-	//g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = bright;
+	if(g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] > 7)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = 7;
+	else if(g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] < 0)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = 0;
+
 	setlcdparameter();
 }
 
 int CLCD::getBrightness()
 {
-	//FIXME for old neutrino.conf
 	if(g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] > 7)
 		g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = 7;
+	else if(g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] < 0)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS] = 0;
 
 	return g_settings.lcd_setting[SNeutrinoSettings::LCD_BRIGHTNESS];
 }
 
-void CLCD::setBrightnessStandby(int bright __attribute__((unused)))
+void CLCD::setBrightnessStandby(int bright)
 {
-	if(!has_lcd) return;
+	g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = bright;
 
-//	g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = bright;
+	if(g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] > 7)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = 7;
+	else if(g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] < 0)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = 0;
+
 	setlcdparameter();
 }
 
 int CLCD::getBrightnessStandby()
 {
-	//FIXME for old neutrino.conf
 	if(g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] > 7)
 		g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = 7;
+	else if(g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] < 0)
+		g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS] = 0;
+
 	return g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_BRIGHTNESS];
 }
 
@@ -341,13 +355,12 @@ void CLCD::togglePower(void)
 {
 }
 
-void CLCD::setMuted(bool mu __attribute__((unused)))
+void CLCD::setMuted(bool /*mu*/)
 {
 }
 
 void CLCD::resume(bool showServiceName)
 {
-	if(!has_lcd) return;
 	showclock = true;
 	waitSec = 0;
 	if (showServiceName)
@@ -357,7 +370,6 @@ void CLCD::resume(bool showServiceName)
 
 void CLCD::pause()
 {
-	if(!has_lcd) return;
 	showclock = false;
 }
 
@@ -372,24 +384,27 @@ void CLCD::Unlock()
 void CLCD::Clear()
 {
 #if HAVE_SPARK_HARDWARE
-	if(!has_lcd) return;
+	if (fd < 0)
+		return;
+
         struct vfd_ioctl_data data;
 	data.start_address = 0x01;
 	data.length = 0x0;
 	
 	int ret = ioctl(fd, VFDDISPLAYCLR, &data);
 	if(ret < 0)
-		perror("IOC_VFD_CLEAR_ALL");
+		perror("VFDDISPLAYCLR");
 #endif
 }
 
 void CLCD::ShowIcon(fp_icon icon, bool show)
 {
 #if HAVE_SPARK_HARDWARE
+	if (fd < 0)
+		return;
 	int which;
 	switch (icon) {
 		case FP_ICON_PLAY:
-		//case FP_ICON_TIMESHIFT:
 			which = LED_GREEN;
 			break;
 		case FP_ICON_RECORD:
@@ -434,6 +449,9 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
         printf("CLCD::ShowText: [%s]\n", str);
 #endif
 
+	if (fd < 0)
+		return;
+
 	waitSec = 0;
 	if (str) {
 		std::string s(str);
@@ -452,10 +470,6 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 	}
 
 	sem_post(&sem);
-}
-
-void CLCD::init(const char *, const char *, const char *, const char *, const char *, const char *)
-{
 }
 
 void CLCD::setEPGTitle(const std::string)
