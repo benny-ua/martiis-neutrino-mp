@@ -82,6 +82,9 @@ typedef enum
 
 #include <configfile.h>
 #include <pthread.h>
+#ifdef MARTII
+#include <semaphore.h>
+#endif
 
 #ifdef HAVE_TRIPLEDRAGON
 #include <lcddisplay/fontrenderer.h>
@@ -182,12 +185,11 @@ class CLCD
 #ifdef MARTII
 		std::string	lastOutput;
 		int		fd;
-		int		time_notify_reader;
-		int		time_notify_writer;
 		int		waitSec;
 		bool		showclock;
 		bool		timeThreadRunning;
 		unsigned int	timeout_cnt;
+		sem_t		sem;
 #endif
 #endif
 	public:

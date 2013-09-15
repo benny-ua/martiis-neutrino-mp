@@ -109,6 +109,8 @@ nGLCD::~nGLCD() {
 		lcd->DeInit();
 		delete lcd;
 	}
+	sem_destroy(&sem);
+	pthread_mutex_destroy(&mutex);
 }
 
 nGLCD *nGLCD::getInstance()
