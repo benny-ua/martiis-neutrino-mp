@@ -142,7 +142,6 @@ int CUpdateSettings::initMenu()
 //	name_apply->setHint("", LOCALE_MENU_HINT_XXX);
 	OnOffNotifier->addItem(name_apply);
 #endif
-#endif
 
 #if 0
 	CMenuOptionChooser *apply_kernel = new CMenuOptionChooser(LOCALE_FLASHUPDATE_MENU_APPLY_KERNEL, &g_settings.apply_kernel, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, g_settings.apply_settings);
@@ -157,7 +156,6 @@ int CUpdateSettings::initMenu()
 	w_upsettings.addItem(GenericMenuSeparatorLine);
 	w_upsettings.addItem(apply_settings);
 	w_upsettings.addItem(name_apply);
-#endif
 #endif
 
 #if 0

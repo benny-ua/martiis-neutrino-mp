@@ -32,6 +32,7 @@
 #include <sys/timeb.h>
 #include <time.h>
 #include <unistd.h>
+#include <errno.h>
 #include <driver/lcdd.h>
 #include <global.h>
 #include <neutrino.h>
