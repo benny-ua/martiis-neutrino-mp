@@ -135,6 +135,8 @@ CShairPlay::~CShairPlay(void)
 	g_RCInput->killTimer(coverArtTimer);
 	sem_destroy(&sem);
 	sem_destroy(&audioSem);
+	pthread_mutex_destroy(&videoMutex);
+	pthread_mutex_destroy(&audioMutex);
 }
 
 void *
