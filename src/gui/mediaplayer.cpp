@@ -185,7 +185,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 #ifdef ENABLE_SHAIRPLAY
 		neutrino_msg_t shairplay_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_blue : CRCInput::RC_nokey;
 		const char* shairplay_btn = usage_mode == MODE_AUDIO ? NEUTRINO_ICON_BUTTON_BLUE : "";
-		if (!CNeutrinoApp::getInstance()->shairplay_enabled_cur)
+		if (g_settings.shairplay_enabled && !CNeutrinoApp::getInstance()->shairplay_enabled_cur)
 			fw_shairplay = new CMenuForwarder(LOCALE_SHAIRPLAY_REENABLE, true, NULL, this, "shairplay", shairplay_rc, shairplay_btn);
 		//fw_shairplay->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_SHAIRPLAY);
 #endif
