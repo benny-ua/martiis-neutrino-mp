@@ -3441,6 +3441,7 @@ _repeat:
 	}
 	else if( msg == NeutrinoMessages::SHUTDOWN ) {
 		if(!skipShutdownTimer) {
+			timer_wakeup = true;
 			ExitRun(true, can_deepstandby);
 		}
 		else {
