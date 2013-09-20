@@ -243,7 +243,6 @@
 #define NEUTRINO_ICON_HINT_RESTORE	"hint_restore"
 #define NEUTRINO_ICON_HINT_FACTORY	"hint_factory"
 
-#ifdef MARTII
 /* opkg manager */
 #define NEUTRINO_ICON_CHECKMARK		"checkmark"
 #define NEUTRINO_ICON_WARNING		"warning"
@@ -270,7 +269,7 @@
 #define NEUTRINO_ICON_GREEN_7		"7-green"
 #define NEUTRINO_ICON_GREEN_8		"8-green"
 #define NEUTRINO_ICON_GREEN_9		"9-green"
-#endif
+
 /* misc */
 #define NEUTRINO_ICON_HINT_YTPLAY	"hint_ytplay"
 

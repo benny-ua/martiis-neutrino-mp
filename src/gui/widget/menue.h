@@ -46,13 +46,11 @@
 
 #include <string>
 #include <vector>
-#ifdef MARTII
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 }
-#endif
 
 #define NO_WIDGET_ID -1
 
@@ -78,12 +76,10 @@ class CChangeObserver
 		{
 			return false;
 		}
-#ifdef MARTII
 		virtual bool changeNotify(lua_State * /*L*/, const std::string & /*luaId*/, const std::string & /*luaAction*/, void * /*Data*/)
 		{
 			return false;
 		}
-#endif
 };
 
 class CMenuTarget
@@ -108,11 +104,9 @@ class CMenuItem
 		fb_pixel_t item_color, item_bgcolor;
 		
 		void initItemColors(const bool select_mode);
-#ifdef MARTII
 		lua_State	*luaState;
 		std::string	luaAction;
 		std::string	luaId;
-#endif
 		neutrino_locale_t name;
 		std::string nameString;
 	public:
@@ -124,9 +118,7 @@ class CMenuItem
 		std::string    	selected_iconName;
 		std::string    	iconName_Info_right;
 		std::string	hintIcon;
-#ifdef MARTII
 		void setLua(lua_State *_luaState, std::string &_luaAction, std::string &_luaId) { luaState = _luaState; luaAction = _luaAction; luaId = _luaId; };
-#endif
 		neutrino_locale_t hint;
 
 		CMenuItem();
@@ -524,9 +516,7 @@ class CMenuWidget : public CMenuTarget
 			MENU_POS_BOTTOM_LEFT	,
 			MENU_POS_BOTTOM_RIGHT
 		};
-#ifdef MARTII
 		void addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string &action);
-#endif
 };
 
 class CPINProtection

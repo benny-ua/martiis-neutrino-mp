@@ -465,18 +465,10 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 		else if (msg==CRCInput::RC_down)
 		{
 			keyDownPressed();
-#ifdef MARTII
 		} else if (msg==(neutrino_msg_t)g_settings.key_volumeup)
-#else
-		} else if (msg==CRCInput::RC_plus)
-#endif
 		{
 			keyPlusPressed();
-#ifdef MARTII
 		} else if (msg==(neutrino_msg_t)g_settings.key_volumedown)
-#else
-		} else if (msg==CRCInput::RC_minus)
-#endif
 		{
 			keyMinusPressed();
 		}

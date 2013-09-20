@@ -265,11 +265,7 @@ void CMenuItem::paintItemButton(const bool select_mode, const int &item_height, 
 	{
 		frameBuffer->getIconSize(iconName_Info_right.c_str(), &icon_w, &icon_h);
 
-#ifdef MARTII
 		if (icon_w>0 && icon_h>0)
-#else
-		if (active  && icon_w>0 && icon_h>0)
-#endif
 		{
 			icon_painted = frameBuffer->paintIcon(iconName_Info_right, dx + icon_start_x - (icon_w + 20), y+ ((item_height/2- icon_h/2)) );
 		}
@@ -540,15 +536,11 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 	int retval = menu_return::RETURN_REPAINT;
 	uint64_t timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_MENU]);
 		
-#ifdef MARTII
 	bool bAllowRepeatLR_override = keyActionMap.find(CRCInput::RC_left) != keyActionMap.end() || keyActionMap.find(CRCInput::RC_right) != keyActionMap.end();
-#endif
 	do {
 		if(hasItem() && selected >= 0 && (int)items.size() > selected )
 			bAllowRepeatLR = items[selected]->isMenueOptionChooser();
-#ifdef MARTII
 		bAllowRepeatLR |= bAllowRepeatLR_override;
-#endif
 
 		g_RCInput->getMsgAbsoluteTimeout(&msg, &data, &timeoutEnd, bAllowRepeatLR);
 
@@ -556,7 +548,6 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 		if ( msg <= CRCInput::RC_MaxRC ) {
 			timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_MENU] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_MENU]);
 
-#ifdef MARTII
 			std::map<neutrino_msg_t, keyAction>::iterator it = keyActionMap.find(msg);
 			if (it != keyActionMap.end()) {
 				fader.Stop();
@@ -578,7 +569,6 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 				frameBuffer->blit();
 				continue;
 			}
-#endif
 			for (unsigned int i= 0; i< items.size(); i++) {
 				CMenuItem* titem = items[i];
 				if ((titem->directKey != CRCInput::RC_nokey) && (titem->directKey == msg)) {
@@ -593,12 +583,10 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 					break;
 				}
 			}
-#ifdef MARTII
 			if (msg == (uint32_t) g_settings.key_channelList_pageup)
 				msg = CRCInput::RC_page_up;
 			else if (msg == (uint32_t) g_settings.key_channelList_pagedown)
 				msg = CRCInput::RC_page_down;
-#endif
 		}
 
 		if (handled)
@@ -1223,13 +1211,12 @@ void CMenuWidget::paintHint(int pos)
 	hint_painted = true;
 	
 }
-#ifdef MARTII
+
 void CMenuWidget::addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string & action)
 {
 	keyActionMap[key].menue = menue;
 	keyActionMap[key].action = action;
 }
-#endif
 
 //-------------------------------------------------------------------------------------------------------------------------------
 CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
@@ -1285,21 +1272,17 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 		else
 			(*optionValue)++;
 	}
-#ifndef MARTII
-	paint(true);
-#endif
-#ifdef MARTII
+
 	if(observ && !luaAction.empty()) {
 		// optionValue is int*
 		observ->changeNotify(luaState, luaAction, luaId, (void *) to_string(*optionValue).c_str());
 	} else
-#endif
+
 	if(observ)
 		observ->changeNotify(name, optionValue);
-#ifdef MARTII
+
 	// give the observer a chance to modify the value
 	paint(true);
-#endif
 
 	return menu_return::RETURN_NONE;
 }
@@ -1449,9 +1432,7 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 {
 	bool wantsRepaint = false;
 	int ret = menu_return::RETURN_NONE;
-#ifdef MARTII
 	char *optionValname = NULL;
-#endif
 
 	if((msg == CRCInput::RC_ok) && pulldown) {
 		int select = -1;
@@ -1481,9 +1462,7 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 		if(select >= 0) 
 		{
 			*optionValue = options[select].key;
-#ifdef MARTII
 			optionValname = (char *) options[select].valname;
-#endif
 		}
 		delete menu;
 		delete selector;
@@ -1492,32 +1471,23 @@ int CMenuOptionChooser::exec(CMenuTarget*)
 			if (options[count].key == (*optionValue)) {
 				if(msg == CRCInput::RC_left) {
 					if(count > 0)
-#ifdef MARTII
 						optionValname = (char *) options[(count-1) % number_of_options].valname,
-#endif
 						*optionValue = options[(count-1) % number_of_options].key;
 					else
-#ifdef MARTII
 						optionValname = (char *) options[number_of_options-1].valname,
-#endif
 						*optionValue = options[number_of_options-1].key;
 				} else
-#ifdef MARTII
 					optionValname = (char *) options[(count+1) % number_of_options].valname,
-#endif
 					*optionValue = options[(count+1) % number_of_options].key;
 				break;
 			}
 		}
 	}
 	paint(true);
-#ifdef MARTII
 	if(observ && !luaAction.empty()) {
 		if (optionValname)
 			wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, optionValname);
-	} else
-#endif
-	if(observ)
+	} else if(observ)
 		wantsRepaint = observ->changeNotify(name, optionValue);
 
 	if ( wantsRepaint )
@@ -1679,12 +1649,9 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 
 		paint(true);
 	}
-#ifdef MARTII
 	if(observ && !luaAction.empty())
 		wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, (void *)(optionValueString ? optionValueString->c_str() : ""));
-	else
-#endif
-	if(observ) {
+	else if(observ) {
 		wantsRepaint = observ->changeNotify(name, (void *)(optionValueString ? optionValueString->c_str() : ""));
 	}
 	if (wantsRepaint)
