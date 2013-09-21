@@ -611,8 +611,9 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 	std::string boxname = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
 #else
 	unsigned int system_rev = cs_get_revision();
-	std::string boxname = "CST ";
+	std::string boxname = NeutrinoAPI->NeutrinoYParser->func_get_boxtype(hh, "");
 #endif
+
 	static CNetAdapter netadapter; 
 	std::string eth_id = netadapter.getMacAddr();
 	std::transform(eth_id.begin(), eth_id.end(), eth_id.begin(), ::tolower);
@@ -660,8 +661,6 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 	boxname += (g_info.delivery_system == DVB_S || (system_rev == 1)) ? " SAT":" CABLE";
 #endif
 	hh->printf("%s\nMAC:%s\n", boxname.c_str(),eth_id.c_str());
-
-
 }
 //-----------------------------------------------------------------------------
 void CControlAPI::ShutdownCGI(CyhookHandler *hh)

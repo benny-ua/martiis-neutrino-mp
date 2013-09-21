@@ -534,12 +534,16 @@ void CUpnpBrowserGui::selectDevice()
 			loop=false;
 			g_RCInput->postMsg(msg, data);
 		}
+#if 0
 		else if (msg == NeutrinoMessages::EVT_TIMER)
 		{
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
 		}
 		else if (msg > CRCInput::RC_MaxRC)
+#endif
+		else
 		{
+printf("msg: %x\n", (int) msg);
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all)
 				loop = false;
 		}
@@ -850,6 +854,7 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 			loop = false;
 			g_RCInput->postMsg(msg, data);
 		}
+#if 0
 		else if (msg == NeutrinoMessages::EVT_TIMER)
 		{
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
@@ -876,6 +881,8 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 				CAudioPlayer::getInstance()->stop();
 		}
 		else if (msg > CRCInput::RC_MaxRC)
+#endif
+		else
 		{
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all)
 				loop = false;

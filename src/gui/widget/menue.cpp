@@ -35,7 +35,7 @@
 
 #include <gui/components/cc_frm.h>
 #include <gui/widget/stringinput.h>
-
+#include <gui/components/cc_item_shapes.h>
 #include <global.h>
 #include <neutrino.h>
 #include <neutrino_menue.h>
@@ -168,7 +168,10 @@ void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height,
 		if (right_bgcol) {
 			if (!*right_text)
 				stringstartposOption -= 60;
-			CFrameBuffer::getInstance()->paintBoxRel(stringstartposOption, y + 1, dx - stringstartposOption + x - 1, item_height - 2, right_bgcol, RADIUS_LARGE);
+			CComponentsShapeSquare col(stringstartposOption, y + 2, dx - stringstartposOption + x - 2, item_height - 4, false, COL_MENUCONTENT_PLUS_6, right_bgcol);
+			col.setFrameThickness(3);
+			col.setCorner(RADIUS_LARGE);
+			col.paint(false);
 		}
 		if (*right_text)
 			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(stringstartposOption, y+item_height,dx- (stringstartposOption- x),  right_text, item_color, 0, true);
@@ -1192,7 +1195,7 @@ void CMenuWidget::paintHint(int pos)
 		info_box->setFrameThickness(2);
 		info_box->removeLineBreaks(str);
 		info_box->setText(str, CTextBox::AUTO_WIDTH, g_Font[SNeutrinoSettings::FONT_TYPE_MENU_HINT]);
-		info_box->setCornerRadius(RADIUS_LARGE);
+		info_box->setCorner(RADIUS_LARGE);
 		info_box->syncSysColors();
 		info_box->setColorBody(COL_MENUCONTENTDARK_PLUS_0);
 		info_box->setShadowOnOff(CC_SHADOW_ON);
