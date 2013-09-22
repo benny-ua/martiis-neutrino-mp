@@ -27,10 +27,8 @@
 #include <system/settings.h>
 #include <gui/widget/msgbox.h>
 #include <gui/widget/messagebox.h>
-#ifdef MARTII
 #include <gui/filebrowser.h>
 #include <driver/pictureviewer/pictureviewer.h>
-#endif
 #include <neutrino.h>
 
 #include "luainstance.h"
@@ -240,7 +238,6 @@ static void set_lua_variables(lua_State *L)
 		{ "END_Y", g_settings.screen_EndY },
 		{ NULL, 0 }
 	};
-#ifdef MARTII
 	table_key menureturn[] =
 	{
 		{ "NONE", menu_return::RETURN_NONE },
@@ -250,7 +247,6 @@ static void set_lua_variables(lua_State *L)
 		{ "EXIT_REPAINT", menu_return::RETURN_EXIT_REPAINT },
 		{ NULL, 0 }
 	};
-#endif
 
 	/* list of environment variable arrays to be exported */
 	lua_envexport e[] =
@@ -260,9 +256,7 @@ static void set_lua_variables(lua_State *L)
 		{ "SCREEN",	screenopts },
 		{ "FONT",	fontlist },
 		{ "CORNER",	corners },
-#ifdef MARTII
 		{ "MENU_RETURN", menureturn },
-#endif
 		{ NULL, NULL }
 	};
 
@@ -344,12 +338,10 @@ const luaL_Reg CLuaInstance::methods[] =
 	{ "PaintIcon", CLuaInstance::PaintIcon },
 	{ "GetInput", CLuaInstance::GetInput },
 	{ "FontHeight", CLuaInstance::FontHeight },
-#ifdef MARTII
 	{ "GetSize", CLuaInstance::GetSize },
 	{ "DisplayImage", CLuaInstance::DisplayImage },
 	{ "Blit", CLuaInstance::Blit },
 	{ "GetLanguage", CLuaInstance::GetLanguage },
-#endif
 	{ NULL, NULL }
 };
 
@@ -418,11 +410,9 @@ void CLuaInstance::registerFunctions()
 	lua_pop(lua, 1);
 
 	lua_register(lua, className, NewWindow);
-#ifdef MARTII
 	MenueRegister(lua);
 	HintboxRegister(lua);
 	MessageboxRegister(lua);
-#endif
 }
 
 CLuaData *CLuaInstance::CheckData(lua_State *L, int narg)
@@ -514,7 +504,6 @@ int CLuaInstance::PaintIcon(lua_State *L)
 	return 0;
 }
 
-#ifdef MARTII
 extern CPictureViewer * g_PicViewer;
 
 int CLuaInstance::DisplayImage(lua_State *L)
@@ -547,7 +536,6 @@ int CLuaInstance::GetSize(lua_State *L)
 	lua_pushinteger(L, h);
 	return 2;
 }
-#endif
 
 int CLuaInstance::RenderString(lua_State *L)
 {
@@ -641,7 +629,7 @@ int CLuaInstance::GCWindow(lua_State *L)
 	delete w;
 	return 0;
 }
-#ifdef MARTII
+
 int CLuaInstance::Blit(lua_State *L)
 {
 	CLuaData *W = CheckData(L, 1);
@@ -1275,4 +1263,3 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 
 	return 1;
 }
-#endif

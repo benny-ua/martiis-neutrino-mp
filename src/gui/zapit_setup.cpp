@@ -166,7 +166,7 @@ int CSelectChannelWidget::InitZapitChannelHelper(CZapitClient::channelsMode mode
 			mwtv->addItem(chan_item);
 
 		}
-#ifdef MARTII
+#if 1 // FIXME, probably unneeded by now --martii
 		if (g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_others"
 		 || g_bouquetManager->Bouquets[i]->Name == "extra.zapit_bouquetname_newchannels")
 			continue;

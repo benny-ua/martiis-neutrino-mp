@@ -89,7 +89,7 @@ void CComponentsPIP::paint(bool do_save_bg)
 	}
 	
 	if(CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_tv){
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		videoDecoder->Pig(pig_x+2, pig_y, pig_w, pig_h, screen_w, screen_h,
 			g_settings.screen_StartX_int,
 			g_settings.screen_StartY_int,

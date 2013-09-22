@@ -373,9 +373,7 @@ class CMovieBrowser : public CMenuTarget
 		bool delFile_vlc(CFile& file);
 		bool delFile_std(CFile& file);
 		int  getMenuRet() { return menu_ret; }
-#ifdef MARTII
 		bool doProbe(void);
-#endif
 		int  getMode() { return show_mode; }
 		void  setMode(int mode) { show_mode = mode; }
 

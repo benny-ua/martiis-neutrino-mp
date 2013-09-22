@@ -73,9 +73,7 @@ struct NeutrinoMessages {
 		UNLOCK_RC               =       CRCInput::RC_Messages + 20,
 		REBOOT                  =       CRCInput::RC_Messages + 21,
 		RELOAD_SETUP            =       CRCInput::RC_Messages + 22,
-#ifdef MARTII
 		SHOW_MAINSETTINGS       =       CRCInput::RC_Messages + 23,
-#endif
 
 		EVT_VOLCHANGED                           = CRCInput::RC_Events + 1,
 		EVT_MUTECHANGED                          = CRCInput::RC_Events + 2,
@@ -154,9 +152,7 @@ struct NeutrinoMessages {
 		/* sectionsd */
 		EVT_EIT_COMPLETE                         = CRCInput::RC_WithData + 24, /* data: (t_channel_id *) */
 		EVT_BACK_ZAP_COMPLETE                    = CRCInput::RC_WithData + 25, /* data: (t_channel_id *) */
-#ifdef MARTII
 		EVT_BATCHEPG				 = CRCInput::RC_WithData + 26
-#endif
 	};
 	enum
 	{

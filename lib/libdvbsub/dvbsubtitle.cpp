@@ -21,23 +21,16 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/avutil.h>
-#ifdef MARTII
 #include <libavcodec/version.h>
-#endif
 }
 #include <driver/framebuffer.h>
 #include "Debug.hpp"
 
 // Set these to 'true' for debug output:
-#ifdef MARTII
 static bool DebugConverter = false;
-#else
-static bool DebugConverter = true;
-#endif
 
 #define dbgconverter(a...) if (DebugConverter) sub_debug.print(Debug::VERBOSE, a)
 
-#ifdef MARTII
 // CAVEAT EMPTOR
 // THIS IS COPIED FROM ffmpeg/libavcodec/dvbsubdec.c
 //
@@ -70,7 +63,6 @@ typedef struct DVBSubContext {
     void /*DVBSubRegionDisplay*/ *display_list;
     DVBSubDisplayDefinition *display_definition;
 } DVBSubContext;
-#endif
 
 // --- cDvbSubtitleBitmaps ---------------------------------------------------
 
@@ -146,7 +138,7 @@ fb_pixel_t * simple_resize32(uint8_t * orgin, uint32_t * colors, int nb_colors, 
 
 void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define DEFAULT_XRES 1280	// backbuffer width
 #define DEFAULT_YRES 720	// backbuffer height
 
@@ -191,7 +183,7 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 	}
 
 	dbgconverter("cDvbSubtitleBitmaps::%s: done\n", __func__);
-#else // MARTII
+#else
 	int i;
 #if !HAVE_SPARK_HARDWARE
 	int stride = CFrameBuffer::getInstance()->getScreenWidth(true);
@@ -275,7 +267,7 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 //	if(Count())
 //		dbgconverter("cDvbSubtitleBitmaps::Draw: finish, min/max screen: x=% d y= %d, w= %d, h= %d\n", min_x, min_y, max_x-min_x, max_y-min_y);
 //	dbgconverter("\n");
-#endif // MARTII
+#endif
 }
 
 static int screen_w, screen_h, screen_x, screen_y;
@@ -348,14 +340,12 @@ void cDvbSubtitleConverter::Pause(bool pause)
 		Unlock();
 		//Reset();
 	} else {
-#ifdef MARTII
 		// Assume that we've switched channel. Drop the existing display_definition.
 		DVBSubContext *ctx = (DVBSubContext *) avctx->priv_data;
 		if (ctx) {
 			if (ctx->display_definition)
 				av_freep(&ctx->display_definition);
 		}
-#endif
 		//Reset();
 		running = true;
 	}
@@ -363,7 +353,7 @@ void cDvbSubtitleConverter::Pause(bool pause)
 
 void cDvbSubtitleConverter::Clear(void)
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	CFrameBuffer::getInstance()->Clear();
 #else
 //	dbgconverter("cDvbSubtitleConverter::Clear: x=% d y= %d, w= %d, h= %d\n", min_x, min_y, max_x-min_x, max_y-min_y);
@@ -453,7 +443,6 @@ int cDvbSubtitleConverter::Action(void)
 		return -1;
 	}
 
-#ifdef MARTII
 	min_x = min_y = 0;
 	max_x = 720;
 	max_y = 576;
@@ -469,7 +458,7 @@ int cDvbSubtitleConverter::Action(void)
 			dbgconverter("cDvbSubtitleConverter::Action: Display Definition: min_x=%d min_y=%d max_x=%d max_y=%d\n", min_x, min_y, max_x, max_y);
 		}
 	}
-#endif
+
 	Lock();
 	if (cDvbSubtitleBitmaps *sb = bitmaps->First()) {
 		int64_t STC;

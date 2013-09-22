@@ -397,9 +397,8 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 		parent->hide();
 	}
 
-#ifdef MARTII
 	saved_dispmode = (int)CVFD::getInstance()->getMode();
-#endif
+
 	int ret = show();
 	CVFD::getInstance()->setMode((CVFD::MODES)saved_dispmode);
 
@@ -526,12 +525,12 @@ int CTimerList::show()
 				loop=false;
 
 		}
-		else if ((msg == CRCInput::RC_up || msg == (unsigned int)g_settings.key_channelList_pageup) && !(timerlist.empty()))
+		else if ((msg == CRCInput::RC_up || msg == (unsigned int)g_settings.key_pageup) && !(timerlist.empty()))
 		{
 			int step = 0;
 			int prev_selected = selected;
 
-			step = (msg == (unsigned int)g_settings.key_channelList_pageup) ? listmaxshow : 1;  // browse or step 1
+			step = (msg == (unsigned int)g_settings.key_pageup) ? listmaxshow : 1;  // browse or step 1
 			selected -= step;
 			if((prev_selected-step) < 0)		// because of uint
 				selected = timerlist.size() - 1;
@@ -550,12 +549,12 @@ int CTimerList::show()
 
 			paintFoot();
 		}
-		else if ((msg == CRCInput::RC_down || msg == (unsigned int)g_settings.key_channelList_pagedown) && !(timerlist.empty()))
+		else if ((msg == CRCInput::RC_down || msg == (unsigned int)g_settings.key_pagedown) && !(timerlist.empty()))
 		{
 			unsigned int step = 0;
 			int prev_selected = selected;
 
-			step = (msg == (unsigned int)g_settings.key_channelList_pagedown) ? listmaxshow : 1;  // browse or step 1
+			step = (msg == (unsigned int)g_settings.key_pagedown) ? listmaxshow : 1;  // browse or step 1
 			selected += step;
 
 			if(selected >= timerlist.size())
@@ -647,11 +646,7 @@ int CTimerList::show()
 			res=menu_return::RETURN_EXIT_ALL;
 			loop=false;
 		}
-#ifdef MARTII
 		else if ( msg == (uint32_t) g_settings.key_help || msg == CRCInput::RC_info)
-#else
-		else if ( msg == CRCInput::RC_help || msg == CRCInput::RC_info)
-#endif
 		{
 			CTimerd::responseGetTimer* timer=&timerlist[selected];
 			if (timer!=NULL)
@@ -915,9 +910,6 @@ void CTimerList::paint()
 	unsigned int page_nr = (listmaxshow == 0) ? 0 : (selected / listmaxshow);
 	liststart = page_nr * listmaxshow;
 
-#ifndef MARTII
-	saved_dispmode = (int)CVFD::getInstance()->getMode();
-#endif
 	CVFD::getInstance()->setMode(CVFD::MODE_MENU_UTF8, g_Locale->getText(LOCALE_TIMERLIST_NAME));
 
 	paintHead();
@@ -961,10 +953,8 @@ const char * CTimerList::convertTimerType2String(const CTimerd::CTimerEventTypes
 		return g_Locale->getText(LOCALE_TIMERLIST_TYPE_SLEEPTIMER );
 	case CTimerd::TIMER_EXEC_PLUGIN :
 		return g_Locale->getText(LOCALE_TIMERLIST_TYPE_EXECPLUGIN );
-#ifdef MARTII
 	case CTimerd::TIMER_BATCHEPG    :
 		return g_Locale->getText(LOCALE_TIMERLIST_TYPE_BATCHEPG );
-#endif
 	default                         :
 		return g_Locale->getText(LOCALE_TIMERLIST_TYPE_UNKNOWN    );
 	}
@@ -1048,15 +1038,7 @@ const CMenuOptionChooser::keyval TIMERLIST_STANDBY_OPTIONS[TIMERLIST_STANDBY_OPT
 	{ 1, LOCALE_TIMERLIST_STANDBY_ON }
 };
 
-#ifdef MARTII
 #define TIMERLIST_TYPE_OPTION_COUNT 8
-#else
-#if 1
-#define TIMERLIST_TYPE_OPTION_COUNT 7
-#else
-#define TIMERLIST_TYPE_OPTION_COUNT 8
-#endif
-#endif
 const CMenuOptionChooser::keyval TIMERLIST_TYPE_OPTIONS[TIMERLIST_TYPE_OPTION_COUNT] =
 {
 #if 0
@@ -1068,10 +1050,8 @@ const CMenuOptionChooser::keyval TIMERLIST_TYPE_OPTIONS[TIMERLIST_TYPE_OPTION_CO
 	{ CTimerd::TIMER_SLEEPTIMER,	LOCALE_TIMERLIST_TYPE_SLEEPTIMER },
 	{ CTimerd::TIMER_REMIND,	LOCALE_TIMERLIST_TYPE_REMIND },
 	{ CTimerd::TIMER_SHUTDOWN,	LOCALE_TIMERLIST_TYPE_SHUTDOWN },
-	{ CTimerd::TIMER_EXEC_PLUGIN,	LOCALE_TIMERLIST_TYPE_EXECPLUGIN }
-#ifdef MARTII
-	, { CTimerd::TIMER_BATCHEPG   , LOCALE_TIMERLIST_TYPE_BATCHEPG  }
-#endif
+	{ CTimerd::TIMER_EXEC_PLUGIN,	LOCALE_TIMERLIST_TYPE_EXECPLUGIN },
+	{ CTimerd::TIMER_BATCHEPG   , LOCALE_TIMERLIST_TYPE_BATCHEPG  }
 };
 
 #define MESSAGEBOX_NO_YES_OPTION_COUNT 2
@@ -1203,9 +1183,7 @@ int CTimerList::newTimer()
 	CMenuWidget mctv(LOCALE_TIMERLIST_BOUQUETSELECT, NEUTRINO_ICON_SETTINGS);
 	CMenuWidget mcradio(LOCALE_TIMERLIST_BOUQUETSELECT, NEUTRINO_ICON_SETTINGS);
 
-#ifdef MARTII
 	localizeBouquetNames();
-#endif
 	for (int i = 0; i < (int) g_bouquetManager->Bouquets.size(); i++) {
 		if (!g_bouquetManager->Bouquets[i]->bHidden) {
 			CMenuWidget* mwtv = new CMenuWidget(LOCALE_TIMERLIST_CHANNELSELECT, NEUTRINO_ICON_SETTINGS);
@@ -1221,12 +1199,7 @@ int CTimerList::newTimer()
 				mwtv->addItem(new CMenuForwarder(channels[j]->getName(), true, NULL, this, (std::string(cChannelId) + channels[j]->getName()).c_str(), CRCInput::RC_nokey, NULL, channels[j]->scrambled ? NEUTRINO_ICON_SCRAMBLED : NULL));
 			}
 			if (!channels.empty())
-#ifdef MARTII
 				mctv.addItem(new CMenuForwarder(g_bouquetManager->Bouquets[i]->lName, true, NULL, mwtv));
-#else
-				mctv.addItem(new CMenuForwarder(g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : g_bouquetManager->Bouquets[i]->Name.c_str() /*g_bouquetManager->Bouquets[i]->Name.c_str()*/, true, NULL, mwtv));
-#endif
-
 
 			g_bouquetManager->Bouquets[i]->getRadioChannels(channels);
 			for (int j = 0; j < (int) channels.size(); j++) {
@@ -1235,11 +1208,7 @@ int CTimerList::newTimer()
 				mwradio->addItem(new CMenuForwarder(channels[j]->getName(), true, NULL, this, (std::string(cChannelId) + channels[j]->getName()).c_str(), CRCInput::RC_nokey, NULL, channels[j]->scrambled ? NEUTRINO_ICON_SCRAMBLED : NULL));
 			}
 			if (!channels.empty())
-#ifdef MARTII
 				mcradio.addItem(new CMenuForwarder(g_bouquetManager->Bouquets[i]->lName, true, NULL, mwradio));
-#else
-				mcradio.addItem(new CMenuForwarder(g_bouquetManager->Bouquets[i]->Name, true, NULL, mwradio));
-#endif
 		}
 	}
 
@@ -1263,9 +1232,7 @@ int CTimerList::newTimer()
 	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL, timerNew.pluginName);
 	std::string timerNew_pluginName(timerNew.pluginName);
 	CMenuForwarder *m10 = new CMenuForwarder(LOCALE_TIMERLIST_PLUGIN, false, timerNew_pluginName, &plugin_chooser);
-#ifdef MARTII
 	CMenuForwarder *m11 = new CMenuForwarder(LOCALE_TIMERLIST_BATCHEPG, false, "", &plugin_chooser);
-#endif
 
 
 	CTimerListNewNotifier notifier2((int *)&timerNew.eventType,
@@ -1290,9 +1257,7 @@ int CTimerList::newTimer()
 	timerSettings.addItem( m8);
 	timerSettings.addItem( m9);
 	timerSettings.addItem( m10);
-#ifdef MARTII
 	timerSettings.addItem( m11);
-#endif
 
 	notifier2.changeNotify(NONEXISTANT_LOCALE, NULL);
 	int ret=timerSettings.exec(this,"");
@@ -1309,17 +1274,13 @@ int CTimerList::newTimer()
 	return ret;
 }
 
-#ifdef MARTII
 bool askUserOnTimerConflict(time_t announceTime, time_t stopTime, t_channel_id channel_id)
-#else
-bool askUserOnTimerConflict(time_t announceTime, time_t stopTime)
-#endif
 {
 	if (CFEManager::getInstance()->getEnabledCount() == 1) {
 		CTimerdClient Timer;
 		CTimerd::TimerList overlappingTimers = Timer.getOverlappingTimers(announceTime,stopTime);
 		//printf("[CTimerdClient] attention\n%d\t%d\t%d conflicts with:\n",timerNew.announceTime,timerNew.alarmTime,timerNew.stopTime);
-#ifdef MARTII
+
 		// Don't ask if there are overlapping timers on the same transponder.
 		if (channel_id) {
 			CTimerd::TimerList::iterator i;
@@ -1329,7 +1290,6 @@ bool askUserOnTimerConflict(time_t announceTime, time_t stopTime)
 			if (i == overlappingTimers.end())
 				return true; // yes, add timer
 		}
-#endif
 
 		std::string timerbuf = g_Locale->getText(LOCALE_TIMERLIST_OVERLAPPING_TIMER);
 		timerbuf += "\n";

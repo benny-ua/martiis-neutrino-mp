@@ -26,11 +26,9 @@ extern "C" {
 #include <lualib.h>
 }
 #include <driver/fb_window.h>
-#ifdef MARTII
 #include <gui/widget/menue.h>
 #include <gui/widget/hintbox.h>
 #include <gui/widget/messagebox.h>
-#endif
 
 /* this is stored as userdata in the lua_State */
 struct CLuaData
@@ -38,7 +36,7 @@ struct CLuaData
 	CFBWindow *fbwin;
 	CRCInput *rcinput;
 };
-#ifdef MARTII
+
 struct CLuaMenueItem
 {
 	int int_val;
@@ -119,16 +117,14 @@ class CLuaMessagebox
 		~CLuaMessagebox();
 };
 
-#endif
+
 
 /* inspired by Steve Kemp http://www.steve.org.uk/ */
 class CLuaInstance
 {
 	static const char className[];
 	static const luaL_Reg methods[];
-#ifdef MARTII
 	static const luaL_Reg menue_methods[];
-#endif
 	static CLuaData *CheckData(lua_State *L, int narg);
 public:
 	CLuaInstance();
@@ -146,7 +142,6 @@ private:
 	static int FontHeight(lua_State *L);
 	static int GetInput(lua_State *L);
 	static int GCWindow(lua_State *L);
-#ifdef MARTII
 	static int Blit(lua_State *L);
 	static int GetLanguage(lua_State *L);
 	static int GetSize(lua_State *L);
@@ -175,7 +170,6 @@ private:
 
 	static bool tableLookup(lua_State*, const char*, std::string&);
 	static bool tableLookup(lua_State*, const char*, int&);
-#endif
 };
 
 #endif /* _LUAINSTANCE_H */

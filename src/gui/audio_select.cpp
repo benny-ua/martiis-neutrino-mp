@@ -117,7 +117,7 @@ int CAudioSelectMenuHandler::doMenu ()
 		AudioSelector.addItem(fw, (i == g_RemoteControl->current_PIDs.PIDs.selected_apid));
 		shortcut_num = i+1;
 	}
-#ifndef MARTII // should be: HAVE_SPARK_HARDWARE
+#if !HAVE_SPARK_HARDWARE
 	if (p_count)
 		AudioSelector.addItem(GenericMenuSeparatorLine);
 
@@ -143,14 +143,14 @@ int CAudioSelectMenuHandler::doMenu ()
 	bool sep_added = false;
 	if(cc)
 	{
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		bool have_dvb_sub = false;
 #endif
 		for (int i = 0 ; i < (int)cc->getSubtitleCount() ; ++i)
 		{
 			CZapitAbsSub* s = cc->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 				have_dvb_sub = true;
 #endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
@@ -186,7 +186,7 @@ int CAudioSelectMenuHandler::doMenu ()
 							!tuxtx_subtitle_running(&pid, &page, NULL), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			}
 		}
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		if (have_dvb_sub)
 			AudioSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
 #endif
@@ -212,7 +212,7 @@ int CAudioSelectMenuHandler::doMenu ()
 					0, 999, CVolume::getInstance()));
 	}
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int res = AudioSelector.exec(NULL, "");
 	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
 	return res;

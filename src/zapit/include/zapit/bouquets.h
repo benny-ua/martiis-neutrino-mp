@@ -31,9 +31,7 @@ class CZapitBouquet
 	public:
 
 	std::string Name;
-#ifdef MARTII
 	std::string lName; // localized name, defaults to Name
-#endif
 	bool        bHidden;
 	bool        bLocked;
 	bool        bUser;
@@ -44,12 +42,8 @@ class CZapitBouquet
 	ZapitChannelList radioChannels;
 	ZapitChannelList tvChannels;
 
-#ifdef MARTII
 	inline CZapitBouquet(const std::string name) { Name = name; lName = name; bHidden = false; bLocked = false; bUser = true; }
 	inline void updateLocalizedName(const std::string name) { lName = name; }
-#else
-	inline CZapitBouquet(const std::string name) { Name = name; bHidden = false; bLocked = false; bUser = true; }
-#endif
 
 	void addService(CZapitChannel* newChannel);
 

@@ -559,12 +559,10 @@ int CBouquetManager::existsBouquet(char const * const name, bool ignore_user)
 		{
 			return (int)i;
 		}
-#ifdef MARTII
 		if (Bouquets[i]->lName == name)
 		{
 			return (int)i;
 		}
-#endif
 #if 0
 		else if (strcasecmp(Bouquets[i]->Name.c_str(), name)==0)
 		{
@@ -620,10 +618,8 @@ int CBouquetManager::existsUBouquet(char const * const name, bool myfav)
 		//else if (Bouquets[i]->bUser && strncasecmp(Bouquets[i]->Name.c_str(), name,Bouquets[i]->Name.length())==0)
 		else if (Bouquets[i]->bUser && (Bouquets[i]->Name == name))
 			return (int)i;
-#ifdef MARTII
 		else if (Bouquets[i]->bUser && (Bouquets[i]->lName == name))
 			return (int)i;
-#endif
 	}
 	return -1;
 }

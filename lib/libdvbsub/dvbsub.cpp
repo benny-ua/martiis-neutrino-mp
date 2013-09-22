@@ -13,10 +13,8 @@
 #include <cerrno>
 
 #include <zapit/include/dmx.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
 #include <poll.h>
-#endif
 
 #include "Debug.hpp"
 #include "PacketQueue.hpp"
@@ -48,7 +46,7 @@ static int dvbsub_paused = true;
 static int dvbsub_pid;
 static int dvbsub_stopped;
 static int pid_change_req;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 static bool isEplayer = false;
 static int eplayer_fd = -1;
 #endif
@@ -61,11 +59,7 @@ static void clear_queue();
 int dvbsub_init() {
 	int trc;
 
-#ifdef MARTII
 	sub_debug.set_level(0);
-#else
-	sub_debug.set_level(3);
-#endif
 
 	reader_running = true;
 	dvbsub_stopped = 1;
@@ -103,13 +97,13 @@ int dvbsub_pause()
 	return 0;
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 int dvbsub_start(int pid, bool _isEplayer)
 #else
 int dvbsub_start(int pid)
 #endif
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	isEplayer = _isEplayer;
 	if (isEplayer && !dvbsub_paused)
 		return 0;
@@ -119,7 +113,7 @@ int dvbsub_start(int pid)
 		return 0;
 	}
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (isEplayer || pid) {
 		if(isEplayer || pid != dvbsub_pid) {
 #else
@@ -138,7 +132,7 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 	while(!dvbsub_stopped)
 		usleep(10);
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if(isEplayer || dvbsub_pid > 0) {
 #else
 	if(dvbsub_pid > 0) {
@@ -177,7 +171,7 @@ void dvbsub_setpid(int pid)
 {
 	dvbsub_pid = pid;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (!isEplayer)
 #endif
 	if(dvbsub_pid == 0)
@@ -207,13 +201,9 @@ int dvbsub_close()
 		pthread_cond_broadcast(&readerCond);
 		pthread_mutex_unlock(&readerMutex);
 
-#ifdef MARTII
 // dvbsub_close() is called at shutdown time only. Instead of waiting for
 // the threads to terminate just detach. --martii
 		pthread_detach(threadReader);
-#else
-		pthread_join(threadReader, NULL);
-#endif
 		threadReader = 0;
 	}
 	if(threadDvbsub) {
@@ -223,11 +213,7 @@ int dvbsub_close()
 		pthread_cond_broadcast(&packetCond);
 		pthread_mutex_unlock(&packetMutex);
 
-#ifdef MARTII
 		pthread_detach(threadDvbsub);
-#else
-		pthread_join(threadDvbsub, NULL);
-#endif
 		threadDvbsub = 0;
 	}
 	printf("[dvb-sub] stopped\n");
@@ -237,19 +223,16 @@ int dvbsub_close()
 
 static cDemux * dmx;
 
-#ifdef MARTII
 static int64_t stc_offset = 0;
 
 void dvbsub_set_stc_offset(int64_t o) {
 	stc_offset = o;
 }
-#endif
 
 extern void getPlayerPts(int64_t *);
 
 void dvbsub_get_stc(int64_t * STC)
 {
-#ifdef MARTII
 #if HAVE_SPARK_HARDWARE // requires libeplayer3
 	if (isEplayer) {
 		getPlayerPts(STC);
@@ -263,10 +246,6 @@ void dvbsub_get_stc(int64_t * STC)
 		return;
 	}
 	*STC = 0;
-#else
-	if(dmx)
-		dmx->getSTC(STC);
-#endif
 }
 
 static int64_t get_pts(unsigned char * packet)
@@ -309,7 +288,7 @@ static void clear_queue()
 	pthread_mutex_unlock(&packetMutex);
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 static int eRead(uint8_t *buf, int len)
 {
 	int count = 0;
@@ -340,9 +319,7 @@ static void* reader_thread(void * /*arg*/)
 	uint16_t packlen;
 	uint8_t* buf;
 	bool bad_startcode = false;
-#ifdef MARTII
 	set_threadname("dvbsub_reader_thread");
-#endif
 
         dmx = new cDemux(0);
 #if HAVE_TRIPLEDRAGON
@@ -350,7 +327,7 @@ static void* reader_thread(void * /*arg*/)
 #else
         dmx->Open(DMX_PES_CHANNEL, NULL, 64*1024);
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	static const char DVBSUBTITLEPIPE[] 	= "/tmp/.eplayer3_dvbsubtitle";
 	mkfifo(DVBSUBTITLEPIPE, 0644);
 	eplayer_fd = open (DVBSUBTITLEPIPE, O_RDONLY | O_NONBLOCK);
@@ -375,7 +352,7 @@ static void* reader_thread(void * /*arg*/)
 			dvbsub_stopped = 0;
 			sub_debug.print(Debug::VERBOSE, "%s (re)started with pid 0x%x\n", __FUNCTION__, dvbsub_pid);
 		}
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		if (!isEplayer)
 #endif
 		if(pid_change_req) {
@@ -390,7 +367,7 @@ static void* reader_thread(void * /*arg*/)
 		len = 0;
 		count = 0;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		if (isEplayer)
 			len = eRead(tmp, 6);
 		else
@@ -398,7 +375,7 @@ static void* reader_thread(void * /*arg*/)
 		len = dmx->Read(tmp, 6, 1000);
 		if(len <= 0)
 			continue;
-#ifdef MARTII
+
 		if(!memcmp(tmp, "\x00\x00\x01\xbe", 4)) { // padding stream
 			packlen =  getbits(tmp, 4*8, 16) + 6;
 			count = 6;
@@ -408,18 +385,14 @@ static void* reader_thread(void * /*arg*/)
 			memmove(buf, tmp, 6);
 			/* read rest of the packet */
 			while((count < packlen) && !dvbsub_stopped) {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 				if (isEplayer)
 					len = eRead(buf + count, packlen-count);
 				else
 #endif
 				len = dmx->Read(buf+count, packlen-count, 1000);
 				if (len < 0) {
-#ifdef MARTII
 					break;
-#else
-					continue;
-#endif
 				} else {
 					count += len;
 				}
@@ -428,13 +401,13 @@ static void* reader_thread(void * /*arg*/)
 			buf = NULL;
 			continue;
 		}
-#endif
+
 		if(memcmp(tmp, "\x00\x00\x01\xbd", 4)) {
 			if (!bad_startcode) {
 				sub_debug.print(Debug::VERBOSE, "[subtitles] bad start code: %02x%02x%02x%02x\n", tmp[0], tmp[1], tmp[2], tmp[3]);
 				bad_startcode = true;
 			}
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 			if (isEplayer) {
 				char b[65536];
 				while (read(eplayer_fd, b, sizeof(b)) > 0);
@@ -452,18 +425,14 @@ static void* reader_thread(void * /*arg*/)
 		memmove(buf, tmp, 6);
 		/* read rest of the packet */
 		while((count < packlen) && !dvbsub_stopped) {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 			if (isEplayer)
 				len = eRead(buf+count, packlen-count);
 			else
 #endif
 			len = dmx->Read(buf+count, packlen-count, 1000);
 			if (len < 0) {
-#ifdef MARTII
 				break;
-#else
-				continue;
-#endif
 			} else {
 				count += len;
 			}
@@ -498,7 +467,7 @@ static void* reader_thread(void * /*arg*/)
 	dmx->Stop();
 	delete dmx;
 	dmx = NULL;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (eplayer_fd > -1) {
 		close(eplayer_fd);
 		eplayer_fd = -1;
@@ -513,9 +482,7 @@ static void* dvbsub_thread(void* /*arg*/)
 {
 	struct timespec restartWait;
 	struct timeval now;
-#ifdef MARTII
 	set_threadname("dvbsub_thread");
-#endif
 
 	sub_debug.print(Debug::VERBOSE, "%s started\n", __FUNCTION__);
 	if (!dvbSubtitleConverter)

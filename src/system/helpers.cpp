@@ -247,11 +247,7 @@ int check_dir(const char * dir)
 				ret = 0;
 				break; //ok
 			default:
-#ifdef MARTII
 				fprintf(stderr, "%s: Unknown File system type 0x%x\n", dir, (int)s.f_type);
-#else
-				fprintf(stderr, "%s Unknown filesystem type: 0x%x\n", dir, (int)s.f_type);
-#endif
 				break; // error
 		}
 	}

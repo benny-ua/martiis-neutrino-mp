@@ -160,8 +160,8 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 {
 	{LOCALE_KEYBINDINGMENU_TVRADIOMODE,   	&g_settings.key_tvradio_mode,		LOCALE_MENU_HINT_KEY_TVRADIOMODE },
 	{LOCALE_KEYBINDINGMENU_POWEROFF,      	&g_settings.key_power_off,		LOCALE_MENU_HINT_KEY_POWEROFF },
-	{LOCALE_KEYBINDINGMENU_PAGEUP, 		&g_settings.key_channelList_pageup,	LOCALE_MENU_HINT_KEY_PAGEUP },
-	{LOCALE_KEYBINDINGMENU_PAGEDOWN, 	&g_settings.key_channelList_pagedown, 	LOCALE_MENU_HINT_KEY_PAGEDOWN },
+	{LOCALE_KEYBINDINGMENU_PAGEUP, 		&g_settings.key_pageup,			LOCALE_MENU_HINT_KEY_PAGEUP },
+	{LOCALE_KEYBINDINGMENU_PAGEDOWN, 	&g_settings.key_pagedown, 		LOCALE_MENU_HINT_KEY_PAGEDOWN },
 	{LOCALE_KEYBINDINGMENU_VOLUMEUP, 	&g_settings.key_volumeup,		LOCALE_MENU_HINT_KEY_VOLUMEUP },
 	{LOCALE_KEYBINDINGMENU_VOLUMEDOWN,	&g_settings.key_volumedown, 		LOCALE_MENU_HINT_KEY_VOLUMEDOWN },
 	{LOCALE_EXTRA_KEY_LIST_START, 		&g_settings.key_list_start, 		LOCALE_MENU_HINT_KEY_LIST_START },

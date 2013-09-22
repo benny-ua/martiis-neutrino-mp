@@ -51,10 +51,10 @@
 
 
 #include <driver/record.h>
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 #include <driver/nglcd.h>
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #include <driver/display.h>
 #endif
 #include <driver/streamts.h>
@@ -137,7 +137,7 @@ void CRecordInstance::WaitRecMsg(time_t StartTime, time_t WaitTime)
 	while (time(0) < StartTime + WaitTime)
 		usleep(100000);
 }
-#ifdef MARTII
+
 void recordingFailureHelper(void *data)
 {
 	CRecordInstance *inst = (CRecordInstance *) data;
@@ -148,6 +148,7 @@ void recordingFailureHelper(void *data)
 	hintBox.hide();
 }
 
+#if HAVE_SPARK_HARDWARE
 static OpenThreads::Mutex led_mutex;
 static int led_count = 0;
 #endif
@@ -193,13 +194,9 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		apids[numpids++] = recMovieInfo->audioPids[i].epgAudioPid;
 		psi.addPid(recMovieInfo->audioPids[i].epgAudioPid, EN_TYPE_AUDIO, recMovieInfo->audioPids[i].atype);
 	}
-#ifdef MARTII
 	bool StreamPAT = false;
-#endif
 	if ((StreamVTxtPid) && (allpids.PIDs.vtxtpid != 0)){
-#ifdef MARTII
 		StreamPmtPid = true;
-#endif
 		apids[numpids++] = allpids.PIDs.vtxtpid;
 		psi.addPid(allpids.PIDs.vtxtpid, EN_TYPE_TELTEX, 0, channel->getTeletextLang());
 	}
@@ -207,16 +204,10 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		for (int i = 0 ; i < (int)channel->getSubtitleCount() ; ++i) {
 			CZapitAbsSub* s = channel->getChannelSub(i);
 			if (s->thisSubType == CZapitAbsSub::DVB) {
-#ifdef MARTII
 				if(i>REC_MAX_DPIDS - 1)//max sub pids
-#else
-				if(i>9)//max sub pids
-#endif
 					break;
 
-#ifdef MARTII
 				StreamPmtPid = true;
-#endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				apids[numpids++] = sd->pId;
 				psi.addPid( sd->pId, EN_TYPE_DVBSUB, 0, sd->ISO639_language_code.c_str() );
@@ -224,23 +215,15 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		}
 
 	}
-#ifndef MARTII
-	psi.genpsi(fd);
-#endif
-
 
 	if ((StreamPmtPid) && (allpids.PIDs.pmtpid != 0))
-#ifdef MARTII
 		StreamPAT = true,
-#endif
 		apids[numpids++] = allpids.PIDs.pmtpid;
-#ifdef MARTII
 	if (StreamPAT)
 		apids[numpids++] = 0;
 	psi.genpsi(fd);
-#endif
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if(record == NULL) {
 		record = new cRecord(channel->getRecordDemux(), g_settings.recording_bufsize_dmx * 1024 * 1024, g_settings.recording_bufsize * 1024 * 1024);
 		record->setFailureCallback(&recordingFailureHelper, this);
@@ -271,7 +254,7 @@ printf("CRecordInstance::Start: fe %d demux %d\n", frontend->getNumber(), channe
 
 	CCamManager::getInstance()->Start(channel->getChannelID(), CCamManager::RECORD);
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	led_mutex.lock();
 	if (!led_count)
 		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
@@ -307,7 +290,7 @@ bool CRecordInstance::Stop(bool remove_event)
 	printf("%s: channel %" PRIx64 " recording_id %d\n", __func__, channel_id, recording_id);
 	SaveXml();
 	/* Stop do close fd - if started */
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (record->GetStatus() != REC_STATUS_STOPPED) {
 		led_mutex.lock();
 		if (led_count > 0)
@@ -994,7 +977,7 @@ bool CRecordManager::Record(const CTimerd::RecordingInfo * const eventinfo, cons
 				if(eventinfo->channel_id == live_channel_id)
 					recordingstatus = 1;
 #endif
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 				nGLCD::Update();
 #endif
 			} else {
@@ -1226,7 +1209,7 @@ bool CRecordManager::Stop(const CTimerd::RecordingStopInfo * recinfo)
 	if(inst != NULL && recinfo->eventID == inst->GetRecordingId()) {
 		StopInstance(inst, false);
 		ret = true;
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 		nGLCD::Update();
 #endif
 	} else {
@@ -1630,10 +1613,8 @@ bool CRecordManager::RunStartScript(void)
 	//FIXME only if no recordings yet or always ?
 	if(RecordingStatus())
 		return false;
-#ifdef MARTII
 	if (access(NEUTRINO_RECORDING_START_SCRIPT, X_OK))
 		return true;
-#endif
 
 	puts("[neutrino.cpp] executing " NEUTRINO_RECORDING_START_SCRIPT ".");
 	if (my_system(NEUTRINO_RECORDING_START_SCRIPT) != 0) {
@@ -1649,10 +1630,8 @@ bool CRecordManager::RunStopScript(void)
 	if(RecordingStatus())
 		return false;
 
-#ifdef MARTII
 	if (access(NEUTRINO_RECORDING_ENDED_SCRIPT, X_OK))
 		return true;
-#endif
 	puts("[neutrino.cpp] executing " NEUTRINO_RECORDING_ENDED_SCRIPT ".");
 	if (my_system(NEUTRINO_RECORDING_ENDED_SCRIPT) != 0) {
 		perror(NEUTRINO_RECORDING_ENDED_SCRIPT " failed");
@@ -1826,7 +1805,7 @@ bool CRecordManager::doGuiRecord()
 		}
 	} else {
 		int recording_id = 0;
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 		nGLCD::Update();
 #endif
 		mutex.lock();
@@ -1854,7 +1833,7 @@ bool CRecordManager::changeNotify(const neutrino_locale_t OptionName, void * /*d
 			if(recordingstatus)
 				ret = true;
 			recordingstatus = 0;
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 			nGLCD::Update();
 #endif
 		}

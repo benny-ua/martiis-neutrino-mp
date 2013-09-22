@@ -57,7 +57,6 @@
 #include <system/helpers.h>
 
 #include <zapit/client/zapittools.h>
-#ifdef MARTII
 #include "widget/shellwindow.h"
 #include "widget/messagebox.h"
 #include <poll.h>
@@ -66,7 +65,6 @@
 
 #include <video.h>
 extern cVideo * videoDecoder;
-#endif
 
 #include "plugins.h"
 /* for alexW images with old drivers:
@@ -180,7 +178,6 @@ CPlugins::~CPlugins()
 	plugin_list.clear();
 }
 
-#ifdef MARTII
 bool CPlugins::overrideType(plugin *plugin_data, std::string &setting, p_type type)
 {
 	if (!setting.empty()) {
@@ -195,7 +192,7 @@ bool CPlugins::overrideType(plugin *plugin_data, std::string &setting, p_type ty
 	}
 	return false;
 }
-#endif
+
 bool CPlugins::parseCfg(plugin *plugin_data)
 {
 //	FILE *fd;
@@ -290,13 +287,13 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 	}
 
 	inFile.close();
-#ifdef MARTII
+
 	overrideType(plugin_data, g_settings.plugins_disabled, P_TYPE_DISABLED) ||
 	overrideType(plugin_data, g_settings.plugins_game, P_TYPE_GAME) ||
 	overrideType(plugin_data, g_settings.plugins_tool, P_TYPE_TOOL) ||
 	overrideType(plugin_data, g_settings.plugins_script, P_TYPE_SCRIPT) ||
 	overrideType(plugin_data, g_settings.plugins_lua, P_TYPE_LUA);
-#endif
+
 	return !reject;
 }
 
@@ -352,36 +349,12 @@ void CPlugins::startScriptPlugin(int number)
 		       script, plugin_list[number].cfgfile.c_str());
 		return;
 	}
-#ifdef MARTII
+
 	// workaround for manually messed up permissions
 	if (access(script, X_OK))
 		chmod(script, 0755);
 	CShellWindow(script, CShellWindow::VERBOSE | CShellWindow::ACKNOWLEDGE);
 	scriptOutput = "";
-#else
-	pid_t pid = 0;
-	FILE *f = my_popen(pid,script,"r");
-	if (f != NULL)
-	{
-		char *output=NULL;
-		size_t len = 0;
-		while (( getline(&output, &len, f)) != -1)
-
-		{
-			scriptOutput += output;
-		}
-		pclose(f);
-		int s;
-		while (waitpid(pid,&s,WNOHANG)>0);
-		kill(pid,SIGTERM);
-		if(output)
-			free(output);
-	}
-	else
-	{
-		printf("[CPlugins] can't execute %s\n",script);
-	}
-#endif
 }
 
 void CPlugins::startLuaPlugin(int number)
@@ -397,11 +370,11 @@ void CPlugins::startLuaPlugin(int number)
 	CLuaInstance *lua = new CLuaInstance();
 	lua->runScript(script);
 	delete lua;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	frameBuffer->ClearFB();
+#endif
 	videoDecoder->Pig(-1, -1, -1, -1);
 	frameBuffer->paintBackground();
-#endif
 }
 
 void CPlugins::startPlugin(int number,int /*param*/)
@@ -410,25 +383,25 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	delScriptOutput();
 	/* export neutrino settings to the environment */
 	char tmp[32];
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	sprintf(tmp, "%d", g_settings.screen_StartX_int);
 #else
 	sprintf(tmp, "%d", g_settings.screen_StartX);
 #endif
 	setenv("SCREEN_OFF_X", tmp, 1);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	sprintf(tmp, "%d", g_settings.screen_StartY_int);
 #else
 	sprintf(tmp, "%d", g_settings.screen_StartY);
 #endif
 	setenv("SCREEN_OFF_Y", tmp, 1);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	sprintf(tmp, "%d", g_settings.screen_EndX_int);
 #else
 	sprintf(tmp, "%d", g_settings.screen_EndX);
 #endif
 	setenv("SCREEN_END_X", tmp, 1);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	sprintf(tmp, "%d", g_settings.screen_EndY_int);
 #else
 	sprintf(tmp, "%d", g_settings.screen_EndY);
@@ -673,18 +646,18 @@ void CPlugins::startPlugin(int number,int /*param*/)
 	frameBuffer->Lock();
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	printf("Starting %s\n", plugin_list[number].pluginfile.c_str());
-#ifdef MARTII
+
 	// workaround for manually messed up permissions
 	if (access(plugin_list[number].pluginfile, X_OK))
 		chmod(plugin_list[number].pluginfile.c_str(), 0755);
-#endif
+
 	my_system(2, plugin_list[number].pluginfile.c_str(), NULL);
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	frameBuffer->Unlock();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	frameBuffer->ClearFB();
-	videoDecoder->Pig(-1, -1, -1, -1);
 #endif
+	videoDecoder->Pig(-1, -1, -1, -1);
 	frameBuffer->paintBackground();
 	g_RCInput->restartInput();
 	g_RCInput->clearRCMsg();

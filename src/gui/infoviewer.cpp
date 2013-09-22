@@ -481,7 +481,7 @@ void CInfoViewer::show_current_next(bool new_chan, int  epgpos)
 	}
 }
 
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 void CInfoViewer::showShairPlay(const std::string &album, const std::string &artist, const std::string &title,
 				const std::string &/*comment*/, const std::string &/*composer*/, const std::string &/*genre*/,
 				const std::string &/*decription*/, const std::string &year, bool dot)
@@ -946,11 +946,9 @@ void CInfoViewer::loop(bool show_dot)
 			else
 				res = messages_return::cancel_info;
 		} else if ((msg == NeutrinoMessages::EVT_TIMER) && (data == sec_timer_id)) {
-#ifdef MARTII
 			// doesn't belong here, but easiest way to check for a change ...
 			if (is_visible && showButtonBar)
 				infoViewerBB->showIcon_CA_Status(0);
-#endif
 			showSNR ();
 			paintTime (show_dot, false);
 			showRecordIcon (show_dot);

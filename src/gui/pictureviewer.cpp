@@ -306,11 +306,7 @@ int CPictureViewerGui::show()
 				view(next);
 			}
 		}
-#ifdef MARTII
-		else if (msg == CRCInput::RC_left || msg == (uint32_t) g_settings.key_channelList_pageup)
-#else
-		else if (msg == CRCInput::RC_left)
-#endif
+		else if (msg == CRCInput::RC_left || msg == (uint32_t) g_settings.key_pageup)
 		{
 			if (!playlist.empty())
 			{
@@ -329,11 +325,7 @@ int CPictureViewerGui::show()
 				}
 			}
 		}
-#ifdef MARTII
-		else if (msg == CRCInput::RC_right || msg == (uint32_t) g_settings.key_channelList_pagedown)
-#else
-		else if (msg == CRCInput::RC_right)
-#endif
+		else if (msg == CRCInput::RC_right || msg == (uint32_t) g_settings.key_pagedown)
 		{
 			if (!playlist.empty())
 			{
@@ -503,11 +495,7 @@ int CPictureViewerGui::show()
 				}
 			}
 		}
-#ifdef MARTII
 		else if (msg==(uint32_t)g_settings.key_help)
-#else
-		else if (msg==CRCInput::RC_help)
-#endif
 		{
 			if (m_state == MENU)
 			{

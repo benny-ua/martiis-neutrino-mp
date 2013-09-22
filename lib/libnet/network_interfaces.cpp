@@ -357,15 +357,8 @@ bool setStaticAttributes(const std::string &name, const bool automatic_start, co
 	attribute["address"] = address;
 	attribute["netmask"] = netmask;
 
-#ifdef MARTII
 	if(wireless)
 		attribute["pre-up"] = "/etc/network/pre-wlan.sh";
-#else
-	if(wireless) {
-		attribute["pre-up"] = "/etc/network/pre-" + name + ".sh";
-		attribute["post-down"] = "/etc/network/post-" + name + ".sh";
-	}
-#endif
 
 	if (!broadcast.empty())
 		attribute["broadcast"] = broadcast;
@@ -383,15 +376,8 @@ bool setDhcpAttributes(const std::string &name, const bool automatic_start, bool
 	if(gethostname(hostname, sizeof(hostname)) == 0)
 		attribute["hostname"] = hostname;
 
-#ifdef MARTII
 	if(wireless)
 		attribute["pre-up"] = "/etc/network/pre-wlan.sh";
-#else
-	if(wireless) {
-		attribute["pre-up"] = "/etc/network/pre-" + name + ".sh";
-		attribute["post-down"] = "/etc/network/post-" + name + ".sh";
-	}
-#endif
 
 	return write_interface("/etc/network/interfaces", name, automatic_start, "inet", "dhcp", attribute);
 }

@@ -37,9 +37,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#ifdef MARTII
 #include <driver/framebuffer.h>
-#endif
 #include "tuxtxt_def.h"
 
 #include <ft2build.h>
@@ -65,9 +63,7 @@ extern void tuxtxt_decode_adip(); /* additional information table */
 extern void tuxtxt_compress_page(int p, int sp, unsigned char* buffer);
 extern void tuxtxt_decompress_page(int p, int sp, unsigned char* buffer);
 extern void tuxtxt_clear_p26(tstExtData* extData);
-#ifdef MARTII
 extern void tuxtxt_clear_cache(void);
-#endif
 #if TUXTXT_DEBUG
 extern int tuxtxt_get_zipsize(int p, int sp);
 #endif
@@ -241,13 +237,8 @@ const char *ObjectType[] =
 #define NoServicesFound 3
 
 /* framebuffer stuff */
-#ifdef MARTII
 static fb_pixel_t *lfb = NULL;
 static fb_pixel_t *lbb = NULL;
-#else
-static unsigned char *lfb = 0;
-static unsigned char *lbb = 0;
-#endif
 struct fb_var_screeninfo var_screeninfo;
 struct fb_fix_screeninfo fix_screeninfo;
 
@@ -596,12 +587,8 @@ int sx, ex, sy, ey;
 int PosX, PosY, StartX, StartY;
 int lastpage;
 int inputcounter;
-#ifdef MARTII
 int zoommode[2], screenmode[2], transpmode[2], hintmode, nofirst, savedscreenmode[2], showflof, show39, showl25, prevscreenmode[2];
 bool boxed, oldboxed;
-#else
-int zoommode, screenmode, transpmode, hintmode, boxed, nofirst, savedscreenmode, showflof, show39, showl25, prevscreenmode;
-#endif
 char dumpl25;
 int catch_row, catch_col, catched_page, pagecatching;
 int prev_100, prev_10, next_10, next_100;
@@ -1252,7 +1239,6 @@ const unsigned short defaultcolors[] =	/* 0x0bgr */
 	0x420, 0x210, 0x420, 0x000, 0x000
 };
 
-#ifdef MARTII
 fb_pixel_t argb[] = {
 	0xff000000, 0xff000000, 0xff000000, 0xff000000,
 	0xff000000, 0xff000000, 0xff000000, 0xff000000,
@@ -1265,35 +1251,6 @@ fb_pixel_t argb[] = {
 	0xff000000, 0xff000000, 0xc0000000, 0x00000000,
 	0x33000000
 };
-#else
-#if !HAVE_TRIPLEDRAGON
-/* 32bit colortable */
-unsigned char argb[][5] = { 
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xFF",
-"\0\0\0\xFF", "\0\0\0\xFF", "\0\0\0\xC0", "\0\0\0\x00",
-"\0\0\0\x33" };
-#else
-/* actually "ARGB" */
-unsigned char argb[][5] = {
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0", "\xFF\0\0\0",
-"\xFF\0\0\0", "\xFF\0\0\0", "\xC0\0\0\0", "\x00\0\0\0",
-"\x33\0\0\0" };
-#endif
-#endif
 
 /* old 8bit color table */
 unsigned short rd0[] = {0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0x00<<8, 0x00<<8, 0x00<<8, 0,      0      };

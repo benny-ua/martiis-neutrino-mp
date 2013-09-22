@@ -45,14 +45,8 @@
 
 #include <OpenThreads/Mutex>
 
-#ifdef MARTII
 #define REC_MAX_APIDS 20
-#else
-#define REC_MAX_APIDS 10
-#endif
-#ifdef MARTII
 #define REC_MAX_DPIDS 20
-#endif
 #define FILENAMEBUFFERSIZE 1024
 #if HAVE_TRIPLEDRAGON
 /* I'm not able to get it to work with more than 1 recording at a time :-( */
@@ -95,11 +89,7 @@ class CRecordInstance
 		bool		StreamVTxtPid;
 		bool		StreamSubtitlePids;
 		bool		StreamPmtPid;
-#ifdef MARTII
 		unsigned short	apids[REC_MAX_APIDS + REC_MAX_DPIDS];
-#else
-		unsigned short	apids[REC_MAX_APIDS];
-#endif
 		unsigned int	numpids;
 		CZapitClient::responseGetPIDs allpids;
 		int		recording_id;
@@ -227,9 +217,7 @@ class CRecordManager : public CMenuTarget /*, public CChangeObserver*/
 		};
 		void SetDirectory(std::string directory) { Directory	= directory; };
 		void SetTimeshiftDirectory(std::string directory) { TimeshiftDirectory	= directory; };
-#ifdef MARTII
 		std::string GetTimeshiftDirectory(void) { return TimeshiftDirectory; };
-#endif
 		bool RecordingStatus(const t_channel_id channel_id = 0);
 		bool TimeshiftOnly();
 		bool Timeshift() { return (autoshift || shift_timer); };

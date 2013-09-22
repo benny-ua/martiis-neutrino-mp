@@ -30,7 +30,7 @@
 #include "controlapi.h"
 #include "lcdapi.h"
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define EVENTDEV "/dev/input/nevis_ir"
 #else
 #define EVENTDEV "/dev/input/event0"
@@ -1762,7 +1762,7 @@ void CControlAPI::YWeb_SendRadioStreamingPid(CyhookHandler *hh)
 //-----------------------------------------------------------------------------
 std::string CControlAPI::YexecuteScript(CyhookHandler *, std::string cmd)
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
     {
 	const char *fbshot = "Y_Tools fbshot fb /";
 	int len = strlen(fbshot);

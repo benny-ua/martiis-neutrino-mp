@@ -120,7 +120,7 @@ bool CPmt::Parse(CZapitChannel * const channel)
 		memmove(p, buffer, pmtlen);
 		channel->setRawPmt(p, pmtlen);
 	}
-#ifdef MARTII
+
 #define PID_CONFIG_FILE CONFIGDIR "/zapit/supplemental_pids.conf"
 	// This file is maintained manually and is currently used for adding TTX subtitle pids on ARD/ZDF only. --martii
 	//
@@ -173,7 +173,6 @@ bool CPmt::Parse(CZapitChannel * const channel)
 		}
 		fclose(SUPPIDS);
 	}
-#endif
 
 	channel->setPidsFlag();
 	return true;

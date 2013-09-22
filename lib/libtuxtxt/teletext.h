@@ -1,11 +1,12 @@
 #ifndef __teletext_h__
 #define __teletext_h__
+#include <config.h>
 
 int tuxtxt_init();
 void tuxtxt_close();
 void tuxtxt_start(int tpid, int source = 0);  // Start caching
 int  tuxtxt_stop(); // Stop caching
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 int tuxtx_main(int _rc, int pid, int page = 0, int source = 0, bool _isEplayer = false);
 #else
 int tuxtx_main(int _rc, int pid, int page = 0, int source = 0);

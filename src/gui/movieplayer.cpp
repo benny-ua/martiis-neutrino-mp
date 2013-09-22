@@ -660,16 +660,20 @@ void CMoviePlayerGui::PlayFile(void)
 		duration = p_movie_info->length * 60 * 1000;
 		int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
 		CZapit::getInstance()->SetVolumePercent(percent);
+#if HAVE_SPARK_HARDWARE
 		CScreenSetup cSS;
 		cSS.showBorder(p_movie_info->epgId);
 	} else {
 		CScreenSetup cSS;
 		cSS.showBorder(0);
+#endif
 	}
 
 	file_prozent = 0;
+#if HAVE_SPARK_HARDWARE
 	CFrameBuffer::Mode3D old3dmode = frameBuffer->get3DMode();
-#ifdef ENABLE_GRAPHLCD // MARTII
+#endif
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
 	if (p_movie_info)
 		nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
@@ -743,7 +747,7 @@ void CMoviePlayerGui::PlayFile(void)
 
 	while (playstate >= CMoviePlayerGui::PLAY)
 	{
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 		if (p_movie_info)
 			nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle, duration ? (100 * position / duration) : 0);
 #endif
@@ -791,8 +795,10 @@ void CMoviePlayerGui::PlayFile(void)
 		} else if (msg == (neutrino_msg_t) CRCInput::RC_home) {
 			playstate = CMoviePlayerGui::STOPPED;
 			playback->RequestAbort();
+#if HAVE_SPARK_HARDWARE
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_next3dmode) {
 			frameBuffer->set3DMode((CFrameBuffer::Mode3D)(((frameBuffer->get3DMode()) + 1) % CFrameBuffer::Mode3D_SIZE));
+#endif
 		} else if( msg == (neutrino_msg_t) g_settings.key_next43mode) {
 			g_videoSettings->next43Mode();
 		} else if( msg == (neutrino_msg_t) g_settings.key_switchformat) {
@@ -963,6 +969,7 @@ void CMoviePlayerGui::PlayFile(void)
 			clearSubtitle();
 #endif
 			//showHelpTS();
+#if HAVE_SPARK_HARDWARE
 		} else if((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
 			uint16_t pid = playback->GetTeletextPid();
 			if (pid) {
@@ -994,6 +1001,7 @@ void CMoviePlayerGui::PlayFile(void)
 					g_RCInput->getMsg(&msg, &data, 1);
 				while (msg != CRCInput::RC_timeout);
 			}
+#endif
 		} else if(timeshift && (msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 			bool restore = FileTime.IsVisible();
 			FileTime.hide();
@@ -1108,7 +1116,9 @@ void CMoviePlayerGui::PlayFile(void)
 	tuxtx_stop_subtitle();
 	dvbsub_stop();
 
+#if HAVE_SPARK_HARDWARE
 	frameBuffer->set3DMode(old3dmode);
+#endif
 #ifdef ENABLE_GRAPHLCD
 	if (p_movie_info)
 		nGLCD::unlockChannel();
@@ -1121,8 +1131,10 @@ void CMoviePlayerGui::PlayFile(void)
 	SubtitleChanger.exec(NULL, "off");
 	delete playback;
 	playback = NULL;
+#if HAVE_SPARK_HARDWARE
 	CScreenSetup cSS;
 	cSS.showBorder(CZapit::getInstance()->GetCurrentChannelID());
+#endif
 
 	CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, false);
 	CVFD::getInstance()->ShowIcon(FP_ICON_PAUSE, false);
@@ -1368,7 +1380,9 @@ void CMoviePlayerGui::selectAudioPid(bool file_player)
 
 	APIDSelector.exec(NULL, "");
 	delete selector;
+#if HAVE_SPARK_HARDWARE
 	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
+#endif
 	printf("CMoviePlayerGui::selectAudioPid: selected %d (%x) current %x\n", select, (select >= 0) ? apids[select] : -1, currentapid);
 	if(SubtitleChanger.actionKey.substr(0, 3) == "TTX")
 		currentttxsub = SubtitleChanger.actionKey;
@@ -1673,6 +1687,7 @@ void CMoviePlayerGui::StopSubtitles(bool b)
 void CMoviePlayerGui::StopSubtitles(bool)
 #endif
 {
+#if HAVE_SPARK_HARDWARE
 	printf("[neutrino] %s\n", __FUNCTION__);
 	int ttx, ttxpid, ttxpage;
 	int dvbpid;
@@ -1686,16 +1701,18 @@ void CMoviePlayerGui::StopSubtitles(bool)
 		tuxtx_pause_subtitle(true);
 		frameBuffer->paintBackground();
 	}
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	if (b)
 		nGLCD::MirrorOSD();
+#endif
 #endif
 }
 
 void CMoviePlayerGui::StartSubtitles(bool show)
 {
+#if HAVE_SPARK_HARDWARE
 	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
 #endif
 	if(!show)
@@ -1703,6 +1720,7 @@ void CMoviePlayerGui::StartSubtitles(bool show)
 	playback->SuspendSubtitle(false);
 	dvbsub_start(0, true);
 	tuxtx_pause_subtitle(false);
+#endif
 }
 
 #if 0

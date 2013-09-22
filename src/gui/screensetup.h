@@ -36,7 +36,7 @@
 #include <gui/widget/menue.h>
 
 #include <driver/framebuffer.h>
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #include <zapit/client/zapittypes.h>
 #endif
 
@@ -55,7 +55,7 @@ class CScreenSetup : public CMenuTarget
     int BoxWidth;
     int x_coord[2];
     int y_coord[2];
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
     std::string coord[2];
     int x_coord_bak[2];
     int y_coord_bak[2];
@@ -73,7 +73,7 @@ class CScreenSetup : public CMenuTarget
     void paint();
     void paintBorderUL();
     void paintBorderLR();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
     void updateCoords();
 #else
     void paintCoords();
@@ -84,7 +84,7 @@ class CScreenSetup : public CMenuTarget
 	
  public:
     CScreenSetup();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
     void showBorder(t_channel_id cid);
     void hideBorder();
     void resetBorder(t_channel_id cid);

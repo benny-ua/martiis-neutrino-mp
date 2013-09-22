@@ -1196,19 +1196,11 @@ void CScanSetup::addScanMenuManualScan(CMenuWidget *manual_Scan)
 	//----------------------------------------------------------------------
 	manual_Scan->addItem(GenericMenuSeparatorLine);
 
-#ifdef MARTII
 	mf = new CMenuForwarder(LOCALE_SCANTS_TEST, allow_start, NULL, this, r_system == DVB_C ? "ctest" : (r_system == DVB_T ? "ttest" : "stest"), CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
-#else
-	mf = new CMenuForwarder(LOCALE_SCANTS_TEST, allow_start, NULL, this, r_system == DVB_C ? "ctest" : "stest", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
-#endif
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_TEST);
 	manual_Scan->addItem(mf);
 
-#ifdef MARTII
 	mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, r_system == DVB_C ? "cmanual" : (r_system == DVB_T ? "tmanual" : "smanual"), CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
-#else
-	mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, r_system == DVB_C ? "cmanual" : "smanual", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
-#endif
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_START);
 	manual_Scan->addItem(mf);
 }
@@ -1651,7 +1643,6 @@ int CTPSelectHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 			old_selected = i;
 
 		std::string tname = t.description();
-#ifdef MARTII
 		if (actionkey == "terrestrial") {
 			uint32_t ch = (t.feparams.dvb_feparams.frequency - 306000)/8000;
 			if (ch * 8000 + 306000 == t.feparams.dvb_feparams.frequency) {
@@ -1660,7 +1651,6 @@ int CTPSelectHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 				tname += std::string(s);
 			}
 		}
-#endif
 		CMenuForwarder * ts_item = new CMenuForwarder(tname, true, NULL, selector, cnt, CRCInput::RC_nokey, NULL)/*, false*/;
 
 		ts_item->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);

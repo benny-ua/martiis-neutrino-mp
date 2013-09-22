@@ -93,11 +93,6 @@ class CTimerList : public CMenuTarget
 		static std::string convertChannelId2String(const t_channel_id id); // UTF-8
 };
 
-#ifdef MARTII
 bool askUserOnTimerConflict(time_t announceTime, time_t stopTime, t_channel_id channel_id = 0);
-#else
-bool askUserOnTimerConflict(time_t announceTime, time_t stopTime);
-#endif
-
 
 #endif

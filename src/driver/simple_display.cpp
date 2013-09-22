@@ -181,6 +181,7 @@ void CLCD::showServicename(const std::string name, bool)
 
 void CLCD::showTime(bool)
 {
+#if HAVE_SPARK_HARDWARE
 	int m = g_settings.lcd_setting[ (mode == MODE_STANDBY)
 			? SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE
 			: SNeutrinoSettings::LCD_DISPLAYMODE];
@@ -202,6 +203,7 @@ void CLCD::showTime(bool)
 				return;
 			break;
 	}
+#endif
 
 	struct tm tm;
 	time_t now = time(NULL);
@@ -426,6 +428,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 	if (!str && servicename.length() > 0)
 		str = (char *) servicename.c_str();
 
+#if HAVE_SPARK_HARDWARE
 	int m = g_settings.lcd_setting[ (mode == MODE_STANDBY)
 			? SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE
 			: SNeutrinoSettings::LCD_DISPLAYMODE];
@@ -445,6 +448,7 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			Clear();
 			return;
 	}
+#endif
 
 #if HAVE_GENERIC_HARDWARE
         printf("CLCD::ShowText: [%s]\n", str);

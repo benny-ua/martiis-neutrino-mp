@@ -369,9 +369,7 @@ class CZapitClient:public CBasicClient
 
 	/* get dvb transmission type */
 	delivery_system_t getDeliverySystem(void);
-#ifdef MARTII
 	void lockRc(const bool mute);
-#endif
 
 	void zaptoNvodSubService(const int num);
 

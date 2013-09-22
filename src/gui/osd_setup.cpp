@@ -354,13 +354,11 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		chooserDir(g_settings.logo_hdd_dir, false, action_str);
 		return res;
 	}
-#ifdef MARTII
 	else if(actionKey=="logo_dir_2") {
 		const char *action_str = "logo_2";
 		chooserDir(g_settings.logo_hdd_dir_2, false, action_str);
 		return menu_return::RETURN_REPAINT;
 	}
-#endif
 	else if(actionKey=="screenshot_dir") {
 		const char *action_str = "screenshot";
 		chooserDir(g_settings.screenshot_dir, true, action_str);
@@ -977,9 +975,9 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_COLORED_EVENT);
 	menu_infobar->addItem(mc);
 
-#ifdef MARTII
+	// show infobar on current-next change. FIXME, still needed? --martii
 	menu_infobar->addItem(new CMenuOptionChooser(LOCALE_MISCSETTINGS_INFOBAR_AUTOSHOW_IF_CN, &g_settings.infobar_cn, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-#endif
+
 	// radiotext
 	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_RADIOTEXT, &g_settings.radiotext_enable, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_INFOBAR_RADIOTEXT);

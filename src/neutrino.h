@@ -33,6 +33,8 @@
 #ifndef __neutrino__
 #define __neutrino__
 
+#include "config.h"
+
 #include <configfile.h>
 
 #include <neutrinoMessages.h>
@@ -46,13 +48,14 @@
 #include "gui/rc_lock.h"
 #include "gui/user_menue.h"
 #include "gui/timerlist.h"
-#ifdef MARTII
+
 #include <gui/adzap.h>
+#if HAVE_SPARK_HARDWARE
 #include <gui/psisetup.h>
 #include <gui/3dsetup.h>
+#endif
 #if ENABLE_SHAIRPLAY
 #include <gui/shairplay.h>
-#endif
 #endif
 
 #include <string>
@@ -92,9 +95,7 @@ private:
 	CUserMenu 			usermenu;
 	int                             network_dhcp;
 	int                             network_automatic_start;
-#ifdef MARTII
 	CMenuWidget			*mainMenu;
-#endif
 
 	int				mode;
 	int				lastMode;
@@ -176,15 +177,15 @@ public:
 	CChannelList			*TVchannelList;
 	CChannelList			*RADIOchannelList;
 	CChannelList			*channelList;
-#ifdef MARTII
 	CAdZapMenu			*AdZapChanger;
+#if HAVE_SPARK_HARDWARE
 	CPSISetup			*chPSISetup;
 	C3DSetup			*threeDSetup;
+#endif
 #if ENABLE_SHAIRPLAY
 	CShairPlay			*shairPlay;
 	bool				shairplay_active;
 	bool				shairplay_enabled_cur;
-#endif
 #endif
 	bool                            timer_wakeup;
 
@@ -222,20 +223,18 @@ public:
 	void MarkChannelListChanged(void) { g_channel_list_changed = true; };
 	void quickZap(int msg);
 	void numericZap(int msg);
-# ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	void StopSubtitles(bool b = true);
-# else
+#else
 	void StopSubtitles();
-# endif
+#endif
 	void StartSubtitles(bool show = true);
 	bool StartPip(const t_channel_id channel_id);
 	void SelectSubtitles();
 	void showInfo(void);
 	CConfigFile* getConfigFile() {return &configfile;};
 	bool 		SDTreloadChannels;
-#ifdef MARTII
 	CMenuTarget			*batchEPGSettings;
-#endif
 	void saveEpg(bool cvfd_mode);
 	void stopDaemonsForFlash();
 };

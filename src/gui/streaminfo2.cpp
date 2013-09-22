@@ -307,11 +307,7 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	if (paint_mode == 0)
 		maxmin_x = sig_text_ber_x-(fontW*4);
 	else
-#ifdef MARTII
 		maxmin_x = _x + 40 + xd * 3 + (fontW*8);
-#else
-		maxmin_x = _x + 40 + xd * 3 + (fontW*4);
-#endif
 
 	g_Font[font_small]->RenderString(maxmin_x, y1 + sheight + 5, fw*3, "max", COL_INFOBAR_TEXT, 0, true);
 	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 2) +5, fw*3, "now", COL_INFOBAR_TEXT, 0, true);
@@ -672,7 +668,7 @@ void CStreamInfo2::paintCASystem(int xpos, int ypos)
 		array[i] = g_Font[font_info]->getRenderWidth(casys[i].c_str());
 		caids[i] = false;
 	}
-#ifdef MARTII
+
 	int acaid = 0;
 	FILE *f = fopen("/tmp/ecm.info", "rt");
 	if (f) {
@@ -684,7 +680,6 @@ void CStreamInfo2::paintCASystem(int xpos, int ypos)
 		}
 		fclose(f);
 	}
-#endif
 
 	int spaceoffset = 0;
 
@@ -834,10 +829,6 @@ int CStreamInfo2::ts_setup ()
 	last_tv.tv_sec = first_tv.tv_sec;
 	last_tv.tv_usec = first_tv.tv_usec;
 	ret = b_total = 0;
-#ifdef MARTII
-	dmxfd = dmx->getFD();
-	fcntl(dmxfd, F_SETFL, fcntl(dmxfd, F_GETFL) | O_NONBLOCK);
-#endif
 	return ret;
 }
 

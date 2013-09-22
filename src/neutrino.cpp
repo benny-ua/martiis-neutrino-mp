@@ -97,11 +97,11 @@
 #include "gui/pipsetup.h"
 #endif
 
-#ifdef MARTII
 #include "gui/batchepg.h"
+#if HAVE_SPARK_HARDWARE
 #include "gui/screensetup.h"
-#include <system/set_threadname.h>
 #endif
+#include <system/set_threadname.h>
 #if HAVE_COOL_HARDWARE
 #include "gui/widget/progressbar.h"
 #endif
@@ -117,14 +117,12 @@
 #include <system/setting_helpers.h>
 #include <system/settings.h>
 #include <system/helpers.h>
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 #include <driver/nglcd.h>
 #endif
-#ifdef MARTII
 #include <system/safe_system.h>
 #include <system/localize_bouquetnames.h>
 #define CONF_VERSION 1
-#endif
 
 #include <timerdclient/timerdmsg.h>
 
@@ -289,7 +287,7 @@ const lcd_setting_struct_t lcd_setting[SNeutrinoSettings::LCD_SETTING_COUNT] =
 #if HAVE_TRIPLEDRAGON || USE_STB_HAL
 	,{ "lcd_epgmode"        , 0 /*DEFAULT_LCD_EPGMODE*/ }
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	, {"lcd_displaymode"      , DEFAULT_LCD_DISPLAYMODE    }
 	, {"lcd_standbydisplaymode", DEFAULT_LCD_DISPLAYMODE   }
 #endif
@@ -337,9 +335,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		}
 	}
 	parentallocked = !access(NEUTRINO_PARENTALLOCKED_FILE, R_OK);
-#ifdef MARTII
 	g_settings.conf_version = configfile.getInt32("conf_version", 0);
-#endif
 	// video
 #if HAVE_TRIPLEDRAGON
 	int vid_Mode_default = VIDEO_STD_PAL;
@@ -362,7 +358,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.hdmi_cec_mode = configfile.getInt32("hdmi_cec_mode", 0); // default off
 	g_settings.hdmi_cec_view_on = configfile.getInt32("hdmi_cec_view_on", 0); // default off
 	g_settings.hdmi_cec_standby = configfile.getInt32("hdmi_cec_standby", 0); // default off
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	g_settings.hdmi_cec_broadcast = configfile.getInt32("hdmi_cec_broadcast", 0); // default off
 	g_settings.psi_contrast = configfile.getInt32("video_psi_contrast", 128);
 	g_settings.psi_saturation = configfile.getInt32("video_psi_saturation", 128);
@@ -381,7 +377,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.audio_volume_percent_ac3 = configfile.getInt32("audio_volume_percent_ac3", 100);
 	g_settings.audio_volume_percent_pcm = configfile.getInt32("audio_volume_percent_pcm", 100);
 #endif
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	g_settings.shairplay_enabled = configfile.getInt32("shairplay_enabled", 0);
 	shairplay_enabled_cur = g_settings.shairplay_enabled;
 	g_settings.shairplay_port = configfile.getInt32("shairplay_port", 5000);
@@ -410,7 +406,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	for(int i = 0; i < VIDEOMENU_VIDEOMODE_OPTION_COUNT; i++) {
 		g_settings.enabled_video_modes[i] = configfile.getInt32("enabled_video_mode_" + to_string(i), 0);
 	}
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 #if VIDEOMENU_VIDEOMODE_OPTION_COUNT > 3
 	g_settings.enabled_video_modes[3] = 1; // 720p 50Hz
 	g_settings.enabled_video_modes[4] = 1; // 1080i 50Hz
@@ -418,7 +414,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 #endif
 
 	g_settings.cpufreq = configfile.getInt32("cpufreq", 0);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	g_settings.standby_cpufreq = configfile.getInt32("standby_cpufreq", 0);
 #else
 	g_settings.standby_cpufreq = configfile.getInt32("standby_cpufreq", 100);
@@ -462,19 +458,15 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.shutdown_min = "000";
 	if (can_deepstandby || cs_get_revision() == 1)
-#ifdef MARTII
 		g_settings.shutdown_min = configfile.getString("shutdown_min","000");
-#else
-		g_settings.shutdown_min = configfile.getString("shutdown_min","180");
-#endif
 
 	g_settings.infobar_sat_display   = configfile.getBool("infobar_sat_display"  , true );
 	g_settings.infobar_show_channeldesc   = configfile.getBool("infobar_show_channeldesc"  , false );
 	g_settings.infobar_subchan_disp_pos = configfile.getInt32("infobar_subchan_disp_pos"  , 0 );
-#ifdef MARTII
+
 	g_settings.infobar_cn = configfile.getInt32("infobar_cn", 0 );
 	g_settings.menu_numbers_as_icons = configfile.getBool("menu_numbers_as_icons", true);
-#endif
+
 	g_settings.progressbar_color = configfile.getBool("progressbar_color", true );
 	g_settings.progressbar_design =  configfile.getInt32("progressbar_design", 2); //horizontal bars
 	g_settings.infobar_show  = configfile.getInt32("infobar_show", 1);
@@ -491,19 +483,17 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.show_mute_icon = configfile.getInt32("show_mute_icon" ,0);
 	g_settings.infobar_show_res = configfile.getInt32("infobar_show_res", 0 );
 	g_settings.infobar_show_dd_available = configfile.getInt32("infobar_show_dd_available", 1 );
-#ifdef MARTII
 	g_settings.show_background_picture = configfile.getInt32("show_background_picture", 1 );
-#endif
 	g_settings.infobar_show_tuner = configfile.getInt32("infobar_show_tuner", 1 );
 	g_settings.radiotext_enable = configfile.getBool("radiotext_enable"          , false);
-#ifdef MARTII
 	g_settings.radiotext_rass_dir = configfile.getString("radiotext_rass_dir", "/tmp/rass");
-#endif
+
 	//audio
 	g_settings.audio_AnalogMode = configfile.getInt32( "audio_AnalogMode", 0 );
 	g_settings.audio_DolbyDigital    = configfile.getBool("audio_DolbyDigital"   , false);
-#ifdef MARTII
+
 	g_settings.dvb_subtitle_delay = configfile.getInt32("dvb_subtitle_delay", 0);
+#if HAVE_SPARK_HARDWARE
 	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
 #endif
 
@@ -530,12 +520,12 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.epg_old_events       = configfile.getString("epg_old_events", "1");
 	g_settings.epg_max_events       = configfile.getString("epg_max_events", "30000");
 	g_settings.epg_dir              = configfile.getString("epg_dir", "/media/sda1/epg");
-#ifdef MARTII
+
         g_settings.epg_enable_freesat   = configfile.getBool("epg_enable_freesat", false);
         g_settings.epg_enable_viasat   = configfile.getBool("epg_enable_viasat", false);
         g_settings.batchepg_run_at_shutdown   = configfile.getBool("batchepg_run_at_shutdown", false);
 	g_settings.batchepg_standard_waittime = configfile.getInt32("batchepg_standard_waittime", 90);
-#endif
+
 	// NTP-Server for sectionsd
 	g_settings.network_ntpserver    = configfile.getString("network_ntpserver", "time.fu-berlin.de");
 	g_settings.network_ntprefresh   = configfile.getString("network_ntprefresh", "30" );
@@ -600,7 +590,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.infobar_Text_green = configfile.getInt32( "infobar_Text_green", 0x64 );
 	g_settings.infobar_Text_blue = configfile.getInt32( "infobar_Text_blue", 0x64 );
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	g_settings.glcd_enable = configfile.getInt32("glcd_enable", 0);
 	g_settings.glcd_color_fg = configfile.getInt32("glcd_color_fg", GLCD::cColor::White);
 	g_settings.glcd_color_bg = configfile.getInt32("glcd_color_bg", GLCD::cColor::Black);
@@ -686,11 +676,13 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.recording_stream_vtxt_pid       = configfile.getBool("recordingmenu.stream_vtxt_pid"      , true);
 	g_settings.recording_stream_subtitle_pids  = configfile.getBool("recordingmenu.stream_subtitle_pids", true);
 	g_settings.recording_stream_pmt_pid        = configfile.getBool("recordingmenu.stream_pmt_pid"      , false);
-#ifdef MARTII
+
 	g_settings.recording_stream_subtitle_pids  = configfile.getBool("recordingmenu.stream_subtitle_pids", false);
+#if HAVE_SPARK_HARDWARE
 	g_settings.recording_bufsize		   = configfile.getInt32("recording_bufsize", 10);
 	g_settings.recording_bufsize_dmx	   = configfile.getInt32("recording_bufsize_dmx", 2);
 #endif
+
 	g_settings.recording_choose_direct_rec_dir = configfile.getInt32( "recording_choose_direct_rec_dir", 0 );
 	g_settings.recording_epg_for_filename      = configfile.getBool("recording_epg_for_filename"         , true);
 	g_settings.recording_epg_for_end           = configfile.getBool("recording_epg_for_end"              , true);
@@ -701,19 +693,18 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "Teletext" );
 	g_settings.onekey_plugin = configfile.getString( "onekey_plugin", "noplugin" );
 	g_settings.plugin_hdd_dir = configfile.getString( "plugin_hdd_dir", "/hdd/tuxbox/plugins" );
-#ifdef MARTII
+
 	g_settings.plugins_disabled = configfile.getString( "plugins_disabled", "" );
 	g_settings.plugins_game = configfile.getString( "plugins_game", "" );
 	g_settings.plugins_tool = configfile.getString( "plugins_tool", "" );
 	g_settings.plugins_script = configfile.getString( "plugins_script", "" );
 	g_settings.plugins_lua = configfile.getString( "plugins_lua", "" );
-#endif
+
 	g_settings.logo_hdd_dir = configfile.getString( "logo_hdd_dir", "/var/share/icons/logo" );
-#ifdef MARTII
+
 	g_settings.logo_hdd_dir_2 = configfile.getString( "logo_hdd_dir_2", "/share/tuxbox/neutrino/icons/logo");
 	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "");
 	g_settings.webtv_xml = configfile.getString("webtv_xml", CONFIGDIR "/webtv_usr.xml");
-#endif
 
 	loadKeys();
 
@@ -767,7 +758,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.screen_StartY = g_settings.screen_preset ? g_settings.screen_StartY_lcd : g_settings.screen_StartY_crt;
 	g_settings.screen_EndX = g_settings.screen_preset ? g_settings.screen_EndX_lcd : g_settings.screen_EndX_crt;
 	g_settings.screen_EndY = g_settings.screen_preset ? g_settings.screen_EndY_lcd : g_settings.screen_EndY_crt;
-#if HAVE_SPARK_HARDWARE // MARTII
+#if HAVE_SPARK_HARDWARE
 	g_settings.screen_StartX_int = g_settings.screen_StartX;
 	g_settings.screen_StartY_int = g_settings.screen_StartY;
 	g_settings.screen_EndX_int = g_settings.screen_EndX;
@@ -862,9 +853,8 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	if ((g_settings.filebrowser_sortmethod < 0) || (g_settings.filebrowser_sortmethod >= FILEBROWSER_NUMBER_OF_SORT_VARIANTS))
 		g_settings.filebrowser_sortmethod = 0;
 	g_settings.filebrowser_denydirectoryleave = configfile.getBool("filebrowser_denydirectoryleave", false);
-#ifdef MARTII
 	g_settings.filebrowser_use_filter = configfile.getBool("filebrowser_usefilter", true);
-#endif
+
 	//zapit setup
 	g_settings.StartChannelTV = configfile.getString("startchanneltv","");
 	g_settings.StartChannelRadio = configfile.getString("startchannelradio","");
@@ -872,9 +862,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.startchannelradio_id =  configfile.getInt64("startchannelradio_id", 0);
 	g_settings.uselastchannel         = configfile.getInt32("uselastchannel" , 1);
 
-#ifdef MARTII
 	g_settings.adzap_zapBackPeriod = configfile.getInt32("adzap_zapBackPeriod", 180);
-#endif
 
 	// USERMENU -> in system/settings.h
 	//-------------------------------------------
@@ -954,9 +942,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		dprintf(DEBUG_NORMAL, "error while saving scan-settings!\n");
 	}
 
-#ifdef MARTII
 	configfile.setInt32("conf_version", CONF_VERSION);
-#endif
+
 	//video
 	configfile.setInt32( "video_Mode", g_settings.video_Mode );
 	configfile.setInt32( "analog_mode1", g_settings.analog_mode1 );
@@ -969,7 +956,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "hdmi_cec_mode", g_settings.hdmi_cec_mode );
 	configfile.setInt32( "hdmi_cec_view_on", g_settings.hdmi_cec_view_on );
 	configfile.setInt32( "hdmi_cec_standby", g_settings.hdmi_cec_standby );
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	configfile.setInt32( "hdmi_cec_broadcast", g_settings.hdmi_cec_broadcast );
 	configfile.setInt32( "video_psi_contrast", g_settings.psi_contrast );
 	configfile.setInt32( "video_psi_saturation", g_settings.psi_saturation );
@@ -980,14 +967,14 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	configfile.setInt32( "current_volume", g_settings.current_volume );
 	configfile.setInt32( "current_volume_step", g_settings.current_volume_step );
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	configfile.setInt32("audio_mixer_volume_analog", g_settings.audio_mixer_volume_analog);
 	configfile.setInt32("audio_mixer_volume_hdmi", g_settings.audio_mixer_volume_hdmi);
 	configfile.setInt32("audio_mixer_volume_spdif", g_settings.audio_mixer_volume_spdif);
 	configfile.setInt32("audio_volume_percent_ac3", g_settings.audio_volume_percent_ac3);
 	configfile.setInt32("audio_volume_percent_pcm", g_settings.audio_volume_percent_pcm);
 #endif
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	configfile.setInt32("shairplay_enabled", g_settings.shairplay_enabled);
 	configfile.setInt32("shairplay_port", g_settings.shairplay_port);
 	configfile.setInt32("shairplay_bufsize", g_settings.shairplay_bufsize);
@@ -1047,10 +1034,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("infobar_sat_display"  , g_settings.infobar_sat_display  );
 	configfile.setBool("infobar_show_channeldesc"  , g_settings.infobar_show_channeldesc  );
 	configfile.setInt32("infobar_subchan_disp_pos"  , g_settings.infobar_subchan_disp_pos  );
-#ifdef MARTII
 	configfile.setInt32("infobar_cn"  , g_settings.infobar_cn);
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
-#endif
 	configfile.setInt32("progressbar_color", g_settings.progressbar_color);
 	configfile.setInt32("progressbar_design", g_settings.progressbar_design);
 	configfile.setInt32("infobar_show", g_settings.infobar_show);
@@ -1067,14 +1052,11 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("show_mute_icon"   , g_settings.show_mute_icon);
 	configfile.setInt32("infobar_show_res"  , g_settings.infobar_show_res  );
 	configfile.setInt32("infobar_show_dd_available"  , g_settings.infobar_show_dd_available  );
-#ifdef MARTII
 	configfile.setInt32("show_background_picture"  , g_settings.show_background_picture  );
-#endif
 	configfile.setInt32("infobar_show_tuner"  , g_settings.infobar_show_tuner  );
 	configfile.setBool("radiotext_enable"          , g_settings.radiotext_enable);
-#ifdef MARTII
 	configfile.setString("radiotext_rass_dir", g_settings.radiotext_rass_dir);
-#endif
+
 	//audio
 	configfile.setInt32( "audio_AnalogMode", g_settings.audio_AnalogMode );
 	configfile.setBool("audio_DolbyDigital"   , g_settings.audio_DolbyDigital   );
@@ -1086,9 +1068,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		configfile.setString("pref_subs_" + i_str, g_settings.pref_subs[i]);
 	}
 	configfile.setString( "audio_PCMOffset", g_settings.audio_PCMOffset );
-#ifdef MARTII
 	configfile.setInt32( "dvb_subtitle_delay", g_settings.dvb_subtitle_delay );
-#endif
 
 	//vcr
 	configfile.setBool("vcr_AutoSwitch"       , g_settings.vcr_AutoSwitch       );
@@ -1105,10 +1085,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString("epg_old_events"           ,g_settings.epg_old_events );
 	configfile.setString("epg_max_events"           ,g_settings.epg_max_events );
 	configfile.setString("epg_dir"                  ,g_settings.epg_dir);
-#ifdef MARTII
         configfile.setBool("batchepg_run_at_shutdown"	,g_settings.batchepg_run_at_shutdown);
         configfile.setInt32("batchepg_standard_waittime",g_settings.batchepg_standard_waittime);
-#endif
 
 	// NTP-Server for sectionsd
 	configfile.setString( "network_ntpserver", g_settings.network_ntpserver);
@@ -1171,7 +1149,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "infobar_Text_green", g_settings.infobar_Text_green );
 	configfile.setInt32( "infobar_Text_blue", g_settings.infobar_Text_blue );
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	configfile.setInt32("glcd_enable", g_settings.glcd_enable);
 	configfile.setInt32("glcd_color_fg", g_settings.glcd_color_fg);
 	configfile.setInt32("glcd_color_bg", g_settings.glcd_color_bg);
@@ -1235,7 +1213,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool  ("shutdown_timer_record_type"          , g_settings.shutdown_timer_record_type    );
 
 	configfile.setBool  ("recordingmenu.stream_vtxt_pid"      , g_settings.recording_stream_vtxt_pid      );
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	configfile.setInt32 ("recording_bufsize", g_settings.recording_bufsize);
 	configfile.setInt32 ("recording_bufsize_dmx", g_settings.recording_bufsize_dmx);
 #endif
@@ -1251,20 +1229,18 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString ( "movieplayer_plugin", g_settings.movieplayer_plugin );
 	configfile.setString ( "onekey_plugin", g_settings.onekey_plugin );
 	configfile.setString ( "plugin_hdd_dir", g_settings.plugin_hdd_dir );
-#ifdef MARTII
+
 	configfile.setString ( "plugins_disabled", g_settings.plugins_disabled );
 	configfile.setString ( "plugins_game", g_settings.plugins_game );
 	configfile.setString ( "plugins_tool", g_settings.plugins_tool );
 	configfile.setString ( "plugins_script", g_settings.plugins_script );
 	configfile.setString ( "plugins_lua", g_settings.plugins_lua );
-#endif
+
 	configfile.setString ( "logo_hdd_dir", g_settings.logo_hdd_dir );
-#ifdef MARTII
 	configfile.setString ( "logo_hdd_dir_2", g_settings.logo_hdd_dir_2 );
 
 	configfile.setString ( "streaming_server_url", g_settings.streaming_server_url);
 	configfile.setString ( "webtv_xml", g_settings.webtv_xml);
-#endif
 
 	saveKeys();
 
@@ -1371,9 +1347,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("filebrowser_showrights", g_settings.filebrowser_showrights);
 	configfile.setInt32("filebrowser_sortmethod", g_settings.filebrowser_sortmethod);
 	configfile.setBool("filebrowser_denydirectoryleave", g_settings.filebrowser_denydirectoryleave);
-#ifdef MARTII
 	configfile.setBool("filebrowser_usefilter", g_settings.filebrowser_use_filter);
-#endif
 
 	//zapit setup
 	configfile.setString( "startchanneltv", g_settings.StartChannelTV );
@@ -1381,9 +1355,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt64("startchanneltv_id", g_settings.startchanneltv_id);
 	configfile.setInt64("startchannelradio_id", g_settings.startchannelradio_id);
 	configfile.setInt32("uselastchannel", g_settings.uselastchannel);
-#ifdef MARTII
 	configfile.setInt32("adzap_zapBackPeriod", g_settings.adzap_zapBackPeriod);
-#endif
 
 	// USERMENU
 	//---------------------------------------
@@ -1614,7 +1586,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 	SetChannelMode(lastChannelMode);
 
 	dprintf(DEBUG_DEBUG, "\nAll bouquets-channels received\n");
-#ifdef MARTII
+
 #ifdef DEBUG
 	struct mallinfo myinfo = mallinfo();
 	printf("[neutrino] total memory allocated by malloc, in bytes: %d (%dkb), chunks %d\n",
@@ -1622,7 +1594,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 #endif
 
 	localizeBouquetNames();
-#endif
+
 	reloadhintBox->hide();
 }
 
@@ -1712,7 +1684,7 @@ void CNeutrinoApp::CmdParser(int argc, char **argv)
 
 	for(int x=1; x<argc; x++) {
 		if ((!strcmp(argv[x], "-u")) || (!strcmp(argv[x], "--enable-update"))) {
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 			dprintf(DEBUG_NORMAL, "Software update enabled\n");
 			softupdate = true;
 			allow_flash = 1;
@@ -1969,9 +1941,6 @@ void wake_up(bool &wakeup)
 	/* not platform specific - this is created by the init process */
 	if (access("/tmp/.timer_wakeup", F_OK) == 0) {
 		wakeup = true;
-#ifndef MARTII
-		unlink("/tmp/.timer_wakeup");
-#endif
 	}
 
 	if(!wakeup){
@@ -1981,7 +1950,6 @@ void wake_up(bool &wakeup)
 	}
 }
 
-#ifdef MARTII
 static void *autodelete_thread(void *) {
 	set_threadname(__func__);
 	std::string timeshiftDir = CRecordManager::getInstance()->GetTimeshiftDirectory();
@@ -2004,12 +1972,9 @@ static void *autodelete_thread(void *) {
 	return NULL;
 }
 
-#endif
 int CNeutrinoApp::run(int argc, char **argv)
 {
-#ifdef MARTII
 	set_threadname("CNeutrinoApp::run");
-#endif
 time_t starttime = time_monotonic_ms();
 	CmdParser(argc, argv);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2027,12 +1992,16 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	int loadSettingsErg = loadSetup(NEUTRINO_SETTINGS_FILE);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
-#ifdef MARTII
+
+#if HAVE_SPARK_HARDWARE
 	cpuFreq = new cCpuFreqManager();
 	cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
+#endif
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	wake_up( timer_wakeup );
 	CFSMounter::automount_async_start();
+
+#if HAVE_SPARK_HARDWARE
 	{
 		CCECSetup cecsetup;
 		cecsetup.setCECSettings(true);
@@ -2062,7 +2031,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_NEUTRINO_STARTING));
 	hintBox->paint();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, false);
 	CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 #endif
@@ -2073,7 +2042,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	CVFD::getInstance()->setBacklight(g_settings.backlight_tv);
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::getInstance();
 #endif
 	/* set service manager options before starting zapit */
@@ -2122,7 +2091,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_Zapit->setStandby(false);
 
 	//timer start
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 	timer_wakeup = false;//init
 	wake_up( timer_wakeup );
 
@@ -2147,7 +2116,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	pthread_create (&timer_thread, NULL, timerd_main_thread, (void *)&timer_wakeup);
 	timerd_thread_started = true;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG, &g_settings.audio_mixer_volume_analog);
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF, &g_settings.audio_mixer_volume_spdif);
 	audioSetupNotifier->changeNotify(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI, &g_settings.audio_mixer_volume_hdmi);
@@ -2155,7 +2124,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	powerManager = new cPowerManager;
 	powerManager->Open();
 
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 	cpuFreq = new cCpuFreqManager();
 	cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 #endif
@@ -2187,7 +2156,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	CStreamManager::getInstance()->Start();
 
-#ifdef MARTII
 	CFSMounter::automount_async_stop();
 	safe_mkdir(CRecordManager::getInstance()->GetTimeshiftDirectory());
 	safe_mkdir(g_settings.network_nfs_audioplayerdir);
@@ -2202,7 +2170,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 		pthread_create (&thr, NULL, autodelete_thread, NULL);
 		pthread_detach(thr);
 	}
-#endif
+
 #ifndef DISABLE_SECTIONSD
 	CSectionsdClient::epg_config config;
 	MakeSectionsdConfig(config);
@@ -2233,9 +2201,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	my_system(3, "mount", "/dev/sdb1", "/media/sdb1");
 #endif
 
-#ifndef MARTII
-	CFSMounter::automount();
-#endif
 	g_PluginList = new CPlugins;
 	g_PluginList->setPluginDir(PLUGINDIR);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2243,9 +2208,9 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_PluginList->loadPlugins();
 
 	MoviePluginChanger        = new CMoviePluginChangeExec;
-#ifdef MARTII
 	AdZapChanger              = new CAdZapMenu;
 	batchEPGSettings	  = new CBatchEPG_Menu;
+#if HAVE_SPARK_HARDWARE
 	threeDSetup		  = new C3DSetup;
 #endif
 
@@ -2304,14 +2269,14 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	g_audioMute->AudioMute(current_muted, true);
 	CZapit::getInstance()->SetVolumePercent(g_settings.audio_volume_percent_ac3, g_settings.audio_volume_percent_pcm);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	threeDSetup->exec(NULL, "zapped");
 	chPSISetup = new CPSISetup(LOCALE_VIDEOMENU_PSI);
 	chPSISetup->blankScreen(false);
+#endif
 	if (!access("/etc/init.d/cam", X_OK))
 		safe_system("/etc/init.d/cam init >/dev/null 2>/dev/null&");
-#endif
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	shairPlay = g_settings.shairplay_enabled ? new CShairPlay(&shairplay_enabled_cur, &shairplay_active) : NULL;
 #endif
 	SHTDCNT::getInstance()->init();
@@ -2329,7 +2294,7 @@ void CNeutrinoApp::quickZap(int msg)
 {
 	int res;
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	StopSubtitles(false);
 #else
 	StopSubtitles();
@@ -2363,7 +2328,7 @@ void CNeutrinoApp::numericZap(int msg)
 
 void CNeutrinoApp::showInfo()
 {
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	StopSubtitles(false);
 #else
 	StopSubtitles();
@@ -2381,15 +2346,10 @@ void CNeutrinoApp::showInfo()
 	StartSubtitles();
 }
 
-#ifdef MARTII
 void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
-#else
-void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
-#endif
 {
-#ifdef MARTII
 	mainMenu = &_mainMenu;
-#endif
+
 	neutrino_msg_t      msg;
 	neutrino_msg_data_t data;
 
@@ -2412,7 +2372,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 	while( true ) {
 		g_RCInput->getMsg(&msg, &data, 100, ((g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME) && (g_RemoteControl->subChannels.size() < 1)) ? true : false);	// 10 secs..
 
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 		if (shairPlay && shairplay_enabled_cur && shairplay_active) {
 			StopSubtitles();
 			shairPlay->exec();
@@ -2448,7 +2408,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				tuxtx_stop_subtitle();
 
 				tuxtx_main(g_RCInput->getFileHandle(), g_RemoteControl->current_PIDs.PIDs.vtxtpid);
-#ifdef MARTII
+#if 1 // FIXME, needed? --martii
 				//purge input queue
 				do
 					g_RCInput->getMsg(&msg, &data, 1);
@@ -2468,11 +2428,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					StopSubtitles();
 					if(g_settings.mode_clock)
 						InfoClock->StopClock();
-#ifdef MARTII
 					mainMenu->exec(NULL, "");
-#else
-					mainMenu.exec(NULL, "");
-#endif
 					if(g_settings.mode_clock)
 						InfoClock->StartClock();
 					StartSubtitles();
@@ -2489,7 +2445,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 			}
 			else if( msg == (neutrino_msg_t) g_settings.key_subchannel_up || msg == (neutrino_msg_t) g_settings.key_subchannel_down) {
 				if( !g_RemoteControl->subChannels.empty() ) {
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 					StopSubtitles(false);
 #else
 					StopSubtitles();
@@ -2608,88 +2564,19 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				}
 			}
 			else if( msg == CRCInput::RC_record) {
-#ifdef MARTII
 				StopSubtitles();
 				if (recordingstatus)
 					CRecordManager::getInstance()->exec(NULL, "Stop_record");
 				else
-#endif
 				if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 					CRecordManager::getInstance()->exec(NULL, "Record");
-#ifdef MARTII
 				StartSubtitles();
-#endif
 			}
 			else if( msg == CRCInput::RC_stop ) {
-#ifdef MARTII
 				StopSubtitles();
-#endif
 				CRecordManager::getInstance()->exec(NULL, "Stop_record");
-#ifdef MARTII
-				StartSubtitles();
-#endif
-			}
-#ifndef MARTII
-			else if( msg == CRCInput::RC_red ) {
-				// eventlist
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// EventList Menu - Personalization Check
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
-					StartSubtitles();
-				}
-					else
-						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player)
-			{
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
 				StartSubtitles();
 			}
-			else if( msg == CRCInput::RC_green)
-			{
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_GREEN_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if( msg == CRCInput::RC_yellow ) {       // NVODs
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_YELLOW_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_YELLOW);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if( (msg == CRCInput::RC_green) || ((msg == CRCInput::RC_audio) && !g_settings.audio_run_player) )
-			{
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
-				StartSubtitles();
-			}
-			else if( msg == CRCInput::RC_yellow ) {       // NVODs
-				StopSubtitles();
-				usermenu.showUserMenu(SNeutrinoSettings::BUTTON_YELLOW);
-				StartSubtitles();
-			}
-			else if( msg == CRCInput::RC_blue ) {
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_BLUE_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// Features Menu - Personalization Check
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_BLUE);
-					StartSubtitles();
-				}
-					else
-						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
-			}
-#endif
 			else if((msg == (uint32_t) g_settings.key_audioplayback)) {
 				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
 				CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
@@ -2713,7 +2600,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				nGLCD::unlockChannel();
 #endif
 			}
-#ifdef MARTII
 			else if (msg == (uint32_t) g_settings.key_fileplayback) {
 #ifdef ENABLE_GRAPHLCD
 				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
@@ -2733,14 +2619,12 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				nGLCD::unlockChannel();
 #endif
 			}
-#endif
 			else if (CRCInput::isNumeric(msg) && g_RemoteControl->director_mode ) {
 				g_RemoteControl->setSubChannel(CRCInput::getNumericValue(msg));
 				g_InfoViewer->showSubchan();
 			}
-#ifdef MARTII
 			else if( ( msg == (uint32_t) g_settings.key_hddmenu )) {
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 				StopSubtitles(false);
 #else
 				StopSubtitles();
@@ -2752,10 +2636,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 			else if( ( msg == (uint32_t) g_settings.key_help ) || ( msg == CRCInput::RC_info) ||
 						(g_settings.infobar_cn && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
 						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
-#else
-			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
-						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
-#endif
 			{
 				bool show_info = ((msg != NeutrinoMessages::SHOW_INFOBAR) || (g_InfoViewer->is_visible || g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] != 0));
 			         // turn on LCD display
@@ -2765,33 +2645,24 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 				if(show_info && channelList->getSize()) {
 					showInfo();
 				}
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 				if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)
 					nGLCD::Update();
 			} else if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) {
 				nGLCD::Update();
 #endif
 			}
-#ifdef MARTII
 			else if (msg == (uint32_t) g_settings.key_showclock)
 			{
 				switchClockOnOff();
 			}
 			else if (msg == (uint32_t) g_settings.key_timerlist)
-#else
-			else if (msg == CRCInput::RC_timer)
-#endif
 			{
 				CTimerList Timerlist;
-#ifdef MARTII
 				StopSubtitles();
-#endif
 				Timerlist.exec(NULL, "");
-#ifdef MARTII
 				StartSubtitles();
-#endif
 			}
-#ifdef MARTII
 			else if( msg == CRCInput::RC_red ) {
 				// eventlist
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// EventList Menu - Personalization Check
@@ -2834,7 +2705,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &mainMenu)
 					else
 						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
 			}
-#endif
 			else if (msg == CRCInput::RC_aux)
 				scartMode(true);
 			else {
@@ -2873,13 +2743,13 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if(g_settings.audio_AnalogMode < 0 || g_settings.audio_AnalogMode > 2)
 			g_settings.audio_AnalogMode = 0;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		threeDSetup->exec(NULL, "zapped");
 #endif
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 		nGLCD::Update();
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		{
 			CScreenSetup cSS;
 			cSS.showBorder(CZapit::getInstance()->GetCurrentChannelID());
@@ -2905,7 +2775,6 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			return messages_return::handled;
 		}
 	}
-#ifdef MARTII
 	if(msg == NeutrinoMessages::SHOW_MAINSETTINGS) {
 		if(g_settings.mode_clock)
 			InfoClock->StopClock();
@@ -2918,7 +2787,6 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		saveSetup(NEUTRINO_SETTINGS_FILE);
 		return messages_return::handled;
 	}
-#endif
 	if ((msg == NeutrinoMessages::EVT_EIT_COMPLETE || msg == NeutrinoMessages::EVT_BACK_ZAP_COMPLETE)) {
 		CEpgScan::getInstance()->handleMsg(msg, data);
 		return messages_return::handled;
@@ -2934,21 +2802,13 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 	if( res != messages_return::unhandled ) {
 		if( ( msg>= CRCInput::RC_WithData ) && ( msg< CRCInput::RC_WithData+ 0x10000000 ) )
 			delete[] (unsigned char*) data;
-#ifdef MARTII
 		return( res & ~messages_return::unhandled);
-#else
-		return( res & ( 0xFFFFFFFF - messages_return::unhandled ) );
-#endif
 	}
 
 	/* we assume g_CamHandler free/delete data if needed */
 	res = g_CamHandler->handleMsg(msg, data);
 	if( res != messages_return::unhandled ) {
-#ifdef MARTII
 		return(res & ~messages_return::unhandled);
-#else
-		return(res & (0xFFFFFFFF - messages_return::unhandled));
-#endif
 	}
 
 	/* ================================== KEYS ================================================ */
@@ -3264,9 +3124,7 @@ _repeat:
 				g_CamHandler->exec(NULL, "ca_ci_reset1");
 			}
 		}
-#ifdef MARTII
 		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
-#endif
 #if 0
 		//zap to rec channel if box start from deepstandby
 		if(timer_wakeup){
@@ -3298,9 +3156,7 @@ _repeat:
 		return messages_return::handled | messages_return::cancel_all;
 	}
 	else if( msg == NeutrinoMessages::RECORD_STOP) {
-#ifdef MARTII
 		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
-#endif
 		CTimerd::RecordingStopInfo* recinfo = (CTimerd::RecordingStopInfo*)data;
 		printf("NeutrinoMessages::RECORD_STOP: eventID %d channel_id %" PRIx64 "\n", recinfo->eventID, recinfo->channel_id);
 		CRecordManager::getInstance()->Stop(recinfo);
@@ -3458,11 +3314,7 @@ _repeat:
 	else if( msg == NeutrinoMessages::REBOOT ) {
 		FILE *f = fopen("/tmp/.reboot", "w");
 		fclose(f);
-#ifdef MARTII
 		ExitRun(true, 2);
-#else
-		ExitRun(true);
-#endif
 	}
 	else if (msg == NeutrinoMessages::EVT_POPUP || msg == NeutrinoMessages::EVT_EXTMSG) {
 		if (mode != mode_scart) {
@@ -3564,12 +3416,10 @@ _repeat:
 		delete[] (unsigned char*) data;
 		return messages_return::handled;
 	}
-#ifdef MARTII
 	else if (msg == NeutrinoMessages::EVT_BATCHEPG) {
 		batchEPGSettings->exec(NULL, "timer");
 		return messages_return::handled;
 	}
-#endif
 	else if (msg == NeutrinoMessages::EVT_SERVICES_UPD) {
 		SDTreloadChannels = true;
 		g_InfoViewer->SDT_freq_update = true;
@@ -3618,17 +3468,14 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/shutdown.jpg");
 
 		if(g_settings.epg_save /* && timeset && g_Sectionsd->getIsTimeSet ()*/) {
-#ifdef MARTII
 			batchEPGSettings->exec(NULL, "shutdown");
 			CHintBox * hintBox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_MISCSETTINGS_EPG_SAVING)); // UTF-8
 			hintBox->paint();
 
-#endif
 			saveEpg(true);// true CVFD::MODE_SHUTDOWN
-#ifdef MARTII
+
 			hintBox->hide();
 			delete hintBox;
-#endif
 		}
 		CVFD::getInstance()->setMode(CVFD::MODE_SHUTDOWN);
 
@@ -3733,16 +3580,20 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			delete CVFD::getInstance();
 			delete SHTDCNT::getInstance();
 			stop_video();
-#ifdef MARTII
+
+#if HAVE_SPARK_HARDWARE
 			if (retcode == 1) {
 				CCECSetup cecsetup;
 				cecsetup.setCECSettings(false);
-#ifdef ENABLE_GRAPHLCD // MARTII
-				nGLCD::SetBrightness(0);
-#endif
 			}
 #endif
-#if 0 //#ifdef ENABLE_SHAIRPLAY
+
+#ifdef ENABLE_GRAPHLCD
+			if (retcode == 1)
+				nGLCD::SetBrightness(0);
+#endif
+
+#if 0 //#if ENABLE_SHAIRPLAY
 			if (shairPlay)
 				delete shairPlay;
 #endif
@@ -3901,12 +3752,12 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 	lockStandbyCall = true;
 
 	if( bOnOff ) {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		CCECSetup cecsetup;
 		cecsetup.setCECSettings(false);
-#ifdef ENABLE_GRAPHLCD // MARTII
-		nGLCD::StandbyMode(true);
 #endif
+#ifdef ENABLE_GRAPHLCD
+		nGLCD::StandbyMode(true);
 #endif
 		CVFD::getInstance()->ShowText("standby...        ");
 		if( mode == mode_scart ) {
@@ -3988,10 +3839,10 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		CSectionsdClient::CurrentNextInfo dummy;
 		g_InfoViewer->getEPG(0, dummy);
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(false);
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		if (timer_wakeup) {
 			CCECSetup cecsetup;
 			cecsetup.setCECSettings(true);
@@ -4097,10 +3948,8 @@ void CNeutrinoApp::radioMode( bool rezap)
 		else
 			channelList->zapTo(0, true); /* force re-zap */
 	}
-#ifdef MARTII
 	if (g_settings.show_background_picture)
-#endif
-	videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 }
 
 //switching from current mode to tv or radio mode or to optional parameter prev_mode
@@ -4208,7 +4057,6 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		hintBox->hide();
 		delete hintBox;
 	}
-#ifdef MARTII
 	else if(actionKey=="restarttuner") {
 		CHintBox * hintBox = new CHintBox(LOCALE_SERVICEMENU_RESTART_TUNER,
 			g_Locale->getText(LOCALE_SERVICEMENU_RESTARTING_TUNER));
@@ -4279,7 +4127,6 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 			g_Radiotext->RASS_interactive_mode();
 		return menu_return::RETURN_EXIT_ALL;
 	}
-#endif
 	else if(actionKey=="restart") {
 		if (recordingstatus)
 			DisplayErrorMessage(g_Locale->getText(LOCALE_SERVICEMENU_RESTART_REFUSED_RECORDING));
@@ -4367,7 +4214,6 @@ void CNeutrinoApp::stopDaemonsForFlash()
 /**************************************************************************************
 *          Main programm - no function here                                           *
 **************************************************************************************/
-#ifdef MARTII
 int my_pthread_join(pthread_t thread, void **retval)
 {
 	struct timespec ts;
@@ -4379,7 +4225,7 @@ int my_pthread_join(pthread_t thread, void **retval)
 	return res;
 }
 #define pthread_join my_pthread_join
-#endif
+
 void stop_daemons(bool stopall, bool for_flash)
 {
 	if (for_flash) {
@@ -4394,11 +4240,10 @@ void stop_daemons(bool stopall, bool for_flash)
 	tuxtxt_stop();
 	tuxtxt_close();
 
-#ifdef MARTII
 	if (!access("/etc/init.d/cam", X_OK))
 		safe_system("/etc/init.d/cam stop >/dev/null 2>/dev/null&");
-#endif
-#ifdef ENABLE_GRAPHLCD // MARTII
+
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::Exit();
 #endif
 	if (g_Radiotext) {
@@ -4536,7 +4381,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	}
 
 	//rc-key configuration
-#ifdef MARTII
+
 	g_settings.key_switchformat = tconfig.getInt32("key_switchformat", CRCInput::RC_prev);
 	g_settings.key_next43mode = tconfig.getInt32("key_next43mode", CRCInput::RC_next);
 	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", CRCInput::RC_tv );
@@ -4549,13 +4394,11 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_audioplayback = tconfig.getInt32( "key_audioplayback", CRCInput::RC_audio );
 	g_settings.key_volumeup = tconfig.getInt32( "key_volumeup",  CRCInput::RC_plus );
 	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
-#else
-	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", (unsigned int)CRCInput::RC_nokey );
-#endif
+
 	g_settings.key_power_off = tconfig.getInt32( "key_power_off", CRCInput::RC_standby );
 
-	g_settings.key_channelList_pageup = tconfig.getInt32( "key_channelList_pageup",  CRCInput::RC_page_up );
-	g_settings.key_channelList_pagedown = tconfig.getInt32( "key_channelList_pagedown", CRCInput::RC_page_down );
+	g_settings.key_pageup = tconfig.getInt32("key_pageup", tconfig.getInt32("key_channelList_pageup", CRCInput::RC_page_up));
+	g_settings.key_pagedown = tconfig.getInt32("key_pagedown", tconfig.getInt32("key_channelList_pagedown", CRCInput::RC_page_down));
 	g_settings.key_channelList_cancel = tconfig.getInt32( "key_channelList_cancel",  CRCInput::RC_home );
 	g_settings.key_channelList_sort = tconfig.getInt32( "key_channelList_sort",  CRCInput::RC_blue );
 	g_settings.key_channelList_addrecord = tconfig.getInt32( "key_channelList_addrecord",  CRCInput::RC_red );
@@ -4583,7 +4426,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 
 	g_settings.key_bouquet_up = tconfig.getInt32( "key_bouquet_up",  CRCInput::RC_right);
 	g_settings.key_bouquet_down = tconfig.getInt32( "key_bouquet_down",  CRCInput::RC_left);
-#ifdef MARTII
 	g_settings.key_timerlist = tconfig.getInt32( "key_timerlist", CRCInput::RC_timer);
 	g_settings.key_showclock = tconfig.getInt32( "key_showclock", CRCInput::RC_nokey );
 	g_settings.key_help = tconfig.getInt32( "key_help", CRCInput::RC_help );
@@ -4592,7 +4434,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 #else
 	g_settings.key_hddmenu = tconfig.getInt32("key_hddmenu", CRCInput::RC_nokey);
 #endif
-#endif
 
 	g_settings.mpkey_rewind = tconfig.getInt32( "mpkey.rewind", CRCInput::RC_rewind );
 	g_settings.mpkey_forward = tconfig.getInt32( "mpkey.forward", CRCInput::RC_forward );
@@ -4600,7 +4441,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.mpkey_stop = tconfig.getInt32( "mpkey.stop", CRCInput::RC_stop );
 	g_settings.mpkey_play = tconfig.getInt32( "mpkey.play", CRCInput::RC_play );
 	g_settings.mpkey_audio = tconfig.getInt32( "mpkey.audio", CRCInput::RC_green );
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	g_settings.mpkey_time = tconfig.getInt32( "mpkey.time", CRCInput::RC_timeshift );
 	if (g_settings.mpkey_time == CRCInput::RC_setup)
 		g_settings.mpkey_time = CRCInput::RC_timeshift;
@@ -4609,11 +4450,10 @@ void CNeutrinoApp::loadKeys(const char * fname)
 #endif
 	g_settings.mpkey_bookmark = tconfig.getInt32( "mpkey.bookmark", CRCInput::RC_blue );
 	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", CRCInput::RC_red );
-#ifdef MARTII
 	g_settings.mpkey_next3dmode = tconfig.getInt32( "mpkey.next3dmode", CRCInput::RC_nokey );
 	g_settings.mpkey_vtxt = tconfig.getInt32( "mpkey.vtxt", CRCInput::RC_text );
 	g_settings.mpkey_goto = tconfig.getInt32( "mpkey.goto", CRCInput::RC_nokey );
-#endif
+
 	g_settings.mpkey_subtitle = tconfig.getInt32( "mpkey.subtitle", CRCInput::RC_sub );
 
 	g_settings.key_format_mode_active = tconfig.getInt32( "key_format_mode_active", 1 );
@@ -4626,12 +4466,13 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_click = tconfig.getInt32( "key_click", 1 );
 	g_settings.repeat_blocker = tconfig.getString("repeat_blocker", "450");
 	g_settings.repeat_genericblocker = tconfig.getString("repeat_genericblocker", "100");
-#ifdef MARTII
+
 	if (g_settings.conf_version < 1) {
 		// Use default key repeat settings when upgrading from earlier releases:
 		g_settings.repeat_blocker = "450";
 		g_settings.repeat_genericblocker = "100";
 	}
+#if HAVE_SPARK_HARDWARE
 	g_settings.accept_other_remotes = tconfig.getInt32( "accept_other_remotes", 1);
 #endif
 
@@ -4648,7 +4489,6 @@ void CNeutrinoApp::saveKeys(const char * fname)
 		tconfig = newconfig;
 	}
 	//rc-key configuration
-#ifdef MARTII
 	tconfig.setInt32( "key_switchformat", g_settings.key_switchformat );
 	tconfig.setInt32( "key_next43mode", g_settings.key_next43mode );
 	tconfig.setInt32( "key_tsplayback", g_settings.key_tsplayback );
@@ -4656,12 +4496,11 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_audioplayback", g_settings.key_audioplayback );
 	tconfig.setInt32( "key_volumeup", g_settings.key_volumeup );
 	tconfig.setInt32( "key_volumedown", g_settings.key_volumedown );
-#endif
 	tconfig.setInt32( "key_tvradio_mode", g_settings.key_tvradio_mode );
 	tconfig.setInt32( "key_power_off", g_settings.key_power_off );
 
-	tconfig.setInt32( "key_channelList_pageup", g_settings.key_channelList_pageup );
-	tconfig.setInt32( "key_channelList_pagedown", g_settings.key_channelList_pagedown );
+	tconfig.setInt32( "key_pageup", g_settings.key_pageup );
+	tconfig.setInt32( "key_pagedown", g_settings.key_pagedown );
 	tconfig.setInt32( "key_channelList_cancel", g_settings.key_channelList_cancel );
 	tconfig.setInt32( "key_channelList_sort", g_settings.key_channelList_sort );
 	tconfig.setInt32( "key_channelList_addrecord", g_settings.key_channelList_addrecord );
@@ -4689,12 +4528,10 @@ void CNeutrinoApp::saveKeys(const char * fname)
 
 	tconfig.setInt32( "key_bouquet_up", g_settings.key_bouquet_up );
 	tconfig.setInt32( "key_bouquet_down", g_settings.key_bouquet_down );
-#ifdef MARTII
 	tconfig.setInt32( "key_timerlist", g_settings.key_timerlist );
 	tconfig.setInt32( "key_showclock", g_settings.key_showclock );
 	tconfig.setInt32( "key_help", g_settings.key_help );
 	tconfig.setInt32( "key_hddmenu", g_settings.key_hddmenu );
-#endif
 
 	tconfig.setInt32( "mpkey.rewind", g_settings.mpkey_rewind );
 	tconfig.setInt32( "mpkey.forward", g_settings.mpkey_forward );
@@ -4705,11 +4542,9 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "mpkey.time", g_settings.mpkey_time );
 	tconfig.setInt32( "mpkey.bookmark", g_settings.mpkey_bookmark );
 	tconfig.setInt32( "mpkey.plugin", g_settings.mpkey_plugin );
-#ifdef MARTII
 	tconfig.setInt32( "mpkey.next3dmode", g_settings.mpkey_next3dmode );
 	tconfig.setInt32( "mpkey.vtxt", g_settings.mpkey_vtxt );
 	tconfig.setInt32( "mpkey.goto", g_settings.mpkey_goto );
-#endif
 	tconfig.setInt32( "mpkey.subtitle", g_settings.mpkey_subtitle );
 
 	tconfig.setInt32( "key_format_mode_active", g_settings.key_format_mode_active );
@@ -4721,7 +4556,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_click", g_settings.key_click );
 	tconfig.setString( "repeat_blocker", g_settings.repeat_blocker );
 	tconfig.setString( "repeat_genericblocker", g_settings.repeat_genericblocker );
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	tconfig.setInt32("accept_other_remotes", g_settings.accept_other_remotes);
 #endif
 
@@ -4733,7 +4568,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 		tconfig.saveConfig(fname);
 }
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 void CNeutrinoApp::StopSubtitles(bool b)
 #else
 void CNeutrinoApp::StopSubtitles()
@@ -4751,7 +4586,7 @@ void CNeutrinoApp::StopSubtitles()
 		tuxtx_pause_subtitle(true);
 		frameBuffer->paintBackground();
 	}
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	if (b)
 		nGLCD::MirrorOSD();
 #endif
@@ -4760,7 +4595,7 @@ void CNeutrinoApp::StopSubtitles()
 void CNeutrinoApp::StartSubtitles(bool show)
 {
 	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
 #endif
 	if(!show)
@@ -4951,7 +4786,7 @@ void CNeutrinoApp::Cleanup()
 	printf("cleanup 5\n");fflush(stdout);
 	delete CEitManager::getInstance();
 	printf("cleanup 6\n");fflush(stdout);
-#ifndef MARTII
+#if 0
 	delete CVFD::getInstance();
 #ifdef __UCLIBC__
 	malloc_stats(NULL);

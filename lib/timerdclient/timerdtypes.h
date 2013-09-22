@@ -68,10 +68,8 @@ class CTimerd
 			TIMER_REMIND,
 			TIMER_SLEEPTIMER,
 			TIMER_EXEC_PLUGIN,
- 			TIMER_IMMEDIATE_RECORD
-#ifdef MARTII
- 			, TIMER_BATCHEPG
-#endif
+ 			TIMER_IMMEDIATE_RECORD,
+ 			TIMER_BATCHEPG
 		};
 		
 		enum CTimerEventStates 

@@ -234,11 +234,9 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_EPG:
 			icon = NEUTRINO_ICON_BUTTON_RED;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-#ifdef MARTII
 			text = CUserMenu::getUserMenuButtonName(0);
 			if (!text.empty())
 				break;
-#endif
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_RED];
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
@@ -246,11 +244,9 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_AUDIO:
 			icon = NEUTRINO_ICON_BUTTON_GREEN;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-#ifdef MARTII
 			text = CUserMenu::getUserMenuButtonName(1);
 			if (!text.empty())
 				break;
-#endif
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_GREEN];
 			if (text == g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD))
 				text = "";
@@ -266,11 +262,9 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_SUBS:
 			icon = NEUTRINO_ICON_BUTTON_YELLOW;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-#ifdef MARTII
 			text = CUserMenu::getUserMenuButtonName(2);
 			if (!text.empty())
 				break;
-#endif
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_YELLOW];
 			if (text.empty())
 				text = g_Locale->getText((g_RemoteControl->are_subchannels) ? LOCALE_INFOVIEWER_SUBSERVICE : LOCALE_INFOVIEWER_SELECTTIME);
@@ -278,11 +272,9 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_FEAT:
 			icon = NEUTRINO_ICON_BUTTON_BLUE;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-#ifdef MARTII
 			text = CUserMenu::getUserMenuButtonName(3);
 			if (!text.empty())
 				break;
-#endif
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_BLUE];
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
@@ -302,22 +294,12 @@ void CInfoViewerBB::getBBButtonInfo()
 	bbButtonMaxX = g_InfoViewer->ChanInfoX + 10;
 	int br = 0, count = 0;
 	for (int i = 0; i < CInfoViewerBB::BUTTON_MAX; i++) {
-#ifndef MARTII
-		if ((i == CInfoViewerBB::BUTTON_SUBS) && (g_RemoteControl->subChannels.empty())) { // no subchannels
-			bbButtonInfo[i].paint = false;
-//			bbButtonInfo[i].x = -1;
-//			continue;
-		}
-		else
-#endif
-		{
-			count++;
-			bbButtonInfo[i].paint = true;
-			br += bbButtonInfo[i].w;
-			bbButtonInfo[i].x = bbButtonMaxX;
-			bbButtonMaxX += bbButtonInfo[i].w;
-			bbButtonMaxW = std::max(bbButtonMaxW, bbButtonInfo[i].w);
-		}
+		count++;
+		bbButtonInfo[i].paint = true;
+		br += bbButtonInfo[i].w;
+		bbButtonInfo[i].x = bbButtonMaxX;
+		bbButtonMaxX += bbButtonInfo[i].w;
+		bbButtonMaxW = std::max(bbButtonMaxW, bbButtonInfo[i].w);
 	}
 	if (br > MaxBr)
 		printf("[infoviewer_bb:%s#%d] width br (%d) > MaxBr (%d) count %d\n", __func__, __LINE__, br, MaxBr, count);
@@ -785,11 +767,9 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 	int caids[] = {  0x900, 0xD00, 0xB00, 0x1800, 0x0500, 0x0100, 0x600,  0x2600, 0x4a00, 0x0E00 };
 	const char * white = (char *) "white";
 	const char * yellow = (char *) "yellow";
-#ifdef MARTII
 	const char * green = (char *) "green";
-#endif
 	int icon_space_offset = 0;
-#ifdef MARTII
+
 	int acaid = 0;
 	if(!notfirst) {
 		FILE *f = fopen("/tmp/ecm.info", "rt");
@@ -803,7 +783,6 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 			fclose(f);
 		}
 	}
-#endif
 
 	if(!g_InfoViewer->chanready) {
 		if (g_settings.casystem_display == 2) {
@@ -845,19 +824,12 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 				if((found = (caid == caids[i])))
 					break;
 			}
-#ifdef MARTII
 			if(g_settings.casystem_display == 0) {
 				if ((caids[i] & 0xFF00) == (acaid & 0xFF00) || (caids[i] == 0x1700 && (acaid & 0xFF00) == 0x0600))
 					paint_ca_icons(caids[i], (char *) green, icon_space_offset);
 				else
 					paint_ca_icons(caids[i], (char *) (found ? yellow : white), icon_space_offset);
 			}
-#else
-			if(g_settings.casystem_display == 0)
-				paint_ca_icons(caids[i], (char *) (found ? yellow : white), icon_space_offset);
-			else if(found)
-				paint_ca_icons(caids[i], (char *) yellow, icon_space_offset);
-#endif
 		}
 	}
 }

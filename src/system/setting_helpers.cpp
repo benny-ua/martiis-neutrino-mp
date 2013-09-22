@@ -408,9 +408,10 @@ printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, pt
 	}
         return menu_return::RETURN_EXIT;
 }
-#ifdef MARTII
+
 int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & ActionKey)
 {
+#if HAVE_SPARK_HARDWARE
 	actionKey = ActionKey;
 
 	tuxtx_stop_subtitle();
@@ -441,9 +442,9 @@ printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, pt
 		tuxtx_set_pid(pid, page, ptr);
 		tuxtx_main(0, pid, page, 0, true);
 	}
+#endif
         return menu_return::RETURN_EXIT;
 }
-#endif
 
 int CNVODChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
 {

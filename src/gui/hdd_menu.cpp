@@ -103,7 +103,6 @@ CHDDMenuHandler::~CHDDMenuHandler()
 
 }
 
-#ifdef MARTII
 static bool is_mounted(const char *dev)
 {
 	bool res = false;
@@ -124,13 +123,9 @@ static bool is_mounted(const char *dev)
 
 
 int CHDDMenuHandler::exec(CMenuTarget* parent, const std::string &actionkey)
-#else
-int CHDDMenuHandler::exec(CMenuTarget* parent, const std::string &/*actionkey*/)
-#endif
 {
 	if (parent)
 		parent->hide();
-#ifdef MARTII
 	for (std::vector<hdd_s>::iterator it = hdd_list.begin(); it != hdd_list.end(); ++it)
 		if (it->devname == actionkey) {
 			std::string cmd = "ACTION=" + std::string((it->mounted ? "remove" : "add"))
@@ -140,7 +135,6 @@ int CHDDMenuHandler::exec(CMenuTarget* parent, const std::string &/*actionkey*/)
                 	it->cmf->setOption(g_Locale->getText(it->mounted ? LOCALE_HDD_UMOUNT : LOCALE_HDD_MOUNT));
 			return menu_return::RETURN_REPAINT;
 		}
-#endif
 
 	return doMenu ();
 }
@@ -191,9 +185,7 @@ int CHDDMenuHandler::doMenu ()
 	//if(n > 0)
 	hddmenu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_HDD_MANAGE));
 
-#ifdef MARTII
 	hdd_list.clear();
-#endif
 	ret = stat("/", &s);
 	int drive_mask = 0xfff0;
 	if (ret != -1) {
@@ -205,9 +197,7 @@ int CHDDMenuHandler::doMenu ()
 	std::string tmp_str[n];
 	CMenuWidget * tempMenu[n];
 	for(int i = 0; i < n;i++) {
-#ifdef MARTII
 		tempMenu[i] = NULL;
-#endif
 		char str[256];
 		char sstr[256];
 		char vendor[128], model[128];
@@ -301,7 +291,6 @@ int CHDDMenuHandler::doMenu ()
 
 	if(!hdd_found)
 		hddmenu->addItem(new CMenuForwarder(LOCALE_HDD_NOT_FOUND, false));
-#ifdef MARTII
 	else {
 		FILE *b = popen("/sbin/blkid", "r");
 		if (b) {
@@ -331,7 +320,6 @@ int CHDDMenuHandler::doMenu ()
 			}
 		}
 	}
-#endif
 
 	ret = hddmenu->exec(NULL, "");
 	for(int i = 0; i < n;i++) {
@@ -704,19 +692,11 @@ _remount:
 	{
 		switch(g_settings.hdd_fs) {
                 case 0:
-#ifdef MARTII
 			mkdir(dst, 0755);
-#else
-			safe_mkdir(dst);
-#endif
 			res = mount(src, dst, "ext3", 0, NULL);
                         break;
                 case 1:
-#ifdef MARTII
 			mkdir(dst, 0755);
-#else
-			safe_mkdir(dst);
-#endif
 			res = mount(src, dst, "reiserfs", 0, NULL);
                         break;
 		default:

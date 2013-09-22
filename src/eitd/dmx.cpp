@@ -280,7 +280,7 @@ int DMX::getSection(uint8_t *buf, const unsigned timeoutInMSeconds, int &timeout
 	eit_extended_section_header *eit_extended_header;
 
 	/* filter == 0 && maks == 0 => EIT dummy filter to slow down EIT thread startup */
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 	if ((pID == 0x12 || pID == 0x39) && filters[filter_index].filter == 0 && filters[filter_index].mask == 0)
 #else
 	if (pID == 0x12 && filters[filter_index].filter == 0 && filters[filter_index].mask == 0)
@@ -399,7 +399,7 @@ int DMX::getSection(uint8_t *buf, const unsigned timeoutInMSeconds, int &timeout
 	unsigned short current_tsid = 0;
 	uint8_t segment_last_section_number = last_section_number;
 
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 	if (pID == 0x12 || pID == 0x39) {
 #else
 	if (pID == 0x12) {
@@ -415,7 +415,7 @@ int DMX::getSection(uint8_t *buf, const unsigned timeoutInMSeconds, int &timeout
 	sections_id_t s_id = create_sections_id(table_id, eh_tbl_extension_id, current_onid, current_tsid, section_number);
 
 	bool complete = false;
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 	if (pID == 0x12 || pID == 0x39)
 #else
 	if (pID == 0x12)
@@ -663,7 +663,7 @@ int DMX::change(const int new_filter_index, const t_channel_id new_current_servi
 	}
 
 	if (sections_debug) { // friendly debug output...
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 		if((pID==0x12 || pID==0x39) && filters[0].filter != 0x4e) { // Only EIT
 #else
 		if(pID==0x12 && filters[0].filter != 0x4e) { // Only EIT

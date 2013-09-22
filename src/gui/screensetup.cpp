@@ -41,7 +41,7 @@
 
 #include <driver/fontrenderer.h>
 #include <driver/rcinput.h>
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #include <driver/screen_max.h>
 #endif
 #include <system/settings.h>
@@ -50,7 +50,7 @@
 #include <global.h>
 #include <neutrino.h>
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 struct borderFrame { int sx, sy, ex, ey; };
 static map<t_channel_id, borderFrame> borderMap;
 #define BORDER_CONFIG_FILE CONFIGDIR "/zapit/borders.conf"
@@ -66,7 +66,7 @@ inline unsigned int make16color(__u32 rgb)
 CScreenSetup::CScreenSetup()
 {
 	frameBuffer = CFrameBuffer::getInstance();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	screenheight = frameBuffer->getScreenHeight(true);
 	screenwidth = frameBuffer->getScreenWidth(true);
 	startX = g_settings.screen_StartX_int;
@@ -78,7 +78,7 @@ CScreenSetup::CScreenSetup()
 	m = NULL;
 #endif
 }
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 int CScreenSetup::exec(CMenuTarget* parent, const std::string &action)
 {
 	if (!m) {
@@ -381,7 +381,7 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &)
 
 void CScreenSetup::hide()
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	frameBuffer->paintBackgroundBox(0, 0, screenwidth, screenheight);
 	if (channel_id)
 		showBorder(channel_id);
@@ -397,7 +397,7 @@ void CScreenSetup::hide()
 	frameBuffer->blit();
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 bool CScreenSetup::loadBorder(t_channel_id cid)
 {
 	loadBorders();

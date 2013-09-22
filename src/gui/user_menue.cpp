@@ -152,9 +152,7 @@ bool CUserMenu::showUserMenu(int button)
 		menu->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
 	else
 		menu->addItem(GenericMenuSeparator);
-#ifdef MARTII
 	StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
-#endif
 	
 	// go through any postition number
 	for (int pos = 0; pos < SNeutrinoSettings::ITEM_MAX ; pos++) {
@@ -325,9 +323,6 @@ bool CUserMenu::showUserMenu(int button)
 					menu_prev = SNeutrinoSettings::ITEM_PLUGIN;
 					neutrino_msg_t d_key = g_PluginList->getKey(count);
 					//printf("[neutrino usermenu] plugin %d, set key %d...\n", count, g_PluginList->getKey(count));
-#ifndef MARTII
-					StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
-#endif
 					keyhelper.get(&key,&icon, d_key);
 					menu_item = new CMenuForwarder(g_PluginList->getName(count), true, NULL, StreamFeaturesChanger, id, key, icon);
 
@@ -342,9 +337,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_VTXT;
 			keyhelper.get(&key,&icon, feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_VTXT]].key); //CRCInput::RC_blue
-#ifndef MARTII
-			StreamFeaturesChanger     = new CStreamFeaturesChangeExec();
-#endif
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_VTXT, true, NULL, StreamFeaturesChanger, "teletext", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -409,7 +401,6 @@ bool CUserMenu::showUserMenu(int button)
 			}
 			break;
 #endif
-#ifdef MARTII
 		case SNeutrinoSettings::ITEM_ADZAP:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_ADZAP;
@@ -434,6 +425,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, CNeutrinoApp::getInstance(), "restarttuner", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
+#if HAVE_SPARK_HARDWARE
 		case SNeutrinoSettings::ITEM_THREE_D_MODE:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_THREE_D_MODE;
@@ -442,6 +434,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, "3dmode", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
+#endif
 		case SNeutrinoSettings::ITEM_WEBTV:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_WEBTV;
@@ -468,7 +461,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
-#endif
 		default:
 			printf("[neutrino] WARNING! menu wrong item!!\n");
 			break;
@@ -527,7 +519,6 @@ bool CUserMenu::showUserMenu(int button)
  	return 0;
 }
 
-#ifdef MARTII
 const char *CUserMenu::getUserMenuButtonName(int button)
 {
         if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
@@ -613,7 +604,7 @@ const char *CUserMenu::getUserMenuButtonName(int button)
 		return g_Locale->getText(usermenu[button].def_name);
 	return "";
 }
-#endif
+
 /**************************************************************************************
 *          changeNotify - features menu recording start / stop                        *
 **************************************************************************************/

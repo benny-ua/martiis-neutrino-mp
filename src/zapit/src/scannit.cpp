@@ -29,9 +29,7 @@
 #include <dvbsi++/private_data_specifier_descriptor.h>
 #include <math.h>
 #include <eitd/edvbstring.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 
 //#define DEBUG_NIT
 //#define DEBUG_NIT_UNUSED
@@ -69,9 +67,7 @@ bool CNit::Stop()
 
 void CNit::run()
 {
-#ifdef MARTII
 	set_threadname("CNit::run");
-#endif
 	if(Parse())
 		printf("[scan] NIT finished.\n");
 	else

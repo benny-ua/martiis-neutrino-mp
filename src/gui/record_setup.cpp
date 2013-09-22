@@ -206,7 +206,7 @@ int CRecordSetup::showRecordSetup()
 	//template
 	//CStringInput recordingSettings_filenameTemplate(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, &g_settings.recording_filename_template[0], 21, LOCALE_RECORDINGMENU_FILENAME_TEMPLATE_HINT, LOCALE_IPSETUP_HINT_2, "%/-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ");
 	//CMenuForwarder* mf11 = new CMenuForwarder(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, true, g_settings.recording_filename_template[0], &recordingSettings_filenameTemplate);
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	recordingSettings->addItem(new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE, &g_settings.recording_bufsize, true, 1, 25, NULL) );
 	recordingSettings->addItem(new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE_DMX, &g_settings.recording_bufsize_dmx, true, 1, 25, NULL) );
 #endif
@@ -242,9 +242,7 @@ int CRecordSetup::showRecordSetup()
 
 	int res = recordingSettings->exec(NULL, "");
 	delete recordingSettings;
-#ifdef MARTII
 	CRecordManager::getInstance()->Config(g_settings.recording_stopsectionsd, g_settings.recording_stream_vtxt_pid, g_settings.recording_stream_pmt_pid, g_settings.recording_stream_subtitle_pids);
-#endif
 	return res;
 }
 
@@ -312,25 +310,19 @@ void CRecordSetup::showRecordAudioSetup(CMenuWidget *menu_audiosettings)
 void CRecordSetup::showRecordDataSetup(CMenuWidget *menu_datasettings)
 {
 	//recording data pids
-#ifdef MARTII
 	// PAT/PMT
 	CMenuOptionChooser* doj0 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_PMT_PID, &g_settings.recording_stream_pmt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
-#endif
 
 	//teletext pids
 	CMenuOptionChooser* doj1 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_VTXT_PID, &g_settings.recording_stream_vtxt_pid, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	CMenuOptionChooser* doj2 = new CMenuOptionChooser(LOCALE_RECORDINGMENU_DVBSUB_PIDS, &g_settings.recording_stream_subtitle_pids, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 
-#ifdef MARTII
 	doj0->setHint("", LOCALE_MENU_HINT_RECORD_DATA_PMT);
-#endif
 	doj1->setHint("", LOCALE_MENU_HINT_RECORD_DATA_VTXT);
 	doj2->setHint("", LOCALE_MENU_HINT_RECORD_DATA_DVBSUB);
 
 	menu_datasettings->addIntroItems(LOCALE_RECORDINGMENU_DATA_PIDS);
-#ifdef MARTII
 	menu_datasettings->addItem(doj0);
-#endif
 	menu_datasettings->addItem(doj1);
 	menu_datasettings->addItem(doj2);
 }

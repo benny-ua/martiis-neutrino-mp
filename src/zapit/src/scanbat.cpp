@@ -29,9 +29,7 @@
 #include <dvbsi++/private_data_specifier_descriptor.h>
 #include <math.h>
 #include <eitd/edvbstring.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 
 #define DEBUG_BAT
 #define DEBUG_BAT_UNUSED
@@ -72,9 +70,7 @@ bool CBat::Stop()
 
 void CBat::run()
 {
-#ifdef MARTII
 	set_threadname("CBat::run");
-#endif
 	if(Parse())
 		printf("[scan] BAT finished.\n");
 	else

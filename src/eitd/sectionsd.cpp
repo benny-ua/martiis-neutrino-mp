@@ -46,9 +46,7 @@
 #include <sectionsdclient/sectionsdclient.h>
 #include <eventserver.h>
 #include <driver/abstime.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 
 #include "eitd.h"
 #include "sectionsd.h"
@@ -67,7 +65,7 @@
 
 /*static*/ bool reader_ready = true;
 static unsigned int max_events;
-#ifndef MARTII
+#if 0
 static bool notify_complete = false;
 #endif
 
@@ -97,9 +95,7 @@ extern bool epg_filter_except_current_next;
 
 static bool messaging_zap_detected = false;
 /*static*/ bool dvb_time_update = false;
-#ifdef MARTII
 static bool sendEvent_needed = false;
-#endif
 
 //NTP-Config
 #define CONF_FILE CONFIGDIR "/neutrino.conf"
@@ -135,7 +131,7 @@ static pthread_rwlock_t messagingLock = PTHREAD_RWLOCK_INITIALIZER;
 static CTimeThread threadTIME;
 static CEitThread threadEIT;
 static CCNThread threadCN;
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 // ViaSAT uses pid 0x39 instead of 0x12
 static CEitThread threadVSEIT("viasatThread", 0x39);
 #endif
@@ -285,12 +281,11 @@ static bool deleteEvent(const event_id_t uniqueKey)
 //xprintf("addEvent: current %012" PRIx64 " event %012" PRIx64 " messaging_got_CN %d\n", messaging_current_servicekey, evt.get_channel_id(), messaging_got_CN);
 		readLockMessaging();
 		// only if it is the current channel... and if we don't have them already.
-		if (evt.get_channel_id() == messaging_current_servicekey && 
-#ifdef MARTII
-				true) {
-#else
-				(messaging_got_CN != 0x03)) { 
+		if (evt.get_channel_id() == messaging_current_servicekey
+#if 0
+				&& (messaging_got_CN != 0x03)
 #endif
+			){ 
 xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_channel_id(), evt.runningStatus(), evt.runningStatus() > 2 ? "curr" : "next", messaging_got_CN);
 
 			unlockMessaging();
@@ -312,9 +307,7 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 					unlockMessaging();
 					dprintf("addevent-cn: added running (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
-#ifdef MARTII
 					sendEvent_needed = true;
-#endif
 				} else {
 					writeLockMessaging();
 					messaging_got_CN |= 0x01;
@@ -332,9 +325,7 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 					unlockMessaging();
 					dprintf("addevent-cn: added next    (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
-#ifdef MARTII
 					sendEvent_needed = true;
-#endif
 				} else {
 					dprintf("addevent-cn: not added next(%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
@@ -1416,9 +1407,7 @@ void CTimeThread::addFilters()
 
 void CTimeThread::run()
 {
-#ifdef MARTII
 	set_threadname(name.c_str());
-#endif
 	time_t dvb_time = 0;
 	xprintf("%s::run:: starting, pid %d (%lu)\n", name.c_str(), getpid(), pthread_self());
 
@@ -1554,9 +1543,7 @@ int CSectionThread::Sleep()
 /* common thread main function */
 void CSectionThread::run()
 {
-#ifdef MARTII
 	set_threadname(name.c_str());
-#endif
 	xprintf("%s::run:: starting, pid %d (%lu)\n", name.c_str(), getpid(), pthread_self());
 	if (sections_debug)
 		dump_sched_info(name);
@@ -1733,7 +1720,7 @@ CEitThread::CEitThread()
 	: CEventsThread("eitThread")
 {
 }
-#ifdef ENABLE_VIASATEPG // MARTII
+#ifdef ENABLE_VIASATEPG
 CEitThread::CEitThread(std::string tname, unsigned short pid)
 	: CEventsThread(tname, pid)
 {
@@ -1771,7 +1758,7 @@ void CEitThread::beforeSleep()
 			CEventServer::INITID_SECTIONSD,
 			&current_service,
 			sizeof(messaging_current_servicekey));
-#ifndef MARTII
+#if 0
 	if(notify_complete)
 		system(CONFIGDIR "/epgdone.sh");
 #endif
@@ -2210,9 +2197,7 @@ bool CEitManager::Stop()
 
 void CEitManager::run()
 {
-#ifdef MARTII
 	set_threadname("CEitManager::run");
-#endif
 	pthread_t /*threadTOT,*/ threadHouseKeeping;
 	int rc;
 

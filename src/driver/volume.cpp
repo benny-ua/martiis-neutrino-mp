@@ -42,7 +42,7 @@
 #include <gui/audiomute.h>
 #include <gui/mediaplayer.h>
 #include <zapit/zapit.h>
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 #include <driver/nglcd.h>
 #endif
 
@@ -162,7 +162,7 @@ void CVolume::setVolume(const neutrino_msg_t key)
 						}
 					}
 					g_settings.current_volume = v;
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 					nGLCD::ShowVolume(false);
 #endif
 				}
@@ -199,7 +199,7 @@ void CVolume::setVolume(const neutrino_msg_t key)
 		}
 	} while (msg != CRCInput::RC_timeout);
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	nGLCD::ShowVolume(false);
 #endif
 	hideVolscale();

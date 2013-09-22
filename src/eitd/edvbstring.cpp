@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <map>
 #include <set>
-#if defined(MARTII) && defined(ENABLE_FREESATEPG)
+#ifdef ENABLE_FREESATEPG
 #include "freesatv2.h"
 #endif
 
@@ -1602,11 +1602,7 @@ const unsigned short cGB2312UNI[] = {
 // Two Char Mapping ( many polish services and UPC Direct/HBO services)
 // get from http://mitglied.lycos.de/buran/charsets/videotex-suppl.html
 //static inline unsigned int doVideoTexSuppl(int c1, int c2)
-#ifdef MARTII
 static inline unsigned int doVideoTexSuppl(u_char c1, u_char c2)
-#else
-static inline unsigned int doVideoTexSuppl(char c1, char c2)
-#endif
 {
 	switch (c1)
 	{
@@ -2022,7 +2018,7 @@ static inline unsigned int recode(unsigned char d, int cp)
 	}
 }
 
-#if defined(MARTII) && defined(ENABLE_FREESATEPG)
+#ifdef ENABLE_FREESATEPG
 static freesatHuffmanDecoder *huffmanDecoder = NULL;
 #endif
 std::string convertDVBUTF8(const char *data, int len, int table, int tsidonid)
@@ -2090,18 +2086,13 @@ std::string convertDVBUTF8(const char *data, int len, int table, int tsidonid)
 		break;
 	case 0x1F:
 		{
-#if defined(MARTII) && defined(ENABLE_FREESATEPG)
+#ifdef ENABLE_FREESATEPG
 			if (!huffmanDecoder)
 				huffmanDecoder = new freesatHuffmanDecoder;
 			std::string decoded_string = huffmanDecoder->decode((const unsigned char *)data, len);
 			if (!decoded_string.empty())
 				return decoded_string;
-#else
-#ifdef ENABLE_FREESATEPG
-			std::string decoded_string = freesatHuffmanDecode(std::string(data, len));
-			if (!decoded_string.empty()) return decoded_string;
 #endif
-#endif // MARTII
 		}
 		++i;
 		break;

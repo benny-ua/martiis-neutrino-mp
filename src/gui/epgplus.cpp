@@ -31,9 +31,7 @@
 #include <neutrino.h>
 
 #include <gui/epgplus.h>
-#ifdef MARTII
 #include <gui/followscreenings.h>
-#endif
 #include <sectionsdclient/sectionsdclient.h>
 
 #include <gui/widget/icons.h>
@@ -1089,20 +1087,16 @@ int EpgPlus::exec (CChannelList * pchannelList, int selectedChannelIndex, CBouqu
 						{
 							TCChannelEventEntries::const_iterator It = this->getSelectedEvent();
 
-#ifdef MARTII
 							time_t endtime = (*It)->channelEvent.startTime + (*It)->channelEvent.duration;
 XXX:
-#endif
 							if ((It != this->selectedChannelEntry->channelEventEntries.end() - 1)
 									&& (It != this->selectedChannelEntry->channelEventEntries.end())) {
 								++It;
-#ifdef MARTII
 								if((*It)->channelEvent.startTime < endtime) {
 									// overlapping epg entries. While the "goto" is certainly ugly, it's least invasive
 									++It;
 									goto XXX;
 								}
-#endif
 
 								this->selectedTime = (*It)->channelEvent.startTime + (*It)->channelEvent.duration / 2;
 
@@ -1121,11 +1115,7 @@ XXX:
 						break;
 				}
 			} 
-#ifdef MARTII 
 			else if (msg == (uint32_t) g_settings.key_help || msg == CRCInput::RC_info) {
-#else
-			else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
-#endif
 				TCChannelEventEntries::const_iterator It = this->getSelectedEvent();
 
 				if (It != this->selectedChannelEntry->channelEventEntries.end()) {
@@ -1322,12 +1312,11 @@ EpgPlus::MenuTargetAddRecordTimer::MenuTargetAddRecordTimer (EpgPlus * pepgPlus)
 	this->epgPlus = pepgPlus;
 }
 
-#ifdef MARTII
 static bool sortByDateTime (const CChannelEvent& a, const CChannelEvent& b)
 {
 	return a.startTime < b.startTime;
 }
-#endif
+
 int EpgPlus::MenuTargetAddRecordTimer::exec (CMenuTarget * /*parent*/, const std::string & /*actionKey*/)
 {
 	TCChannelEventEntries::const_iterator It = this->epgPlus->getSelectedEvent();
@@ -1336,8 +1325,6 @@ int EpgPlus::MenuTargetAddRecordTimer::exec (CMenuTarget * /*parent*/, const std
 			&& (!(*It)->channelEvent.description.empty())
 	   ) {
 		if (g_Timerd->isTimerdAvailable()) {
-
-#ifdef MARTII
 			CChannelEventList evtlist;
 			CEitManager::getInstance()->getEventsServiceKey(this->epgPlus->selectedChannelEntry->channel->channel_id, evtlist);
 			sort(evtlist.begin(),evtlist.end(),sortByDateTime);
@@ -1346,12 +1333,6 @@ int EpgPlus::MenuTargetAddRecordTimer::exec (CMenuTarget * /*parent*/, const std
 				(*It)->channelEvent.startTime + (*It)->channelEvent.duration,
 				(*It)->channelEvent.description, (*It)->channelEvent.eventID, TIMERD_APIDS_CONF, true, "", &evtlist);
 			m.exec(NULL, "");
-#else
-			g_Timerd->addRecordTimerEvent (this->epgPlus->selectedChannelEntry->channel->channel_id, (*It)->channelEvent.startTime, (*It)->channelEvent.startTime + (*It)->channelEvent.duration, (*It)->channelEvent.eventID, (*It)->channelEvent.startTime, (*It)->channelEvent.startTime - (ANNOUNCETIME + 120)
-						       , TIMERD_APIDS_CONF, true);
-			ShowMsg (LOCALE_TIMER_EVENTRECORD_TITLE, g_Locale->getText (LOCALE_TIMER_EVENTRECORD_MSG)
-				    , CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);	// UTF-8
-#endif
 		} else
 			printf ("timerd not available\n");
 	}

@@ -48,9 +48,7 @@ private:
 	std::string func_set_timer_form(CyhookHandler *hh, std::string para);
 	std::string func_bouquet_editor_main(CyhookHandler *hh, std::string para);
 	std::string func_set_bouquet_edit_form(CyhookHandler *hh, std::string para);
-#ifdef MARTII
 	std::string func_get_logo_name(CyhookHandler *hh, std::string para);
-#endif
 
 protected:
 	CNeutrinoAPI	*NeutrinoAPI;

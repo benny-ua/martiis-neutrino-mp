@@ -54,6 +54,11 @@
 #include <driver/rcinput.h>
 #include <gui/audiomute.h>
 
+#if !HAVE_SPARK_HARDWARE
+#include <video.h>
+extern cVideo * videoDecoder;
+#endif
+
 CBatchEPG_Menu::CBatchEPG_Menu()
 {
 	//frameBuffer = CFrameBuffer::getInstance();
@@ -238,7 +243,11 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		if (actionKey != "run") {
 			Load();
+#if HAVE_SPARK_HARDWARE
 			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+#else
+			videoDecoder->setBlank(true);
+#endif
 			g_audioMute->AudioMute(true, false);
 		}
 
@@ -256,8 +265,12 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 				g_Zapit->zapTo_serviceID(live_channel_id);
 
 		if (!wakeup) {
+#if HAVE_SPARK_HARDWARE
 			// restore PSI settings
 			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+#else
+			videoDecoder->setBlank(false);
+#endif
 			// restore audio
 			if (!muted)
 					g_audioMute->AudioMute(false, false);

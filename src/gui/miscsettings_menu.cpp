@@ -42,8 +42,8 @@
 #include <gui/plugins.h>
 #include <gui/sleeptimer.h>
 #include <gui/zapit_setup.h>
-#ifdef MARTII
 #include <gui/batchepg.h>
+#if HAVE_SPARK_HARDWARE
 #include <gui/kerneloptions.h>
 #endif
 
@@ -146,7 +146,7 @@ const CMenuOptionChooser::keyval CHANNELLIST_NEW_ZAP_MODE_OPTIONS[CHANNELLIST_NE
 };
 
 #ifdef CPU_FREQ
-#if HAVE_SPARK_HARDWARE // MARTII
+#if HAVE_SPARK_HARDWARE
 #define CPU_FREQ_OPTION_COUNT 6
 const CMenuOptionChooser::keyval_ext CPU_FREQ_OPTIONS[CPU_FREQ_OPTION_COUNT] =
 {
@@ -270,7 +270,7 @@ int CMiscMenue::showMiscSettingsMenu()
 	showMiscSettingsMenuCPUFreq(&misc_menue_cpu);
 	misc_menue.addItem( new CMenuForwarder("CPU", true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4));
 #endif /*CPU_FREQ*/
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	KernelOptions_Menu kernelOptions;
 	misc_menue.addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_HEAD, true, NULL, &kernelOptions, NULL, CRCInput::RC_5));
 #endif
@@ -402,9 +402,7 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	ms_epg->addItem(mf4);
 	ms_epg->addItem(mc2);
 
-#ifdef MARTII
 	ms_epg->addItem(new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS ,true, NULL, CNeutrinoApp::getInstance()->batchEPGSettings));
-#endif
 }
 
 //filebrowser settings
@@ -468,7 +466,7 @@ void CMiscMenue::showMiscSettingsMenuCPUFreq(CMenuWidget *ms_cpu)
 
 	CCpuFreqNotifier * cpuNotifier = new CCpuFreqNotifier();
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_NORMAL, &g_settings.cpufreq, CPU_FREQ_OPTIONS, CPU_FREQ_OPTION_COUNT, true, cpuNotifier));
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_STANDBY, &g_settings.standby_cpufreq, CPU_FREQ_OPTIONS_STANDBY, CPU_FREQ_OPTION_STANDBY_COUNT, true));
 #else
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_STANDBY, &g_settings.standby_cpufreq, CPU_FREQ_OPTIONS, CPU_FREQ_OPTION_COUNT, true));

@@ -225,9 +225,7 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						case CTimerd::TIMER_SLEEPTIMER:
 						case CTimerd::TIMER_EXEC_PLUGIN:
 						case CTimerd::TIMER_IMMEDIATE_RECORD:
-#ifdef MARTII
 						case CTimerd::TIMER_BATCHEPG:
-#endif
 							break;
 						case CTimerd::TIMER_RECORD:
 						{
@@ -398,7 +396,6 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 									   msgAddTimer.repeatCount);
 					rspAddTimer.eventID = CTimerManager::getInstance()->addEvent(event);
 					break;
-#ifdef MARTII
 				case CTimerd::TIMER_BATCHEPG :
 					event = new CTimerEvent_BatchEPG(
 						msgAddTimer.announceTime,
@@ -407,7 +404,6 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 						msgAddTimer.repeatCount);
 					rspAddTimer.eventID = CTimerManager::getInstance()->addEvent(event);
 					break;
-#endif
 				default:
 					printf("[timerd] Unknown TimerType\n");
 			}
@@ -476,9 +472,7 @@ bool timerd_parse_command(CBasicMessage::Header &rmsg, int connfd)
 
 int timerd_main_thread(void *data)
 {
-#ifdef MARTII
 	set_threadname(__func__);
-#endif
 	pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 
 	printf("timerd startup, tid %ld\n", syscall(__NR_gettid));

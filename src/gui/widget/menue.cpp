@@ -586,9 +586,9 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 					break;
 				}
 			}
-			if (msg == (uint32_t) g_settings.key_channelList_pageup)
+			if (msg == (uint32_t) g_settings.key_pageup)
 				msg = CRCInput::RC_page_up;
-			else if (msg == (uint32_t) g_settings.key_channelList_pagedown)
+			else if (msg == (uint32_t) g_settings.key_pagedown)
 				msg = CRCInput::RC_page_down;
 		}
 

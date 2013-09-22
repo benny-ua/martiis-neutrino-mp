@@ -779,10 +779,10 @@ int CChannelList::show()
 		else if (msg == (neutrino_msg_t) g_settings.key_list_end) {
 			actzap = updateSelection(chanlist.size()-1);
 		}
-		else if (msg == CRCInput::RC_up || (int) msg == g_settings.key_channelList_pageup)
+		else if (msg == CRCInput::RC_up || (int) msg == g_settings.key_pageup)
 		{
 			displayList = 1;
-			int step = ((int) msg == g_settings.key_channelList_pageup) ? listmaxshow : 1;  // browse or step 1
+			int step = ((int) msg == g_settings.key_pageup) ? listmaxshow : 1;  // browse or step 1
 
 			int new_selected = selected - step;
 			if (new_selected < 0)
@@ -790,10 +790,10 @@ int CChannelList::show()
 
 			actzap = updateSelection(new_selected);
 		}
-		else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_channelList_pagedown)
+		else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_pagedown)
 		{
 			displayList = 1;
-			int step =  ((int) msg == g_settings.key_channelList_pagedown) ? listmaxshow : 1;  // browse or step 1
+			int step =  ((int) msg == g_settings.key_pagedown) ? listmaxshow : 1;  // browse or step 1
 
 			int new_selected = selected + step;
 			if (new_selected >= (int) chanlist.size())
@@ -936,11 +936,7 @@ int CChannelList::show()
 			}
 		}
 #endif
-#ifdef MARTII
 		else if ((msg == CRCInput::RC_info) || (msg == (uint32_t) g_settings.key_help)) {
-#else
-		else if ((msg == CRCInput::RC_info) || (msg == CRCInput::RC_help)) {
-#endif
 			hide();
 			CChannelEvent *p_event=NULL;
 			if (displayNext)
@@ -2271,7 +2267,7 @@ void CChannelList::paint_pig (int _x, int _y, int w, int h)
 {
 	frameBuffer->paintBackgroundBoxRel (_x, _y, w, h);
 	//printf("CChannelList::paint_pig x %d y %d w %d h %d osd_w %d osd_w %d\n", _x, _y, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	videoDecoder->Pig(_x, _y, w, h, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true),
 				g_settings.screen_StartX_int,
 				g_settings.screen_StartY_int,

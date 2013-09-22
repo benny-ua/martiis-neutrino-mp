@@ -604,7 +604,7 @@ void CZapitClient::getVolume(unsigned int *left, unsigned int *right)
 
         close_connection();
 }
-#ifdef MARTII
+
 void CZapitClient::lockRc(const bool lock)
 {
 	CZapitMessages::commandBoolean msg;
@@ -616,7 +616,7 @@ void CZapitClient::lockRc(const bool lock)
 
 	close_connection();
 }
-#endif
+
 #if 0 
 //never used
 delivery_system_t CZapitClient::getDeliverySystem(void)

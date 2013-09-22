@@ -28,6 +28,10 @@
 #ifndef __lcdd__
 #define __lcdd__
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #define LCDDIR_VAR "/var/share/tuxbox/neutrino/lcdd"
 
 typedef enum
@@ -62,17 +66,12 @@ typedef enum
 	FP_ICON_PAUSE      = 0x0A000001,
 	FP_ICON_CAM1       = 0x0B000001,
 	FP_ICON_COL2       = 0x0B000002,
-	FP_ICON_CAM2       = 0x0C000001
-#ifdef MARTII
-	, FP_ICON_RECORD // dummy
-#endif
+	FP_ICON_CAM2       = 0x0C000001,
+	FP_ICON_RECORD // dummy
 } fp_icon;
 #define CVFD CLCD
 
 #ifdef LCD_UPDATE
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 // TODO Why is USE_FILE_OFFSET64 not defined, if file.h is included here????
 #ifndef __USE_FILE_OFFSET64
 #define __USE_FILE_OFFSET64 1
@@ -82,9 +81,7 @@ typedef enum
 
 #include <configfile.h>
 #include <pthread.h>
-#ifdef MARTII
 #include <semaphore.h>
-#endif
 
 #ifdef HAVE_TRIPLEDRAGON
 #include <lcddisplay/fontrenderer.h>
@@ -182,7 +179,6 @@ class CLCD
 		static void	*TimeThread(void *);
 		pthread_t	thrTime;
 		bool		thread_running;
-#ifdef MARTII
 		std::string	lastOutput;
 		int		fd;
 		int		waitSec;
@@ -191,15 +187,12 @@ class CLCD
 		unsigned int	timeout_cnt;
 		sem_t		sem;
 #endif
-#endif
 	public:
 		bool has_lcd;
 		void wake_up();
 		void setled(void) { return; };
 		void setlcdparameter(void);
-#ifdef MARTII
 		void setlcdparameter(int, int);
-#endif
 		void setBacklight(bool) { return; };
 
 		static CLCD* getInstance();
@@ -211,9 +204,7 @@ class CLCD
 		MODES getMode() { return mode; };
 
 		void showServicename(const std::string name, const bool clear_epg = false);
-#ifdef MARTII
 		std::string getServicename(void) { return servicename; }
-#endif
 		void setEPGTitle(const std::string title);
 		void setMovieInfo(const AUDIOMODES playmode, const std::string big, const std::string small, const bool centered = false);
 		void setMovieAudio(const bool is_ac3);
@@ -251,22 +242,14 @@ class CLCD
 
 		void setMuted(bool);
 
-#ifdef MARTII
 		void resume(bool showLastServiceName = false);
-#else
-		void resume();
-#endif
 		void pause();
 
 		void Lock();
 		void Unlock();
 		void Clear();
 		void ShowIcon(fp_icon icon, bool show);
-#ifdef MARTII
 		void ShowText(const char * str, bool rescheduleTime = true);
-#else
-		void ShowText(const char *s) { showServicename(std::string(s), true); };
-#endif
 		~CLCD();
 #ifdef LCD_UPDATE
 	private:

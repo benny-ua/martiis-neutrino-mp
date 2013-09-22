@@ -47,13 +47,13 @@
 #include <cs_api.h>
 #include <video.h>
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <gui/kerneloptions.h>
 #endif
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 extern cVideo *videoDecoder;
 #endif
 
@@ -83,7 +83,7 @@ int CCECSetup::exec(CMenuTarget* parent, const std::string &/*actionKey*/)
 }
 
 
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 #define VIDEOMENU_HDMI_CEC_MODE_OPTION_COUNT 3
 const CMenuOptionChooser::keyval VIDEOMENU_HDMI_CEC_MODE_OPTIONS[VIDEOMENU_HDMI_CEC_MODE_OPTION_COUNT] =
 {
@@ -92,7 +92,7 @@ const CMenuOptionChooser::keyval VIDEOMENU_HDMI_CEC_MODE_OPTIONS[VIDEOMENU_HDMI_
 	{ VIDEO_HDMI_CEC_MODE_RECORDER	, LOCALE_VIDEOMENU_HDMI_CEC_MODE_RECORDER },
 };
 #endif
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define VIDEOMENU_HDMI_CEC_STANDBY_OPTION_COUNT 3
 const CMenuOptionChooser::keyval VIDEOMENU_HDMI_CEC_STANDBY_OPTIONS[VIDEOMENU_HDMI_CEC_STANDBY_OPTION_COUNT] =
 {
@@ -109,7 +109,7 @@ int CCECSetup::showMenu()
 	cec->addIntroItems(LOCALE_VIDEOMENU_HDMI_CEC);
 
 	//cec
-#ifdef MARTII // should be: HAVE_SPARK_HARDWARE
+#if HAVE_SPARK_HARDWARE
 	KernelOptions_Menu ko;
 	g_settings.hdmi_cec_mode = ko.isEnabled("cec");
 	CMenuOptionChooser *cec_ch = new CMenuOptionChooser(LOCALE_VIDEOMENU_HDMI_CEC_MODE, &g_settings.hdmi_cec_mode, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
@@ -125,7 +125,7 @@ int CCECSetup::showMenu()
 #endif
 
 	cec->addItem(cec_ch);
-#ifndef MARTII
+#if !HAVE_SPARK_HARDWARE
 	cec->addItem(GenericMenuSeparatorLine);
 #endif
 	//-------------------------------------------------------
@@ -138,7 +138,7 @@ int CCECSetup::showMenu()
 	return res;
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 void CCECSetup::setCECSettings(bool b)
 {	
 	printf("[neutrino CEC Settings] %s init CEC settings...\n", __FUNCTION__);
@@ -176,7 +176,7 @@ void CCECSetup::setCECSettings()
 bool CCECSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*/)
 {
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_VIDEOMENU_HDMI_CEC_MODE))
 	{
 		printf("[neutrino CEC Settings] %s set CEC settings...\n", __FUNCTION__);

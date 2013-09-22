@@ -203,16 +203,11 @@ CPersonalizeGui::CPersonalizeGui() : CPINProtection(g_settings.personalize_pinco
 	widget_count = 0;
 	shortcut = 1;
 	show_usermenu = false;
-#ifdef MARTII
 	show_pluginmenu = false;
-#endif
 	show_pin_setup = false;
 	user_menu_notifier = NULL;
 	pin_setup_notifier = NULL;
 	fkeyMenu = NULL;
-#ifndef MARTII
-	plMenu = NULL;
-#endif
 	tmpW = NULL;
 	v_observ.clear();
 	options_count = 0;
@@ -321,7 +316,6 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 	
 		ShowUserMenu(uMenu, v_userMenuSetup);
 	}
-#ifdef MARTII
 	CMenuWidget* plMenu = NULL;
 	int pcount = g_PluginList->getNumberOfPlugins();
 	std::string pldesc[pcount];
@@ -335,19 +329,12 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 	
 		ShowPluginMenu(plMenu, pldesc, pltype);
 	}
-#endif
-	
 	
 	//help
 	pMenu->addItem(GenericMenuSeparatorLine);
-#ifdef MARTII
 	pMenu->addItem(new CMenuForwarder(LOCALE_PERSONALIZE_HELP, true, NULL, this, "personalize_help", g_settings.key_help, NEUTRINO_ICON_BUTTON_HELP));
-#else
-	pMenu->addItem(new CMenuForwarder(LOCALE_PERSONALIZE_HELP, true, NULL, this, "personalize_help", CRCInput::RC_help, NEUTRINO_ICON_BUTTON_HELP));
-#endif
 	
 	int res = pMenu->exec(NULL, "");
-#ifdef MARTII
 	if (show_pluginmenu) {
 		g_settings.plugins_disabled = "";
 		g_settings.plugins_game = "";
@@ -384,7 +371,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		}
 		g_PluginList->loadPlugins();
 	}
-#endif
+
 	delete pMenu;
 	delete uMenu;
 	delete pinChangeWidget;
@@ -486,7 +473,6 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 }
 
-#ifdef MARTII
 #define PERSONALIZE_PLUGINTYPE_MAX 5
 const CMenuOptionChooser::keyval PERSONALIZE_PLUGINTYPE_OPTIONS[PERSONALIZE_PLUGINTYPE_MAX] =
 {
@@ -496,19 +482,13 @@ const CMenuOptionChooser::keyval PERSONALIZE_PLUGINTYPE_OPTIONS[PERSONALIZE_PLUG
 	{ CPlugins::P_TYPE_SCRIPT, LOCALE_PLUGINTYPE_SCRIPT },
 	{ CPlugins::P_TYPE_LUA, LOCALE_PLUGINTYPE_LUA }
 };
-#endif
 
 //init plugin settings
-#ifdef MARTII
 void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget, std::string da[], int ia[])
-#else
-void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget)
-#endif
 {
 	p_widget->addIntroItems(LOCALE_PERSONALIZE_PLUGINS);
 	
 	uint  d_key = 1;	
-#ifdef MARTII
 	int pcount = g_PluginList->getNumberOfPlugins();
 	for (int i = 0; i < pcount; i++)
 	{
@@ -522,16 +502,6 @@ void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget)
 		p_widget->addItem(new CMenuOptionChooser(da[i].c_str(), &ia[i], PERSONALIZE_PLUGINTYPE_OPTIONS, PERSONALIZE_PLUGINTYPE_MAX,
 			!g_PluginList->isHidden(i), NULL, getShortcut(d_key++)));
 	}
-#else
-	for (int i = 0; i<g_PluginList->getNumberOfPlugins(); i++)
-	{
-		if( g_PluginList->getType(i)== CPlugins::P_TYPE_TOOL && !g_PluginList->isHidden(i)) //don't show hidden plugins an games
-		{
-			p_widget->addItem(new CMenuForwarder(g_PluginList->getName(i), true, g_PluginList->getDescription(i), NULL, NULL, getShortcut(d_key)));
-			d_key++;
-		}
-	}
-#endif
 }
 
 //Here we give the user the option to enable, disable, or PIN protect items on the Main Menu.
@@ -818,11 +788,7 @@ void CPersonalizeGui::addSeparator(CMenuWidget &widget, const neutrino_locale_t 
 		menu_item_t to_add_sep = {&widget, GenericMenuSeparatorLine, false, locale_text, NULL, item_mode, NULL};
 		v_item.push_back(to_add_sep);
 	} else {
-#ifdef MARTII
 		menu_item_t to_add_sep = {&widget, new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, locale_text, true), false, locale_text, NULL, item_mode, NULL};
-#else
-		menu_item_t to_add_sep = {&widget, new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, locale_text), false, locale_text, NULL, item_mode, NULL};
-#endif
 		v_item.push_back(to_add_sep);
 	}
 }

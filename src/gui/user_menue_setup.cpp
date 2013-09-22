@@ -88,7 +88,6 @@ const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUN
 	{ SNeutrinoSettings::ITEM_CLOCK,		LOCALE_CLOCK_SWITCH_ON },
 	{ SNeutrinoSettings::ITEM_GAMES,		LOCALE_MAINMENU_GAMES },
 	{ SNeutrinoSettings::ITEM_SCRIPTS,		LOCALE_MAINMENU_SCRIPTS },
-#ifdef MARTII
         { SNeutrinoSettings::ITEM_ADZAP,		LOCALE_USERMENU_ITEM_ADZAP },
         { SNeutrinoSettings::ITEM_EMU_RESTART,		LOCALE_SERVICEMENU_RESTART_CAM },
         { SNeutrinoSettings::ITEM_TUNER_RESTART,	LOCALE_SERVICEMENU_RESTART_TUNER },
@@ -96,7 +95,6 @@ const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUN
         { SNeutrinoSettings::ITEM_WEBTV,		LOCALE_WEBTV_HEAD },
         { SNeutrinoSettings::ITEM_RASS,			LOCALE_RASS_HEAD },
         { SNeutrinoSettings::ITEM_YOUTUBE,		LOCALE_MOVIEPLAYER_YTPLAYBACK },
-#endif
 	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD }
 };
 

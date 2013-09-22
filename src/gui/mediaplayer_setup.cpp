@@ -48,7 +48,7 @@
 #include <gui/pictureviewer_setup.h>
 #include <gui/webtv_setup.h>
 #include <gui/moviebrowser.h>
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 #include <gui/shairplay_setup.h>
 #endif
 
@@ -96,7 +96,7 @@ int CMediaPlayerSetup::showMediaPlayerSetup()
 
 	CAudioPlayerSetup asetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, &asetup, "", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	CShairPlaySetup isetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_SHAIRPLAY_HEAD, true, NULL, &isetup, "", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 #endif

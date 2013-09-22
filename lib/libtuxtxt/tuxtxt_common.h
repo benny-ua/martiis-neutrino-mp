@@ -12,9 +12,9 @@
 #if TUXTXT_COMPRESS == 1
 #include <zlib.h>
 #endif
-#ifdef MARTII
-#include <poll.h>
 #include <system/set_threadname.h>
+#if HAVE_SPARK_HARDWARE
+#include <poll.h>
 #endif
 
 #include <zapit/include/dmx.h>
@@ -575,7 +575,7 @@ void tuxtxt_allocate_cache(int magazine)
 /******************************************************************************
  * CacheThread                                                                *
  ******************************************************************************/
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 int eplayer_fd = -1;
 extern bool isTtxEplayer;
 #endif
@@ -602,9 +602,7 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 	tstPageinfo *pageinfo_thread;
 
 	printf("TuxTxt running thread...(%04x)\n",tuxtxt_cache.vtxtpid);
-#ifdef MARTII
 	set_threadname("tuxtxt_CacheThread");
-#endif
 	tuxtxt_cache.receiving = 1;
 	nice(3);
 	while (!stop_cache)
@@ -618,7 +616,7 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 		/* read packet */
 		ssize_t readcnt;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		if (isTtxEplayer) {
 			struct pollfd fds;
 			fds.fd = eplayer_fd;
@@ -1112,7 +1110,7 @@ int tuxtxt_start_thread(int source)
 		return 0;
 
 	tuxtxt_cache.thread_starting = 1;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (isTtxEplayer)
 		eplayer_fd = open("/tmp/.eplayer3_teletext", O_RDONLY | O_NONBLOCK);
 	else {
@@ -1121,7 +1119,7 @@ int tuxtxt_start_thread(int source)
 
 	dmx->pesFilter(tuxtxt_cache.vtxtpid);
 	dmx->Start();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	}
 #endif
 	stop_cache = 0;
@@ -1169,7 +1167,7 @@ int tuxtxt_stop_thread()
 		delete dmx;
 		dmx = NULL;
 	}
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (eplayer_fd > -1) {
 		close(eplayer_fd);
 		eplayer_fd = -1;

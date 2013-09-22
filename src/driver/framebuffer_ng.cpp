@@ -21,10 +21,8 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef MARTII
 #define _FILE_OFFSET_BITS 64
 #include <png.h>
-#endif
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -328,7 +326,7 @@ unsigned int CFrameBuffer::getStride() const
 	return stride;
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 unsigned int CFrameBuffer::getScreenWidth(bool)
 {
 	return DEFAULT_XRES;
@@ -402,16 +400,10 @@ unsigned int CFrameBuffer::getScreenY()
 }
 #endif
 
-#ifdef MARTII
 fb_pixel_t * CFrameBuffer::getFrameBufferPointer(bool real)
-#else
-fb_pixel_t * CFrameBuffer::getFrameBufferPointer() const
-#endif
 {
-#ifdef MARTII
 	if (real)
 		return lfb;
-#endif
 	if (active || (virtual_fb == NULL))
 		return accel->lbb;
 	else
@@ -1330,7 +1322,7 @@ void CFrameBuffer::paintMuteIcon(bool paint, int ax, int ay, int dx, int dy, boo
 		paintBackgroundBoxRel(ax, ay, dx, dy);
 	blit();
 }
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 CFrameBuffer::Mode3D CFrameBuffer::get3DMode()
 {
 	return mode3D;

@@ -106,11 +106,7 @@ int CSettingsManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		{
 			struct statfs s;
 			int ret = ::statfs(fileBrowser.getSelectedFile()->Name.c_str(), &s);
-#ifdef MARTII
 			if(ret == 0 && s.f_type != 0x72b6L /*jffs2*/ && s.f_type != 0x5941ff53L /*yaffs2*/)
-#else
-			if(ret == 0 && s.f_type != 0x72b6L) /*jffs2*/
-#endif
 			{
 				const char backup_sh[] = "/bin/backup.sh";
 				printf("backup: executing [%s %s]\n",backup_sh, fileBrowser.getSelectedFile()->Name.c_str());
@@ -150,19 +146,11 @@ int CSettingsManager::showMenu()
 	CDataResetNotifier * resetNotifier = new CDataResetNotifier();
 
 	CMenuWidget * mset = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_SETTINGS_MNGR);
-#ifdef MARTII
 	mset->addIntroItems(NONEXISTANT_LOCALE, LOCALE_EXTRA_NEUTRINOSETTINGS_TITLE);
-#else
-	mset->addIntroItems(LOCALE_MAINSETTINGS_MANAGE);
-#endif
 
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_RESET_SETTINGS,   true, NULL, resetNotifier,    "settings",     CRCInput::RC_recall);
 	mf->setHint(NEUTRINO_ICON_HINT_RESET, LOCALE_MENU_HINT_RESET); // FIXME: RC-button RECALL is broken
 	mset->addItem(mf);
-
-#ifndef MARTII
-	mset->addItem(GenericMenuSeparatorLine);
-#endif
 
 	mf = new CMenuForwarder(LOCALE_EXTRA_SAVECONFIG, true, NULL, this, "saveconfig", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	mf->setHint(NEUTRINO_ICON_HINT_SAVEAS, LOCALE_MENU_HINT_SAVEAS);
@@ -172,11 +160,7 @@ int CSettingsManager::showMenu()
 	mf->setHint(NEUTRINO_ICON_HINT_LOAD, LOCALE_MENU_HINT_LOAD);
 	mset->addItem(mf);
 
-#ifdef MARTII
 	mset->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_EXTRA_IMAGESETTINGS_TITLE));
-#else
-	mset->addItem(GenericMenuSeparatorLine);
-#endif
 
 	mf = new CMenuForwarder(LOCALE_SETTINGS_BACKUP, true, NULL, this, "backup",  CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
 	mf->setHint(NEUTRINO_ICON_HINT_BACKUP, LOCALE_MENU_HINT_BACKUP);

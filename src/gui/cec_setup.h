@@ -46,7 +46,7 @@ class CCECSetup : public CMenuTarget, CChangeObserver
 	public:	
 		CCECSetup();
 		~CCECSetup();
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 		void setCECSettings(bool);
 #else
 		void setCECSettings();

@@ -39,7 +39,7 @@ static int ttx_req_pause;
 static int sub_pid, sub_page;
 static bool use_gui;
 static int cfg_national_subset;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 bool isTtxEplayer = false;
 #endif
 
@@ -1552,7 +1552,7 @@ void tuxtx_pause_subtitle(bool pause)
 		printf("TuxTxt subtitle unpause, running %d pid %d page %x\n", reader_running, sub_pid, sub_page);
 		ttx_paused = 0;
 		if(!reader_running && sub_pid && sub_page)
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 			tuxtx_main(0, sub_pid, sub_page, 0, isTtxEplayer);
 #else
 			tuxtx_main(0, sub_pid, sub_page);
@@ -1615,7 +1615,7 @@ int tuxtx_subtitle_running(int *pid, int *page, int *running)
 	return ret;
 }
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 int tuxtx_main(int _rc, int pid, int page, int source, bool isEplayer)
 #else
 int tuxtx_main(int _rc, int pid, int page, int source)
@@ -1623,7 +1623,7 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 {
 	char cvs_revision[] = "$Revision: 1.95 $";
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (isTtxEplayer != isEplayer) {
 		tuxtxt_stop();
 		tuxtxt_clear_cache();
@@ -2348,7 +2348,7 @@ static void CleanUp()
  ******************************************************************************/
 static int GetTeletextPIDs()
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (isTtxEplayer)
 		return 0;
 #endif
@@ -2365,7 +2365,7 @@ static int GetTeletextPIDs()
         unsigned char mask[DMX_FILTER_SIZE];
 	int res;
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
         cDemux * dmx = new cDemux(0); // live demux
 #else
         cDemux * dmx = new cDemux(1);

@@ -56,11 +56,9 @@
 #include <driver/streamts.h>
 #include <driver/record.h>
 #include <driver/genpsi.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 
-#ifndef MARTII
+#if 0
 /* experimental mode:
  * stream not possible, if record running
  * pids in url ignored, and added from channel, with fake PAT/PMT
@@ -130,7 +128,7 @@ bool CStreamInstance::Send(ssize_t r)
 #endif
 		} while ((ret != r) && (i-- > 0));
 		if (ret != r) {
-#ifndef MARTII
+#if 0
 			if (r < 0)
 				perror("send");
 			printf("send err, fd %d: (%d from %d)\n", *it, ret, (int)r);
@@ -167,9 +165,7 @@ void CStreamInstance::RemoveClient(int clientfd)
 
 void CStreamInstance::run()
 {
-#ifdef MARTII
 	set_threadname("CStreamInstance::run");
-#endif
 	printf("CStreamInstance::run: %" PRIx64 "\n", channel_id);
 
 #if 0
@@ -331,9 +327,7 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 	}
 
 #ifndef ENABLE_MULTI_CHANNEL
-#ifdef MARTII
 	char *obp;
-#endif
 	/* parse stdin / url path, start dmx filters */
 	do {
 		int pid;
@@ -342,15 +336,9 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 			printf("New pid: 0x%x\n", pid);
 			pids.insert(pid);
 		}
-#ifdef MARTII
 		obp = bp;
-#endif
 	}
-#ifdef MARTII
 	while (((bp = strchr(obp, ',')) || (bp = strchr(obp, ':'))) && (bp++));
-#else
-	while ((bp = strchr(bp, ',')) && (bp++));
-#endif
 #endif
 
 	chid = CZapit::getInstance()->GetCurrentChannelID();
@@ -449,9 +437,7 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 
 void CStreamManager::run()
 {
-#ifdef MARTII
 	set_threadname("CStreamManager::run");
-#endif
 	struct sockaddr_in servaddr;
 	int clilen = sizeof(servaddr);;
 

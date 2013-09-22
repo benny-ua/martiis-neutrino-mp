@@ -184,7 +184,6 @@ public:
         bool changeNotify(const neutrino_locale_t, void * data);
 };
 
-#ifdef MARTII
 class CMPSubtitleChangeExec : public CMenuTarget
 {
 	public:
@@ -193,5 +192,4 @@ class CMPSubtitleChangeExec : public CMenuTarget
 		cPlayback *playback;
 		std::string actionKey;
 };
-#endif
 #endif

@@ -52,16 +52,15 @@
 
 struct SNeutrinoSettings
 {
-#ifdef MARTII
 	int conf_version;
-#endif
 	//video
 	int video_Format;
 	int video_Mode;
 	int analog_mode1;
 	int analog_mode2;
 	int video_43mode;
-#ifdef MARTII
+
+#if HAVE_SPARK_HARDWARE
 	int hdmi_mode;
 	int psi_contrast;
 	int psi_saturation;
@@ -90,9 +89,7 @@ struct SNeutrinoSettings
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
 	int infobar_subchan_disp_pos;
-#ifdef MARTII
 	int infobar_cn; // show infoviewer at current-next epg update
-#endif
 	int fan_speed;
 	int infobar_show;
 	int infobar_show_channellogo;
@@ -111,20 +108,18 @@ struct SNeutrinoSettings
 	int infobar_show_res;
 	int infobar_show_tuner;
 	int infobar_show_dd_available;
-#ifdef MARTII
 	int show_background_picture;
-#endif
 	//audio
 	int audio_AnalogMode;
 	int audio_DolbyDigital;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int audio_mixer_volume_analog;
 	int audio_mixer_volume_spdif;
 	int audio_mixer_volume_hdmi;
+#endif
 	int audio_volume_percent_ac3;
 	int audio_volume_percent_pcm;
 	int dvb_subtitle_delay;
-#endif
 	int auto_lang;
 	int auto_subs;
 	std::string audio_PCMOffset; //FIXME
@@ -140,7 +135,7 @@ struct SNeutrinoSettings
 	int hdmi_cec_mode;
 	int hdmi_cec_view_on;
 	int hdmi_cec_standby;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int hdmi_cec_broadcast;
 #endif
 	int enabled_video_modes[VIDEOMENU_VIDEOMODE_OPTION_COUNT];
@@ -157,9 +152,7 @@ struct SNeutrinoSettings
 	int ci_clock;
 	int ci_ignore_messages;
 	int radiotext_enable;
-#ifdef MARTII
 	std::string radiotext_rass_dir;
-#endif
 	
 	//vcr
 	int vcr_AutoSwitch;
@@ -180,7 +173,7 @@ struct SNeutrinoSettings
 	std::string epg_extendedcache;
 	std::string epg_dir;
 	int epg_scan;
-#ifdef MARTII
+
 	int epg_enable_freesat;
 	int epg_enable_viasat;
 	int batchepg_run_at_shutdown;
@@ -189,8 +182,7 @@ struct SNeutrinoSettings
 	std::string streaming_server_url;
 	std::string streaming_server_name;
 	std::string webtv_xml;
-#endif
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	int shairplay_enabled;
 	int shairplay_port;
 	int shairplay_bufsize;
@@ -204,7 +196,7 @@ struct SNeutrinoSettings
 	int network_ntpenable;
 	std::string ifname;
 	
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
         int		glcd_enable;
         uint32_t	glcd_color_fg;
         uint32_t	glcd_color_bg;
@@ -274,12 +266,10 @@ struct SNeutrinoSettings
 		P_MSER_RESET_CHANNELS,
 		P_MSER_RESTART,
 		P_MSER_RELOAD_PLUGINS,
-#ifdef MARTII
 		P_MSER_SCRIPTS,
 		P_MSER_RESTART_TUNER,
 		P_MSER_RESTART_CAM,
 		P_MSER_BOOT_SPARK,
-#endif
 		P_MSER_SERVICE_INFOMENU,
 		P_MSER_SOFTUPDATE,
 		
@@ -294,9 +284,7 @@ struct SNeutrinoSettings
 		//movieplayer menu
 		P_MPLAYER_MBROWSER,
 		P_MPLAYER_FILEPLAY,
-#ifdef MARTII
 		P_MPLAYER_INETPLAY,
-#endif
 		P_MPLAYER_YTPLAY,
 		
 		//feature keys
@@ -423,7 +411,7 @@ struct SNeutrinoSettings
 	int recording_audio_pids_std;
 	int recording_audio_pids_alt;
 	int recording_audio_pids_ac3;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int  recording_bufsize;
 	int  recording_bufsize_dmx;
 #endif
@@ -445,7 +433,6 @@ struct SNeutrinoSettings
 	std::string plugin_hdd_dir;
 	
 	std::string logo_hdd_dir;
-#ifdef MARTII
 	std::string logo_hdd_dir_2;
 
 	std::string plugins_disabled;
@@ -453,13 +440,13 @@ struct SNeutrinoSettings
 	std::string plugins_tool;
 	std::string plugins_script;
 	std::string plugins_lua;
-#endif
 
 	//key configuration
 	int key_tvradio_mode;
 
-	int key_channelList_pageup;
-	int key_channelList_pagedown;
+	int key_pageup;
+	int key_pagedown;
+
 	int key_channelList_cancel;
 	int key_channelList_sort;
 	int key_channelList_addrecord;
@@ -484,7 +471,6 @@ struct SNeutrinoSettings
 	int temp_timeshift;
 	int auto_delete;
 	int record_hours;
-#ifdef MARTII
 	int key_timerlist;
 	int key_showclock;
 	int key_help;
@@ -496,7 +482,6 @@ struct SNeutrinoSettings
 	int key_audioplayback;
 	int key_volumeup;
 	int key_volumedown;
-#endif
 
 	int mpkey_rewind;
 	int mpkey_forward;
@@ -507,11 +492,9 @@ struct SNeutrinoSettings
 	int mpkey_time;
 	int mpkey_bookmark;
 	int mpkey_plugin;
-#ifdef MARTII
 	int mpkey_next3dmode;
 	int mpkey_vtxt;
 	int mpkey_goto;
-#endif
 	int mpkey_subtitle;
 	int key_timeshift;
 	int key_plugin;
@@ -524,10 +507,8 @@ struct SNeutrinoSettings
 	int screenshot_cover;
 	int screenshot_mode;
 	int screenshot_res;
-#ifdef MARTII
 	int screenshot_png_compression;
 	int screenshot_backbuffer;
-#endif
 	std::string screenshot_dir;
 
 	int key_current_transponder;
@@ -572,7 +553,7 @@ struct SNeutrinoSettings
 	int channellist_numeric_adjust;
 	std::string repeat_blocker; //FIXME
 	std::string repeat_genericblocker; //FIXME
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int accept_other_remotes;
 #endif
 	int remote_control_hardware;
@@ -591,7 +572,7 @@ struct SNeutrinoSettings
 	int screen_StartY_lcd;
 	int screen_EndX_lcd;
 	int screen_EndY_lcd;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int screen_StartX_int;
 	int screen_StartY_int;
 	int screen_EndX_int;
@@ -668,8 +649,8 @@ struct SNeutrinoSettings
 #if HAVE_TRIPLEDRAGON || USE_STB_HAL
 		LCD_EPGMODE            ,
 #endif
-#ifdef MARTII
-		LCD_DISPLAYMODE,
+#if HAVE_SPARK_HARDWARE
+		LCD_DISPLAYMODE        ,
 		LCD_STANDBY_DISPLAYMODE,
 #endif
 		LCD_SETTING_COUNT
@@ -710,9 +691,7 @@ struct SNeutrinoSettings
 	int filebrowser_showrights;
 	int filebrowser_sortmethod;
 	int filebrowser_denydirectoryleave;
-#ifdef MARTII
 	int filebrowser_use_filter;
-#endif
 
 	//zapit setup
 	std::string StartChannelTV;
@@ -731,10 +710,8 @@ struct SNeutrinoSettings
 	std::string	font_file;
 	std::string	ttx_font_file;
 	std::string	update_dir;
-#ifdef MARTII
 	int	adzap_zapBackPeriod;
 	int	menu_numbers_as_icons;
-#endif
 	// USERMENU
 	typedef enum
 	{
@@ -771,7 +748,6 @@ struct SNeutrinoSettings
 #if 0
 		ITEM_MOVIEPLAYER_TS,
 #endif
-#ifdef MARTII
                 ITEM_ADZAP = 22,
                 ITEM_EMU_RESTART = 23,
                 ITEM_TUNER_RESTART = 24,
@@ -779,7 +755,6 @@ struct SNeutrinoSettings
                 ITEM_WEBTV = 26,
                 ITEM_RASS = 27,
                 ITEM_YOUTUBE = 28,
-#endif
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];
@@ -830,7 +805,7 @@ const time_settings_struct_t timing_setting[SNeutrinoSettings::TIMING_SETTING_CO
 #define DEFAULT_LCD_INVERSE			0x00
 #define DEFAULT_LCD_AUTODIMM			0x00
 #define DEFAULT_LCD_SHOW_VOLUME			0x01
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define LCD_DISPLAYMODE_OFF			0
 #define LCD_DISPLAYMODE_ON			1
 #define LCD_DISPLAYMODE_TIMEONLY		2

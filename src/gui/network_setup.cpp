@@ -157,9 +157,7 @@ void CNetworkSetup::readNetworkSettings()
 	mac_addr		= networkConfig->mac_addr;
 	network_ssid		= networkConfig->ssid;
 	network_key		= networkConfig->key;
-#ifdef MARTII
 	network_encryption	= (networkConfig->encryption == "WPA") ? 0 : 1;
-#endif
 }
 
 void CNetworkSetup::backupNetworkSettings()
@@ -177,9 +175,7 @@ void CNetworkSetup::backupNetworkSettings()
 	old_network_key			= networkConfig->key;
 	old_ifname 			= g_settings.ifname;
 	old_mac_addr			= mac_addr;
-#ifdef MARTII
 	old_network_encryption		= (networkConfig->encryption == "WPA") ? 0 : 1;
-#endif
 }
 
 #define OPTIONS_NTPENABLE_OPTION_COUNT 2
@@ -189,14 +185,13 @@ const CMenuOptionChooser::keyval OPTIONS_NTPENABLE_OPTIONS[OPTIONS_NTPENABLE_OPT
 	{ CNetworkSetup::NETWORK_NTP_ON, LOCALE_OPTIONS_NTP_ON }
 };
 
-#ifdef MARTII
 #define OPTIONS_WLAN_SECURITY_OPTION_COUNT 2
 const CMenuOptionChooser::keyval_ext OPTIONS_WLAN_SECURITY_OPTIONS[OPTIONS_WLAN_SECURITY_OPTION_COUNT] =
 {
         { 0, NONEXISTANT_LOCALE, "WPA" },
         { 1, NONEXISTANT_LOCALE, "WPA2"  }
 };
-#endif
+
 static int my_filter(const struct dirent * dent)
 {
 	if(dent->d_name[0] == 'l' && dent->d_name[1] == 'o')
@@ -352,13 +347,13 @@ int CNetworkSetup::showNetworkSetup()
 
 		networkSettings->addItem( m9);	//ssid
 		networkSettings->addItem( m10);	//key
-#ifdef MARTII
+
 		//encryption
 		CMenuOptionChooser* m11 = new CMenuOptionChooser(LOCALE_NETWORKMENU_WLAN_SECURITY, &network_encryption,
 			OPTIONS_WLAN_SECURITY_OPTIONS, OPTIONS_WLAN_SECURITY_OPTION_COUNT, true);
 		wlanEnable[2] = m11;
 		networkSettings->addItem( m11); //encryption
-#endif
+
 		networkSettings->addItem(GenericMenuSeparatorLine);
 	}
 	//------------------------------------------------
@@ -407,11 +402,11 @@ int CNetworkSetup::showNetworkSetup()
 
 	delete networkSettings;
 	delete sectionsdConfigNotifier;
-#ifdef MARTII
+
 	// Width may have changed.
 	CFrameBuffer::getInstance()->Clear();
 	CFrameBuffer::getInstance()->blit();
-#endif
+
 	return ret;
 }
 
@@ -501,12 +496,8 @@ bool CNetworkSetup::checkStringSettings()
 			return true;
 	}
 	if(CNetworkConfig::getInstance()->wireless) {
-		if((old_network_ssid != network_ssid) || (old_network_key != network_key))
+		if((old_network_ssid != network_ssid) || (old_network_key != network_key) || (old_network_encryption != network_encryption))
 			return true;
-#ifdef MARTII
-		if(old_network_encryption != network_encryption)
-			return true;
-#endif
 	}
 
 	return false;
@@ -534,9 +525,7 @@ void CNetworkSetup::prepareSettings()
 	networkConfig->hostname 	= network_hostname;
 	networkConfig->ssid 		= network_ssid;
 	networkConfig->key 		= network_key;
-#ifdef MARTII
 	networkConfig->encryption 	= network_encryption ? "WPA2" : "WPA";
-#endif
 
 	readNetworkSettings();
 	backupNetworkSettings();
@@ -651,9 +640,7 @@ void CNetworkSetup::restoreNetworkSettings()
 	network_hostname		= old_network_hostname;
 	network_ssid			= old_network_ssid;
 	network_key			= old_network_key;
-#ifdef MARTII
 	network_encryption		= old_network_encryption;
-#endif
 
 	networkConfig->automatic_start 	= network_automatic_start;
 	networkConfig->inet_static 	= (network_dhcp ? false : true);
@@ -665,9 +652,7 @@ void CNetworkSetup::restoreNetworkSettings()
 	networkConfig->hostname 	= network_hostname;
 	networkConfig->ssid 		= network_ssid;
 	networkConfig->key 		= network_key;
-#ifdef MARTII
 	networkConfig->encryption 	= network_encryption ? "WPA2" : "WPA";
-#endif
 
 	networkConfig->commitConfig();
 }
@@ -679,22 +664,17 @@ bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void *)
 	} else if(locale == LOCALE_NETWORKMENU_NETMASK) {
 		setBroadcast();
 	} else if(locale == LOCALE_NETWORKMENU_SELECT_IF) {
-#ifdef MARTII
 		// Width may change. Clear framebuffer, caller will redraw anyway.
 		CFrameBuffer::getInstance()->Clear();
 		CFrameBuffer::getInstance()->blit();
-#endif
+
 		networkConfig->readConfig(g_settings.ifname);
 		readNetworkSettings();
 		printf("CNetworkSetup::changeNotify: using %s, static %d\n", g_settings.ifname.c_str(), CNetworkConfig::getInstance()->inet_static);
 
 		changeNotify(LOCALE_NETWORKMENU_DHCP, &CNetworkConfig::getInstance()->inet_static);
 
-#ifdef MARTII
 		int ecnt = sizeof(wlanEnable) / sizeof(CMenuItem*);
-#else
-		int ecnt = sizeof(wlanEnable) / sizeof(CMenuForwarder*);
-#endif
 		for(int i = 0; i < ecnt; i++)
 			wlanEnable[i]->setActive(CNetworkConfig::getInstance()->wireless);
 
@@ -705,11 +685,7 @@ bool CNetworkSetup::changeNotify(const neutrino_locale_t locale, void *)
 		for(int i = 0; i < ecnt; i++)
 			dhcpDisable[i]->setActive(CNetworkConfig::getInstance()->inet_static);
 	}
-#ifdef MARTII
 	return true; // repaint
-#else
-	return false;
-#endif
 }
 
 //sets menu mode to "wizard" or "default"

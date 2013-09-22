@@ -102,8 +102,8 @@ start-block~buttons_save_settings
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_addrecord;{=key_channelList_addrecord=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_addremind;{=key_channelList_addremind=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_cancel;{=key_channelList_cancel=}~cache=}
-{=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_pagedown;{=key_channelList_pagedown=}~cache=}
-{=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_pageup;{=key_channelList_pageup=}~cache=}
+{=ini-set:/var/tuxbox/config/neutrino.conf;key_pagedown;{=key_pagedown=}~cache=}
+{=ini-set:/var/tuxbox/config/neutrino.conf;key_pageup;{=key_pageup=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_reload;{=key_channelList_reload=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_search;{=key_channelList_search=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;key_channelList_sort;{=key_channelList_sort=}~cache=}

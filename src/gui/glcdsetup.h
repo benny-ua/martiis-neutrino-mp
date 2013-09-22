@@ -20,7 +20,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 
 #ifndef __glcdsetup_h__
 #define __glcdsetup_h__

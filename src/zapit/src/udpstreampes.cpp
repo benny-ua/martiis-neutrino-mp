@@ -32,9 +32,7 @@
 #include <sched.h>
 #include <pthread.h>
 #include <errno.h>
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 
 #include <linux/dvb/dmx.h>
 #include <zapit/client/zapitclient.h>
@@ -434,9 +432,7 @@ void ReadLine( char String[] )
 
 void * TcpReceiver( void * Ptr )
 {
-#ifdef MARTII
    set_threadname(__func__);
-#endif
    char TcpString[STRING_SIZE], PacketString[STRING_SIZE];
    unsigned SPktBuf, u;
 

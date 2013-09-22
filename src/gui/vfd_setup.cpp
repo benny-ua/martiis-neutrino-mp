@@ -35,7 +35,7 @@
 
 
 #include "vfd_setup.h"
-#ifdef MARTII
+#ifdef ENABLE_GRAPHLCD
 #include <gui/glcdsetup.h>
 #endif
 
@@ -112,7 +112,7 @@ const CMenuOptionChooser::keyval LCD_INFO_OPTIONS[LCD_INFO_OPTION_COUNT] =
 	{ 1, LOCALE_LCD_INFO_LINE_CLOCK }
 };
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT 4
 const CMenuOptionChooser::keyval OPTIONS_LCD_DISPLAYMODE_OPTIONS[OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT] =
 {
@@ -127,7 +127,7 @@ int CVfdSetup::showSetup()
 	CMenuWidget *vfds = new CMenuWidget(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_LCD, width, MN_WIDGET_ID_VFDSETUP);
 	vfds->addIntroItems(LOCALE_LCDMENU_HEAD);
 
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	int displaymode_option_count = OPTIONS_LCD_DISPLAYMODE_OPTION_COUNT;
 	if(g_info.hw_caps->display_type == HW_DISPLAY_LINE_TEXT) {
 		displaymode_option_count = 2;
@@ -139,7 +139,7 @@ int CVfdSetup::showSetup()
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_STANDBY,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE],
 		OPTIONS_LCD_DISPLAYMODE_OPTIONS, 2, true));
-#ifdef ENABLE_GRAPHLCD // MARTII
+#ifdef ENABLE_GRAPHLCD
 	vfds->addItem(GenericMenuSeparatorLine);
 	GLCD_Menu glcdMenu;
 	vfds->addItem(new CMenuForwarder(LOCALE_GLCD_HEAD, true, NULL,
@@ -276,7 +276,7 @@ void CVfdSetup::showBacklightSetup(CMenuWidget *mn_led_widget)
 
 bool CVfdSetup::changeNotify(const neutrino_locale_t OptionName, void */* data */)
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_RUNNING) ||
 	    ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_STANDBY)) {
 		CVFD::getInstance()->ShowText(NULL);

@@ -38,9 +38,7 @@
 #include <gui/widget/messagebox.h>
 #include <gui/widget/mountchooser.h>
 #include <gui/pictureviewer.h>
-#ifdef MARTII
 #include <gui/followscreenings.h>
-#endif
 
 #include "widget/hintbox.h"
 #include "widget/buttons.h"
@@ -317,9 +315,6 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 	}
 	paint(channel_id);
 	showFunctionBar(true, channel_id);
-#ifndef MARTII
-	frameBuffer->blit();
-#endif
 
 	int oldselected = selected;
 
@@ -328,9 +323,7 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 	bool loop = true;
 	while (loop)
 	{
-#ifdef MARTII
 		frameBuffer->blit();
-#endif
 		g_RCInput->getMsgAbsoluteTimeout(&msg, &data, &timeoutEnd);
 
 		if ( msg <= CRCInput::RC_MaxRC )
@@ -351,8 +344,8 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 		}
 		
 		//manage painting of function bar during scrolling, depends of timerevent types
-		if (msg == CRCInput::RC_up || (int) msg == g_settings.key_channelList_pageup || 
-			msg == CRCInput::RC_down || (int) msg == g_settings.key_channelList_pagedown)
+		if (msg == CRCInput::RC_up || (int) msg == g_settings.key_pageup || 
+			msg == CRCInput::RC_down || (int) msg == g_settings.key_pagedown)
 		{
 			bool paint_buttonbar = false; //function bar
 			int step = 0;
@@ -364,17 +357,17 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 			     (g_settings.key_channelList_addrecord != (int)CRCInput::RC_nokey)))
 				paint_buttonbar = true;
 			
-			if (msg == CRCInput::RC_up || (int) msg == g_settings.key_channelList_pageup)
+			if (msg == CRCInput::RC_up || (int) msg == g_settings.key_pageup)
 			{
-				step = ((int) msg == g_settings.key_channelList_pageup) ? listmaxshow : 1;  // browse or step 1
+				step = ((int) msg == g_settings.key_pageup) ? listmaxshow : 1;  // browse or step 1
 				selected -= step;
 				if((prev_selected-step) < 0)            // because of uint
 					selected = evtlist.size() - 1;
 				paintDescription(selected);
 			}
-			else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_channelList_pagedown)
+			else if (msg == CRCInput::RC_down || (int) msg == g_settings.key_pagedown)
 			{
-				step = ((int) msg == g_settings.key_channelList_pagedown) ? listmaxshow : 1;  // browse or step 1
+				step = ((int) msg == g_settings.key_pagedown) ? listmaxshow : 1;  // browse or step 1
 				selected += step;
 
 				if(selected >= evtlist.size()) 
@@ -480,40 +473,11 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 				}
 				if (!recDir.empty()) //add/remove recording timer events and check/warn for conflicts
 				{
-#ifdef MARTII
 					CFollowScreenings m(channel_id,
 						evtlist[selected].startTime,
 						evtlist[selected].startTime + evtlist[selected].duration,
 						evtlist[selected].description, evtlist[selected].eventID, TIMERD_APIDS_CONF, true, "", &evtlist);
 					m.exec(NULL, "");
-#else
-					if (g_Timerd->addRecordTimerEvent(evtlist[selected].channelID ,
-								evtlist[selected].startTime,
-								evtlist[selected].startTime + evtlist[selected].duration,
-								evtlist[selected].eventID, evtlist[selected].startTime,
-								evtlist[selected].startTime - (ANNOUNCETIME + 120),
-								TIMERD_APIDS_CONF, true, recDir,false) == -1)
-					{
-						if(askUserOnTimerConflict(evtlist[selected].startTime - (ANNOUNCETIME + 120), evtlist[selected].startTime + evtlist[selected].duration)) //check for timer conflict
-						{
-							g_Timerd->addRecordTimerEvent(evtlist[selected].channelID ,
-									evtlist[selected].startTime,
-									evtlist[selected].startTime + evtlist[selected].duration,
-									evtlist[selected].eventID, evtlist[selected].startTime,
-									evtlist[selected].startTime - (ANNOUNCETIME + 120),
-									TIMERD_APIDS_CONF, true, recDir,true);
-									
-							//ask user whether the timer event should be set anyway
-							ShowMsg(LOCALE_TIMER_EVENTRECORD_TITLE, LOCALE_TIMER_EVENTRECORD_MSG, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
-							timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_EPG]);
-						}
-					} 
-					else 
-					{
-						//ShowMsg(LOCALE_TIMER_EVENTRECORD_TITLE, LOCALE_TIMER_EVENTRECORD_MSG, CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_INFO);
-						timeoutEnd = CRCInput::calcTimeoutEnd(g_settings.timing[SNeutrinoSettings::TIMING_EPG]);
-					}
-#endif
 				}
 				timerlist.clear();
 				g_Timerd->getTimerList (timerlist);
@@ -624,11 +588,7 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 			eplus.exec(NULL, "");
 			loop = false;
 		}
-#ifdef MARTII
 		else if (msg==(uint32_t)g_settings.key_help || msg==CRCInput::RC_right || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
-#else
-		else if (msg==CRCInput::RC_help || msg==CRCInput::RC_right || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
-#endif
 		{
 			if ( evtlist[selected].eventID != 0 )
 			{
@@ -684,9 +644,6 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 				res = menu_return::RETURN_EXIT_ALL;
 			}
 		}
-#ifndef MARTII
-		frameBuffer->blit();
-#endif
 	}
 
 	if (cc_infozone)
@@ -830,9 +787,6 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 		// paint 2nd line text
 		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMLARGE]->RenderString(x+10+iw, ypos+ fheight, width- 25- 20 -iw, evtlist[curpos].description, color, 0, true);
 	}
-#ifndef MARTII
-	frameBuffer->blit();
-#endif
 }
 
 void CNeutrinoEventList::paintDescription(int index)

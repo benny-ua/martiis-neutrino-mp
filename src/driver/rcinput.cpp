@@ -58,7 +58,9 @@
 #include <timerd/timermanager.h>
 #include <cs_api.h>
 
+#if HAVE_SPARK_HARDWARE
 #include <gui/cec_setup.h> // FIXME
+#endif
 
 //#define RCDEBUG
 //#define USE_GETTIMEOFDAY
@@ -1278,8 +1280,10 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					if (*timer_wakeup) {
 						unlink("/tmp/.timer_wakeup");
 						*timer_wakeup = false;
+#if HAVE_SPARK_HARDWARE
 						CCECSetup cecsetup;
 						cecsetup.setCECSettings(true);
+#endif
 						CTimerManager::getInstance()->cancelShutdownOnWakeup();
 					}
 					uint64_t now_pressed;

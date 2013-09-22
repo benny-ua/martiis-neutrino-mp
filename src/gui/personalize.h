@@ -144,16 +144,11 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 		CUserMenuNotifier *user_menu_notifier;
 		CPinSetupNotifier *pin_setup_notifier;
 		CMenuWidget* fkeyMenu;
-#ifndef MARTII
-		CMenuWidget* plMenu;
-#endif
 		CMenuWidget* tmpW;
 		
 		int width, widget_count, shortcut, options_count;
 		bool show_usermenu, show_pin_setup;
-#ifdef MARTII
 		bool show_pluginmenu;
-#endif
 				
 		//stuff for settings handlers
 		void	handleSetting(int *setting);
@@ -171,11 +166,7 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 		void 	ShowHelpPersonalize();
 		void 	ShowPinSetup(CMenuWidget* p_widget, CPINChangeWidget *pin_widget);
 		void 	ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuSetup*> &v_umenu);
-#ifdef MARTII
 		void 	ShowPluginMenu(CMenuWidget* p_widget, std::string da[], int ia[]);
-#else
-		void 	ShowPluginMenu(CMenuWidget* p_widget);
-#endif
 		void 	ShowPreverredKeySetup(CMenuWidget* p_widget);
 		void 	SaveAndExit();
 		
@@ -257,9 +248,7 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 		void 	addSeparator(const int& widget_id, const neutrino_locale_t locale_text = NONEXISTANT_LOCALE, const int& item_mode = PERSONALIZE_SHOW_AS_ITEM_OPTION);
 		void 	addPersonalizedItems();
 		void	enableUsermenu(bool show = true){show_usermenu = show;};
-#ifdef MARTII
 		void	enablePluginMenu(bool show = true){show_pluginmenu = show;};
-#endif
 		void	enablePinSetup(bool show = true){show_pin_setup = show;};
 };
 

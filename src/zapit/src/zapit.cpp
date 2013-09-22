@@ -70,11 +70,9 @@
 #include <video_td.h>
 #include <audio_td.h>
 #endif
-#ifdef MARTII
 #include <system/set_threadname.h>
 #include <driver/rcinput.h>
 #include <OpenThreads/ScopedLock>
-#endif
 
 #include <driver/abstime.h>
 #include <libdvbsub/dvbsub.h>
@@ -181,10 +179,8 @@ void CZapit::SaveSettings(bool write)
 			configfile.setInt64("lastChannelRadio", lastChannelRadio);
 			configfile.setInt64("lastChannelTV", lastChannelTV);
 			configfile.setInt64("lastChannel", live_channel_id);
-#ifdef MARTII
 			if (!(currentMode & RADIO_MODE))
 				configfile.setBool("lastChannelTVScrambled", !current_channel || current_channel->scrambled);
-#endif
 		}
 
 #if 0 // unused
@@ -1860,7 +1856,6 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 			audioDecoder->unmute();
 		break;
 	}
-#ifdef MARTII
 	case CZapitMessages::CMD_LOCKRC: {
 		CZapitMessages::commandBoolean msgBoolean;
 		CBasicServer::receive_data(connfd, &msgBoolean, sizeof(msgBoolean));
@@ -1871,7 +1866,6 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 			g_RCInput->restartInput();
 		break;
 	}
-#endif
 
 	case CZapitMessages::CMD_SET_VOLUME: {
 		CZapitMessages::commandVolume msgVolume;
@@ -2504,9 +2498,7 @@ static bool zapit_parse_command(CBasicMessage::Header &rmsg, int connfd)
 
 void CZapit::run()
 {
-#ifdef MARTII
 	set_threadname("CZapit::run");
-#endif
 	printf("[zapit] starting... tid %ld\n", syscall(__NR_gettid));
 
 	abort_zapit = 0;
@@ -2673,9 +2665,7 @@ bool CZapitSdtMonitor::Stop()
 
 void CZapitSdtMonitor::run()
 {
-#ifdef MARTII
 	set_threadname("CZapitSdtMonitor::run");
-#endif
 	time_t /*tstart,*/ tcur, wtime = 0;
 	t_transport_stream_id           transport_stream_id = 0;
 	t_original_network_id           original_network_id = 0;

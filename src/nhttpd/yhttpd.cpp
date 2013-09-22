@@ -12,9 +12,7 @@
 #include <syscall.h>
 #include <stdio.h>
 
-#ifdef MARTII
 #include <system/set_threadname.h>
-#endif
 // yhttpd
 #include "yconfig.h"
 #include <ylogging.h>
@@ -121,9 +119,7 @@ void thread_cleanup (void *p)
 
 #ifndef Y_CONFIG_BUILD_AS_DAEMON
 void * nhttpd_main_thread(void *) {
-#ifdef MARTII
 	set_threadname(__func__);
-#endif
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	aprintf("Webserver %s tid %ld\n", WEBSERVERNAME, syscall(__NR_gettid));
@@ -339,9 +335,7 @@ bool Cyhttpd::Configure() {
 // Main Webserver call
 //-----------------------------------------------------------------------------
 void Cyhttpd::run() {
-#ifdef MARTII
 	set_threadname("Cyhttpd::run");
-#endif
 	if (webserver) {
 		if (flag_threading_off)
 			webserver->is_threading = false;
@@ -569,10 +563,8 @@ void Cyhttpd::ReadConfig(void) {
 #endif //Y_CONFIG_USE_HOSTEDWEB
 	}
 	ConfigList["Tuxbox.LogosURL"] = Config->getString("Tuxbox.LogosURL", "");
-#ifdef MARTII
 	ConfigList["Tuxbox.DisplayLogos"] = Config->getString("Tuxbox.DisplayLogos", "true");
 	ConfigList["Tuxbox.PidSeparator"] = Config->getString("Tuxbox.PidSeparator", ",");
-#endif
 
 #ifdef Y_CONFIG_USE_OPEN_SSL
 	ConfigList["SSL"] = Config->getString("WebsiteMain.ssl", "false");

@@ -168,7 +168,7 @@ int CPluginList::exec(CMenuTarget* parent, const std::string & /*actionKey*/)
 			} else
 				loop=false;
 		}
-		else if ( msg == (neutrino_msg_t)g_settings.key_channelList_pageup )
+		else if ( msg == (neutrino_msg_t)g_settings.key_pageup )
 		{
 			if ((int(selected)-int(listmaxshow))<0)
 				selected=0;
@@ -177,7 +177,7 @@ int CPluginList::exec(CMenuTarget* parent, const std::string & /*actionKey*/)
 			liststart = (selected/listmaxshow)*listmaxshow;
 			paintItems();
 		}
-		else if ( msg == (neutrino_msg_t)g_settings.key_channelList_pagedown )
+		else if ( msg == (neutrino_msg_t)g_settings.key_pagedown )
 		{
 			selected+=listmaxshow;
 			if (selected>pluginlist.size()-1)

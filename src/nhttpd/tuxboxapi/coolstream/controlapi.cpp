@@ -53,7 +53,7 @@
 
 extern CPlugins *g_PluginList;//for relodplugins
 extern CBouquetManager *g_bouquetManager;
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
 #define EVENTDEV "/dev/input/nevis_ir"
 #else
 #define EVENTDEV "/dev/input/input0"
@@ -607,7 +607,7 @@ void CControlAPI::InfoCGI(CyhookHandler *hh)
 
 void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 {
-#ifdef MARTII // should be: HAVE_HARDWARE_SPARK
+#if HAVE_HARDWARE_SPARK
 	std::string boxname = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
 #else
 	unsigned int system_rev = cs_get_revision();
@@ -618,7 +618,7 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 	std::string eth_id = netadapter.getMacAddr();
 	std::transform(eth_id.begin(), eth_id.end(), eth_id.begin(), ::tolower);
 
-#ifndef MARTII // should be: HAVE_HARDWARE_SPARK
+#if !HAVE_HARDWARE_SPARK
 #if HAVE_TRIPLEDRAGON
 	boxname = "Armas ";
 #endif
@@ -716,7 +716,6 @@ struct key {
 #endif
 
 static const struct key keynames[] = {
-#ifdef MARTII
 	{"KEY_ARCHIVE",		KEY_ARCHIVE},
 	{"KEY_AUDIO",		KEY_AUDIO},
 	{"KEY_AUX",		KEY_AUX},
@@ -744,7 +743,6 @@ static const struct key keynames[] = {
 	{"KEY_V",		KEY_V},
 	{"KEY_VIDEO",		KEY_VIDEO},
 	{"KEY_ZOOM",		KEY_ZOOM},
-#endif
 	{"KEY_POWER",		KEY_POWER},
 	{"KEY_MUTE",		KEY_MUTE},
 	{"KEY_1",			KEY_1},
@@ -1239,9 +1237,7 @@ void CControlAPI::GetBouquetsCGI(CyhookHandler *hh) {
 	if (hh->ParamList["encode"] == "true")
 		encode = true;
 
-#ifdef MARTII
 	localizeBouquetNames();
-#endif
 	bool fav = false;
 	if (hh->ParamList["fav"] == "true")
 		fav = true;
@@ -1252,11 +1248,7 @@ void CControlAPI::GetBouquetsCGI(CyhookHandler *hh) {
 		std::string item = "";
 		ZapitChannelList * channels = mode == CZapitClient::MODE_RADIO ? &g_bouquetManager->Bouquets[i]->radioChannels : &g_bouquetManager->Bouquets[i]->tvChannels;
 		if (!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || show_hidden) && (!fav || g_bouquetManager->Bouquets[i]->bUser)) {
-#ifdef MARTII
 			bouquet = std::string(g_bouquetManager->Bouquets[i]->lName.c_str());
-#else
-			bouquet = std::string(g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : g_bouquetManager->Bouquets[i]->Name.c_str());
-#endif
 			if (encode)
 				bouquet = encodeString(bouquet); // encode (URLencode) the bouquetname
 			item = hh->outPair("number", string_printf("%u", i + 1), true);
@@ -1370,9 +1362,7 @@ void CControlAPI::epgDetailList(CyhookHandler *hh) {
 	TOutType outType = hh->outStart();
 	std::string result = "";
 
-#ifdef MARTII
 	localizeBouquetNames();
-#endif
 	NeutrinoAPI->eList.clear();
 	if (bouquetnr >= 0 || all_bouquets) {
 		int bouquet_size = (int) g_bouquetManager->Bouquets.size();
@@ -1388,11 +1378,7 @@ void CControlAPI::epgDetailList(CyhookHandler *hh) {
 
 		for (int i = start_bouquet; i < bouquet_size; i++) {
 			channels = mode == CZapitClient::MODE_RADIO ? g_bouquetManager->Bouquets[i]->radioChannels : g_bouquetManager->Bouquets[i]->tvChannels;
-#ifdef MARTII
 			std::string bouquet = g_bouquetManager->Bouquets[i]->lName;
-#else
-			std::string bouquet = std::string(g_bouquetManager->Bouquets[i]->bFav ? g_Locale->getText(LOCALE_FAVORITES_BOUQUETNAME) : g_bouquetManager->Bouquets[i]->Name.c_str());
-#endif
 			bouquet = encodeString(bouquet); // encode (URLencode) the bouquetname
 			std::string res_channels = "";
 
@@ -2188,7 +2174,7 @@ void CControlAPI::YWeb_SendRadioStreamingPid(CyhookHandler *hh)
 //-----------------------------------------------------------------------------
 std::string CControlAPI::YexecuteScript(CyhookHandler *, std::string cmd)
 {
-#ifdef MARTII
+#if HAVE_SPARK_HARDWARE
     {
 	const char *fbshot = "Y_Tools fbshot fb /";
 	int len = strlen(fbshot);
@@ -2649,7 +2635,6 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 			apid_idx=apid_no;
 		if(!pids.APIDs.empty())
 			apid = pids.APIDs[apid_idx].pid;
-#ifdef MARTII
 		CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
 		int curnum = channelList->getActiveChannelNumber();
 		CZapitChannel * cc = channelList->getChannel(curnum);
@@ -2671,11 +2656,6 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 			snprintf(tmp, sizeof(tmp), "0x%04x", pids.PIDs.pcrpid);
 			xpids += hh->WebserverConfigList["Tuxbox.PidSeparator"] + string(tmp);
         	}
-#else
-		xpids = string_printf("0x%04x,0x%04x,0x%04x",pids.PIDs.pmtpid,pids.PIDs.vpid,apid);
-		if (pids.PIDs.pcrpid != pids.PIDs.vpid)
-			xpids += string_printf(",0x%04x", pids.PIDs.pcrpid);
-#endif
 	}
 	else if ( mode == CZapitClient::MODE_RADIO)
 	{
@@ -2687,17 +2667,13 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 			apid = pids.APIDs[0].pid;
 
 		//xpids = string_printf("0x%04x",apid);
-#ifdef MARTII
 		xpids = string_printf("0x%04x%c0x%04x",pids.PIDs.pmtpid,*(hh->WebserverConfigList["Tuxbox.PidSeparator"].c_str()),apid);
-#else
-		xpids = string_printf("0x%04x,0x%04x",pids.PIDs.pmtpid,apid);
-#endif
 	}
 	else
 		hh->SendError();
 	// build url
 	std::string url = "";
-#ifdef MARTII
+
 	// strip ":<port>" from hostname, if necessary  --martii
 	std::string host = hh->ParamList["host"];
 	if(host == "")
@@ -2709,18 +2685,6 @@ void CControlAPI::build_live_url(CyhookHandler *hh)
 	url = "http://" + host;
 	//url += (mode == CZapitClient::MODE_TV) ? ":31339/0," : ":31338/";
 	url += ":31339/0" + hh->WebserverConfigList["Tuxbox.PidSeparator"];
-#else
-	if(hh->ParamList["host"] !="")
-		url = "http://"+hh->ParamList["host"];
-	else
-		url = "http://"+hh->HeaderList["Host"];
-	/* strip off optional custom port */
-	if (url.rfind(":") != 4)
-		url = url.substr(0, url.rfind(":"));
-
-	//url += (mode == CZapitClient::MODE_TV) ? ":31339/0," : ":31338/";
-	url += ":31339/0,";
-#endif
 	url += xpids;
 
 	// response url

@@ -101,7 +101,7 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		audiomute->enableMuteIcon(true);
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	else if (actionKey == "shairplay")
 	{
 		CNeutrinoApp::getInstance()->shairplay_enabled_cur = true;
@@ -160,7 +160,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	CMenuForwarder *fw_inet = NULL;
 	CMenuForwarder *fw_pviewer = NULL;
 	CPictureViewerGui *pictureviewergui = NULL;
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 	CMenuForwarder *fw_shairplay = NULL;
 #endif
 #if ENABLE_UPNP
@@ -182,7 +182,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		fw_inet = new CMenuForwarder(LOCALE_INETRADIO_NAME, true, NULL, this, "inetplayer", inet_rc, inet_btn);
 		fw_inet->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_INET_RADIO);
 
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
 		neutrino_msg_t shairplay_rc = usage_mode == MODE_AUDIO ? CRCInput::RC_blue : CRCInput::RC_nokey;
 		const char* shairplay_btn = usage_mode == MODE_AUDIO ? NEUTRINO_ICON_BUTTON_BLUE : "";
 		if (g_settings.shairplay_enabled && !CNeutrinoApp::getInstance()->shairplay_enabled_cur)
@@ -213,7 +213,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
  		//internet player
 		personalize->addItem(media, fw_inet, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
 
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
  		//shairplay
 		if (fw_shairplay)
 				personalize->addItem(media, fw_shairplay, &g_settings.personalize[SNeutrinoSettings::P_MEDIA_INETPLAY]);
@@ -242,7 +242,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 		if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 			showMoviePlayer(media, personalize);
 
-#ifdef ENABLE_SHAIRPLAY
+#if ENABLE_SHAIRPLAY
  		//shairplay
 		if (fw_shairplay) {
 			personalize->addSeparator(0);

@@ -87,7 +87,6 @@ class CMoviePlayerGui : public CMenuTarget
 	unsigned short apids[REC_MAX_APIDS];
 	unsigned short ac3flags[REC_MAX_APIDS];
 	unsigned short currentapid, currentac3;
-#ifdef MARTII
 	// subtitle data
 	unsigned short numpids;
 #ifndef REC_MAX_SPIDS
@@ -114,7 +113,6 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string currentttxsub;
 
 	bool probePids;
-#endif
 
 #if 0
 	/* subtitles vars */
@@ -169,12 +167,10 @@ class CMoviePlayerGui : public CMenuTarget
 	void handleMovieBrowser(neutrino_msg_t msg, int position = 0);
 	bool SelectFile();
 	void updateLcd();
-#ifdef MARTII
 	void StopSubtitles(bool b);
 	void StartSubtitles(bool show = true);
 
 	static void *ShowWebTVHint(void *arg);
-#endif
 
 #if 0
 	void selectSubtitle();
