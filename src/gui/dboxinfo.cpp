@@ -355,6 +355,11 @@ void CDBoxInfoWidget::paint()
 		bool rec_mp=false, memory_flag = false;
 		const int headSize_mem = 5;
 		const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use%"};
+#define DBINFO_TOTAL 0
+#define DBINFO_USED 1
+#define DBINFO_FREE 2
+#define DBINFO_RAM 0
+#define DBINFO_SWAP 1
 		// paint mount head
 		for (int j = 0; j < headSize_mem; j++) {
 			switch (j)
@@ -378,7 +383,7 @@ void CDBoxInfoWidget::paint()
 			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
 		}
 		ypos+= mheight;
-		int m[2][4] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
+		int m[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
 		const char *n[2] = { "RAM", "Swap" };
 		FILE *procmeminfo = fopen("/proc/meminfo", "r");
 		if (procmeminfo) {
@@ -387,24 +392,24 @@ void CDBoxInfoWidget::paint()
 			while (fgets(buf, sizeof(buf), procmeminfo))
 				if (2 == sscanf(buf, "%[^:]: %d", a, &v)) {
 					if (!strcasecmp(a, "MemTotal"))
-						m[0][0] = v;
+						m[DBINFO_RAM][DBINFO_TOTAL] += v;
 					else if (!strcasecmp(a, "MemFree"))
-						m[0][2] += v;
+						m[DBINFO_RAM][DBINFO_FREE] += v;
 					else if (!strcasecmp(a, "Buffers"))
-						m[0][2] += v;
+						m[DBINFO_RAM][DBINFO_FREE] += v;
 					else if (!strcasecmp(a, "Cached"))
-						m[0][2] = v;
+						m[DBINFO_RAM][DBINFO_FREE] += v;
 					else if (!strcasecmp(a, "SwapTotal"))
-						m[1][0] = v;
+						m[DBINFO_SWAP][DBINFO_TOTAL] += v;
 					else if (!strcasecmp(a, "SwapFree"))
-						m[1][2] = v;
+						m[DBINFO_SWAP][DBINFO_FREE] += v;
 					else if (!strcasecmp(a, "SwapCached"))
-						m[1][2] = v;
+						m[DBINFO_SWAP][DBINFO_FREE] += v;
 				}
 			fclose(procmeminfo);
 		}
 		for (int k = 0; k < 2; k++) {
-			m[k][1] = m[k][0] - m[k][2];
+			m[k][DBINFO_USED] = m[k][DBINFO_TOTAL] - m[k][DBINFO_FREE];
 			for (int j = 0; j < headSize_mem; j++) {
 				switch (j) {
 					case 0:
@@ -413,19 +418,19 @@ void CDBoxInfoWidget::paint()
 						break;
 					case 1:
 						mpOffset = nameOffset + 10;
-						bytes2string(1024 * m[k][0], ubuf, buf_size);
+						bytes2string(1024 * m[k][DBINFO_TOTAL], ubuf, buf_size);
 						break;
 					case 2:
 						mpOffset = nameOffset+ (sizeOffset+10)*1+10;
-						bytes2string(1024 * m[k][1], ubuf, buf_size);
+						bytes2string(1024 * m[k][DBINFO_FREE], ubuf, buf_size);
 						break;
 					case 3:
 						mpOffset = nameOffset+ (sizeOffset+10)*2+10;
-						bytes2string(1024 * m[k][2], ubuf, buf_size);
+						bytes2string(1024 * m[k][DBINFO_USED], ubuf, buf_size);
 						break;
 					case 4:
 						mpOffset = nameOffset+ (sizeOffset+10)*3+10;
-						snprintf(ubuf, buf_size, "%4d%%", m[k][0] ? (m[k][1] * 100) / m[k][0] : 0);
+						snprintf(ubuf, buf_size, "%4d%%", m[k][DBINFO_TOTAL] ? (m[k][DBINFO_FREE] * 100) / m[k][DBINFO_TOTAL] : 0);
 						break;
 				}
 				g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
