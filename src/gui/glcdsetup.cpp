@@ -148,7 +148,7 @@ GLCD_Menu_Notifier::changeNotify (const neutrino_locale_t OptionName, void *Data
 			nglcd->Suspend();
 		return true;
 	case LOCALE_GLCD_MIRROR_OSD:
-		nglcd->MirrorOSD(g_settings.glcd_mirror_osd);
+		nglcd->MirrorOSD(*((int *) Data));
 		break;
 	case LOCALE_GLCD_MIRROR_VIDEO:
 		nglcd->Update();
@@ -241,6 +241,7 @@ void GLCD_Menu::GLCD_Menu_Settings()
 	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, NULL, this, "rescan",
 				CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 	m.exec(NULL, "");
+	selected = m.getSelected();
 	nGLCD::getInstance()->StandbyMode(false);
 	m.hide();
 }

@@ -4588,7 +4588,7 @@ void CNeutrinoApp::StopSubtitles()
 	}
 #ifdef ENABLE_GRAPHLCD
 	if (b)
-		nGLCD::MirrorOSD();
+		nGLCD::MirrorOSD(g_settings.glcd_mirror_osd);
 #endif
 }
 
