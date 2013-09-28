@@ -2645,7 +2645,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				m.exec(NULL, "hotkey");
 				StartSubtitles();
 			}
-			else if( ( msg == (uint32_t) g_settings.key_help ) || ( msg == CRCInput::RC_info) ||
+			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
 						(g_settings.infobar_cn && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
 						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
 			{

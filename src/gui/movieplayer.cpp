@@ -968,7 +968,7 @@ void CMoviePlayerGui::PlayFile(void)
 			jumpTime.hide();
 			if (!cancel && ((3 == sscanf(Value.c_str(), "%d:%d:%d", &hh, &mm, &ss)) || (2 == sscanf(Value.c_str(), "%d:%d", &hh, &mm))))
 				playback->SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
-		} else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
+		} else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
 			callInfoViewer(/*duration, position*/);
 			update_lcd = true;
 #if 0

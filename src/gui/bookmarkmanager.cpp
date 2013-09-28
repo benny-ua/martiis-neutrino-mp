@@ -322,7 +322,7 @@ const CBookmark * CBookmarkManager::getBookmark(CMenuTarget* parent)
 			res=-1;
 			loop=false;
 		}
-		else if ( msg == (uint32_t) g_settings.key_help )
+		else if (msg==CRCInput::RC_help)
 		{
 			// TODO Add Help
 		}

@@ -332,7 +332,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 	
 	//help
 	pMenu->addItem(GenericMenuSeparatorLine);
-	pMenu->addItem(new CMenuForwarder(LOCALE_PERSONALIZE_HELP, true, NULL, this, "personalize_help", g_settings.key_help, NEUTRINO_ICON_BUTTON_HELP));
+	pMenu->addItem(new CMenuForwarder(LOCALE_PERSONALIZE_HELP, true, NULL, this, "personalize_help", CRCInput::RC_help, NEUTRINO_ICON_BUTTON_HELP));
 	
 	int res = pMenu->exec(NULL, "");
 	if (show_pluginmenu) {

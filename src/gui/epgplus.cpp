@@ -1115,7 +1115,7 @@ XXX:
 						break;
 				}
 			} 
-			else if (msg == (uint32_t) g_settings.key_help || msg == CRCInput::RC_info) {
+			else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
 				TCChannelEventEntries::const_iterator It = this->getSelectedEvent();
 
 				if (It != this->selectedChannelEntry->channelEventEntries.end()) {

@@ -1681,6 +1681,8 @@ const char *CRCInput::getKeyNameC(const unsigned int key)
 **************************************************************************/
 int CRCInput::translate(int code, int /*num*/)
 {
+	if (code == g_settings.key_help)
+		return RC_help;
 	switch(code)
 	{
 #if HAVE_SPARK_HARDWARE || HAVE_DUCKBOX_HARDWARE

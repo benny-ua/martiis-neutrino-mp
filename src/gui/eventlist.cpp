@@ -589,7 +589,7 @@ int CNeutrinoEventList::exec(const t_channel_id channel_id, const std::string& c
 			eplus.exec(NULL, "");
 			loop = false;
 		}
-		else if (msg==(uint32_t)g_settings.key_help || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
+		else if (msg==CRCInput::RC_help || msg==CRCInput::RC_ok || msg==CRCInput::RC_info)
 		{
 			if ( evtlist[selected].eventID != 0 )
 			{

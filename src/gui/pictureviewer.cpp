@@ -495,7 +495,7 @@ int CPictureViewerGui::show()
 				}
 			}
 		}
-		else if (msg==(uint32_t)g_settings.key_help)
+		else if (msg==CRCInput::RC_help)
 		{
 			if (m_state == MENU)
 			{

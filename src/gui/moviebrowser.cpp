@@ -1879,7 +1879,7 @@ bool CMovieBrowser::onButtonPressMainFrame(neutrino_msg_t msg)
 		 		onDeleteFile(*m_movieSelectionHandler, skipAsk);
 		}
 	}
-	else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info)
+	else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info)
 	{
 		if(m_movieSelectionHandler != NULL)
 		{

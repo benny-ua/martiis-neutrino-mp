@@ -934,7 +934,7 @@ void CInfoViewer::loop(bool show_dot)
 			g_RCInput->postMsg (msg, 0);
 			res = messages_return::cancel_info;
 		}
-		else if (msg == (uint32_t)g_settings.key_help || msg == CRCInput::RC_info) {
+		else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
 			g_RCInput->postMsg (NeutrinoMessages::SHOW_EPG, 0);
 			res = messages_return::cancel_info;
 		} else if ((msg == NeutrinoMessages::EVT_TIMER) && (data == fader.GetTimer())) {

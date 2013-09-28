@@ -946,7 +946,7 @@ int CChannelList::show()
 			}
 		}
 #endif
-		else if ((msg == CRCInput::RC_info) || (msg == (uint32_t) g_settings.key_help)) {
+		else if ((msg == CRCInput::RC_info) || (msg == CRCInput::RC_help)) {
 			hide();
 			CChannelEvent *p_event=NULL;
 			if (displayNext)
