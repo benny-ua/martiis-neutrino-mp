@@ -159,7 +159,7 @@ class CInfoViewer
 
 	void	showMovieTitle(const int playState, const std::string &title,
 				const std::string &g_file_epg, const std::string &g_file_epg1,
-				const int duration, const int curr_pos);
+				const int duration, const int curr_pos, const int repeat_mode);
 #if ENABLE_SHAIRPLAY
 	void showShairPlay(const std::string &album, const std::string &artist, const std::string &title,
 			   const std::string &comment, const std::string &composer, const std::string &genre,

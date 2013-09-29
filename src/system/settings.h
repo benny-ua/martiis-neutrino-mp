@@ -496,6 +496,7 @@ struct SNeutrinoSettings
 	int mpkey_vtxt;
 	int mpkey_goto;
 	int mpkey_subtitle;
+	int mpkey_next_repeat_mode;
 	int key_timeshift;
 	int key_plugin;
 
@@ -698,6 +699,9 @@ struct SNeutrinoSettings
 	int filebrowser_sortmethod;
 	int filebrowser_denydirectoryleave;
 	int filebrowser_use_filter;
+
+	//movieplayer
+	int   movieplayer_repeat_on;
 
 	//zapit setup
 	std::string StartChannelTV;

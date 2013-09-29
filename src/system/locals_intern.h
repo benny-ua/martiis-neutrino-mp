@@ -1601,6 +1601,7 @@ const char * locale_real_names[] =
 	"mpkey.forward",
 	"mpkey.goto",
 	"mpkey.next3dmode",
+	"mpkey.next_repeat_mode",
 	"mpkey.pause",
 	"mpkey.play",
 	"mpkey.plugin",

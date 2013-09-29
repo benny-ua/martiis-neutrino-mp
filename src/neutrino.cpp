@@ -853,6 +853,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.audioplayer_enable_sc_metadata = configfile.getInt32("audioplayer_enable_sc_metadata",1);
 	g_settings.shoutcast_dev_id = configfile.getString("shoutcast_dev_id","XXXXXXXXXXXXXXXX");
 
+	//Movie-Player
+	g_settings.movieplayer_repeat_on = configfile.getInt32("movieplayer_repeat_on",0);
+
 	//Filebrowser
 	g_settings.filebrowser_showrights =  configfile.getInt32("filebrowser_showrights", 1);
 	g_settings.filebrowser_sortmethod = configfile.getInt32("filebrowser_sortmethod", 0);
@@ -1354,6 +1357,9 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "audioplayer_show_playlist", g_settings.audioplayer_show_playlist );
 	configfile.setInt32( "audioplayer_enable_sc_metadata", g_settings.audioplayer_enable_sc_metadata );
 	configfile.setString( "shoutcast_dev_id", g_settings.shoutcast_dev_id );
+
+	//Movie-Player
+	configfile.setInt32( "movieplayer_repeat_on", g_settings.movieplayer_repeat_on );
 
 	//Filebrowser
 	configfile.setInt32("filebrowser_showrights", g_settings.filebrowser_showrights);
@@ -4463,6 +4469,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.mpkey_bookmark = tconfig.getInt32( "mpkey.bookmark", CRCInput::RC_blue );
 	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", CRCInput::RC_red );
 	g_settings.mpkey_next3dmode = tconfig.getInt32( "mpkey.next3dmode", CRCInput::RC_nokey );
+	g_settings.mpkey_next_repeat_mode = tconfig.getInt32( "mpkey.next_repeat_mode", CRCInput::RC_playmode );
 	g_settings.mpkey_vtxt = tconfig.getInt32( "mpkey.vtxt", CRCInput::RC_text );
 	g_settings.mpkey_goto = tconfig.getInt32( "mpkey.goto", CRCInput::RC_nokey );
 
@@ -4555,6 +4562,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "mpkey.bookmark", g_settings.mpkey_bookmark );
 	tconfig.setInt32( "mpkey.plugin", g_settings.mpkey_plugin );
 	tconfig.setInt32( "mpkey.next3dmode", g_settings.mpkey_next3dmode );
+	tconfig.setInt32( "mpkey.next_repeat_mode", g_settings.mpkey_next_repeat_mode );
 	tconfig.setInt32( "mpkey.vtxt", g_settings.mpkey_vtxt );
 	tconfig.setInt32( "mpkey.goto", g_settings.mpkey_goto );
 	tconfig.setInt32( "mpkey.subtitle", g_settings.mpkey_subtitle );

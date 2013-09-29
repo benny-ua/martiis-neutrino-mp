@@ -65,6 +65,8 @@ class CMoviePlayerGui : public CMenuTarget
 		    REW         =  6
 		};
 
+	enum repeat_mode_enum { REPEAT_OFF = 0, REPEAT_TRACK = 1, REPEAT_ALL = 2 };
+
  private:
 	CFrameBuffer * frameBuffer;
 	int            m_LastMode;	
@@ -113,6 +115,8 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string currentttxsub;
 
 	bool probePids;
+	
+	repeat_mode_enum repeat_mode;
 
 #if 0
 	/* subtitles vars */
@@ -141,6 +145,8 @@ class CMoviePlayerGui : public CMenuTarget
 	bool is_file_player;
 	CFileBrowser * filebrowser;
 	CFileFilter tsfilefilter;
+	CFileList filelist;
+	CFileList::iterator filelist_it;
 	std::string Path_local;
 	int menu_ret;
 
