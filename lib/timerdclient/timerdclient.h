@@ -153,6 +153,7 @@ class CTimerdClient:private CBasicClient
 			eventInfo.epgID = epgID;
 			eventInfo.epg_starttime = epg_starttime;
 			eventInfo.apids = apids;
+			eventInfo.recordingSafety = false;
 			return addTimerEvent(CTimerd::TIMER_ZAPTO, &eventInfo, announcetime, alarmtime, stoptime);
 		};
 
