@@ -102,7 +102,6 @@ CMoviePlayerGui::~CMoviePlayerGui()
 	delete filebrowser;
 	delete bookmarkmanager;
 	delete webtv;
-	filelist.clear();
 	instance_mp = NULL;
 }
 
