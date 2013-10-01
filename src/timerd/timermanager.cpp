@@ -64,6 +64,7 @@ void CTimerManager::Init(void)
 	m_saveEvents = false;
 	m_isTimeSet = false;
 	timer_is_rec = false;
+	wakeup = NULL;
 	shutdown_eventID = -1;
 	loadRecordingSafety();
 
