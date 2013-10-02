@@ -113,9 +113,9 @@ void CBouquetList::deleteBouquet(CBouquet*bouquet)
 	}
 }
 
-int CBouquetList::getActiveBouquetNumber()
+t_bouquet_id CBouquetList::getActiveBouquetNumber()
 {
-	return selected;
+	return (t_bouquet_id)selected;
 }
 
 #if 0

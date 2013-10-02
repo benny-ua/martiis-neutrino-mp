@@ -100,7 +100,7 @@ void CComponentsPIP::paint(bool do_save_bg)
 #endif
 	}
 	else{ //paint an alternate image if no tv mode available
-		CComponentsPicture pic = CComponentsPicture (pig_x, pig_y, pig_w, pig_h, pic_name, CC_ALIGN_LEFT);
+		CComponentsPicture pic = CComponentsPicture (pig_x, pig_y, pig_w, pig_h, pic_name, CC_ALIGN_HOR_CENTER | CC_ALIGN_VER_CENTER);
 		pic.paint(CC_SAVE_SCREEN_NO);
 	}
 	
