@@ -46,6 +46,11 @@ libneutrino_driver_a_SOURCES += \
 	nglcd.cpp
 endif
 
+if ENABLE_SHAIRPLAY
+libneutrino_driver_a_SOURCES += \
+	shairplay.cpp
+endif
+
 if BOXTYPE_COOL
 libneutrino_driver_a_SOURCES += \
 	vfd.cpp

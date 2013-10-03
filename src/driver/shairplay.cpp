@@ -46,7 +46,7 @@
  *  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <gui/shairplay.h>
+#include <driver/shairplay.h>
 #include <math.h>
 #include <linux/dvb/audio.h>
 #include <global.h>

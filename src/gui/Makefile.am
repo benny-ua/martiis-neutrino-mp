@@ -131,7 +131,6 @@ endif
 
 if ENABLE_SHAIRPLAY
 libneutrino_gui_a_SOURCES += \
-	shairplay.cpp \
 	shairplay_setup.cpp
 endif
 

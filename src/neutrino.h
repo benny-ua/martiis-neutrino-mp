@@ -55,7 +55,7 @@
 #include <gui/3dsetup.h>
 #endif
 #if ENABLE_SHAIRPLAY
-#include <gui/shairplay.h>
+#include <driver/shairplay.h>
 #endif
 
 #include <string>

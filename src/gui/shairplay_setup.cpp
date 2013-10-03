@@ -52,13 +52,7 @@ int CShairPlaySetup::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 
 void CShairPlaySetup::Show()
 {
-	CMenuWidget m(LOCALE_SHAIRPLAY_HEAD, NEUTRINO_ICON_AUDIO, width);
-	m.setSelected(selected);
-	m.addItem(GenericMenuSeparator);
-	m.addItem(GenericMenuBack);
-	m.addItem(GenericMenuSeparatorLine);
 	int shortcut = 1;
-
 	bool shairplay_enabled_old = g_settings.shairplay_enabled;
 	int shairplay_port_old = g_settings.shairplay_port;
 	int shairplay_bufsize_old = g_settings.shairplay_bufsize;
@@ -70,6 +64,9 @@ void CShairPlaySetup::Show()
 	CStringInputSMS si_password(LOCALE_SHAIRPLAY_PASSWORD, &g_settings.shairplay_password, 20,
 		NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 -_/()<>=+.,:!?\\'");
 
+	CMenuWidget m(LOCALE_SHAIRPLAY_HEAD, NEUTRINO_ICON_AUDIO, width);
+	m.addIntroItems(NONEXISTANT_LOCALE);
+	m.setSelected(selected);
 	m.addItem(new CMenuOptionChooser(LOCALE_SHAIRPLAY_ENABLE, &g_settings.shairplay_enabled,
 				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, NULL,
 				CRCInput::convertDigitToKey(shortcut++)));
@@ -93,7 +90,9 @@ void CShairPlaySetup::Show()
 	if (shairplay_enabled_old != g_settings.shairplay_enabled) {
 		CNeutrinoApp::getInstance()->shairplay_enabled_cur = g_settings.shairplay_enabled;
 		if (g_settings.shairplay_enabled)
-				CNeutrinoApp::getInstance()->shairPlay = new CShairPlay(&CNeutrinoApp::getInstance()->shairplay_enabled_cur, &CNeutrinoApp::getInstance()->shairplay_active);
+				CNeutrinoApp::getInstance()->shairPlay =
+					new CShairPlay(&CNeutrinoApp::getInstance()->shairplay_enabled_cur,
+								   &CNeutrinoApp::getInstance()->shairplay_active);
 		else {
 			delete CNeutrinoApp::getInstance()->shairPlay;
 			CNeutrinoApp::getInstance()->shairPlay = NULL;
