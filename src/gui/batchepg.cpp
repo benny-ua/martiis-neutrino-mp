@@ -371,8 +371,7 @@ const CMenuOptionChooser::keyval ONOFF_OPTIONS[ONOFF_OPTION_COUNT] = {
 void CBatchEPG_Menu::Settings()
 {
 	CMenuWidget* menu = new CMenuWidget(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS, "settings");
-	menu->addItem(GenericMenuSeparator);
-	menu->addItem(GenericMenuBack);
+	menu->addIntroItems(NONEXISTANT_LOCALE);
 	menu->addItem(new CMenuForwarder(LOCALE_BATCHEPG_SAVE, true, NULL, this,
 		"save", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
 
