@@ -596,7 +596,7 @@ bool CFlashExpert::checkSize(int mtd, std::string &backupFile)
 	backupMaxSize = (backupMaxSize - ((backupMaxSize * res) / 100)) / 1024;
 	if (backupMaxSize < backupRequiredSize) {
 		snprintf(errMsg, sizeof(errMsg)-1, g_Locale->getText(LOCALE_FLASHUPDATE_READ_NO_AVAILABLE_SPACE), path.c_str(), backupMaxSize, backupRequiredSize);
-		ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, errMsg);
+		ShowHint(LOCALE_MESSAGEBOX_ERROR, errMsg);
 		return false;
 	}
 
@@ -681,8 +681,8 @@ void CFlashExpert::readmtd(int preadmtd)
 	netGetHostname(hostName);
 	std::string timeStr  = getNowTimeStr("_%Y%m%d_%H%M");
 
-#if ENABLE_EXTUPDATE
 	std::string tankStr  = "";
+#if ENABLE_EXTUPDATE
 #ifdef BOXMODEL_APOLLO
 	int eSize = CMTDInfo::getInstance()->getMTDEraseSize(CMTDInfo::getInstance()->findMTDsystem());
 	if (preadmtd == 0) {
