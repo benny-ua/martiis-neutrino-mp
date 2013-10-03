@@ -395,15 +395,11 @@ void CDBoxInfoWidget::paint()
 						m[DBINFO_RAM][DBINFO_TOTAL] += v;
 					else if (!strcasecmp(a, "MemFree"))
 						m[DBINFO_RAM][DBINFO_FREE] += v;
-					else if (!strcasecmp(a, "Buffers"))
-						m[DBINFO_RAM][DBINFO_FREE] += v;
-					else if (!strcasecmp(a, "Cached"))
+					else if (!strcasecmp(a, "Inactive"))
 						m[DBINFO_RAM][DBINFO_FREE] += v;
 					else if (!strcasecmp(a, "SwapTotal"))
-						m[DBINFO_SWAP][DBINFO_TOTAL] += v;
+						m[DBINFO_SWAP][DBINFO_TOTAL] = v;
 					else if (!strcasecmp(a, "SwapFree"))
-						m[DBINFO_SWAP][DBINFO_FREE] += v;
-					else if (!strcasecmp(a, "SwapCached"))
 						m[DBINFO_SWAP][DBINFO_FREE] += v;
 				}
 			fclose(procmeminfo);
