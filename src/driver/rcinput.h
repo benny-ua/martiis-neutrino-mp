@@ -239,22 +239,13 @@ class CRCInput
 			RC_pos		= KEY_MOVE,
 			RC_sleep	= KEY_SLEEP,
 
-			RC_power_on	= KEY_POWERON,
-			RC_power_off	= KEY_POWEROFF,
-			RC_standby_on	= KEY_STANDBYON,
-			RC_standby_off	= KEY_STANDBYOFF,
-			RC_mute_on	= KEY_MUTEON,
-			RC_mute_off	= KEY_MUTEOFF,
-			RC_analog_on	= KEY_ANALOGON,
-			RC_analog_off	= KEY_ANALOGOFF,
-
 			/* tripledragon keys */
 			RC_eject	= KEY_EJECTCD,
 			RC_aux		= KEY_AUX,          /* 0x186 */
 			RC_timer	= KEY_TIME,
-			RC_tttv		= KEY_TTTV,
-			RC_ttzoom	= KEY_TTZOOM,
-			RC_ttreveal	= KEY_REVEAL,
+			RC_tttv		= KEY_FN_1,
+			RC_ttzoom	= KEY_FN_2,
+			RC_ttreveal	= KEY_FN_D,
 			RC_zoomin	= KEY_ZOOMIN,
 			RC_zoomout	= KEY_ZOOMOUT,
 
@@ -274,6 +265,15 @@ class CRCInput
 			RC_prog2	= KEY_PROG2,
 			RC_prog3	= KEY_PROG3,
 			RC_prog4	= KEY_PROG4,
+
+			RC_power_on	= KEY_POWERON,
+			RC_power_off	= KEY_POWEROFF,
+			RC_standby_on	= KEY_STANDBYON,
+			RC_standby_off	= KEY_STANDBYOFF,
+			RC_mute_on	= KEY_MUTEON,
+			RC_mute_off	= KEY_MUTEOFF,
+			RC_analog_on	= KEY_ANALOGON,
+			RC_analog_off	= KEY_ANALOGOFF,
 
 			RC_timeout	= 0xFFFFFFFF,
 			RC_nokey	= 0xFFFFFFFE
