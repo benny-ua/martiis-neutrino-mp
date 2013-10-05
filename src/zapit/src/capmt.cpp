@@ -218,14 +218,17 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 			source = DEMUX_SOURCE_0;
 			demux = LIVE_DEMUX;
 #else
+		case STREAM:
 			source = cDemux::GetSource(0);
-			demux = cDemux::GetSource(0);
+			demux = source;
 			INFO("PLAY: fe_num %d dmx_src %d", CFEManager::getInstance()->allocateFE(channel)->getNumber(), cDemux::GetSource(0));
 #endif
 			break;
+#if HAVE_COOL_HARDWARE
 		case STREAM:
+#endif
 		case RECORD:
-#if HAVE_SPARK_HARDWARE // experimental, untested
+#if HAVE_SPARK_HARDWARE
 			channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber());
 #endif
 			INFO("RECORD/STREAM(%d): fe_num %d rec_dmx %d", mode, CFEManager::getInstance()->allocateFE(channel)->getNumber(), channel->getRecordDemux());
