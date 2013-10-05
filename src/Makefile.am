@@ -48,6 +48,8 @@ bin_PROGRAMS = neutrino rcsim
 
 neutrino_SOURCES = neutrino_menue.cpp neutrino.cpp
 
+rcsim_SOURCES = rcsim.c rcsim.h
+
 AM_CPPFLAGS =
 
 if ENABLE_FLAC
@@ -146,9 +148,6 @@ bin_PROGRAMS += drivertool
 drivertool_SOURCES = drivertool.c
 bin_PROGRAMS += dt
 dt_SOURCES = dt.c
-bin_PROGRAMS += rcsim
-rcsim_SOURCES = rcsim.c rcsim.h
-
 endif
 
 if USE_STB_HAL
