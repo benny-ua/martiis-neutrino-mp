@@ -610,6 +610,7 @@ void CMovieBrowser::initGlobalSettings(void)
 	m_settings.ts_only = 0;
 	m_settings.ts_probe = 0;
 	m_settings.ytmode = cYTFeedParser::MOST_POPULAR;
+	m_settings.ytorderby = cYTFeedParser::ORDERBY_PUBLISHED;
 	m_settings.ytresults = 10;
 	m_settings.ytregion = "default";
 	m_settings.ytquality = 37;
@@ -773,6 +774,7 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 		settings->browserRowWidth[i] = configfile.getInt32("mb_browserRowWidth_" + to_string(i), 50);
 	}
 	settings->ytmode = configfile.getInt32("mb_ytmode", cYTFeedParser::MOST_POPULAR);
+	settings->ytorderby = configfile.getInt32("mb_ytorderby", cYTFeedParser::ORDERBY_PUBLISHED);
 	settings->ytresults = configfile.getInt32("mb_ytresults", 10);
 	settings->ytquality = configfile.getInt32("mb_ytquality", 22); // itag value (MP4, 720p)
 	settings->ytconcconn = configfile.getInt32("mb_ytconcconn", 4); // concurrent connections
@@ -837,6 +839,7 @@ bool CMovieBrowser::saveSettings(MB_SETTINGS* settings)
 		configfile.setInt32("mb_browserRowWidth_" + to_string(i), settings->browserRowWidth[i]);
 	}
 	configfile.setInt32("mb_ytmode", settings->ytmode);
+	configfile.setInt32("mb_ytorderby", settings->ytorderby);
 	configfile.setInt32("mb_ytresults", settings->ytresults);
 	configfile.setInt32("mb_ytquality", settings->ytquality);
 	configfile.setInt32("mb_ytconcconn", settings->ytconcconn);
@@ -3703,7 +3706,7 @@ void CMovieBrowser::loadYTitles(int mode, std::string search, std::string id)
 	ytparser.SetConcurrentDownloads(m_settings.ytconcconn);
 
 	if (!ytparser.Parsed() || (ytparser.GetFeedMode() != mode)) {
-		if (ytparser.ParseFeed((cYTFeedParser::yt_feed_mode_t)mode, search, id)) {
+		if (ytparser.ParseFeed((cYTFeedParser::yt_feed_mode_t)mode, search, id, (cYTFeedParser::yt_feed_orderby_t)m_settings.ytorderby)) {
 			ytparser.DownloadThumbnails();
 		} else {
 			//FIXME show error
@@ -3752,6 +3755,16 @@ const CMenuOptionChooser::keyval YT_FEED_OPTIONS[] =
 };
 
 #define YT_FEED_OPTION_COUNT (sizeof(YT_FEED_OPTIONS)/sizeof(CMenuOptionChooser::keyval))
+
+const CMenuOptionChooser::keyval YT_ORDERBY_OPTIONS[] =
+{
+        { cYTFeedParser::ORDERBY_PUBLISHED, LOCALE_MOVIEBROWSER_YT_ORDERBY_PUBLISHED },
+        { cYTFeedParser::ORDERBY_RELEVANCE, LOCALE_MOVIEBROWSER_YT_ORDERBY_RELEVANCE },
+        { cYTFeedParser::ORDERBY_VIEWCOUNT, LOCALE_MOVIEBROWSER_YT_ORDERBY_VIEWCOUNT },
+        { cYTFeedParser::ORDERBY_RATING, LOCALE_MOVIEBROWSER_YT_ORDERBY_RATING },
+};
+
+#define YT_ORDERBY_OPTION_COUNT (sizeof(YT_ORDERBY_OPTIONS)/sizeof(CMenuOptionChooser::keyval))
 
 neutrino_locale_t CMovieBrowser::getFeedLocale(void)
 {
@@ -3976,6 +3989,7 @@ bool CMovieBrowser::showYTMenu()
 	std::string search = m_settings.ytsearch;
 	CStringInputSMS stringInput(LOCALE_MOVIEBROWSER_YT_SEARCH, &search, 20, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789 -_/()<>=+.,:!?\\'");
 	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_YT_SEARCH, true, search, &stringInput, NULL, CRCInput::RC_nokey, ""));
+	mainMenu.addItem(new CMenuOptionChooser(LOCALE_MOVIEBROWSER_YT_ORDERBY, &m_settings.ytorderby, YT_ORDERBY_OPTIONS, YT_ORDERBY_OPTION_COUNT, true, NULL, CRCInput::RC_nokey, "", true));
 	sprintf(cnt, "%d", cYTFeedParser::SEARCH);
 	mainMenu.addItem(new CMenuForwarder(LOCALE_EVENTFINDER_START_SEARCH, true, NULL, selector, cnt, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 
