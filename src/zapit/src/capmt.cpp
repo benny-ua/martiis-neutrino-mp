@@ -212,6 +212,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 	}
 
 	/* FIXME until proper demux management */
+	CFrontend *frontend = NULL;
 	switch(mode) {
 		case PLAY:
 #if HAVE_COOL_HARDWARE
@@ -220,15 +221,17 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 #else
 			source = cDemux::GetSource(0);
 			demux = cDemux::GetSource(0);
-			INFO("PLAY: fe_num %d dmx_src %d", CFEManager::getInstance()->allocateFE(channel)->getNumber(), cDemux::GetSource(0));
+			frontend = CFEManager::getInstance()->getFrontend(channel);
+			INFO("PLAY: fe_num %d dmx_src %d", frontend ? frontend->getNumber() : -1, cDemux::GetSource(0));
 #endif
 			break;
 		case STREAM:
 		case RECORD:
-#if HAVE_SPARK_HARDWARE // experimental, untested
+#if 0 // HAVE_SPARK_HARDWARE // experimental, untested
 			channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber());
 #endif
-			INFO("RECORD/STREAM(%d): fe_num %d rec_dmx %d", mode, CFEManager::getInstance()->allocateFE(channel)->getNumber(), channel->getRecordDemux());
+			frontend = CFEManager::getInstance()->getFrontend(channel);
+			INFO("RECORD/STREAM(%d): fe_num %d rec_dmx %d", mode, frontend ? frontend->getNumber() : -1, channel->getRecordDemux());
 			source = channel->getRecordDemux();
 			demux = channel->getRecordDemux();
 			break;
