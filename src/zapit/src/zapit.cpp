@@ -101,7 +101,7 @@ extern cDemux *videoDemux;
 
 #ifdef ENABLE_PIP
 extern cVideo *pipDecoder;
-extern cDemux *pipDemux;
+cDemux *pipDemux;
 #endif
 
 cDemux *pcrDemux = NULL;
