@@ -395,6 +395,7 @@ void CFEManager::linkFrontends(bool init)
 	INFO("linking..");
 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	enabled_count = 0;
+	have_sat = have_cable = have_terr = false;
 	unused_demux = 0;
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
 		CFrontend * fe = it->second;
@@ -447,10 +448,21 @@ void CFEManager::linkFrontends(bool init)
 		}
 		if (init && femode != CFrontend::FE_MODE_UNUSED)
 			fe->Init();
-		if (femode != CFrontend::FE_MODE_UNUSED) {
+		if (femode != CFrontend::FE_MODE_UNUSED)
+		{
 			enabled_count++;
-		} else if (!unused_demux) {
-			unused_demux = fe->fenumber + 1;
+			if (fe->isSat())
+				have_sat = true;
+			else if (fe->isCable())
+				have_cable = true;
+			else if (fe->isTerr())
+				have_terr = true;
+		}
+		else {	/* unused -> no need to keep open */
+			fe->Close();
+			if (!unused_demux) {
+				unused_demux = fe->fenumber + 1;
+			}
 		}
 	}
 }
@@ -729,12 +741,12 @@ CFrontend * CFEManager::getScanFrontend(t_satellite_position satellitePosition)
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
 		CFrontend * mfe = it->second;
 		if (mfe->isCable()) {
-			if ((satellitePosition & 0xF00) == 0xF00) {
+			if ((mfe->getMode() != CFrontend::FE_MODE_UNUSED) && ((satellitePosition & 0xF00) == 0xF00)) {
 				frontend = mfe;
 				break;
 			}
 		} else if (mfe->isTerr()) {
-			if ((satellitePosition & 0xF00) == 0xE00) {
+			if ((mfe->getMode() != CFrontend::FE_MODE_UNUSED) && (satellitePosition & 0xF00) == 0xE00) {
 				frontend = mfe;
 				break;
 			}
