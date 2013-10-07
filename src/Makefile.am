@@ -39,7 +39,7 @@ SUBDIRS += lcddisplay
 endif
 
 if USE_TREMOR
-VORBISLIBS = @VORBISIDEC_LIBS@ -logg
+VORBISLIBS = @VORBISIDEC_LIBS@
 else
 VORBISLIBS = -lvorbisfile -lvorbis -logg
 endif

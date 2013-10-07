@@ -692,7 +692,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	// default plugin for movieplayer
 	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "Teletext" );
 	g_settings.onekey_plugin = configfile.getString( "onekey_plugin", "noplugin" );
-	g_settings.plugin_hdd_dir = configfile.getString( "plugin_hdd_dir", "/hdd/tuxbox/plugins" );
+	g_settings.plugin_hdd_dir = configfile.getString( "plugin_hdd_dir", "/media/sda1/plugins" );
 
 	g_settings.plugins_disabled = configfile.getString( "plugins_disabled", "" );
 	g_settings.plugins_game = configfile.getString( "plugins_game", "" );
@@ -2842,6 +2842,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 _show:
 			int nNewChannel = -1;
 			int old_b = bouquetList->getActiveBouquetNumber();
+			t_channel_id old_id = bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->getActiveChannel_ChannelID();
 			//int old_mode = g_settings.channel_mode;
 			int old_mode = GetChannelMode();
 			printf("************************* ZAP START: bouquetList %p size %d old_b %d\n", bouquetList, (int)bouquetList->Bouquets.size(), old_b);fflush(stdout);
@@ -2884,7 +2885,6 @@ _repeat:
 					bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->setSelected(old_num);
 #endif
 				if(!bouquetList->Bouquets.empty()) {
-					t_channel_id old_id = bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->getActiveChannel_ChannelID();
 					bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->adjustToChannelID(old_id, false);
 				}
 				StartSubtitles(mode == mode_tv);

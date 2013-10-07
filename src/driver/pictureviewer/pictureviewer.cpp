@@ -660,10 +660,9 @@ void CPictureViewer::getSize(const char* name, int* width, int *height)
 	}
 }
 
-#define LOGO_DIR1 DATADIR "/neutrino/icons/logo"
-#define LOGO_FMT ".jpg"
+#define LOGO_FLASH_DIR DATADIR "/neutrino/icons/logo"
 
-bool CPictureViewer::GetLogoName(uint64_t channel_id, std::string ChannelName, std::string & name, int *width, int *height)
+bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& ChannelName, std::string & name, int *width, int *height)
 {
 	char strChanId[16];
 
@@ -759,7 +758,7 @@ found:
 	pthread_mutex_unlock(&logo_map_mutex);
 	return true;
 }
-
+#if 0
 bool CPictureViewer::DisplayLogo (uint64_t channel_id, int posx, int posy, int width, int height)
 {
 	char fname[255];
@@ -784,7 +783,7 @@ bool CPictureViewer::DisplayLogo (uint64_t channel_id, int posx, int posy, int w
 	}
 	return ret;
 }
-
+#endif
 void CPictureViewer::rescaleImageDimensions(int *width, int *height, const int max_width, const int max_height, bool upscale)
 {
 	float aspect;
