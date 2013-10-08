@@ -1692,7 +1692,7 @@ void CControlAPI::SendAllCurrentVAPid(CyhookHandler *hh)
 						{
 							cstrncpy( pids.APIDs[j].desc, _getISO639Description( pids.APIDs[j].desc ),sizeof(pids.APIDs[j].desc));
 						}
-						hh->printf("%05u %s %s\n",pids.APIDs[j].pid,pids.APIDs[j].desc,pids.APIDs[j].is_ac3 ? " (AC3)": " ");
+						hh->printf("%05u %s %s\n",pids.APIDs[j].pid,pids.APIDs[j].desc,pids.APIDs[j].is_ac3 ? " (AC3)": pids.APIDs[j].desc,pids.APIDs[j].is_aac ? "(AAC)" : pids.APIDs[j].desc,pids.APIDs[j].is_eac3 ? "(EAC3)" : " ");
 					}
 					eit_not_ok=false;
 					break;
@@ -1709,7 +1709,7 @@ void CControlAPI::SendAllCurrentVAPid(CyhookHandler *hh)
 			{
 				cstrncpy( pids.APIDs[i].desc, _getISO639Description( pids.APIDs[i].desc ),sizeof(pids.APIDs[i].desc) );
 			}
-			hh->printf("%05u %s %s\n",it->pid,pids.APIDs[i].desc,pids.APIDs[i].is_ac3 ? " (AC3)": " ");
+			hh->printf("%05u %s %s\n",it->pid,pids.APIDs[i].desc,pids.APIDs[i].is_ac3 ? " (AC3)": pids.APIDs[i].desc,pids.APIDs[i].is_aac ? "(AAC)" : pids.APIDs[i].desc,pids.APIDs[i].is_eac3 ? "(EAC3)" : " ");
 			i++;
 		}
 	}
