@@ -3871,7 +3871,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		nGLCD::StandbyMode(false);
 #endif
 #if HAVE_SPARK_HARDWARE
-		if (timer_wakeup) {
+		if (!timer_wakeup) {
 			CCECSetup cecsetup;
 			cecsetup.setCECSettings(true);
 		}
