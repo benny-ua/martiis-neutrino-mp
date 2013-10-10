@@ -65,9 +65,7 @@
 
 /*static*/ bool reader_ready = true;
 static unsigned int max_events;
-#if 0
 static bool notify_complete = false;
-#endif
 
 /* period to remove old events */
 #define HOUSEKEEPING_SLEEP (5 * 60) // sleep 5 minutes
@@ -1754,14 +1752,14 @@ void CEitThread::beforeSleep()
 	writeLockMessaging();
 	messaging_zap_detected = false;
 	unlockMessaging();
-	eventServer->sendEvent(CSectionsdClient::EVT_EIT_COMPLETE,
-			CEventServer::INITID_SECTIONSD,
-			&current_service,
-			sizeof(messaging_current_servicekey));
-#if 0
-	if(notify_complete)
+	if (scanning) {
+		eventServer->sendEvent(CSectionsdClient::EVT_EIT_COMPLETE,
+				CEventServer::INITID_SECTIONSD,
+				&current_service,
+				sizeof(messaging_current_servicekey));
+	}
+	if(notify_complete && !access(CONFIGDIR "/epgdone.sh", X_OK))
 		system(CONFIGDIR "/epgdone.sh");
-#endif
 }
 
 /********************************************************************************/

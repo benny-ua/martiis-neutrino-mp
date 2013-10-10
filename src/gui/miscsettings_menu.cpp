@@ -407,11 +407,8 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_SAVE, &g_settings.epg_save, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true,miscEpgNotifier);
 	mc->setHint("", LOCALE_MENU_HINT_EPG_SAVE);
 
-	CMenuOptionChooser * mc2 = NULL;
-	if (CFEManager::getInstance()->getEnabledCount() > 1) {
-		mc2 = new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_SCAN, &g_settings.epg_scan, EPG_SCAN_OPTIONS, EPG_SCAN_OPTION_COUNT, true);
-		mc2->setHint("", LOCALE_MENU_HINT_EPG_SCAN);
-	}
+	CMenuOptionChooser * mc2 = new CMenuOptionChooser(LOCALE_MISCSETTINGS_EPG_SCAN, &g_settings.epg_scan, EPG_SCAN_OPTIONS, EPG_SCAN_OPTION_COUNT, true);
+	mc2->setHint("", LOCALE_MENU_HINT_EPG_SCAN);
 
 	ms_epg->addItem(mc);
 	ms_epg->addItem(mc1);
@@ -420,8 +417,7 @@ void CMiscMenue::showMiscSettingsMenuEpg(CMenuWidget *ms_epg)
 	ms_epg->addItem(mf2);
 	ms_epg->addItem(mf3);
 	ms_epg->addItem(mf4);
-	if (mc2)
-		ms_epg->addItem(mc2);
+	ms_epg->addItem(mc2);
 
 	ms_epg->addItem(new CMenuForwarder(LOCALE_MISCSETTINGS_EPG_BATCH_SETTINGS ,true, NULL, CNeutrinoApp::getInstance()->batchEPGSettings));
 }

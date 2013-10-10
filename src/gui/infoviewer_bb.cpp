@@ -644,9 +644,9 @@ void CInfoViewerBB::showSysfsHdd()
 	if (g_settings.infobar_show_sysfs_hdd) {
 		//sysFS info
 		int percent = 0;
-		long t, u;
+		uint64_t t, u;
 		if (get_fs_usage("/", t, u))
-			percent = (u * 100ULL) / t;
+			percent = (int)((u * 100ULL) / t);
 		showBarSys(percent);
 
 		if (check_dir(g_settings.network_nfs_recordingdir.c_str()) == 0)
@@ -659,9 +659,9 @@ void CInfoViewerBB::showSysfsHdd()
 void* CInfoViewerBB::hddperThread(void *arg)
 {
 	CInfoViewerBB *infoViewerBB = (CInfoViewerBB*) arg;
-	long t, u;
+	uint64_t t, u;
 	if (get_fs_usage(g_settings.network_nfs_recordingdir.c_str(), t, u))
-		infoViewerBB->hddpercent = (u * 100ULL) / t;
+		infoViewerBB->hddpercent = (int)((u * 100ULL) / t);
 	else
 		infoViewerBB->hddpercent = 0;
 	infoViewerBB->hddperTflag=false;

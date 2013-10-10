@@ -150,7 +150,8 @@ class CZapitMessages
 			CMD_GET_MODE43			   = 109,
 			CMD_SET_MODE43			   = 110,
 			CMD_STOP_PIP			   = 111,
-			CMD_LOCKRC			   = 112
+			CMD_ZAPTO_EPG			   = 112,
+			CMD_LOCKRC			   = 113,
 		};
 
 	struct commandBoolean
@@ -192,6 +193,11 @@ class CZapitMessages
 		bool pip;
 		bool epg;
 		commandZaptoServiceID():channel_id(0),record(false),pip(false),epg(false){}
+	};
+	struct commandZaptoEpg
+	{
+		t_channel_id channel_id;
+		bool standby;
 	};
 
 	struct commandSetAudioChannel

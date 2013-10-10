@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 
@@ -39,7 +40,7 @@ off_t file_size(const char *filename);
 bool file_exists(const char *filename);
 void wakeup_hdd(const char *hdd_dir);
 int check_dir(const char * dir, bool allow_tmp = false);
-bool get_fs_usage(const char * dir, long &total, long &used, long *bsize=NULL);
+bool get_fs_usage(const char * dir, uint64_t &btotal, uint64_t &bused, long *bsize=NULL);
 bool get_mem_usage(unsigned long &total, unsigned long &free);
 
 std::string getPathName(std::string &path);
@@ -51,6 +52,11 @@ std::string trim(std::string &str, const std::string &trimChars = " \n\r\t");
 
 class CFileHelpers
 {
+	private:
+		unsigned long FileBufSize;
+		char *FileBuf;
+		int fd1, fd2;
+
 	public:
 		CFileHelpers();
 		~CFileHelpers();
