@@ -700,6 +700,7 @@ struct SNeutrinoSettings
 	int filebrowser_denydirectoryleave;
 	int filebrowser_use_filter;
 	int filebrowser_multi_select;
+	int filebrowser_multi_select_confirm_dir;
 
 	//movieplayer
 	int   movieplayer_repeat_on;
