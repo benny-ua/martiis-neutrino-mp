@@ -83,6 +83,7 @@ struct SNeutrinoSettings
 	int shutdown_real_rcdelay;
 	std::string shutdown_count; // FIXME
 	std::string shutdown_min; // FIXME
+	int sleeptimer_min;
 	std::string record_safety_time_before; // FIXME
 	std::string record_safety_time_after; // FIXME
 	int zapto_pre_time;

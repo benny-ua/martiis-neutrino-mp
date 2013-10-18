@@ -457,8 +457,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.shutdown_count = configfile.getString("shutdown_count","0");
 
 	g_settings.shutdown_min = "000";
-	if (can_deepstandby || cs_get_revision() == 1)
+	if (can_deepstandby || cs_get_revision() == 1 || cs_get_revision() > 7)
 		g_settings.shutdown_min = configfile.getString("shutdown_min","000");
+	g_settings.sleeptimer_min = configfile.getInt32("sleeptimer_min", 0);
 
 	g_settings.infobar_sat_display   = configfile.getBool("infobar_sat_display"  , true );
 	g_settings.infobar_show_channeldesc   = configfile.getBool("infobar_show_channeldesc"  , false );
@@ -1042,6 +1043,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("shutdown_real_rcdelay", g_settings.shutdown_real_rcdelay);
 	configfile.setString("shutdown_count"           , g_settings.shutdown_count);
 	configfile.setString("shutdown_min"  , g_settings.shutdown_min  );
+	configfile.setInt32("sleeptimer_min", g_settings.sleeptimer_min);
 	configfile.setBool("infobar_sat_display"  , g_settings.infobar_sat_display  );
 	configfile.setBool("infobar_show_channeldesc"  , g_settings.infobar_show_channeldesc  );
 	configfile.setInt32("infobar_subchan_disp_pos"  , g_settings.infobar_subchan_disp_pos  );
@@ -2785,7 +2787,6 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 		/* update scan settings for manual scan to current channel */
 		CScanSetup::getInstance()->updateManualSettings();
-		CEpgScan::getInstance()->handleMsg(msg, data);
 	}
 	if ((msg == NeutrinoMessages::EVT_TIMER)) {
 		if(data == scrambled_timer) {
@@ -2820,10 +2821,12 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		res = res | channelList->handleMsg(msg, data);
 	// else fprintf(stderr, "channelList = NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	res = res | CRecordManager::getInstance()->handleMsg(msg, data);
+	res = res | CEpgScan::getInstance()->handleMsg(msg, data);
 
 	if( res != messages_return::unhandled ) {
-		if( ( msg>= CRCInput::RC_WithData ) && ( msg< CRCInput::RC_WithData+ 0x10000000 ) )
+		if( ( msg>= CRCInput::RC_WithData ) && ( msg< CRCInput::RC_WithData+ 0x10000000 ) ) {
 			delete[] (unsigned char*) data;
+		}
 		return( res & ~messages_return::unhandled);
 	}
 

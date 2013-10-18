@@ -142,6 +142,7 @@ CZapit::CZapit()
 	current_volume = 100;
 	volume_percent = 0;
 	pip_channel_id = 0;
+	lock_channel_id = 0;
 	pip_fe = NULL;
 }
 
@@ -383,7 +384,7 @@ void CZapit::ConfigFrontend()
 
 void CZapit::SendPMT(bool forupdate)
 {
-	if(!current_channel)
+	if(!current_channel || (!forupdate && playbackStopForced))
 		return;
 
 	CCamManager::getInstance()->Start(current_channel->getChannelID(), CCamManager::PLAY, forupdate);
@@ -558,6 +559,7 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 	current_channel = newchannel;
 
 	live_channel_id = current_channel->getChannelID();
+	lock_channel_id = live_channel_id;
 	SaveSettings(false);
 	srand(time(NULL));
 
@@ -582,7 +584,7 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 	}
 	SendEvent(CZapitClient::EVT_TUNE_COMPLETE, &live_channel_id, sizeof(t_channel_id));
 
-#if 0 // def ENABLE_PIP
+#ifdef ENABLE_PIP
 	if (transponder_change && (live_fe == pip_fe))
 		StopPip();
 #endif
@@ -655,7 +657,9 @@ bool CZapit::StartPip(const t_channel_id channel_id)
 {
 	CZapitChannel* newchannel;
 	bool transponder_change;
-
+	/* do lock if live is running, or in record mode -
+	   this is for the case temporary timeshift is running, it do not lock its frontend */
+	bool need_lock = !playbackStopForced || (currentMode & RECORD_MODE);
 
 	if((newchannel = CServiceManager::getInstance()->FindChannel(channel_id)) == NULL) {
 		INFO("channel_id " PRINTF_CHANNEL_ID_TYPE " not found", channel_id);
@@ -663,14 +667,22 @@ bool CZapit::StartPip(const t_channel_id channel_id)
 	}
 	INFO("[pip] zap to %s (%llx tp %llx)", newchannel->getName().c_str(), newchannel->getChannelID(), newchannel->getTransponderId());
 
-	CFEManager::getInstance()->lockFrontend(live_fe);
+	if (need_lock)
+		CFEManager::getInstance()->lockFrontend(live_fe);
+
 	CFrontend * frontend = CFEManager::getInstance()->allocateFE(newchannel);
-	CFEManager::getInstance()->unlockFrontend(live_fe);
+
+	if (need_lock)
+		CFEManager::getInstance()->unlockFrontend(live_fe);
+
 	if(frontend == NULL) {
 		ERROR("Cannot get frontend\n");
 		return false;
 	}
 	StopPip();
+	if (!need_lock && !SAME_TRANSPONDER(newchannel->getChannelID(), live_channel_id))
+		live_channel_id = newchannel->getChannelID();
+
 	if(!TuneChannel(frontend, newchannel, transponder_change))
 		return false;
 
@@ -1713,6 +1725,7 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 		StopPlayBack(msgBool.truefalse);
 		standby = false;
 		playbackStopForced = true;
+		lock_channel_id = live_channel_id;
 		SendCmdReady(connfd);
 		break;
 	}
@@ -1721,9 +1734,15 @@ bool CZapit::ParseCommand(CBasicMessage::Header &rmsg, int connfd)
 		CZapitMessages::commandBoolean msgBool;
 		CBasicServer::receive_data(connfd, &msgBool, sizeof(msgBool));
 		playbackStopForced = false;
-		StartPlayBack(current_channel);
-		if (msgBool.truefalse)
+		if (lock_channel_id == live_channel_id) {
+			StartPlayBack(current_channel);
 			SendPMT();
+		} else {
+			live_fe->setTsidOnid(0);
+			ZapIt(lock_channel_id);
+			lock_channel_id = 0;
+		}
+
 		SendCmdReady(connfd);
 		break;
 	}

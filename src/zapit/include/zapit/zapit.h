@@ -129,6 +129,7 @@ class CZapit : public OpenThreads::Thread
 		t_channel_id live_channel_id;
 		t_channel_id pip_channel_id;
 		t_channel_id chid; // temporary, but needs to be static
+		t_channel_id lock_channel_id;
 		/* scan params */
 		TP_params TP;
 		fast_scan_type_t scant;
