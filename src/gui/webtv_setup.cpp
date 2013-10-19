@@ -41,9 +41,10 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	int res = menu_return::RETURN_REPAINT;
 
+    if(parent)
+		parent->hide();
+
 	if(actionKey == "select_xml") {
-		if(parent)
-			parent->hide();
 		CFileBrowser fileBrowser;
 		CFileFilter fileFilter;
 		fileFilter.addFilter("xml");
@@ -55,9 +56,6 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 		}
 		return res;
 	}
-
-	if (parent)
-		parent->hide();
 
 	Show();
 

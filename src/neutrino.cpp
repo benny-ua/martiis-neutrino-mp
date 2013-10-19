@@ -4138,6 +4138,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		StopSubtitles();
 		if(g_settings.mode_clock)
 			InfoClock->StopClock();
+		frameBuffer->Clear();
 		CMoviePlayerGui::getInstance().exec(NULL, "webtv");
 		if(g_settings.mode_clock)
 			InfoClock->StartClock();
