@@ -160,8 +160,8 @@ TUXBOX_APPS_DIRECTORY_ONE(ucodedir,UCODEDIR,localstatedir,/var,/tuxbox/ucodes,
 TUXBOX_APPS_DIRECTORY_ONE(themesdir,THEMESDIR,datadir,/share,/tuxbox/neutrino/themes,
 	[--with-themesdir=PATH   ],[where to find the themes (don't change)])
 
-TUXBOX_APPS_DIRECTORY_ONE(iconsdir,ICONSDIR,datadir,/share,/tuxbox/neutrino/icons,
-	[--with-iconsdir=PATH    ],[where to find the icons (don't change)])
+TUXBOX_APPS_DIRECTORY_ONE(iconsdir,ICONSDIR,datadir,/share/tuxbox, /neutrino/icons,
+	[--with-iconsdir=PATH     ],[where to find the icons (don't change)])
 
 TUXBOX_APPS_DIRECTORY_ONE(private_httpddir,PRIVATE_HTTPDDIR,datadir,/share,/tuxbox/neutrino/httpd,
 	[--with-private_httpddir=PATH    ],[where to find the the private httpd files])
