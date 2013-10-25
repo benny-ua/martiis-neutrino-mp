@@ -59,7 +59,7 @@ int CParentalSetup::exec(CMenuTarget* parent, const std::string &/*actionKey*/)
 		parent->hide();
 
 	if (check())
-		showParentalSetup();
+		res = showParentalSetup();
 
 	return res;
 }
@@ -97,7 +97,7 @@ const CMenuOptionChooser::keyval PARENTALLOCK_DEFAULTLOCKED_OPTIONS[PARENTALLOCK
 };
 
 extern bool parentallocked;
-void CParentalSetup::showParentalSetup()
+int CParentalSetup::showParentalSetup()
 {
 	//menue init
 	CMenuWidget* plock = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_LOCK, width, MN_WIDGET_ID_PLOCKSETUP);
@@ -107,6 +107,11 @@ void CParentalSetup::showParentalSetup()
 
 	// intros
 	plock->addIntroItems();
+
+	CPersonalizeGui &p = CNeutrinoApp::getInstance()->getPersonalizeGui();
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PARENTALLOCK_MENU, true, NULL, &p, NULL, CRCInput::RC_red , NEUTRINO_ICON_BUTTON_RED);
+	mf->setHint("", LOCALE_MENU_HINT_PARENTALLOCK_MENU);
+	plock->addItem(mf);
 
 	CMenuOptionChooser * mc;
 	mc = new CMenuOptionChooser(LOCALE_PARENTALLOCK_PROMPT , &g_settings.parentallock_prompt , PARENTALLOCK_PROMPT_OPTIONS, PARENTALLOCK_PROMPT_OPTION_COUNT , !parentallocked);
@@ -121,10 +126,11 @@ void CParentalSetup::showParentalSetup()
 	plock->addItem(new CMenuOptionNumberChooser(LOCALE_PARENTALLOCK_ZAPTIME, (int *)&g_settings.parentallock_zaptime, !parentallocked, 0, 10000));
 
 	CPINChangeWidget pinChangeWidget(LOCALE_PARENTALLOCK_CHANGEPIN, &g_settings.parentallock_pincode, 4, LOCALE_PARENTALLOCK_CHANGEPIN_HINT1);
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PARENTALLOCK_CHANGEPIN, true, NULL, &pinChangeWidget);
+	mf = new CMenuForwarder(LOCALE_PARENTALLOCK_CHANGEPIN, true, NULL, &pinChangeWidget);
 	mf->setHint("", LOCALE_MENU_HINT_PARENTALLOCK_CHANGEPIN);
 	plock->addItem(mf);
 
-	plock->exec(NULL, "");
+	int res = plock->exec(NULL, "");
 	delete plock;
+	return res;
 }

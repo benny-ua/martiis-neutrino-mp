@@ -38,7 +38,7 @@
 #include <string>
 #include <daemonc/remotecontrol.h>
 #include <system/flashtool.h>
-#include <gui/components/cc_item_text.h>
+#include "version.h"
 
 #include "git_version.h"
 #define GIT_DESC "GIT Desc.:"
@@ -354,7 +354,7 @@ void CImageInfo::hide()
 {
 	printf("[CImageInfo]   [%s - %d] hide...\n", __FUNCTION__, __LINE__);
 	if (cc_win){
-		cc_win->hide();
+		cc_win->hideCC();
 		Clean();
 	}
 }

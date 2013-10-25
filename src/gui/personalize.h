@@ -169,6 +169,7 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 		void 	ShowPluginMenu(CMenuWidget* p_widget, std::string da[], int ia[]);
 		void 	ShowPreverredKeySetup(CMenuWidget* p_widget);
 		void 	SaveAndExit();
+		void	ApplySettings();
 		
 		bool	hasPinItems();
 		

@@ -69,7 +69,7 @@ void CAudioMute::AudioMute(int newValue, bool isEvent)
 			if (do_paint_mute_icon)
 			{
 				frameBuffer->fbNoCheck(true);
-				this->hide(true);
+				hideCC(true);
 				frameBuffer->fbNoCheck(false);
 			}
 			frameBuffer->setFbArea(CFrameBuffer::FB_PAINTAREA_MUTEICON1);
@@ -86,7 +86,7 @@ void CAudioMute::AudioMute(int newValue, bool isEvent)
 		}
 		else {
 			if (do_paint_mute_icon)
-				this->hide(true);
+				hideCC(true);
 			frameBuffer->setFbArea(CFrameBuffer::FB_PAINTAREA_MUTEICON1);
 		}
 		frameBuffer->fbNoCheck(false);
@@ -115,7 +115,7 @@ void CAudioMute::enableMuteIcon(bool enable)
 	}
 	else {
 		if (neutrino->isMuted())
-			this->hide(true);
+			hideCC(true);
 		frameBuffer->doPaintMuteIcon(false);
 		do_paint_mute_icon = false;
 	}

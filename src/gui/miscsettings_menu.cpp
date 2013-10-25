@@ -127,6 +127,14 @@ int CMiscMenue::exec(CMenuTarget* parent, const std::string &actionKey)
 		ShowMsg(LOCALE_MESSAGEBOX_INFO, str, CMessageBox::mbrBack, CMessageBox::mbBack);
 		return menu_return::RETURN_REPAINT;
 	}
+	else if(actionKey == "energy")
+	{
+		return showMiscSettingsMenuEnergy();
+	}
+	else if(actionKey == "channellist")
+	{
+		return showMiscSettingsMenuChanlist();
+	}
 
 	return showMiscSettingsMenu();
 }
@@ -226,7 +234,6 @@ const CMenuOptionChooser::keyval_ext SLEEPTIMER_MIN_OPTIONS[SLEEPTIMER_MIN_OPTIO
 int CMiscMenue::showMiscSettingsMenu()
 {
 	//misc settings
-	miscNotifier = NULL; /* for check at exit */
 	fanNotifier = new CFanControlNotifier();
 	sectionsdConfigNotifier = new CSectionsdConfigNotifier();
 	CMenuWidget misc_menue(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP);
@@ -243,9 +250,7 @@ int CMiscMenue::showMiscSettingsMenu()
 	//energy, shutdown
 	if (g_info.hw_caps->can_shutdown)
 	{
-		CMenuWidget *misc_menue_energy = new CMenuWidget(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_ENERGY);
-		showMiscSettingsMenuEnergy(misc_menue_energy);
-		mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_ENERGY, true, NULL, misc_menue_energy, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+		mf = new CMenuForwarder(LOCALE_MISCSETTINGS_ENERGY, true, NULL, this, "energy", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 		mf->setHint("", LOCALE_MENU_HINT_MISC_ENERGY);
 		misc_menue.addItem(mf);
 	}
@@ -281,9 +286,7 @@ int CMiscMenue::showMiscSettingsMenu()
 		misc_menue.addItem(mf);
 	}
 	//channellist
-	CMenuWidget misc_menue_chanlist(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_CHANNELLIST);
-	showMiscSettingsMenuChanlist(&misc_menue_chanlist);
-	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, &misc_menue_chanlist, NULL, CRCInput::RC_2);
+	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, this, "channellist", CRCInput::RC_2);
 	mf->setHint("", LOCALE_MENU_HINT_MISC_CHANNELLIST);
 	misc_menue.addItem(mf);
 
@@ -307,8 +310,6 @@ int CMiscMenue::showMiscSettingsMenu()
 	int res = misc_menue.exec(NULL, "");
 	delete fanNotifier;
 	delete sectionsdConfigNotifier;
-	if (miscNotifier)
-		delete miscNotifier;
 	delete miscEpgNotifier;
 	return res;
 }
@@ -352,8 +353,9 @@ void CMiscMenue::showMiscSettingsMenuGeneral(CMenuWidget *ms_general)
 }
 
 //energy and shutdown settings
-void CMiscMenue::showMiscSettingsMenuEnergy(CMenuWidget *ms_energy)
+int CMiscMenue::showMiscSettingsMenuEnergy()
 {
+	CMenuWidget *ms_energy = new CMenuWidget(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_ENERGY);
 	ms_energy->addIntroItems(LOCALE_MISCSETTINGS_ENERGY);
 
 	CMenuOptionChooser *m1 = new CMenuOptionChooser(LOCALE_MISCSETTINGS_SHUTDOWN_REAL_RCDELAY, &g_settings.shutdown_real_rcdelay, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, !g_settings.shutdown_real);
@@ -362,8 +364,8 @@ void CMiscMenue::showMiscSettingsMenuEnergy(CMenuWidget *ms_energy)
 	CStringInput * miscSettings_shutdown_count = new CStringInput(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, &g_settings.shutdown_count, 3, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT1, LOCALE_MISCSETTINGS_SHUTDOWN_COUNT_HINT2, "0123456789 ");
 	CMenuForwarder *m2 = new CMenuDForwarder(LOCALE_MISCSETTINGS_SHUTDOWN_COUNT, !g_settings.shutdown_real, NULL, miscSettings_shutdown_count);
 	m2->setHint("", LOCALE_MENU_HINT_SHUTDOWN_COUNT);
-	
-	miscNotifier = new COnOffNotifier(1);
+
+	COnOffNotifier * miscNotifier = new COnOffNotifier(1);
 	miscNotifier->addItem(m1);
 	miscNotifier->addItem(m2);
 
@@ -381,6 +383,11 @@ void CMiscMenue::showMiscSettingsMenuEnergy(CMenuWidget *ms_energy)
 	CMenuOptionChooser * m4 = new CMenuOptionChooser(LOCALE_MISCSETTINGS_SLEEPTIMER_MIN, &g_settings.sleeptimer_min, SLEEPTIMER_MIN_OPTIONS, SLEEPTIMER_MIN_OPTION_COUNT, true);
 	m4->setHint("", LOCALE_MENU_HINT_SLEEPTIMER_MIN);
 	ms_energy->addItem(m4);
+
+	int res = ms_energy->exec(NULL, "");
+	delete ms_energy;
+	delete miscNotifier;
+	return res;
 }
 
 //EPG settings
@@ -456,8 +463,9 @@ void CMiscMenue::showMiscSettingsMenuFBrowser(CMenuWidget *ms_fbrowser)
 }
 
 //channellist
-void CMiscMenue::showMiscSettingsMenuChanlist(CMenuWidget *ms_chanlist)
+int CMiscMenue::showMiscSettingsMenuChanlist()
 {
+	CMenuWidget * ms_chanlist = new CMenuWidget(LOCALE_MISCSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_MISCSETUP_CHANNELLIST);
 	ms_chanlist->addIntroItems(LOCALE_MISCSETTINGS_CHANNELLIST);
 
 	CMenuOptionChooser * mc;
@@ -488,6 +496,9 @@ void CMiscMenue::showMiscSettingsMenuChanlist(CMenuWidget *ms_chanlist)
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_NUMERIC_ADJUST,   &g_settings.channellist_numeric_adjust, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_NUMERIC_ADJUST);
 	ms_chanlist->addItem(mc);
+	int res = ms_chanlist->exec(NULL, "");
+	delete ms_chanlist;
+	return res;
 }
 
 #ifdef CPU_FREQ

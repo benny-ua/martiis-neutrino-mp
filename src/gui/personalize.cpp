@@ -509,7 +509,7 @@ void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget, std::string da[], in
 int CPersonalizeGui::ShowMenuOptions(const int& widget)
 {
 	string mn_name = v_widget[widget]->getName();
-	printf("[neutrino-personalize] exec %s...\n", __FUNCTION__);
+	printf("[neutrino-personalize] exec %s for [%s]...\n", __FUNCTION__, mn_name.c_str());
 	
 	mn_widget_id_t w_index = widget+MN_WIDGET_ID_PERSONALIZE_MAIN;
 	CMenuWidget* pm = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width, w_index);
@@ -660,6 +660,17 @@ void CPersonalizeGui::ShowHelpPersonalize()
 	helpbox.show(LOCALE_PERSONALIZE_HELP);
 }
 
+void CPersonalizeGui::ApplySettings()
+{
+	// replace old settings with new settings
+	for (uint i = 0; i < v_int_settings.size(); i++)
+		v_int_settings[i].old_val = *v_int_settings[i].p_val;
+	for (int i = 0; i<(widget_count); i++)
+		v_widget[i]->resetWidget();
+
+	addPersonalizedItems();
+}
+
 void CPersonalizeGui::SaveAndExit()
 {
 	// Save the settings and left menu, if user wants to!
@@ -669,15 +680,7 @@ void CPersonalizeGui::SaveAndExit()
 		{
 			CHintBox hintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_MAINSETTINGS_SAVESETTINGSNOW_HINT)); // UTF-8
 			hintBox.paint();
-			// replace old settings with new settings
-			for (uint i = 0; i < v_int_settings.size(); i++)
-				v_int_settings[i].old_val = *v_int_settings[i].p_val;
-			//CNeutrinoApp::getInstance()->saveSetup();
-
-			for (int i = 0; i<(widget_count); i++)
-				v_widget[i]->resetWidget();
-			
-			addPersonalizedItems();
+			ApplySettings();
 			hintBox.hide();
 		}
 		else
@@ -866,7 +869,7 @@ void CPersonalizeGui::addPersonalizedItems()
 					use_pin = true;
 				
 				//set pinmode for personalize menu or for settings manager menu and if any item is pin protected 
-				if (in_pinmode && !use_pin)		
+				if (in_pinmode && !use_pin)
 					if (v_item[i].personalize_mode == &g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS] || v_item[i].personalize_mode == &g_settings.personalize[SNeutrinoSettings::P_MSET_SETTINGS_MANAGER])
 					{
 						use_pin = true;
