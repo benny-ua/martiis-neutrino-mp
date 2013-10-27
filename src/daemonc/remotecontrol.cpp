@@ -200,10 +200,10 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 
 #if 0
 		printf("[neutrino] EVT_CURRENTEPG: uniqueKey %llx chid %llx subid %llx flags %x\n",
-				info_CN->current_uniqueKey >> 16, current_channel_id & 0xFFFFFFFFFFFFULL,
+				GET_CHANNEL_ID_FROM_EVENT_ID(info_CN->current_uniqueKey), current_channel_id & 0xFFFFFFFFFFFFULL,
 				current_sub_channel_id&0xFFFFFFFFFFFFULL, info_CN->flags);
 #endif
-		t_channel_id chid = (info_CN->current_uniqueKey >> 16);
+		t_channel_id chid = GET_CHANNEL_ID_FROM_EVENT_ID(info_CN->current_uniqueKey);
 		if(chid != (current_channel_id&0xFFFFFFFFFFFFULL) && chid != (current_sub_channel_id&0xFFFFFFFFFFFFULL))
 			return messages_return::handled;
 
@@ -251,12 +251,12 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 	else if ( msg == NeutrinoMessages::EVT_NEXTEPG )
 	{
 		CSectionsdClient::CurrentNextInfo* info_CN = (CSectionsdClient::CurrentNextInfo*) data;
-		t_channel_id chid = (info_CN->next_uniqueKey >> 16);
+		t_channel_id chid = GET_CHANNEL_ID_FROM_EVENT_ID(info_CN->next_uniqueKey);
 		if(chid != (current_channel_id&0xFFFFFFFFFFFFULL) && chid != (current_sub_channel_id&0xFFFFFFFFFFFFULL))
 			return messages_return::handled;
 
 #if 0
-		if ( ( info_CN->next_uniqueKey >> 16) == (current_channel_id&0xFFFFFFFFFFFFULL) )
+		if ( GET_CHANNEL_ID_FROM_EVENT_ID(info_CN->next_uniqueKey) == (current_channel_id&0xFFFFFFFFFFFFULL) )
 		{
 			// next-EPG für den aktuellen Kanal bekommen, current ist leider net da?!;
 			if ( info_CN->next_uniqueKey != next_EPGid )
@@ -347,7 +347,7 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 #endif
 	else if (msg == NeutrinoMessages::EVT_TUNE_COMPLETE) {
 		t_channel_id chid = *(t_channel_id *)data;
-printf("CRemoteControl::handleMsg: EVT_TUNE_COMPLETE (%016" PRIx64 ")\n", chid);
+//printf("CRemoteControl::handleMsg: EVT_TUNE_COMPLETE (%016" PRIx64 ")\n", chid);
 		if(chid)
 			g_Sectionsd->setServiceChanged( chid, true );
 		else

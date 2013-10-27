@@ -2787,6 +2787,10 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 		/* update scan settings for manual scan to current channel */
 		CScanSetup::getInstance()->updateManualSettings();
+
+		/* update subchannels */
+		CSectionsdClient::CurrentNextInfo dummy;
+		g_InfoViewer->getEPG(CZapit::getInstance()->GetCurrentChannelID(), dummy);
 	}
 	if ((msg == NeutrinoMessages::EVT_TIMER)) {
 		if(data == scrambled_timer) {
