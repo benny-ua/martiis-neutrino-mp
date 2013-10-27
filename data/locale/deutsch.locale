@@ -836,10 +836,10 @@ mainmenu.recording Aufnehmen
 mainmenu.recording_start Start
 mainmenu.recording_stop Stopp
 mainmenu.scripts Skripte
-mainmenu.service Service Einstellungen
-mainmenu.settings System Einstellungen
+mainmenu.service Service
+mainmenu.settings Einstellungen
 mainmenu.shutdown Ausschalten
-mainmenu.shutdown_menu Ausschalt Optionen
+mainmenu.shutdown_menu Ausschalt-Optionen
 mainmenu.sleeptimer SleepTimer
 mainmenu.standby Standby
 mainmenu.tvmode TV-Modus
