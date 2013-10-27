@@ -519,8 +519,9 @@ bool CUserMenu::showUserMenu(int button)
  	return 0;
 }
 
-const char *CUserMenu::getUserMenuButtonName(int button)
+const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 {
+	active = false;
         if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
                 return false;
 
@@ -528,7 +529,7 @@ const char *CUserMenu::getUserMenuButtonName(int button)
 	neutrino_locale_t loc = NONEXISTANT_LOCALE;
 	char *text = NULL;
 
-	#define locCheck(L) if(loc != NONEXISTANT_LOCALE) return_title = true; else loc=L;continue
+	#define locCheck(L) if(loc != NONEXISTANT_LOCALE) return_title = true; else loc=L;active=true;continue
 
         for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX && !return_title; pos++) {
                 switch(g_settings.usermenu[button][pos]) {
@@ -542,7 +543,7 @@ const char *CUserMenu::getUserMenuButtonName(int button)
                         case SNeutrinoSettings::ITEM_EPG_INFO:
                                 locCheck(LOCALE_EPGMENU_EVENTINFO);
                         case SNeutrinoSettings::ITEM_EPG_MISC:
-				return_title = true; continue;
+				return_title = true; active = true; continue;
                         case SNeutrinoSettings::ITEM_AUDIO_SELECT:
 				if (g_RemoteControl->current_PIDs.APIDs.size() > 0)
                         		text = g_RemoteControl->current_PIDs.APIDs[

@@ -229,12 +229,13 @@ void CInfoViewerBB::getBBButtonInfo()
 	int bbButtonMaxW = 0;
 	for (int i = 0; i < CInfoViewerBB::BUTTON_MAX; i++) {
 		int w = 0, h = 0;
+		bool active;
 		std::string text, icon;
 		switch (i) {
 		case CInfoViewerBB::BUTTON_EPG:
 			icon = NEUTRINO_ICON_BUTTON_RED;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-			text = CUserMenu::getUserMenuButtonName(0);
+			text = CUserMenu::getUserMenuButtonName(0, active);
 			if (!text.empty())
 				break;
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_RED];
@@ -244,7 +245,7 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_AUDIO:
 			icon = NEUTRINO_ICON_BUTTON_GREEN;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-			text = CUserMenu::getUserMenuButtonName(1);
+			text = CUserMenu::getUserMenuButtonName(1, active);
 			if (!text.empty())
 				break;
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_GREEN];
@@ -262,7 +263,7 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_SUBS:
 			icon = NEUTRINO_ICON_BUTTON_YELLOW;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-			text = CUserMenu::getUserMenuButtonName(2);
+			text = CUserMenu::getUserMenuButtonName(2, active);
 			if (!text.empty())
 				break;
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_YELLOW];
@@ -272,7 +273,7 @@ void CInfoViewerBB::getBBButtonInfo()
 		case CInfoViewerBB::BUTTON_FEAT:
 			icon = NEUTRINO_ICON_BUTTON_BLUE;
 			frameBuffer->getIconSize(icon.c_str(), &w, &h);
-			text = CUserMenu::getUserMenuButtonName(3);
+			text = CUserMenu::getUserMenuButtonName(3, active);
 			if (!text.empty())
 				break;
 			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_BLUE];
@@ -287,6 +288,7 @@ void CInfoViewerBB::getBBButtonInfo()
 		bbButtonInfo[i].h = h;
 		bbButtonInfo[i].text = text;
 		bbButtonInfo[i].icon = icon;
+		bbButtonInfo[i].active = active;
 	}
 	// Calculate position/size of buttons
 	minX = std::min(bbIconMinX, g_InfoViewer->ChanInfoX + (((g_InfoViewer->BoxEndX - g_InfoViewer->ChanInfoX) * 75) / 100));
@@ -391,10 +393,12 @@ void CInfoViewerBB::showBBButtons(const int modus)
 							__LINE__, i);
 					continue;
 				}
-				frameBuffer->paintIcon(bbButtonInfo[i].icon, bbButtonInfo[i].x, BBarY, InfoHeightY_Info);
+				if (bbButtonInfo[i].active) {
+					frameBuffer->paintIcon(bbButtonInfo[i].icon, bbButtonInfo[i].x, BBarY, InfoHeightY_Info);
 
-				g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(bbButtonInfo[i].x + bbButtonInfo[i].cx, BBarFontY, 
-				       bbButtonInfo[i].w - bbButtonInfo[i].cx, bbButtonInfo[i].text, COL_INFOBAR_TEXT, 0, true); // UTF-8
+					g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(bbButtonInfo[i].x + bbButtonInfo[i].cx, BBarFontY, 
+						bbButtonInfo[i].w - bbButtonInfo[i].cx, bbButtonInfo[i].text, COL_INFOBAR_TEXT, 0, true); // UTF-8
+				}
 			}
 		}
 
