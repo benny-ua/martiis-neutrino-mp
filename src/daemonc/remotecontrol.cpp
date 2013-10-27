@@ -209,28 +209,28 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 
 		/* current event came for current channel */
 		if ( info_CN->current_uniqueKey != current_EPGid )
+		{
+			if ( current_EPGid != 0 )
 			{
-				if ( current_EPGid != 0 )
-				{
 				/* new event, not channel. get pids */
-					g_Zapit->getPIDS( current_PIDs );
-					has_unresolved_ctags = true;
-					// infobar indicate on epg change
-					g_InfoViewer->showEpgInfo();
-				}
+				g_Zapit->getPIDS( current_PIDs );
+				has_unresolved_ctags = true;
+				// infobar indicate on epg change
+				g_InfoViewer->showEpgInfo();
+			}
 
 			current_EPGid= info_CN->current_uniqueKey;
 
-				if ( has_unresolved_ctags )
-					processAPIDnames();
+			if ( has_unresolved_ctags )
+				processAPIDnames();
 
 			if ( info_CN->flags & CSectionsdClient::epgflags::current_has_linkagedescriptors ) {
 					subChannels.clear();
 					getSubChannels();
-				}
+			}
 
-				if ( needs_nvods )
-					getNVODs();
+			if ( needs_nvods )
+				getNVODs();
 
 #if 0
 			g_RCInput->killTimer( current_programm_timer );
@@ -238,14 +238,15 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 			time_t end_program= info_CN->current_zeit.startzeit+ info_CN->current_zeit.dauer;
 			current_programm_timer = g_RCInput->addTimer( &end_program );
 #endif
-			}
-
-			// is_video_started is only false if channel is locked
-			if ((!is_video_started) &&
-				(info_CN->current_fsk == 0 || g_settings.parentallock_prompt == PARENTALLOCK_PROMPT_CHANGETOLOCKED))
-				g_RCInput->postMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, 0x100, false);
-			else
-				g_RCInput->postMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, info_CN->current_fsk, false);
+		}
+#if 0 // FIXME, needs investigation. Has side effect on capmt handling when active.
+		// is_video_started is only false if channel is locked
+		if ((!is_video_started) &&
+			(info_CN->current_fsk == 0 || g_settings.parentallock_prompt == PARENTALLOCK_PROMPT_CHANGETOLOCKED))
+			g_RCInput->postMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, 0x100, false);
+		else
+			g_RCInput->postMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, info_CN->current_fsk, false);
+#endif
 		return messages_return::handled;
 	}
 	else if ( msg == NeutrinoMessages::EVT_NEXTEPG )
@@ -347,7 +348,7 @@ int CRemoteControl::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data
 #endif
 	else if (msg == NeutrinoMessages::EVT_TUNE_COMPLETE) {
 		t_channel_id chid = *(t_channel_id *)data;
-//printf("CRemoteControl::handleMsg: EVT_TUNE_COMPLETE (%016" PRIx64 ")\n", chid);
+printf("CRemoteControl::handleMsg: EVT_TUNE_COMPLETE (%016" PRIx64 ")\n", chid);
 		if(chid)
 			g_Sectionsd->setServiceChanged( chid, true );
 		else
@@ -555,7 +556,7 @@ void CRemoteControl::processAPIDnames()
 									strncat(current_PIDs.APIDs[j].desc, " (AC3)", DESC_MAX_LEN - strlen(current_PIDs.APIDs[j].desc)-1);
 								else if (current_PIDs.APIDs[j].is_aac &&  !strstr(current_PIDs.APIDs[j].desc, " (AAC)"))
 									strncat(current_PIDs.APIDs[j].desc, " (AAC)", DESC_MAX_LEN - strlen(current_PIDs.APIDs[j].desc)-1);
-								else if (current_PIDs.APIDs[j].is_aac &&  !strstr(current_PIDs.APIDs[j].desc, " (EAC3)"))
+								else if (current_PIDs.APIDs[j].is_eac3 && !strstr(current_PIDs.APIDs[j].desc, " (EAC3)"))
 									strncat(current_PIDs.APIDs[j].desc, " (EAC3)", DESC_MAX_LEN - strlen(current_PIDs.APIDs[j].desc)-1);
 							}
 							current_PIDs.APIDs[j].component_tag = -1;
