@@ -583,7 +583,8 @@ void CTextBox::refreshText(void)
 		m_old_nBgRadius = m_nBgRadius;
 		m_old_nBgRadiusType = m_nBgRadiusType;
 		m_old_nMode = m_nMode;
-	}
+	} else if (m_old_cText == m_cText)
+		return;
 
 	if( m_nNrOfLines <= 0)
 		return;
