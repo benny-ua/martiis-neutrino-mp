@@ -306,7 +306,7 @@ void CZapit::ClearVolumeMap()
 	unlink(VOLUME_CONFIG_FILE);
 	if (current_channel) {
 		CZapitAudioChannel *currentAudioChannel = current_channel->getAudioChannel();
-		if (currentAudioChannel && currentAudioChannel->audioChannelType == CZapitAudioChannel::AC3) {
+		if (currentAudioChannel && (currentAudioChannel->audioChannelType == CZapitAudioChannel::AC3 || currentAudioChannel->audioChannelType == CZapitAudioChannel::EAC3)) {
 			SetVolumePercent(volume_percent_ac3);
 			return;
 		}
@@ -864,7 +864,8 @@ int CZapit::GetPidVolume(t_channel_id channel_id, int pid, bool ac3)
 		if ((channel_id == live_channel_id) && current_channel) {
 			for (int  i = 0; i < current_channel->getAudioChannelCount(); i++) {
 				if (pid == current_channel->getAudioPid(i)) {
-					percent = current_channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::AC3 ?
+					percent = (current_channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::AC3
+						|| current_channel->getAudioChannel(i)->audioChannelType == CZapitAudioChannel::EAC3) ?
 						volume_percent_ac3 : volume_percent_pcm;
 					break;
 				}
@@ -941,7 +942,7 @@ void CZapit::SetAudioStreamType(CZapitAudioChannel::ZapitAudioChannelType audioC
 	}
 
 	/* FIXME: bigger percent for AC3 only, what about AAC etc ? */
-	int newpercent = GetPidVolume(0, 0, audioChannelType == CZapitAudioChannel::AC3);
+	int newpercent = GetPidVolume(0, 0, audioChannelType == CZapitAudioChannel::AC3 || audioChannelType == CZapitAudioChannel::EAC3);
 	SetVolumePercent(newpercent);
 
 	DBG("starting %s audio\n", audioStr);
