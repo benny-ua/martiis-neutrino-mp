@@ -125,7 +125,10 @@ class CFontSizeNotifier : public CChangeObserver
 
 class CSubtitleChangeExec : public CMenuTarget
 {
+	private:
+		cPlayback *playback;
 	public:
+		CSubtitleChangeExec(cPlayback *p = NULL) { playback = p; }
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 };
 
@@ -182,14 +185,5 @@ class CAutoModeNotifier : public CChangeObserver
 {
 public:
         bool changeNotify(const neutrino_locale_t, void * data);
-};
-
-class CMPSubtitleChangeExec : public CMenuTarget
-{
-	public:
-		CMPSubtitleChangeExec(cPlayback *p) { playback = p; }
-		int exec(CMenuTarget* parent, const std::string & ActionKey);
-		cPlayback *playback;
-		std::string actionKey;
 };
 #endif

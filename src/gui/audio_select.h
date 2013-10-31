@@ -29,6 +29,7 @@
 //
 
 #include "widget/menue.h"
+#include "movieplayer.h"
 
 
 
@@ -37,7 +38,9 @@ using namespace std;
 class CAudioSelectMenuHandler : public CMenuTarget
 {
 	private:
+		CMoviePlayerGui *mp;
 		int width;
+		cPlayback *playback;
 		
 	public:
 		CAudioSelectMenuHandler();

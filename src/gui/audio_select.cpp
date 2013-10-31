@@ -47,6 +47,7 @@ extern CRemoteControl		* g_RemoteControl; /* neutrino.cpp */
 extern CAudioSetupNotifier	* audioSetupNotifier;
 
 #include <gui/audio_select.h>
+#include <gui/movieplayer.h>
 #include <libdvbsub/dvbsub.h>
 #include <libtuxtxt/teletext.h>
 
@@ -76,12 +77,17 @@ const CMenuOptionChooser::keyval AUDIOMENU_ANALOGOUT_OPTIONS[AUDIOMENU_ANALOGOUT
 
 int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 {
+	mp = &CMoviePlayerGui::getInstance();
+
+	if (mp->Playing())
+		playback = mp->getPlayback();
+
 	int sel= atoi(actionkey.c_str());
 	if(sel >= 0) {
-		if (g_RemoteControl->current_PIDs.PIDs.selected_apid!= (unsigned int) sel )
-		{
+		if (mp->Playing())
+			mp->setAPID(sel);
+		else if (g_RemoteControl->current_PIDs.PIDs.selected_apid!= (unsigned int) sel )
 			g_RemoteControl->setAPID(sel);
-		}
 		return menu_return::RETURN_EXIT;
 	}
 
@@ -95,7 +101,7 @@ int CAudioSelectMenuHandler::doMenu ()
 {
 	CMenuWidget AudioSelector(LOCALE_AUDIOSELECTMENUE_HEAD, NEUTRINO_ICON_AUDIO, width);
 
-	CSubtitleChangeExec SubtitleChanger;
+	CSubtitleChangeExec SubtitleChanger(playback);
 
 	//show cancel button if configured in usermenu settings
 	if (g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL])
@@ -103,20 +109,22 @@ int CAudioSelectMenuHandler::doMenu ()
 	else
 		AudioSelector.addItem(GenericMenuSeparator);
 
-	unsigned int shortcut_num = 1;
+	bool is_mp = mp->Playing();
 
-	uint p_count = g_RemoteControl->current_PIDs.APIDs.size();
+	uint p_count = is_mp ? mp->getAPIDCount() : g_RemoteControl->current_PIDs.APIDs.size();
+	uint sel_apid = is_mp ? mp->getAPID() : g_RemoteControl->current_PIDs.PIDs.selected_apid;
+
 	// -- setup menue due to Audio PIDs
-	for( uint i=0; i < p_count; i++ )
+	for(uint i=0; i < p_count; i++ )
 	{
 		char apid[5];
-		sprintf(apid, "%d", i);
-		CMenuForwarder *fw = new CMenuForwarder(g_RemoteControl->current_PIDs.APIDs[i].desc, 
+		snprintf(apid, sizeof(apid), "%d", i);
+		CMenuForwarder *fw = new CMenuForwarder(is_mp ? mp->getAPIDDesc(i).c_str() : g_RemoteControl->current_PIDs.APIDs[i].desc, 
 				true, NULL, this, apid, CRCInput::convertDigitToKey(i + 1));
 		fw->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
-		AudioSelector.addItem(fw, (i == g_RemoteControl->current_PIDs.PIDs.selected_apid));
-		shortcut_num = i+1;
+		AudioSelector.addItem(fw, sel_apid == i);
 	}
+	unsigned int shortcut_num = p_count;
 #if !HAVE_SPARK_HARDWARE
 	if (p_count)
 		AudioSelector.addItem(GenericMenuSeparatorLine);
@@ -136,55 +144,72 @@ int CAudioSelectMenuHandler::doMenu ()
 	AudioSelector.addItem( oj );
 #endif
 
-	CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
-	int curnum = channelList->getActiveChannelNumber();
-	CZapitChannel * cc = channelList->getChannel(curnum);
+	CZapitChannel * cc = NULL;
+	int subtitleCount = 0;
+	if (is_mp) {
+		subtitleCount = mp->getSubtitleCount();
+	} else {
+		CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
+		int curnum = channelList->getActiveChannelNumber();
+		cc = channelList->getChannel(curnum);
+		subtitleCount = (int)cc->getSubtitleCount();
+	}
 
 	bool sep_added = false;
-	if(cc)
+	if(subtitleCount > 0)
 	{
 #if HAVE_SPARK_HARDWARE
 		bool have_dvb_sub = false;
 #endif
-		for (int i = 0 ; i < (int)cc->getSubtitleCount() ; ++i)
+		for (int i = 0 ; i < subtitleCount ; ++i)
 		{
-			CZapitAbsSub* s = cc->getChannelSub(i);
+			CZapitAbsSub* s = is_mp ? mp->getChannelSub(i, &s) : cc->getChannelSub(i);
+			if (!s)
+				continue;
+
+			if(!sep_added)
+			{
+				sep_added = true;
+				AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
+			}
+
 			if (s->thisSubType == CZapitAbsSub::DVB) {
 #if HAVE_SPARK_HARDWARE
 				have_dvb_sub = true;
 #endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				printf("[neutrino] adding DVB subtitle %s pid %x\n", sd->ISO639_language_code.c_str(), sd->pId);
-				if(!sep_added)
-				{
-					sep_added = true;
-					AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
-				}
 				char spid[10];
 				snprintf(spid,sizeof(spid), "DVB:%d", sd->pId);
 				char item[64];
 				snprintf(item,sizeof(item), "DVB: %s (pid %x)", sd->ISO639_language_code.c_str(), sd->pId);
-				AudioSelector.addItem(new CMenuForwarder(item /*sd->ISO639_language_code.c_str()*/,
-							sd->pId != dvbsub_getpid(), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
-			}
-			if (s->thisSubType == CZapitAbsSub::TTX)
-			{
+				AudioSelector.addItem(new CMenuForwarder(item,
+							sd->pId != (is_mp ? mp->getCurrentSubPid(CZapitAbsSub::DVB) : dvbsub_getpid()),
+							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+			} else if (s->thisSubType == CZapitAbsSub::TTX) {
 				CZapitTTXSub* sd = reinterpret_cast<CZapitTTXSub*>(s);
 				printf("[neutrino] adding TTX subtitle %s pid %x mag %X page %x\n", sd->ISO639_language_code.c_str(), sd->pId, sd->teletext_magazine_number, sd->teletext_page_number);
-				if(!sep_added)
-				{
-					sep_added = true;
-					AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
-				}
 				char spid[64];
 				int page = ((sd->teletext_magazine_number & 0xFF) << 8) | sd->teletext_page_number;
 				int pid = sd->pId;
 				snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", sd->pId, page, sd->ISO639_language_code.c_str());
 				char item[64];
 				snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", sd->ISO639_language_code.c_str(), sd->pId, page);
-				AudioSelector.addItem(new CMenuForwarder(item /*sd->ISO639_language_code.c_str()*/,
-							!tuxtx_subtitle_running(&pid, &page, NULL), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+				AudioSelector.addItem(new CMenuForwarder(item,
+							!tuxtx_subtitle_running(&pid, &page, NULL),
+							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+			} else if (is_mp && s->thisSubType == CZapitAbsSub::SUB) {
+				printf("[neutrino] adding SUB subtitle %s pid %x\n", s->ISO639_language_code.c_str(), s->pId);
+				char spid[10];
+				snprintf(spid,sizeof(spid), "SUB:%d", s->pId);
+				char item[64];
+				snprintf(item,sizeof(item), "SUB: %s (pid %x)", s->ISO639_language_code.c_str(), s->pId);
+				AudioSelector.addItem(new CMenuForwarder(item,
+							s->pId != mp->getCurrentSubPid(CZapitAbsSub::SUB),
+							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			}
+			if (is_mp)
+				delete s;
 		}
 #if HAVE_SPARK_HARDWARE
 		if (have_dvb_sub)
@@ -198,25 +223,26 @@ int CAudioSelectMenuHandler::doMenu ()
 		}
 	}
 
-	AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-
-	/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
-	CVolume::getInstance()->SetCurrentChannel(0);
-	CVolume::getInstance()->SetCurrentPid(0);
-	int percent[p_count];
-	for (uint i=0; i < p_count; i++) {
-		percent[i] = CZapit::getInstance()->GetPidVolume(0, g_RemoteControl->current_PIDs.APIDs[i].pid, g_RemoteControl->current_PIDs.APIDs[i].is_ac3);
-		AudioSelector.addItem(new CMenuOptionNumberChooser(g_RemoteControl->current_PIDs.APIDs[i].desc,
-					&percent[i],
-					i == g_RemoteControl->current_PIDs.PIDs.selected_apid,
-					0, 999, CVolume::getInstance()));
+	if (is_mp) {
+		// FIXME
+	} else {
+		AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
+		/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
+		CVolume::getInstance()->SetCurrentChannel(0);
+		CVolume::getInstance()->SetCurrentPid(0);
+		int percent[p_count];
+		for (uint i=0; i < p_count; i++) {
+			percent[i] = CZapit::getInstance()->GetPidVolume(0, g_RemoteControl->current_PIDs.APIDs[i].pid, g_RemoteControl->current_PIDs.APIDs[i].is_ac3);
+			AudioSelector.addItem(new CMenuOptionNumberChooser(g_RemoteControl->current_PIDs.APIDs[i].desc,
+						&percent[i],
+						i == g_RemoteControl->current_PIDs.PIDs.selected_apid,
+						0, 999, CVolume::getInstance()));
+		}
 	}
 
-#if HAVE_SPARK_HARDWARE
 	int res = AudioSelector.exec(NULL, "");
+#if HAVE_SPARK_HARDWARE
 	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
-	return res;
-#else
-	return AudioSelector.exec(NULL, "");
 #endif
+	return res;
 }

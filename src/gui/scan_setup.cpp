@@ -651,11 +651,24 @@ int CScanSetup::showScanMenuFrontendSetup()
 		char tmp[32];
 		snprintf(tmp, sizeof(tmp), "config_frontend%d", i);
 
-		char name[255];
-		snprintf(name, sizeof(name), "%s %d: %s %s", g_Locale->getText(LOCALE_SATSETUP_FE_SETUP), i+1,
-				fe->getInfo()->type == FE_QPSK ? g_Locale->getText(LOCALE_SCANTS_ACTSATELLITE)
-				: g_Locale->getText(LOCALE_SCANTS_ACTCABLE),
-				fe->getInfo()->name);
+		neutrino_locale_t loc = NONEXISTANT_LOCALE;
+		switch (fe->getInfo()->type) {
+			case FE_QPSK:
+				loc = LOCALE_SCANTS_ACTSATELLITE;
+				break;
+			case FE_QAM:
+				loc = LOCALE_SCANTS_ACTCABLE;
+				break;
+			case FE_OFDM:
+				loc = LOCALE_SCANTS_ACTTERRESTRIAL;
+				break;
+			default:
+				break;
+		}
+		std::string name = std::string(g_Locale->getText(LOCALE_SATSETUP_FE_SETUP)) + " " + to_string(i+1) + ": ";
+		if (loc != NONEXISTANT_LOCALE)
+			name += std::string(g_Locale->getText(loc)) + " ";
+		name += fe->getInfo()->name;
 
 		const char * icon = NULL;
 		neutrino_msg_t key = CRCInput::RC_nokey;

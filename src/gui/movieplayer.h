@@ -44,6 +44,7 @@
 #include <gui/timeosd.h>
 #include <gui/webtv.h>
 #include <driver/record.h>
+#include <zapit/channel.h>
 #include <playback.h>
 
 #include <stdio.h>
@@ -82,36 +83,34 @@ class CMoviePlayerGui : public CMenuTarget
 	int duration;
 	CTimeOSD FileTime;
 
-	unsigned short numpida;
-	unsigned short vpid;
-	unsigned short vtype;
+	unsigned int numpida;
+	int vpid;
+	int vtype;
 	std::string    language[REC_MAX_APIDS];
-	unsigned short apids[REC_MAX_APIDS];
-	unsigned short ac3flags[REC_MAX_APIDS];
-	unsigned short currentapid, currentac3;
+	int apids[REC_MAX_APIDS];
+	unsigned int ac3flags[REC_MAX_APIDS];
+	int currentapid, currentac3;
 	// subtitle data
-	unsigned short numpids;
+	unsigned int numpids;
 #ifndef REC_MAX_SPIDS
 #define REC_MAX_SPIDS 20 // whatever
 #endif
 	std::string    slanguage[REC_MAX_SPIDS];
-	unsigned short spids[REC_MAX_SPIDS];
-	unsigned short currentspid;
+	int spids[REC_MAX_SPIDS];
 	// dvb subtitle data
-	unsigned short numpidd;
+	unsigned int numpidd;
 #ifndef REC_MAX_DPIDS
 #define REC_MAX_DPIDS 20 // whatever
 #endif
 	std::string    dlanguage[REC_MAX_DPIDS];
-	unsigned short dpids[REC_MAX_DPIDS];
-	unsigned short currentdpid;
+	int dpids[REC_MAX_DPIDS];
 	// teletext subtitle data
-	unsigned short numpidt;
+	unsigned int numpidt;
 #ifndef REC_MAX_TPIDS
 #define REC_MAX_TPIDS 50 // not pids, actually -- a pid may cover multiple subtitle pages
 #endif
 	std::string    tlanguage[REC_MAX_TPIDS];
-	unsigned short tpids[REC_MAX_TPIDS];
+	int tpids[REC_MAX_TPIDS];
 	std::string currentttxsub;
 
 	bool probePids;
@@ -120,10 +119,10 @@ class CMoviePlayerGui : public CMenuTarget
 
 #if 0
 	/* subtitles vars */
-	unsigned short numsubs;
+	int numsubs;
 	std::string    slanguage[REC_MAX_APIDS];
-	unsigned short spids[REC_MAX_APIDS];
-	unsigned short sub_supported[REC_MAX_APIDS];
+	int spids[REC_MAX_APIDS];
+	int sub_supported[REC_MAX_APIDS];
 	int currentspid;
 	int min_x, min_y, max_x, max_y;
 	time_t end_time;
@@ -139,7 +138,7 @@ class CMoviePlayerGui : public CMenuTarget
 	CMovieBrowser* moviebrowser;
 	CWebTV* webtv;
 	MI_MOVIE_INFO * p_movie_info;
-	const static short MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
+	const static int MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
 
 	/* playback from file */
 	bool is_file_player;
@@ -166,7 +165,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void callInfoViewer(/*const int duration, const int pos*/);
 	void fillPids();
 	bool getAudioName(int pid, std::string &apidtitle);
-	void selectAudioPid(bool file_player);
+	void selectAudioPid(void);
 	void getCurrentAudioName( bool file_player, std::string &audioname);
 	void addAudioFormat(int count, std::string &apidtitle, bool& enabled );
 
@@ -207,6 +206,16 @@ class CMoviePlayerGui : public CMenuTarget
 	int timeshift;
 	int file_prozent;
 	void SetFile(std::string &name, std::string &file) { file_name = name; full_name = file; }
+	unsigned int getAPID(void);
+	unsigned int getAPID(unsigned int i);
+	bool setAPID(unsigned int i);
+	cPlayback *getPlayback() { return playback; }
+	unsigned int getAPIDCount(void);
+	std::string getAPIDDesc(unsigned int i);
+	unsigned int getSubtitleCount(void);
+	CZapitAbsSub* getChannelSub(unsigned int i, CZapitAbsSub **s);
+	int getCurrentSubPid(CZapitAbsSub::ZapitSubtitleType st);
+	void setCurrentTTXSub(const char *s) { currentttxsub = s; }
 };
 
 #endif

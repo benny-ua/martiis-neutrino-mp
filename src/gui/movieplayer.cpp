@@ -33,6 +33,7 @@
 #include <neutrino.h>
 
 #include <gui/audiomute.h>
+#include <gui/audio_select.h>
 #include <gui/movieplayer.h>
 #include <gui/infoviewer.h>
 #include <gui/timeosd.h>
@@ -428,9 +429,9 @@ void CMoviePlayerGui::fillPids()
 	if(p_movie_info == NULL)
 		return;
 
-	numpida = 0; currentapid = 0;
-	numpidd = 0; currentdpid = 0;
-	numpids = 0; currentspid = 0;
+	numpida = 0; currentapid = -1;
+	numpidd = 0;
+	numpids = 0;
 	numpidt = 0; currentttxsub = "";
 	if(!p_movie_info->audioPids.empty()) {
 		currentapid = p_movie_info->audioPids[0].epgAudioPid;
@@ -454,26 +455,26 @@ void CMoviePlayerGui::fillPids()
 void CMoviePlayerGui::Cleanup()
 {
 	/*clear audiopids */
-	for (int i = 0; i < numpida; i++) {
+	for (unsigned int i = 0; i < numpida; i++) {
 		apids[i] = 0;
 		ac3flags[i] = 0;
 		language[i].clear();
 	}
-	numpida = 0; currentapid = 0;
+	numpida = 0; currentapid = -1;
 	// clear subtitlepids
-	for (int i = 0; i < numpids; i++) {
+	for (unsigned int i = 0; i < numpids; i++) {
 		spids[i] = 0;
 		slanguage[i].clear();
 	}
-	numpids = 0; currentspid = 0xffff;
+	numpids = 0;
 	// clear dvbsubtitlepids
-	for (int i = 0; i < numpidd; i++) {
+	for (unsigned int i = 0; i < numpidd; i++) {
 		dpids[i] = 0;
 		dlanguage[i].clear();
 	}
-	numpidd = 0; currentdpid = 0xffff;
+	numpidd = 0;
 	// clear dvbsubtitlepids
-	for (int i = 0; i < numpidt; i++) {
+	for (unsigned int i = 0; i < numpidt; i++) {
 		tpids[i] = 0;
 		tlanguage[i].clear();
 	}
@@ -683,8 +684,7 @@ void CMoviePlayerGui::PlayFile(void)
 
 	cutNeutrino();
 	playback = new cPlayback(3, &framebuffer_callback);
-	CMPSubtitleChangeExec SubtitleChanger(playback);
-	playback->SetTeletextPid(0xffff);
+	playback->SetTeletextPid(-1);
 
 	playback->Open(is_file_player ? PLAYMODE_FILE : PLAYMODE_TS);
 
@@ -735,7 +735,7 @@ void CMoviePlayerGui::PlayFile(void)
 		numpida = REC_MAX_APIDS;
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
 		if (p_movie_info)
-			for (int i = 0; i < numpida; i++) {
+			for (unsigned int i = 0; i < numpida; i++) {
 				EPG_AUDIO_PIDS pids;
 				pids.epgAudioPid = apids[i];
 				pids.selected = 0;
@@ -748,9 +748,8 @@ void CMoviePlayerGui::PlayFile(void)
 		if(timeshift) {
 			first_start_timeshift = true;
 			startposition = -1;
-			int i;
 			int towait = (timeshift == 1) ? TIMESHIFT_SECONDS+1 : TIMESHIFT_SECONDS;
-			for(i = 0; i < 500; i++) {
+			for(unsigned int i = 0; i < 500; i++) {
 				playback->GetPosition(position, duration);
 				startposition = (duration - position);
 
@@ -926,10 +925,13 @@ void CMoviePlayerGui::PlayFile(void)
 #endif
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_audio) {
 			StopSubtitles(true);
-			selectAudioPid(is_file_player);
+			selectAudioPid();
 			StartSubtitles(true);
 			update_lcd = true;
 		} else if ( msg == (neutrino_msg_t) g_settings.mpkey_subtitle) {
+			StopSubtitles(true);
+			selectAudioPid();
+			StartSubtitles(true);
 #if 0
 			selectSubtitle();
 			clearSubtitle();
@@ -1046,9 +1048,9 @@ void CMoviePlayerGui::PlayFile(void)
 			//showHelpTS();
 #if HAVE_SPARK_HARDWARE
 		} else if((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
-			uint16_t pid = playback->GetTeletextPid();
-			if (pid) {
-				playback->SetTeletextPid(0xffff);
+			int pid = playback->GetTeletextPid();
+			if (pid > 0) {
+				playback->SetTeletextPid(-1);
 				StopSubtitles(true);
 				if(g_settings.cacheTXT)
 					tuxtxt_stop();
@@ -1056,9 +1058,11 @@ void CMoviePlayerGui::PlayFile(void)
 				tuxtx_stop_subtitle();
 				tuxtx_main(g_RCInput->getFileHandle(), pid, 0, 2, true);
 				tuxtxt_stop();
-				playback->SetTeletextPid(0xffff);
-				if (currentttxsub != "")
+				playback->SetTeletextPid(-1);
+				if (currentttxsub != "") {
+					CSubtitleChangeExec SubtitleChanger(playback);
 					SubtitleChanger.exec(NULL, currentttxsub);
+				}
 				StartSubtitles(true);
 				frameBuffer->paintBackground();
 				//purge input queue
@@ -1188,7 +1192,7 @@ void CMoviePlayerGui::PlayFile(void)
 			handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_stop, position);
 		}
 	}
-	playback->SetTeletextPid(0xffff);    
+	playback->SetTeletextPid(-1);    
 	tuxtx_stop_subtitle();
 	dvbsub_stop();
 
@@ -1204,6 +1208,7 @@ void CMoviePlayerGui::PlayFile(void)
 
 	playback->SetSpeed(1);
 	playback->Close();
+	CSubtitleChangeExec SubtitleChanger(playback);
 	SubtitleChanger.exec(NULL, "off");
 	delete playback;
 	playback = NULL;
@@ -1331,145 +1336,10 @@ void CMoviePlayerGui::getCurrentAudioName( bool file_player, std::string &audion
 	}
 }
 
-void CMoviePlayerGui::selectAudioPid(bool file_player)
+void CMoviePlayerGui::selectAudioPid()
 {
-	CMenuWidget APIDSelector(LOCALE_APIDSELECTOR_HEAD, NEUTRINO_ICON_AUDIO);
-	APIDSelector.addIntroItems();
-
-	int select = -1;
-	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
-
-	// these may change in-stream
-	numpida = REC_MAX_APIDS;
-	playback->FindAllPids(apids, ac3flags, &numpida, language);
-	numpids = REC_MAX_SPIDS;
-	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
-	numpidd = REC_MAX_DPIDS;
-	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
-	numpidt = REC_MAX_TPIDS;
-	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
-
-	if(numpida)
-		currentapid = playback->GetAPid();
-
-	std::string apidtitle[numpida];
-	for (unsigned int count = 0; count < numpida; count++) {
-		bool name_ok = false;
-		bool enabled = true;
-		bool defpid = currentapid ? (currentapid == apids[count]) : (count == 0);
-
-		if (p_movie_info) {
-			for (unsigned int i = 0; i < p_movie_info->audioPids.size(); i++)
-				if (apids[count] == p_movie_info->audioPids[i].epgAudioPid) {
-					apidtitle[count] = p_movie_info->audioPids[i].epgAudioPidName;
-					break;
-				}
-			if (!apidtitle[count].empty())
-				name_ok = true;
-		}
-		if(!name_ok && !file_player) {
-			name_ok = getAudioName(apids[count], apidtitle[count]);
-		}
-		if (!name_ok && !language[count].empty()){
-			apidtitle[count] = language[count];
-			if (!apidtitle[count].empty())
-				name_ok = true;
-		}
-		if (!name_ok) {
-			char apidnumber[20];
-			snprintf(apidnumber, sizeof(apidnumber), "Stream %d %X", count + 1, apids[count]);
-			apidnumber[sizeof(apidnumber) - 1] = 0;
-			apidtitle[count] = std::string(apidnumber);
-		}
-		addAudioFormat(count, apidtitle[count], enabled);
-
-		if(defpid && !enabled && (count < numpida)){
-			currentapid = apids[count+1];
-			defpid = false;
-		}
-
-		char cnt[5];
-		sprintf(cnt, "%d", count);
-		CMenuForwarder * item = new CMenuForwarder(apidtitle[count], enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
-		APIDSelector.addItem(item, defpid);
-	}
-
-	unsigned int shortcut_num = numpida + 1;
-	currentdpid = playback->GetDvbsubtitlePid();
-	currentspid = playback->GetSubtitlePid();
-	if (numpidd > 0 || numpids > 0 || numpidt > 0)
-		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
-
-	CMPSubtitleChangeExec SubtitleChanger(playback);
-
-	for (unsigned int count = 0; count < numpidt; count++) {
-		char lang[10];
-		unsigned int type, magazine, page;
-		int pid;
-		if (5 != sscanf(tlanguage[count].c_str(), "%d %s %u %u %u", &pid, lang, &type, &magazine, &page))
-			continue;
-		if (!magazine)
-			magazine = 8;
-		page |= magazine << 8;
-		char spid[40];
-		snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", pid, page, lang);
-		char item[64];
-		snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", lang, pid, page);
-		APIDSelector.addItem(new CMenuForwarder(item, strcmp(spid, currentttxsub.c_str()), NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
-		shortcut_num++;
-	}
-	for (unsigned int count = 0; count < numpidd; count++) {
-		char spid[10];
-		snprintf(spid,sizeof(spid), "DVB:%d", dpids[count]);
-		char item[64];
-		snprintf(item,sizeof(item), "DVB: %s (track %x)", dlanguage[count].c_str(), dpids[count]);
-		APIDSelector.addItem(new CMenuForwarder(item, dpids[count] != currentdpid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
-		shortcut_num++;
-	}
-	for (unsigned int count = 0; count < numpids; count++) {
-		char spid[10];
-		snprintf(spid,sizeof(spid), "SUB:%d", spids[count]);
-		char item[64];
-		snprintf(item,sizeof(item), "SUB: %s (track %x)", slanguage[count].c_str(), spids[count]);
-		APIDSelector.addItem(new CMenuForwarder(item, spids[count] != currentspid, NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(shortcut_num)));
-		shortcut_num++;
-	}
-	if (numpidd > 0)
-		APIDSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
-	if (numpidd > 0 || numpids > 0 || numpidt > 0)
-		APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, currentdpid || currentspid /* FIXME -- stoppable? */|| currentttxsub.length(), NULL, &SubtitleChanger, "off", CRCInput::RC_stop));
-
-	if (p_movie_info && numpida <= p_movie_info->audioPids.size()) {
-		APIDSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-
-		CVolume::getInstance()->SetCurrentChannel(p_movie_info->epgId);
-		CVolume::getInstance()->SetCurrentPid(currentapid);
-		int percent[numpida];
-		for (uint i=0; i < numpida; i++) {
-			percent[i] = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, apids[i], ac3flags[i]);
-			APIDSelector.addItem(new CMenuOptionNumberChooser(p_movie_info->audioPids[i].epgAudioPidName,
-						&percent[i],
-						currentapid == apids[i],
-						0, 999, CVolume::getInstance()));
-		}
-	}
-
-	APIDSelector.exec(NULL, "");
-	delete selector;
-#if HAVE_SPARK_HARDWARE
-	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
-#endif
-	printf("CMoviePlayerGui::selectAudioPid: selected %d (%x) current %x\n", select, (select >= 0) ? apids[select] : -1, currentapid);
-	if(SubtitleChanger.actionKey.substr(0, 3) == "TTX")
-		currentttxsub = SubtitleChanger.actionKey;
-	else if(SubtitleChanger.actionKey == "off")
-		currentttxsub = "";
-	if((select >= 0) && (select <= numpida) && (currentapid != apids[select])) {
-		currentapid = apids[select];
-		currentac3 = ac3flags[select];
-		playback->SetAPid(currentapid, currentac3);
-		printf("[movieplayer] apid changed to %d type %d\n", currentapid, currentac3);
-	}
+	CAudioSelectMenuHandler APIDSelector;
+	APIDSelector.exec(NULL, "-1");
 }
 
 void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
@@ -1829,207 +1699,107 @@ void CMoviePlayerGui::selectChapter()
 }
 #endif
 
-#if 0
-void CMoviePlayerGui::selectSubtitle()
+bool CMoviePlayerGui::setAPID(unsigned int i) {
+	if (currentapid != apids[i]) {
+		currentapid = apids[i];
+		currentac3 = ac3flags[i];
+		playback->SetAPid(currentapid, currentac3);
+	}
+	return (i < numpida);
+}
+
+std::string CMoviePlayerGui::getAPIDDesc(unsigned int i)
 {
-	if (!is_file_player)
-		return;
-
-	CMenuWidget APIDSelector(LOCALE_SUBTITLES_HEAD, NEUTRINO_ICON_AUDIO);
-	APIDSelector.addIntroItems();
-
-	int select = -1;
-	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
-	if(!numsubs) {
-		playback->FindAllSubs(spids, sub_supported, &numsubs, slanguage);
-	}
-	char cnt[5];
-	unsigned int count;
-	for (count = 0; count < numsubs; count++) {
-		bool enabled = sub_supported[count];
-		bool defpid = currentspid >= 0 ? (currentspid == spids[count]) : (count == 0);
-		std::string title = slanguage[count];
-		if (title.empty()) {
-			char pidnumber[20];
-			sprintf(pidnumber, "Stream %d %X", count + 1, spids[count]);
-			title = pidnumber;
-		}
-		sprintf(cnt, "%d", count);
-		CMenuForwarder * item = new CMenuForwarder(title.c_str(), enabled, NULL, selector, cnt, CRCInput::convertDigitToKey(count + 1));
-		item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
-		APIDSelector.addItem(item, defpid);
-	}
-	sprintf(cnt, "%d", count);
-	APIDSelector.addItem(new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, selector, cnt, CRCInput::RC_stop), currentspid < 0);
-
-	APIDSelector.exec(NULL, "");
-	delete selector;
-	printf("CMoviePlayerGui::selectSubtitle: selected %d (%x) current %x\n", select, (select >= 0) ? spids[select] : -1, currentspid);
-	if((select >= 0) && (select < numsubs) && (currentspid != spids[select])) {
-		currentspid = spids[select];
-		playback->SelectSubtitles(currentspid);
-		printf("[movieplayer] spid changed to %d\n", currentspid);
-	} else if ( select > 0) {
-		currentspid = -1;
-		playback->SelectSubtitles(currentspid);
-		printf("[movieplayer] spid changed to %d\n", currentspid);
-	}
+	std::string apidtitle;
+	if (i < numpida)
+		getAudioName(apids[i], apidtitle);
+	if (apidtitle == "")
+		apidtitle = "Stream " + to_string(i);
+	return apidtitle;
 }
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
-
-void CMoviePlayerGui::clearSubtitle()
+unsigned int CMoviePlayerGui::getAPID(unsigned int i)
 {
-	if ((max_x-min_x > 0) && (max_y-min_y > 0))
-		frameBuffer->paintBackgroundBoxRel(min_x, min_y, max_x-min_x, max_y-min_y);
-
-	min_x = CFrameBuffer::getInstance()->getScreenWidth();
-	min_y = CFrameBuffer::getInstance()->getScreenHeight();
-	max_x = CFrameBuffer::getInstance()->getScreenX();
-	max_y = CFrameBuffer::getInstance()->getScreenY();
-	end_time = 0;
+	if (i < numpida)
+		return apids[i];
+	return -1;
 }
 
-fb_pixel_t * simple_resize32(uint8_t * orgin, uint32_t * colors, int nb_colors, int ox, int oy, int dx, int dy);
-
-void CMoviePlayerGui::showSubtitle(neutrino_msg_data_t data)
+unsigned int CMoviePlayerGui::getAPID(void)
 {
-	if (!data) {
-		if (end_time && time_monotonic_ms() > end_time) {
-			printf("************************* hide subs *************************\n");
-			clearSubtitle();
-		}
-		return;
-	}
-	AVSubtitle * sub = (AVSubtitle *) data;
-
-	printf("************************* EVT_SUBT_MESSAGE: num_rects %d fmt %d *************************\n",  sub->num_rects, sub->format);
-	if (!sub->num_rects)
-		return;
-
-	if (sub->format == 0) {
-		int xres = 0, yres = 0, framerate;
-		videoDecoder->getPictureInfo(xres, yres, framerate);
-
-		double xc = (double) CFrameBuffer::getInstance()->getScreenWidth(/*true*/)/(double) xres;
-		double yc = (double) CFrameBuffer::getInstance()->getScreenHeight(/*true*/)/(double) yres;
-
-		clearSubtitle();
-
-		for (unsigned i = 0; i < sub->num_rects; i++) {
-			uint32_t * colors = (uint32_t *) sub->rects[i]->pict.data[1];
-
-			int nw = (double) sub->rects[i]->w * xc;
-			int nh = (double) sub->rects[i]->h * yc;
-			int xoff = (double) sub->rects[i]->x * xc;
-			int yoff = (double) sub->rects[i]->y * yc;
-
-			printf("Draw: #%d at %d,%d size %dx%d colors %d (x=%d y=%d w=%d h=%d) \n", i+1,
-					sub->rects[i]->x, sub->rects[i]->y, sub->rects[i]->w, sub->rects[i]->h,
-					sub->rects[i]->nb_colors, xoff, yoff, nw, nh);
-
-			fb_pixel_t * newdata = simple_resize32 (sub->rects[i]->pict.data[0], colors,
-					sub->rects[i]->nb_colors, sub->rects[i]->w, sub->rects[i]->h, nw, nh);
-			frameBuffer->blit2FB(newdata, nw, nh, xoff, yoff);
-			free(newdata);
-
-			min_x = std::min(min_x, xoff);
-			max_x = std::max(max_x, xoff + nw);
-			min_y = std::min(min_y, yoff);
-			max_y = std::max(max_y, yoff + nh);
-		}
-		end_time = sub->end_display_time + time_monotonic_ms();
-		avsubtitle_free(sub);
-		delete sub;
-		return;
-	}
-	std::vector<std::string> subtext;
-	for (unsigned i = 0; i < sub->num_rects; i++) {
-		char * txt = NULL;
-		if (sub->rects[i]->type == SUBTITLE_TEXT)
-			txt = sub->rects[i]->text;
-		else if (sub->rects[i]->type == SUBTITLE_ASS)
-			txt = sub->rects[i]->ass;
-		printf("subt[%d] type %d [%s]\n", i, sub->rects[i]->type, txt ? txt : "");
-		if (txt) {
-			int len = strlen(txt);
-			if (len > 10 && memcmp(txt, "Dialogue: ", 10) == 0) {
-				char* p = txt;
-				int skip_commas = 4;
-				/* skip ass times */
-				for (int j = 0; j < skip_commas && *p != '\0'; p++)
-					if (*p == ',')
-						j++;
-				/* skip ass tags */
-				if (*p == '{') {
-					char * d = strchr(p, '}');
-					if (d)
-						p += d - p + 1;
-				}
-				char * d = strchr(p, '{');
-				if (d && strchr(d, '}'))
-					*d = 0;
-
-				len = strlen(p);
-				/* remove newline */
-				for (int j = len-1; j > 0; j--) {
-					if (p[j] == '\n' || p[j] == '\r')
-						p[j] = 0;
-					else
-						break;
-				}
-				if (*p == '\0')
-					continue;
-				txt = p;
-			}
-			//printf("title: [%s]\n", txt);
-			std::string str(txt);
-			size_t start = 0, end = 0;
-			/* split string with \N as newline */
-			std::string delim("\\N");
-			while ((end = str.find(delim, start)) != string::npos) {
-				subtext.push_back(str.substr(start, end - start));
-				start = end + 2;
-			}
-			subtext.push_back(str.substr(start));
-
-		}
-	}
-	for (unsigned i = 0; i < subtext.size(); i++)
-		printf("subtext %d: [%s]\n", i, subtext[i].c_str());
-	printf("********************************************************************\n");
-
-	if (!subtext.empty()) {
-		int sh = frameBuffer->getScreenHeight();
-		int sw = frameBuffer->getScreenWidth();
-		int h = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
-		int height = h*subtext.size();
-
-		clearSubtitle();
-
-		int x[subtext.size()];
-		int y[subtext.size()];
-		for (unsigned i = 0; i < subtext.size(); i++) {
-			int w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (subtext[i].c_str(), true);
-			x[i] = (sw - w) / 2;
-			y[i] = sh - height + h*(i + 1);
-			min_x = std::min(min_x, x[i]);
-			max_x = std::max(max_x, x[i]+w);
-			min_y = std::min(min_y, y[i]-h);
-			max_y = std::max(max_y, y[i]);
-		}
-
-		frameBuffer->paintBoxRel(min_x, min_y, max_x - min_x, max_y-min_y, COL_MENUCONTENT_PLUS_0);
-
-		for (unsigned i = 0; i < subtext.size(); i++)
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x[i], y[i], sw, subtext[i].c_str(), COL_MENUCONTENT_TEXT, 0, true);
-
-		end_time = sub->end_display_time + time_monotonic_ms();
-	}
-	avsubtitle_free(sub);
-	delete sub;
+	for (unsigned int i = 0; i < numpida; i++)
+		if (apids[i] == currentapid)
+			return i;
+	return -1;
 }
-#endif
+
+unsigned int CMoviePlayerGui::getAPIDCount(void)
+{
+	numpida = REC_MAX_APIDS;
+	playback->FindAllPids(apids, ac3flags, &numpida, language);
+	return numpida;
+}
+
+unsigned int CMoviePlayerGui::getSubtitleCount(void)
+{
+	// these may change in-stream
+	numpids = REC_MAX_SPIDS;
+	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
+	numpidd = REC_MAX_DPIDS;
+	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
+	numpidt = REC_MAX_TPIDS;
+	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
+
+	return numpidd + numpids + numpidt;
+}
+
+CZapitAbsSub* CMoviePlayerGui::getChannelSub(unsigned int i, CZapitAbsSub **s)
+{
+	if (i < numpidd) {
+		CZapitDVBSub *_s = new CZapitDVBSub;
+		_s->thisSubType = CZapitAbsSub::DVB;
+		_s->pId = dpids[i];
+		_s->ISO639_language_code = dlanguage[i];
+		*s = _s;
+		return *s;
+	}
+	i -= numpidd;
+	if (i < numpidt) {
+		int mag, page;
+		char *lang = (char *) alloca(tlanguage[i].size() + 1);
+		if (3 != sscanf(tlanguage[i].c_str(), "%*d %s %*d %d %d", lang, &mag, &page))
+			return NULL;
+		CZapitTTXSub *_s = new CZapitTTXSub;
+		_s->thisSubType = CZapitAbsSub::TTX;
+		_s->pId = tpids[i];
+		_s->ISO639_language_code = tlanguage[i];
+		_s->ISO639_language_code = std::string(lang);
+		_s->teletext_magazine_number =  mag;
+		_s->teletext_page_number = page;
+		*s = _s;
+		return *s;
+	}
+	i -= numpidt;
+	if (i < numpids) {
+		CZapitAbsSub *_s = new CZapitAbsSub;
+		_s->thisSubType = CZapitAbsSub::SUB;
+		_s->pId = spids[i];
+		_s->ISO639_language_code = slanguage[i];
+		*s = _s;
+		return *s;
+	}
+	return NULL;
+}
+
+int CMoviePlayerGui::getCurrentSubPid(CZapitAbsSub::ZapitSubtitleType st)
+{
+	switch(st) {
+		case CZapitAbsSub::DVB:
+			return playback->GetDvbsubtitlePid();
+		case CZapitAbsSub::SUB:
+			return playback->GetSubtitlePid();
+		case CZapitAbsSub::TTX:
+			return -1; // FIXME ... caller would need both pid and page
+	}
+	return -1;
+}

@@ -53,6 +53,7 @@
 #include <neutrino.h>
 #include <gui/widget/stringinput.h>
 #include <gui/infoclock.h>
+#include <gui/movieplayer.h>
 #include <driver/volume.h>
 #include <driver/display.h>
 #include <system/helpers.h>
@@ -380,18 +381,37 @@ bool CFontSizeNotifier::changeNotify(const neutrino_locale_t, void *)
 int CSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 {
 printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
+
+	CMoviePlayerGui *mp = &CMoviePlayerGui::getInstance();
+	bool is_mp = mp->Playing();
+
 	if(actionKey == "off") {
 		tuxtx_stop_subtitle();
 		dvbsub_stop();
+		if (is_mp && playback) {
+			playback->SetDvbsubtitlePid(-1);
+			playback->SetSubtitlePid(-1);
+			playback->SetTeletextPid(-1);
+			mp->setCurrentTTXSub("");
+		}
 		return menu_return::RETURN_EXIT;
 	}
 	if(!strncmp(actionKey.c_str(), "DVB", 3)) {
 		char const * pidptr = strchr(actionKey.c_str(), ':');
 		int pid = atoi(pidptr+1);
 		tuxtx_stop_subtitle();
-		dvbsub_pause();
-		dvbsub_start(pid);
-	} else {
+		dvbsub_stop();
+		if (is_mp) {
+			playback->SetDvbsubtitlePid(-1);
+			playback->SetSubtitlePid(-1);
+			playback->SetTeletextPid(-1);
+			mp->setCurrentTTXSub("");
+			playback->SetDvbsubtitlePid(pid);
+			dvbsub_start(pid, true);
+		} else {
+			dvbsub_start(pid);
+		}
+	} else if(!strncmp(actionKey.c_str(), "TTX", 3)){
 		char const * ptr = strchr(actionKey.c_str(), ':');
 		ptr++;
 		int pid = atoi(ptr);
@@ -400,49 +420,31 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 		int page = strtol(ptr, NULL, 16);
 		ptr = strchr(ptr, ':');
 		ptr++;
-printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
+//printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
 		tuxtx_stop_subtitle();
 		dvbsub_stop();
-		tuxtx_set_pid(pid, page, ptr);
-		tuxtx_main(g_RCInput->getFileHandle(), pid, page);
-	}
-        return menu_return::RETURN_EXIT;
-}
-
-int CMPSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & ActionKey)
-{
-#if HAVE_SPARK_HARDWARE
-	actionKey = ActionKey;
-
-	tuxtx_stop_subtitle();
-	playback->SetDvbsubtitlePid(0xffff);
-	playback->SetSubtitlePid(0xffff);
-	playback->SetTeletextPid(0xffff);
-	dvbsub_stop();
-	if(!strncmp(actionKey.c_str(), "DVB", 3)) {
-		char const * pidptr = strchr(actionKey.c_str(), ':');
-		int pid = atoi(pidptr+1);
-		playback->SetDvbsubtitlePid(pid);
-		dvbsub_start(pid, true);
-	} else if(!strncmp(actionKey.c_str(), "SUB", 3)) {
+		if (is_mp) {
+			playback->SetDvbsubtitlePid(-1);
+			playback->SetSubtitlePid(-1);
+			playback->SetTeletextPid(pid);
+			tuxtx_set_pid(pid, page, ptr);
+			tuxtx_main(-1, pid, page, 0, true);
+			mp->setCurrentTTXSub(actionKey.c_str());
+		} else {
+			tuxtx_set_pid(pid, page, ptr);
+			tuxtx_main(-1, pid, page);
+		}
+	} else if(is_mp && !strncmp(actionKey.c_str(), "SUB", 3)){
+		tuxtx_stop_subtitle();
+		dvbsub_stop();
+		playback->SetDvbsubtitlePid(-1);
+		playback->SetSubtitlePid(-1);
+		playback->SetTeletextPid(-1);
+		mp->setCurrentTTXSub("");
 		char const * pidptr = strchr(actionKey.c_str(), ':');
 		int pid = atoi(pidptr+1);
 		playback->SetSubtitlePid(pid);
-	} else if(!strncmp(actionKey.c_str(), "TTX", 3)) {
-		char const * ptr = strchr(actionKey.c_str(), ':');
-		ptr++;
-		int pid = atoi(ptr);
-		ptr = strchr(ptr, ':');
-		ptr++;
-		int page = strtol(ptr, NULL, 16);
-		ptr = strchr(ptr, ':');
-		ptr++;
-printf("CSubtitleChangeExec::exec: TTX, pid %x page %x lang %s\n", pid, page, ptr);
-		playback->SetTeletextPid(pid);
-		tuxtx_set_pid(pid, page, ptr);
-		tuxtx_main(0, pid, page, 0, true);
 	}
-#endif
         return menu_return::RETURN_EXIT;
 }
 
