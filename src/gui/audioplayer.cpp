@@ -221,9 +221,7 @@ void CAudioPlayerGui::Init(void)
 		audiofilefilter.addFilter("m3u");
 		audiofilefilter.addFilter("ogg");
 		audiofilefilter.addFilter("wav");
-#ifdef ENABLE_FLAC
 		audiofilefilter.addFilter("flac");
-#endif
 	}
 	m_SMSKeyInput.setTimeout(AUDIOPLAYERGUI_SMSKEY_TIMEOUT);
 }
@@ -1321,9 +1319,7 @@ bool CAudioPlayerGui::openFilebrowser(void)
 					||  (files->getType() == CFile::FILE_OGG)
 					||  (files->getType() == CFile::FILE_MP3)
 					||  (files->getType() == CFile::FILE_WAV)
-#ifdef ENABLE_FLAC
 					||  (files->getType() == CFile::FILE_FLAC)
-#endif
 			   )
 			{
 				CAudiofileExt audiofile(files->Name,
@@ -1414,9 +1410,7 @@ bool CAudioPlayerGui::openFilebrowser(void)
 											|| fileType == CFile::FILE_MP3
 											|| fileType == CFile::FILE_OGG
 											|| fileType == CFile::FILE_WAV
-#ifdef ENABLE_FLAC
 											|| fileType == CFile::FILE_FLAC
-#endif
 									   )
 									{
 										CAudiofileExt audioFile(filename,fileType);
