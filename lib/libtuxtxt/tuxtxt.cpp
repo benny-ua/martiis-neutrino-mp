@@ -1616,9 +1616,9 @@ int tuxtx_subtitle_running(int *pid, int *page, int *running)
 }
 
 #if HAVE_SPARK_HARDWARE
-int tuxtx_main(int _rc, int pid, int page, int source, bool isEplayer)
+int tuxtx_main(int /*rc*/, int pid, int page, int source, bool isEplayer)
 #else
-int tuxtx_main(int _rc, int pid, int page, int source)
+int tuxtx_main(int /*rc*/, int pid, int page, int source)
 #endif
 {
 	char cvs_revision[] = "$Revision: 1.95 $";
@@ -1669,7 +1669,6 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 	}
 #endif
 
-	rc = _rc;
 	CFrameBuffer *fbp = CFrameBuffer::getInstance();
 	lfb = fbp->getFrameBufferPointer();
 	lbb = fbp->getBackBufferPointer();
@@ -1683,8 +1682,6 @@ int tuxtx_main(int _rc, int pid, int page, int source)
 		printf("[tuxtxt] No PID given, so scanning for PIDs ...\n\n");
 	else
 		printf("[tuxtxt] using PID %x page %x\n", tuxtxt_cache.vtxtpid, tuxtxt_cache.page);
-
-	fcntl(rc, F_SETFL, fcntl(rc, F_GETFL) | O_EXCL | O_NONBLOCK);
 
 	struct fb_var_screeninfo *var;
 	var = fbp->getScreenInfo();
