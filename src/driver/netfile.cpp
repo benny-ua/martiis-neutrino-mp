@@ -577,7 +577,9 @@ int parse_response(URL *url, void *opt, CSTATE *state)
 	int hlen = 0, response;
 	int meta_interval = 0, rval;
 	int fd = url->fd;
+#if 0
 	ID3 *id3 = (ID3*)opt;
+#endif
 
 	memset(header, 0, 2048);
 	ptr = header;
