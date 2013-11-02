@@ -77,7 +77,7 @@ class CNetworkSetup : public CMenuTarget, CChangeObserver
 
 
 		CMenuForwarder* dhcpDisable[5];
-		CMenuItem* wlanEnable[3];
+		CMenuItem* wlanEnable[4];
 
 		CSectionsdConfigNotifier* sectionsdConfigNotifier;
 			

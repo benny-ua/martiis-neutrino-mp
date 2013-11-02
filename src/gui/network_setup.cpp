@@ -344,6 +344,7 @@ int CNetworkSetup::showNetworkSetup()
 		CMenuForwarder *m9 = new CMenuDForwarder(LOCALE_NETWORKMENU_SSID      , networkConfig->wireless, NULL, networkSettings_ssid );
 		CMenuForwarder *m10 = new CMenuDForwarder(LOCALE_NETWORKMENU_PASSWORD , networkConfig->wireless, NULL, networkSettings_key );
 		CMenuForwarder *m11 = new CMenuForwarder(LOCALE_NETWORKMENU_SSID_SCAN , networkConfig->wireless, NULL, this, "scanssid");
+		CMenuOptionChooser* m12 = new CMenuOptionChooser(LOCALE_NETWORKMENU_WLAN_SECURITY, &network_encryption, OPTIONS_WLAN_SECURITY_OPTIONS, OPTIONS_WLAN_SECURITY_OPTION_COUNT, true);
 
 		m9->setHint("", LOCALE_MENU_HINT_NET_SSID);
 		m10->setHint("", LOCALE_MENU_HINT_NET_PASS);
@@ -352,15 +353,12 @@ int CNetworkSetup::showNetworkSetup()
 		wlanEnable[0] = m9;
 		wlanEnable[1] = m10;
 		wlanEnable[2] = m11;
+		wlanEnable[3] = m12;
 
 		networkSettings->addItem( m11);	//ssid scan
 		networkSettings->addItem( m9);	//ssid
 		networkSettings->addItem( m10);	//key
 
-		//encryption
-		CMenuOptionChooser* m12 = new CMenuOptionChooser(LOCALE_NETWORKMENU_WLAN_SECURITY, &network_encryption,
-			OPTIONS_WLAN_SECURITY_OPTIONS, OPTIONS_WLAN_SECURITY_OPTION_COUNT, true);
-		wlanEnable[2] = m12;
 		networkSettings->addItem( m12); //encryption
 
 		networkSettings->addItem(GenericMenuSeparatorLine);
