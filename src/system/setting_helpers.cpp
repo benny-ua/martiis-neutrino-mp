@@ -387,8 +387,11 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 
 	if(actionKey == "off") {
 		tuxtx_stop_subtitle();
-		dvbsub_stop();
+		if (!mp && dvbsub_getpid() > 0)
+			dvbsub_stop();
 		if (is_mp && playback) {
+			if (playback->GetDvbsubtitlePid() > 0)
+				dvbsub_stop();
 			playback->SetDvbsubtitlePid(-1);
 			playback->SetSubtitlePid(-1);
 			playback->SetTeletextPid(-1);

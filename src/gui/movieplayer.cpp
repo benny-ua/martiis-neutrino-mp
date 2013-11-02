@@ -1321,9 +1321,8 @@ void CMoviePlayerGui::PlayFileLoop(void)
 
 void CMoviePlayerGui::PlayFileEnd(bool restore)
 {
-	playback->SetTeletextPid(-1);    
-	tuxtx_stop_subtitle();
-	dvbsub_stop();
+	CSubtitleChangeExec SubtitleChanger(playback);
+	SubtitleChanger.exec(NULL, "off");
 
 #if HAVE_SPARK_HARDWARE
 	frameBuffer->set3DMode(old3dmode);
@@ -1334,9 +1333,6 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 #endif
 
 	FileTime.hide();
-
-	CSubtitleChangeExec SubtitleChanger(playback);
-	SubtitleChanger.exec(NULL, "off");
 	playback->SetSpeed(1);
 	playback->Close();
 	delete playback;
