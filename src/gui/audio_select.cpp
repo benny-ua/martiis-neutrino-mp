@@ -223,21 +223,31 @@ int CAudioSelectMenuHandler::doMenu ()
 		}
 	}
 
+	AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
+	/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
+	t_channel_id chan = 0;
+	int apid = 0;
+	unsigned int is_ac3;
 	if (is_mp) {
-		// FIXME
-	} else {
-		AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-		/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
-		CVolume::getInstance()->SetCurrentChannel(0);
-		CVolume::getInstance()->SetCurrentPid(0);
-		int percent[p_count];
-		for (uint i=0; i < p_count; i++) {
-			percent[i] = CZapit::getInstance()->GetPidVolume(0, g_RemoteControl->current_PIDs.APIDs[i].pid, g_RemoteControl->current_PIDs.APIDs[i].is_ac3);
-			AudioSelector.addItem(new CMenuOptionNumberChooser(g_RemoteControl->current_PIDs.APIDs[i].desc,
-						&percent[i],
-						i == g_RemoteControl->current_PIDs.PIDs.selected_apid,
-						0, 999, CVolume::getInstance()));
+		chan = mp->getChannelId();
+		mp->getAPID(apid, is_ac3);
+	}
+	CVolume::getInstance()->SetCurrentChannel(chan);
+	CVolume::getInstance()->SetCurrentPid(apid);
+	int percent[p_count];
+	for (uint i=0; i < p_count; i++) {
+		const char *desc;
+		if (is_mp) {
+			mp->getAPID(i, apid, is_ac3);
+			desc = mp->getAPIDDesc(i).c_str();
+		} else {
+			apid = g_RemoteControl->current_PIDs.APIDs[i].pid;
+			is_ac3 = g_RemoteControl->current_PIDs.APIDs[i].is_ac3;
+			desc = g_RemoteControl->current_PIDs.APIDs[i].desc;
 		}
+
+		percent[i] = CZapit::getInstance()->GetPidVolume(chan, apid, is_ac3);
+		AudioSelector.addItem(new CMenuOptionNumberChooser(desc, &percent[i], i == sel_apid, 0, 999, CVolume::getInstance()));
 	}
 
 	int res = AudioSelector.exec(NULL, "");

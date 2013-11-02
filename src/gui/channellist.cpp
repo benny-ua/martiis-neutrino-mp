@@ -696,7 +696,7 @@ int CChannelList::show()
 			} else
 				loop=false;
 		}
-		else if( msg == CRCInput::RC_record) { //start direct recording from channellist
+		else if( msg == CRCInput::RC_record && CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_ts) { //start direct recording from channellist
 #if 0
 			if(!CRecordManager::getInstance()->RecordingStatus(chanlist[selected]->channel_id))
 			{
@@ -1860,6 +1860,8 @@ void CChannelList::paintButtonBar(bool is_current)
 		if (i == 4) {
 			//manage record button
 			if (g_settings.recording_type == RECORDING_OFF)
+				continue;
+			if (IS_WEBTV(chanlist[selected]->channel_id))
 				continue;
 			if (!displayNext){
 				if (do_record){

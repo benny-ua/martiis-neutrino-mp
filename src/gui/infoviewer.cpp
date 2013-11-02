@@ -716,7 +716,8 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	last_curr_id = last_next_id = 0;
 	showButtonBar = !calledFromNumZap;
 
-	fileplay = (ChanNum == 0);
+	fileplay = (ChanNum == 0) && !CMoviePlayerGui::getInstance().Playing();
+	bool webplay = !IS_WEBTV(new_channel_id);
 	newfreq = true;
 
 	reset_allScala();
@@ -771,7 +772,7 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	int ChanNumWidth = 0;
 	int ChannelLogoMode = 0;
 	bool logo_ok = false;
-	if (ChanNum) /* !fileplay */
+	if (ChanNum != 0)
 	{
 		char strChanNum[10];
 		snprintf (strChanNum, sizeof(strChanNum), "%d", ChanNum);
@@ -855,7 +856,7 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 		}
 	}
 
-	if (fileplay) {
+	if (fileplay || webplay) {
 		show_Data ();
 	} else {
 		show_current_next(new_chan,epgpos);
@@ -1322,7 +1323,7 @@ int CInfoViewer::handleMsg (const neutrino_msg_t msg, neutrino_msg_data_t data)
 {
 	if ((msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) || (msg == NeutrinoMessages::EVT_NEXTPROGRAM)) {
 //printf("CInfoViewer::handleMsg: NeutrinoMessages::EVT_CURRENTNEXT_EPG data %llx current %llx\n", *(t_channel_id *) data, channel_id & 0xFFFFFFFFFFFFULL);
-		if ((*(t_channel_id *) data) == (channel_id & 0xFFFFFFFFFFFFULL)) {
+		if (!CMoviePlayerGui::getInstance().Playing() && (*(t_channel_id *) data) == (channel_id & 0xFFFFFFFFFFFFULL)) {
 			getEPG (*(t_channel_id *) data, info_CurrentNext);
 			if (is_visible)
 				show_Data (true);

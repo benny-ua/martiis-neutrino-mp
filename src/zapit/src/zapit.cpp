@@ -503,6 +503,9 @@ bool CZapit::ParsePatPmt(CZapitChannel * channel)
 	return true;
 }
 
+extern bool MoviePlayerZapto(const std::string &file, const std::string &name, t_channel_id chan);
+extern void MoviePlayerStop(void);
+
 bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplayback)
 {
 	bool transponder_change = false;
@@ -516,6 +519,13 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 	}
 
 	INFO("[zapit] zap to %s (%" PRIx64 " tp %" PRIx64 ")", newchannel->getName().c_str(), newchannel->getChannelID(), newchannel->getTransponderId());
+
+	if (!newchannel->getUrl().empty()) {
+		if (MoviePlayerZapto(newchannel->getUrl(), newchannel->getName(), channel_id))
+			current_channel = newchannel;
+		return true;
+	}
+	MoviePlayerStop();
 
 #ifdef ENABLE_PIP
 	/* executed async if zap NOWAIT, race possible with record lock/allocate */
@@ -2402,6 +2412,8 @@ bool CZapit::Start(Z_start_arg *ZapStart_arg)
 	video_mode = ZapStart_arg->video_mode;
 	current_volume = ZapStart_arg->volume;
 
+	webtv_xml = ZapStart_arg->webtv_xml;
+
 	videoDemux = new cDemux();
 	videoDemux->Open(DMX_VIDEO_CHANNEL);
 
@@ -2789,4 +2801,46 @@ void CZapitSdtMonitor::run()
 		}
 	}
 	return;
+}
+
+void CZapit::lockPlayBack(const bool sendpmt)
+{
+	/* hack. if standby true, dont blank video */
+	standby = true;
+	StopPlayBack(sendpmt);
+	standby = false;
+	playbackStopForced = true;
+	lock_channel_id = live_channel_id;
+}
+
+void CZapit::unlockPlayBack(const bool /*sendpmt*/)
+{
+	playbackStopForced = false;
+	if (lock_channel_id == live_channel_id) {
+		StartPlayBack(current_channel);
+		SendPMT();
+	} else {
+		live_fe->setTsidOnid(0);
+		ZapIt(lock_channel_id);
+		lock_channel_id = 0;
+	}
+}
+
+void CZapit::setStandby(const bool enable)
+{
+	if (enable) {
+		// if(currentMode & RECORD_MODE) videoDecoder->freeze();
+		enterStandby();
+	} else
+		leaveStandby();
+}
+
+void CZapit::Rezap(void)
+{
+	if (currentMode & RECORD_MODE)
+		return;
+	if(config.rezapTimeout > 0)
+		sleep(config.rezapTimeout);
+	if(current_channel)
+		ZapIt(current_channel->getChannelID());
 }

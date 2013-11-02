@@ -705,7 +705,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.logo_hdd_dir_2 = configfile.getString( "logo_hdd_dir_2", "/share/tuxbox/neutrino/icons/logo");
 	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "");
-	g_settings.webtv_xml = configfile.getString("webtv_xml", CONFIGDIR "/webtv_usr.xml");
+	g_settings.webtv_xml = configfile.getString("webtv_xml", WEBTV_XML);
 
 	loadKeys();
 
@@ -2080,6 +2080,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	ZapStart_arg.video_mode = g_settings.video_Mode;
 	ZapStart_arg.ci_clock = g_settings.ci_clock;
 	ZapStart_arg.volume = g_settings.current_volume;
+	ZapStart_arg.webtv_xml = &g_settings.webtv_xml;
 
 	/* create decoders, read channels */
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2398,6 +2399,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 
 #if ENABLE_SHAIRPLAY
 		if (shairPlay && shairplay_enabled_cur && shairplay_active) {
+			CMoviePlayerGui::getInstance().stopPlayBack();
 			StopSubtitles();
 			shairPlay->exec();
 			StartSubtitles();
@@ -2405,7 +2407,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 		}
 #endif
 
-		if( ( mode == mode_tv ) || ( ( mode == mode_radio ) ) ) {
+		if( ( mode == mode_tv ) || ( mode == mode_radio ) || ( mode == mode_webtv ) ) {
 			if( (msg == NeutrinoMessages::SHOW_EPG) /* || (msg == CRCInput::RC_info) */ ) {
 				StopSubtitles();
 				t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
@@ -2550,7 +2552,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				g_PluginList->start_plugin_by_name(g_settings.onekey_plugin.c_str(), 0);
 			}
 			else if(msg == (neutrino_msg_t) g_settings.key_timeshift) {
-				CRecordManager::getInstance()->StartTimeshift();
+				if (mode != mode_webtv)
+					CRecordManager::getInstance()->StartTimeshift();
 			}
 			else if (msg == (neutrino_msg_t) g_settings.key_current_transponder){
 				numericZap( msg );
@@ -2588,13 +2591,14 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				}
 			}
 			else if( msg == CRCInput::RC_record) {
-				StopSubtitles();
-				if (recordingstatus)
-					CRecordManager::getInstance()->exec(NULL, "Stop_record");
-				else
-				if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
-					CRecordManager::getInstance()->exec(NULL, "Record");
-				StartSubtitles();
+				if (mode != mode_webtv) {
+					StopSubtitles();
+					if (recordingstatus)
+						CRecordManager::getInstance()->exec(NULL, "Stop_record");
+					else if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
+						CRecordManager::getInstance()->exec(NULL, "Record");
+					StartSubtitles();
+				}
 			}
 			else if( msg == CRCInput::RC_stop ) {
 				StopSubtitles();
@@ -2781,16 +2785,18 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 #endif
 		g_RCInput->killTimer(scrambled_timer);
 
-		scrambled_timer = g_RCInput->addTimer(10*1000*1000, true);
-		SelectSubtitles();
-		StartSubtitles(!g_InfoViewer->is_visible);
+		if (mode != mode_webtv) {
+			scrambled_timer = g_RCInput->addTimer(10*1000*1000, true);
+			SelectSubtitles();
+			StartSubtitles(!g_InfoViewer->is_visible);
 
-		/* update scan settings for manual scan to current channel */
-		CScanSetup::getInstance()->updateManualSettings();
+			/* update scan settings for manual scan to current channel */
+			CScanSetup::getInstance()->updateManualSettings();
 
-		/* update subchannels */
-		CSectionsdClient::CurrentNextInfo dummy;
-		g_InfoViewer->getEPG(CZapit::getInstance()->GetCurrentChannelID(), dummy);
+			/* update subchannels */
+			CSectionsdClient::CurrentNextInfo dummy;
+			g_InfoViewer->getEPG(CZapit::getInstance()->GetCurrentChannelID(), dummy);
+		}
 	}
 	if ((msg == NeutrinoMessages::EVT_TIMER)) {
 		if(data == scrambled_timer) {
@@ -2842,7 +2848,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 	/* ================================== KEYS ================================================ */
 	if( msg == CRCInput::RC_ok || (!g_InfoViewer->virtual_zap_mode && (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites))) {
-		if( (mode == mode_tv) || (mode == mode_radio) || (mode == mode_ts)) {
+		if( (mode == mode_tv) || (mode == mode_radio) || (mode == mode_ts) ) {
 			if(g_settings.mode_clock)
 				InfoClock->StopClock();
 
@@ -2898,7 +2904,7 @@ _repeat:
 				if(!bouquetList->Bouquets.empty()) {
 					bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->adjustToChannelID(old_id, false);
 				}
-				StartSubtitles(mode == mode_tv);
+				StartSubtitles(mode == mode_tv || mode == mode_webtv);
 			}
 			else if(nNewChannel == -3) { // list mode changed
 				printf("************************* ZAP NEW MODE: bouquetList %p size %d\n", bouquetList, (int)bouquetList->Bouquets.size());fflush(stdout);
@@ -3219,7 +3225,7 @@ _repeat:
 				if ((!isTVMode) && (mode != mode_radio)) {
 					radioMode(false);
 				}
-				else if (isTVMode && (mode != mode_tv)) {
+				else if (isTVMode && (mode != mode_tv || mode == mode_webtv)) {
 					tvMode(false);
 				}
 				channelList->zapTo_ChannelID(eventinfo->channel_id);
@@ -3498,6 +3504,7 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 		dprintf(DEBUG_INFO, "exit\n");
 		StopSubtitles();
 		g_Zapit->stopPlayBack();
+		CMoviePlayerGui::getInstance().stopPlayBack();
 
 		frameBuffer->paintBackground();
 		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/shutdown.jpg");
@@ -4314,8 +4321,8 @@ void stop_daemons(bool stopall, bool for_flash)
 	  	videoDecoder->SetCECMode((VIDEO_HDMI_CEC_MODE)0);
 	}
 
-	delete &CMoviePlayerGui::getInstance();
 	CZapit::getInstance()->Stop();
+	delete &CMoviePlayerGui::getInstance();
 	printf("zapit shutdown done\n");
 	if (!for_flash) {
 		CVFD::getInstance()->Clear();
@@ -4615,6 +4622,15 @@ void CNeutrinoApp::StopSubtitles()
 #endif
 {
 	printf("[neutrino] %s\n", __FUNCTION__);
+	if (CMoviePlayerGui::getInstance().Playing()) {
+#ifdef ENABLE_GRAPHLCD
+		CMoviePlayerGui::getInstance().StopSubtitles(b);
+#else
+		CMoviePlayerGui::getInstance().StopSubtitles();
+#endif
+		return;
+	}
+
 	int ttx, dvbpid, ttxpid, ttxpage;
 
 	dvbpid = dvbsub_getpid();
@@ -4635,6 +4651,12 @@ void CNeutrinoApp::StopSubtitles()
 void CNeutrinoApp::StartSubtitles(bool show)
 {
 	printf("%s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
+
+	if (CMoviePlayerGui::getInstance().Playing()) {
+		CMoviePlayerGui::getInstance().StartSubtitles(show);
+		return;
+	}
+		
 #ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
 #endif

@@ -152,7 +152,8 @@ struct NeutrinoMessages {
 		/* sectionsd */
 		EVT_EIT_COMPLETE                         = CRCInput::RC_WithData + 24, /* data: (t_channel_id *) */
 		EVT_BACK_ZAP_COMPLETE                    = CRCInput::RC_WithData + 25, /* data: (t_channel_id *) */
-		EVT_BATCHEPG				 = CRCInput::RC_WithData + 26
+		EVT_BATCHEPG				 = CRCInput::RC_WithData + 26,
+		EVT_WEBTV				 = CRCInput::RC_WithData + 27, /* data: (MI_MOVIE_INFO *) */
 	};
 	enum
 	{
@@ -164,6 +165,7 @@ struct NeutrinoMessages {
 		mode_audio = 5,
 		mode_pic = 6,
 		mode_ts = 7,
+		mode_webtv = 9,
 		mode_mask = 0xFF,
 		norezap = 0x100
 	};

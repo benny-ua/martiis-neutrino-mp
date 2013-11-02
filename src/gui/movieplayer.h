@@ -52,6 +52,9 @@
 #include <string>
 #include <vector>
 
+#include <OpenThreads/Thread>
+#include <OpenThreads/Condition>
+
 class CMoviePlayerGui : public CMenuTarget
 {
  public:
@@ -72,10 +75,11 @@ class CMoviePlayerGui : public CMenuTarget
 	CFrameBuffer * frameBuffer;
 	int            m_LastMode;	
 
-	std::string	full_name;
+	std::string	pretty_name;
 	std::string	file_name;
 	std::string    	currentaudioname;
 	bool		playing;
+	bool		first_start_timeshift;
 	CMoviePlayerGui::state playstate;
 	int speed;
 	int startposition;
@@ -138,6 +142,11 @@ class CMoviePlayerGui : public CMenuTarget
 	CMovieBrowser* moviebrowser;
 	CWebTV* webtv;
 	MI_MOVIE_INFO * p_movie_info;
+	MI_MOVIE_INFO mi;
+#if HAVE_SPARK_HARDWARE
+        CFrameBuffer::Mode3D old3dmode;
+#endif
+
 	const static int MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
 
 	/* playback from file */
@@ -153,11 +162,17 @@ class CMoviePlayerGui : public CMenuTarget
 	CBookmarkManager * bookmarkmanager;
 	bool isBookmark;
 
+	OpenThreads::Mutex mutex;
+	pthread_t bgThread;
+
 	cPlayback *playback;
 	static CMoviePlayerGui* instance_mp;
 
 	void Init(void);
 	void PlayFile();
+	bool PlayFileStart();
+	void PlayFileLoop();
+	void PlayFileEnd(bool restore = true);
 	void cutNeutrino();
 	void restoreNeutrino();
 
@@ -172,8 +187,6 @@ class CMoviePlayerGui : public CMenuTarget
 	void handleMovieBrowser(neutrino_msg_t msg, int position = 0);
 	bool SelectFile();
 	void updateLcd();
-	void StopSubtitles(bool b);
-	void StartSubtitles(bool show = true);
 
 	static void *ShowWebTVHint(void *arg);
 
@@ -186,6 +199,7 @@ class CMoviePlayerGui : public CMenuTarget
 
 	void Cleanup();
 	static void *ShowStartHint(void *arg);
+	static void* bgPlayThread(void *arg);
 
 	CMoviePlayerGui(const CMoviePlayerGui&) {};
 	CMoviePlayerGui();
@@ -205,9 +219,11 @@ class CMoviePlayerGui : public CMenuTarget
 	void UpdatePosition();
 	int timeshift;
 	int file_prozent;
-	void SetFile(std::string &name, std::string &file) { file_name = name; full_name = file; }
+	void SetFile(std::string &name, std::string &file) { pretty_name = name; file_name = file; }
 	unsigned int getAPID(void);
 	unsigned int getAPID(unsigned int i);
+	void getAPID(int &apid, unsigned int &is_ac3);
+	bool getAPID(unsigned int i, int &apid, unsigned int &is_ac3);
 	bool setAPID(unsigned int i);
 	cPlayback *getPlayback() { return playback; }
 	unsigned int getAPIDCount(void);
@@ -216,6 +232,13 @@ class CMoviePlayerGui : public CMenuTarget
 	CZapitAbsSub* getChannelSub(unsigned int i, CZapitAbsSub **s);
 	int getCurrentSubPid(CZapitAbsSub::ZapitSubtitleType st);
 	void setCurrentTTXSub(const char *s) { currentttxsub = s; }
+	t_channel_id getChannelId(void);
+	void LockPlayback(const char *);
+	void UnlockPlayback(void);
+	bool PlayBackgroundStart(const std::string &file, const std::string &name, t_channel_id chan);
+	void stopPlayBack(void);
+	void StopSubtitles(bool b);
+	void StartSubtitles(bool show = true);
 };
 
 #endif

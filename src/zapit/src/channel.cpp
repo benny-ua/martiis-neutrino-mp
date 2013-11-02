@@ -50,6 +50,21 @@ CZapitChannel::CZapitChannel(const std::string & p_name, t_channel_id p_channel_
 	Init();
 }
 
+// For WebTV ...
+CZapitChannel::CZapitChannel(const std::string & p_name, t_channel_id p_channel_id, const std::string & p_url)
+{
+	name = p_name;
+	url = p_url;
+	channel_id = p_channel_id;
+	service_id = 0;
+	transport_stream_id = 0;
+	original_network_id = 0;
+	serviceType = ST_DIGITAL_TELEVISION_SERVICE;
+	satellitePosition = 0;
+	freq = 0;
+	Init();
+}
+
 void CZapitChannel::Init()
 {
 	//caPmt = NULL;
@@ -329,18 +344,28 @@ void CZapitChannel::dumpBouquetXml(FILE * fd)
 	bool write_names = 1;
 
 	if(write_names) {
-		fprintf(fd, "\t\t<S i=\"%x\" n=\"%s\" t=\"%x\" on=\"%x\" s=\"%hd\" frq=\"%hd\"/>\n",
-				getServiceId(), convert_UTF8_To_UTF8_XML(getName().c_str()).c_str(),
-				getTransportStreamId(),
-				getOriginalNetworkId(),
-				getSatellitePosition(),
-				getFreqId());
+		if (url.empty())
+			fprintf(fd, "\t\t<S i=\"%x\" n=\"%s\" t=\"%x\" on=\"%x\" s=\"%hd\" frq=\"%hd\"/>\n",
+					getServiceId(),
+					convert_UTF8_To_UTF8_XML(getName().c_str()).c_str(),
+					getTransportStreamId(),
+					getOriginalNetworkId(),
+					getSatellitePosition(),
+					getFreqId());
+		else
+			fprintf(fd, "\t\t<S n=\"%s\" u=\"%s\"/>\n",
+					convert_UTF8_To_UTF8_XML(getName().c_str()).c_str(),
+					convert_UTF8_To_UTF8_XML(url.c_str()).c_str());
 	} else {
-		fprintf(fd, "\t\t<S i=\"%x\" t=\"%x\" on=\"%x\" s=\"%hd\" frq=\"%hd\"/>\n",
-				getServiceId(),
-				getTransportStreamId(),
-				getOriginalNetworkId(),
-				getSatellitePosition(),
-				getFreqId());
+		if (url.empty())
+			fprintf(fd, "\t\t<S i=\"%x\" t=\"%x\" on=\"%x\" s=\"%hd\" frq=\"%hd\"/>\n",
+					getServiceId(),
+					getTransportStreamId(),
+					getOriginalNetworkId(),
+					getSatellitePosition(),
+					getFreqId());
+		else
+			fprintf(fd, "\t\t<S u=\"%s\"/>\n",
+					convert_UTF8_To_UTF8_XML(url.c_str()).c_str());
 	}
 }

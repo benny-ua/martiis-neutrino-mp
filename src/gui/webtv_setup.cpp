@@ -53,6 +53,7 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 		char *d = dirname((char *) dn.c_str());
 		if (fileBrowser.exec(d) == true) {
 			g_settings.webtv_xml = fileBrowser.getSelectedFile()->Name;
+			g_Zapit->reinitChannels();
 		}
 		return res;
 	}

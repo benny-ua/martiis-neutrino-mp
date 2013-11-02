@@ -720,7 +720,7 @@ void CRemoteControl::startvideo()
 	{
 		is_video_started= true;
 		//g_Zapit->startPlayBack();
-		g_Zapit->unlockPlayBack(false);
+		CZapit::getInstance()->unlockPlayBack(false); //g_Zapit->unlockPlayBack(false);
 	}
 }
 
@@ -734,7 +734,7 @@ void CRemoteControl::stopvideo()
 		   lockPlayback prevents it from being inadvertently starting */
 		g_Zapit->stopPlayBack(false);
 #endif
-		g_Zapit->lockPlayBack(false);
+		CZapit::getInstance()->lockPlayBack(false); //g_Zapit->lockPlayBack(false);
 	}
 }
 

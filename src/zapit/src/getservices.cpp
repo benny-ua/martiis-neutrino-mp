@@ -31,6 +31,7 @@
 #include <math.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <system/helpers.h>
 
 //#define SAVE_DEBUG
 
@@ -705,6 +706,7 @@ bool CServiceManager::LoadServices(bool only_current)
 	service_count = 0;
 	printf("[zapit] Loading services, channel size %d ..\n", (int)sizeof(CZapitChannel));
 	//frontendType = CFEManager::getInstance()->getLiveFE()->getInfo()->type;
+	std::string *webtv_xml = CZapit::getInstance()->GetWebTVXML();
 
 	if(only_current)
 		goto do_current;
@@ -765,6 +767,38 @@ bool CServiceManager::LoadServices(bool only_current)
 			search = search->xmlNextNode;
 		}
 		FindTransponder(xmlDocGetRootElement(parser)->xmlChildrenNode);
+		xmlFreeDoc(parser);
+		parser = NULL;
+	}
+
+	if (webtv_xml && !access(*webtv_xml, R_OK)) {
+		INFO("Loading webtv...");
+		parser = parseXmlFile(webtv_xml->c_str());
+	}
+
+	if (parser != NULL) {
+		xmlNodePtr l0 = NULL;
+		xmlNodePtr l1 = NULL;
+		l0 = xmlDocGetRootElement(parser);
+		l1 = l0->xmlChildrenNode;
+		if (l1) {
+			while ((xmlGetNextOccurence(l1, "webtv"))) {
+				char *title = xmlGetAttribute(l1, "title");
+				char *url = xmlGetAttribute(l1, "url");
+				char *desc = xmlGetAttribute(l1, "description");
+				if (title && url) {
+					std::string t(title);
+					if (desc)
+						t += std::string(" (") + desc + ")";
+					t_channel_id chid = create_channel_id64(0, 0, 0, 0, 0, url);
+					CZapitChannel * channel = new CZapitChannel(t, chid, url);
+					AddChannel(channel);
+					channel->flags = CZapitChannel::PRESENT;
+				}
+
+				l1 = l1->xmlNextNode;
+			}
+		}
 		xmlFreeDoc(parser);
 	}
 
