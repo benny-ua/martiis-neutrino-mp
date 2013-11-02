@@ -407,7 +407,11 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 			playback->SetTeletextPid(-1);
 			mp->setCurrentTTXSub("");
 			playback->SetDvbsubtitlePid(pid);
+#if HAVE_SPARK_HARDWARE
 			dvbsub_start(pid, true);
+#else
+			dvbsub_start(pid);
+#endif
 		} else {
 			dvbsub_start(pid);
 		}
@@ -428,7 +432,11 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 			playback->SetSubtitlePid(-1);
 			playback->SetTeletextPid(pid);
 			tuxtx_set_pid(pid, page, ptr);
+#if HAVE_SPARK_HARDWARE
 			tuxtx_main(-1, pid, page, 0, true);
+#else
+			tuxtx_main(-1, pid, page, 0);
+#endif
 			mp->setCurrentTTXSub(actionKey.c_str());
 		} else {
 			tuxtx_set_pid(pid, page, ptr);

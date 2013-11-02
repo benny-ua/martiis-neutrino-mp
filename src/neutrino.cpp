@@ -4623,10 +4623,10 @@ void CNeutrinoApp::StopSubtitles()
 {
 	printf("[neutrino] %s\n", __FUNCTION__);
 	if (CMoviePlayerGui::getInstance().Playing()) {
-#ifdef ENABLE_GRAPHLCD
+#if HAVE_SPARK_HARDWARE
 		CMoviePlayerGui::getInstance().StopSubtitles(b);
 #else
-		CMoviePlayerGui::getInstance().StopSubtitles();
+		CMoviePlayerGui::getInstance().StopSubtitles(true /* whatever */);
 #endif
 		return;
 	}

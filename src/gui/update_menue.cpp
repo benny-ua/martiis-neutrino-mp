@@ -112,7 +112,6 @@ int CSoftwareUpdate::showSoftwareUpdate()
 	mf->setHint("", LOCALE_MENU_HINT_SOFTUPDATE_EXPERT);
 	softUpdate.addItem(mf);
 
-	}
 #ifdef BOXMODEL_APOLLO
 	softUpdate.addItem(GenericMenuSeparatorLine);
 
