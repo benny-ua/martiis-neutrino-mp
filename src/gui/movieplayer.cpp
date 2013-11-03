@@ -749,6 +749,11 @@ bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::st
 	p_movie_info = &mi;
 	is_file_player = 1;
 
+	numpida = 0; currentapid = -1;
+	numpidd = 0;
+	numpids = 0;
+	numpidt = 0; currentttxsub = "";
+
 	bool res = PlayFileStart();
 	if (res) {
 		if (pthread_create (&bgThread, 0, CMoviePlayerGui::bgPlayThread, this))
@@ -862,6 +867,10 @@ bool CMoviePlayerGui::PlayFileStart(void)
 				pids.epgAudioPidName = language[i];
 				p_movie_info->audioPids.push_back(pids);
 			}
+		if (currentapid < 0 && numpida > 0) {
+			currentapid = apids[0];
+			currentac3 = ac3flags[0];
+		}
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, true);
 		if(timeshift) {
