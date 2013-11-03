@@ -224,7 +224,7 @@ void CMoviePlayerGui::cutNeutrino()
 
 	playing = true;
 	/* set g_InfoViewer update timer to 1 sec, should be reset to default from restoreNeutrino->set neutrino mode  */
-	g_InfoViewer->setUpdateTimer(1000 * 1000);
+	//g_InfoViewer->setUpdateTimer(1000 * 1000);
 
 	if (isUPNP)
 		return;

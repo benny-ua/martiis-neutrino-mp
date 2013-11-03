@@ -2012,15 +2012,17 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 		}
 #endif
 		//calculating icons
+		bool isWebTV = !chan->getUrl().empty();
+		const char *icon = isWebTV ? NEUTRINO_ICON_STREAMING : NEUTRINO_ICON_SCRAMBLED;
 		int  icon_x = (x+width-15-2) - RADIUS_LARGE/2;
 		int r_icon_w;  int s_icon_h=0; int s_icon_w=0;
-		frameBuffer->getIconSize(NEUTRINO_ICON_SCRAMBLED, &s_icon_w, &s_icon_h);
+		frameBuffer->getIconSize(icon, &s_icon_w, &s_icon_h);
 		r_icon_w = ChannelList_Rec;
 		int r_icon_x = icon_x;
 
-		//paint scramble icon
-		if(chan->scrambled)
-			if (frameBuffer->paintIcon(NEUTRINO_ICON_SCRAMBLED, icon_x - s_icon_w, ypos, fheight))//ypos + (fheight - 16)/2);
+		//paint icon
+		if(chan->scrambled || isWebTV)
+			if (frameBuffer->paintIcon(icon, icon_x - s_icon_w, ypos, fheight))//ypos + (fheight - 16)/2);
 				r_icon_x = r_icon_x - s_icon_w;
 
  		//paint recording icon
