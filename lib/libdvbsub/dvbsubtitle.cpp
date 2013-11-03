@@ -283,6 +283,9 @@ cDvbSubtitleConverter::cDvbSubtitleConverter(void)
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
 	pthread_mutex_init(&mutex, &attr);
 	running = false;
+#if HAVE_SPARK_HARDWARE
+	painted = false;
+#endif
 
 	avctx = NULL;
 	avcodec = NULL;
@@ -354,7 +357,10 @@ void cDvbSubtitleConverter::Pause(bool pause)
 void cDvbSubtitleConverter::Clear(void)
 {
 #if HAVE_SPARK_HARDWARE
-	CFrameBuffer::getInstance()->Clear();
+	if (running && painted) {
+		CFrameBuffer::getInstance()->Clear();
+		painted = false;
+	}
 #else
 //	dbgconverter("cDvbSubtitleConverter::Clear: x=% d y= %d, w= %d, h= %d\n", min_x, min_y, max_x-min_x, max_y-min_y);
 	if(running && (max_x-min_x > 0) && (max_y-min_y > 0)) {
@@ -478,8 +484,10 @@ dbgconverter("cDvbSubtitleConverter::Action: PTS: %012llx STC: %012llx (%lld) ti
 					sb->Draw(min_x, min_y, max_x, max_y);
 					Timeout.Set(sb->Timeout());
 				}
-				if(sb->Count())
+				if(sb->Count()) {
 					WaitMs = MIN_DISPLAY_TIME;
+					painted = true;
+				}
 				bitmaps->Del(sb, true);
 //				shown = true;
 			}

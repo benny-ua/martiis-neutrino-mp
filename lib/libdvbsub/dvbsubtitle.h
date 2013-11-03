@@ -15,6 +15,7 @@
 // Workaround for C++
 #define __STDC_CONSTANT_MACROS
 
+#include <config.h>
 extern "C" {
 #include <unistd.h>
 #include <linux/fb.h>
@@ -32,6 +33,9 @@ class cDvbSubtitleBitmaps;
 class cDvbSubtitleConverter  /*: public cThread */{
 private:
   bool running;
+#if HAVE_SPARK_HARDWARE
+  bool painted;
+#endif
   pthread_mutex_t mutex;
   cList<cDvbSubtitleBitmaps> *bitmaps;
   AVCodecContext * avctx;
