@@ -1150,7 +1150,8 @@ bool CChannelList::adjustToChannelID(const t_channel_id channel_id, bool bToo)
 				int new_mode = old_mode;
 				bool has_channel;
 				first_mode_found = -1;
-				if(CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_tv) {
+				if(CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_tv
+				|| CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_webtv) {
 					has_channel = TVfavList->adjustToChannelID(channel_id);
 					if (has_channel && first_mode_found < 0)
 						first_mode_found = LIST_MODE_FAV;

@@ -2584,14 +2584,17 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				numericZap( msg );
 			}
 			else if(msg == CRCInput::RC_rewind) {
-				if(g_RemoteControl->is_video_started) {
-					t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
-					if(CRecordManager::getInstance()->RecordingStatus(live_channel_id))
-						CMoviePlayerGui::getInstance().exec(NULL, "rtimeshift");
+				if (mode != mode_webtv) {
+					if(g_RemoteControl->is_video_started) {
+						t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+						if(CRecordManager::getInstance()->RecordingStatus(live_channel_id))
+							CMoviePlayerGui::getInstance().exec(NULL, "rtimeshift");
+					}
 				}
 			}
 			else if( msg == CRCInput::RC_record) {
 				if (mode != mode_webtv) {
+fprintf(stderr, "######## mode == %d (should be: != %d\n", mode, mode_webtv);
 					StopSubtitles();
 					if (recordingstatus)
 						CRecordManager::getInstance()->exec(NULL, "Stop_record");
@@ -2848,7 +2851,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 	/* ================================== KEYS ================================================ */
 	if( msg == CRCInput::RC_ok || (!g_InfoViewer->virtual_zap_mode && (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites))) {
-		if( (mode == mode_tv) || (mode == mode_radio) || (mode == mode_ts) ) {
+		if( (mode == mode_tv) || (mode == mode_radio) || (mode == mode_ts) || (mode == mode_webtv) ) {
 			if(g_settings.mode_clock)
 				InfoClock->StopClock();
 
@@ -3225,7 +3228,7 @@ _repeat:
 				if ((!isTVMode) && (mode != mode_radio)) {
 					radioMode(false);
 				}
-				else if (isTVMode && (mode != mode_tv || mode == mode_webtv)) {
+				else if (isTVMode && mode != mode_tv && mode != mode_webtv) {
 					tvMode(false);
 				}
 				channelList->zapTo_ChannelID(eventinfo->channel_id);
@@ -3433,6 +3436,10 @@ _repeat:
 				videoDecoder->StopPicture();
 			lastMode=mode;
 			mode=mode_ts;
+		}
+		if((data & mode_mask)== mode_webtv) {
+			lastMode=mode;
+			mode=mode_webtv;
 		}
 	}
 	else if( msg == NeutrinoMessages::VCR_ON ) {
@@ -3719,6 +3726,7 @@ void CNeutrinoApp::tvMode( bool rezap )
 	}
 
 	bool stopauto = (mode != mode_ts);
+	int oldmode = mode;
 	mode = mode_tv;
 	if(stopauto /*&& autoshift*/) {
 		//printf("standby on: autoshift ! stopping ...\n");
@@ -3726,8 +3734,10 @@ void CNeutrinoApp::tvMode( bool rezap )
 		//recordingstatus = 0;
 	}
 
-	frameBuffer->useBackground(false);
-	frameBuffer->paintBackground();
+	if (oldmode != mode_webtv) {
+		frameBuffer->useBackground(false);
+		frameBuffer->paintBackground();
+	}
 
 	g_RemoteControl->tvMode();
 	SetChannelMode(g_settings.channel_mode);
@@ -3774,7 +3784,7 @@ void CNeutrinoApp::scartMode( bool bOnOff )
 		if( lastMode == mode_radio ) {
 			radioMode( false );
 		}
-		else if( lastMode == mode_tv ) {
+		else if( lastMode == mode_tv || lastMode == mode_webtv ) {
 			tvMode( false );
 		}
 		else if( lastMode == mode_standby ) {
@@ -3963,6 +3973,11 @@ void CNeutrinoApp::radioMode( bool rezap)
 {
 	//printf("radioMode: rezap %s\n", rezap ? "yes" : "no");
 	INFO("rezap %d current mode %d", rezap, mode);
+	if (mode == mode_webtv) {
+		CMoviePlayerGui::getInstance().setLastMode(mode_unknown);
+		CMoviePlayerGui::getInstance().stopPlayBack();
+		CVFD::getInstance()->ShowIcon(FP_ICON_TV, false);
+	}
 	if (mode == mode_tv) {
 		CVFD::getInstance()->ShowIcon(FP_ICON_TV, false);
 		StopSubtitles();
@@ -4000,14 +4015,14 @@ void CNeutrinoApp::radioMode( bool rezap)
 void CNeutrinoApp::switchTvRadioMode(const int prev_mode)
 {
 	if (prev_mode != mode_unknown){
-		if (prev_mode == mode_tv && mode != mode_tv )
+		if (prev_mode == mode_tv && mode != mode_tv && mode != mode_webtv)
 			tvMode();
 		else if(prev_mode == mode_radio && mode != mode_radio)
 			radioMode();
 	}else {
 		if (mode == mode_radio )
 			tvMode();
-		else if(mode == mode_tv)
+		else if(mode == mode_tv || mode == mode_webtv)
 			radioMode();
 	}
 }

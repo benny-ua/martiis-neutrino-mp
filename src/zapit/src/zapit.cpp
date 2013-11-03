@@ -178,7 +178,8 @@ void CZapit::SaveSettings(bool write)
 		if (config.saveLastChannel) {
 			configfile.setInt32("lastChannelMode", (currentMode & RADIO_MODE) ? 1 : 0);
 			configfile.setInt64("lastChannelRadio", lastChannelRadio);
-			configfile.setInt64("lastChannelTV", lastChannelTV);
+			if (!IS_WEBTV(lastChannelTV))
+				configfile.setInt64("lastChannelTV", lastChannelTV);
 			configfile.setInt64("lastChannel", live_channel_id);
 			if (!(currentMode & RADIO_MODE))
 				configfile.setBool("lastChannelTVScrambled", !current_channel || current_channel->scrambled);
@@ -521,8 +522,10 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 	INFO("[zapit] zap to %s (%" PRIx64 " tp %" PRIx64 ")", newchannel->getName().c_str(), newchannel->getChannelID(), newchannel->getTransponderId());
 
 	if (!newchannel->getUrl().empty()) {
-		if (MoviePlayerZapto(newchannel->getUrl(), newchannel->getName(), channel_id))
+		if (MoviePlayerZapto(newchannel->getUrl(), newchannel->getName(), channel_id)) {
 			current_channel = newchannel;
+			lastChannelTV = channel_id;
+		}
 		return true;
 	}
 	MoviePlayerStop();

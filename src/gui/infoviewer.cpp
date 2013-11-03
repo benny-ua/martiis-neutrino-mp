@@ -783,26 +783,33 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 
 		int ChanNumYPos = BoxStartY + ChanHeight;
 		if (g_settings.infobar_sat_display) {
-			std::string name = CServiceManager::getInstance()->GetSatelliteName(satellitePosition);
-			int satNameWidth = g_SignalFont->getRenderWidth (name);
-			std::string satname_tmp = name;
-			if (satNameWidth > (ChanWidth - 4)) {
-				satNameWidth = ChanWidth - 4;
-				size_t pos1 = name.find("(") ;
-				size_t pos2 = name.find_last_of(")");
-				size_t pos0 = name.find(" ") ;
-				if ((pos1 != std::string::npos) && (pos2 != std::string::npos) && (pos0 != std::string::npos)) {
-					pos1++;
-					satname_tmp = name.substr(0, pos0 );
+			std::string satname_tmp;
+			int satNameWidth;
+			if (IS_WEBTV(channel_id)) {
+				satname_tmp = "WebTV";
+				satNameWidth = g_SignalFont->getRenderWidth (satname_tmp);
+			} else {
+				std::string name = CServiceManager::getInstance()->GetSatelliteName(satellitePosition);
+				satNameWidth = g_SignalFont->getRenderWidth (name);
+				satname_tmp = name;
+				if (satNameWidth > (ChanWidth - 4)) {
+					satNameWidth = ChanWidth - 4;
+					size_t pos1 = name.find("(") ;
+					size_t pos2 = name.find_last_of(")");
+					size_t pos0 = name.find(" ") ;
+					if ((pos1 != std::string::npos) && (pos2 != std::string::npos) && (pos0 != std::string::npos)) {
+						pos1++;
+						satname_tmp = name.substr(0, pos0 );
 
-					if(satname_tmp == "Hot")
-						satname_tmp = "Hotbird";
+						if(satname_tmp == "Hot")
+							satname_tmp = "Hotbird";
 
-					satname_tmp +=" ";
-					satname_tmp += name.substr( pos1,pos2-pos1 );
-					satNameWidth = g_SignalFont->getRenderWidth (satname_tmp);
-					if (satNameWidth > (ChanWidth - 4)) 
-						satNameWidth = ChanWidth - 4;
+						satname_tmp +=" ";
+						satname_tmp += name.substr( pos1,pos2-pos1 );
+						satNameWidth = g_SignalFont->getRenderWidth (satname_tmp);
+						if (satNameWidth > (ChanWidth - 4)) 
+							satNameWidth = ChanWidth - 4;
+					}
 				}
 			}
 			int chanH = g_SignalFont->getHeight ();
@@ -896,6 +903,7 @@ void CInfoViewer::setInfobarTimeout(int timeout_ext)
 	switch (mode)
 	{
 		case NeutrinoMessages::mode_tv:
+		case NeutrinoMessages::mode_webtv:
 				timeoutEnd = CRCInput::calcTimeoutEnd (g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] == 0 ? 0xFFFF : g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] + timeout_ext);
 				break;
 		case NeutrinoMessages::mode_radio:
@@ -1678,9 +1686,10 @@ void CInfoViewer::display_Info(const char *current, const char *next,
 	if (g_settings.colored_events_infobar == 2)
 		colored_event_N = true;
 
+	if (update_current)
+		frameBuffer->paintBox(InfoX, CurrInfoY - height, currTimeX, CurrInfoY, COL_INFOBAR_PLUS_0);
 	if (current != NULL && update_current)
 	{
-		frameBuffer->paintBox(InfoX, CurrInfoY - height, currTimeX, CurrInfoY, COL_INFOBAR_PLUS_0);
 		if (runningStart != NULL)
 			g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO]->RenderString(InfoX, CurrInfoY, info_time_width, runningStart, colored_event_C ? COL_COLORED_EVENTS_TEXT : COL_INFOBAR_TEXT, 0, UTF8);
 		g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO]->RenderString(xStart, CurrInfoY, currTimeX - xStart - 5, current, colored_event_C ? COL_COLORED_EVENTS_TEXT : COL_INFOBAR_TEXT, 0, UTF8);
@@ -1694,9 +1703,10 @@ void CInfoViewer::display_Info(const char *current, const char *next,
 	if (currTimeW != 0)
 		g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO]->RenderString(currTimeX, CurrInfoY, currTimeW, runningRest, colored_event_C ? COL_COLORED_EVENTS_TEXT : COL_INFOBAR_TEXT, 0, UTF8);
 
+	if (update_next)
+		frameBuffer->paintBox(InfoX, NextInfoY-height, BoxEndX, NextInfoY, COL_INFOBAR_PLUS_0);
 	if (next != NULL && update_next)
 	{
-		frameBuffer->paintBox(InfoX, NextInfoY-height, BoxEndX, NextInfoY, COL_INFOBAR_PLUS_0);
 		if (nextStart != NULL)
 			g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_INFO]->RenderString(InfoX, NextInfoY, info_time_width, nextStart, colored_event_N ? COL_COLORED_EVENTS_TEXT : COL_INFOBAR_TEXT, 0, UTF8);
 		if (starttimes)
@@ -2178,7 +2188,7 @@ void CInfoViewer::showEpgInfo()   //message on event change
 {
 	int mode = CNeutrinoApp::getInstance()->getMode();
 	/* show epg info only if we in TV- or Radio mode and current event is not the same like before */
-	if ((eventname != info_CurrentNext.current_name) && (mode == 2 /*mode_radio*/ || mode == 1 /*mode_tv*/))
+	if ((eventname != info_CurrentNext.current_name) && (mode == NeutrinoMessages::mode_radio || mode == NeutrinoMessages::mode_tv))
 	{
 		eventname = info_CurrentNext.current_name;
 		if (g_settings.infobar_show)

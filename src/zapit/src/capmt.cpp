@@ -186,6 +186,8 @@ CCamManager * CCamManager::getInstance(void)
 
 bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start, bool force_update)
 {
+	if (IS_WEBTV(channel_id))
+		return false;
 	CCam * cam;
 	int oldmask, newmask;
 	int demux = DEMUX_SOURCE_0;
