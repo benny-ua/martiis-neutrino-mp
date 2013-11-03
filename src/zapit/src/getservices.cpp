@@ -788,7 +788,7 @@ bool CServiceManager::LoadServices(bool only_current)
 				char *desc = xmlGetAttribute(l1, "description");
 				if (title && url) {
 					std::string t(title);
-					if (desc)
+					if (desc && *desc)
 						t += std::string(" (") + desc + ")";
 					t_channel_id chid = create_channel_id64(0, 0, 0, 0, 0, url);
 					CZapitChannel * channel = new CZapitChannel(t, chid, url);
