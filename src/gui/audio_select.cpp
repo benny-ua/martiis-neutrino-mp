@@ -226,7 +226,7 @@ int CAudioSelectMenuHandler::doMenu ()
 	AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
 	/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
 	t_channel_id chan = 0;
-	int apid = 0;
+	int apid = -1;
 	unsigned int is_ac3;
 	if (is_mp) {
 		chan = mp->getChannelId();

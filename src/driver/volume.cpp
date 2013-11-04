@@ -62,7 +62,7 @@ CVolume::CVolume()
 	mute_dy		= 0;
 	m_mode 		= CNeutrinoApp::getInstance()->getMode();
 	channel_id	= 0;
-	apid		= 0;
+	apid		= -1;
 }
 
 CVolume::~CVolume()
