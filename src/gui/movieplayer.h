@@ -121,6 +121,8 @@ class CMoviePlayerGui : public CMenuTarget
 	
 	repeat_mode_enum repeat_mode;
 
+	unsigned long long last_read;
+
 #if 0
 	/* subtitles vars */
 	int numsubs;
@@ -216,6 +218,7 @@ class CMoviePlayerGui : public CMenuTarget
 	uint64_t GetPts();
 	int GetPosition() { return position; }
 	int GetDuration() { return duration; }
+	size_t GetReadCount();
 	void UpdatePosition();
 	int timeshift;
 	int file_prozent;

@@ -99,6 +99,10 @@ CMoviePlayerGui::CMoviePlayerGui()
 
 CMoviePlayerGui::~CMoviePlayerGui()
 {
+	LockPlayback(__func__);
+	if (playback && !playback->isPlaying())
+		PlayFileEnd();
+	UnlockPlayback();
 	delete moviebrowser;
 	delete filebrowser;
 	delete bookmarkmanager;
@@ -1972,4 +1976,20 @@ bool CMoviePlayerGui::getAPID(unsigned int i, int &apid, unsigned int &is_ac3)
 		return true;
 	}
 	return false;
+}
+
+size_t CMoviePlayerGui::GetReadCount()
+{
+	unsigned long long this_read = 0;
+	LockPlayback(__func__);
+	if (playback)
+		this_read = playback->GetReadCount();
+	UnlockPlayback();
+	unsigned long long res;
+	if (this_read < last_read)
+		res = 0;
+	else
+		res = this_read - last_read;
+	last_read = this_read;
+	return (size_t) res;
 }

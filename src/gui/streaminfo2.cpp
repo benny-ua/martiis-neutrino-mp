@@ -111,7 +111,14 @@ int CStreamInfo2::exec (CMenuTarget * parent, const std::string &)
 	if (parent)
 		parent->hide ();
 
-	frontend = CFEManager::getInstance()->getLiveFE();
+	mp = &CMoviePlayerGui::getInstance();
+	if (!mp->Playing())
+		mp = NULL;
+
+	if (mp)
+		frontend = NULL;
+	else
+		frontend = CFEManager::getInstance()->getLiveFE();
 	paint (paint_mode);
 	int res = doSignalStrengthLoop ();
 	hide ();
@@ -142,9 +149,11 @@ int CStreamInfo2::doSignalStrengthLoop ()
 		uint64_t timeoutEnd = CRCInput::calcTimeoutEnd_MS(10);
 		g_RCInput->getMsgAbsoluteTimeout (&msg, &data, &timeoutEnd);
 
-		signal.sig = frontend->getSignalStrength() & 0xFFFF;
-		signal.snr = frontend->getSignalNoiseRatio() & 0xFFFF;
-		signal.ber = frontend->getBitErrorRate();
+		if (!mp) {
+			signal.sig = frontend->getSignalStrength() & 0xFFFF;
+			signal.snr = frontend->getSignalNoiseRatio() & 0xFFFF;
+			signal.ber = frontend->getBitErrorRate();
+		}
 
 		int ret = update_rate ();
 		if (paint_mode == 0) {
@@ -154,7 +163,7 @@ int CStreamInfo2::doSignalStrengthLoop ()
 			int dheight = g_Font[font_info]->getHeight ();
 			int dx1 = x + 10;
 
-			if(delay_counter > delay + 1){
+			if(!mp && delay_counter > delay + 1){
 				CZapitChannel * channel = CZapit::getInstance()->GetCurrentChannel();
 				if(channel)
 					pmt_version = channel->getPmtVersion();
@@ -180,14 +189,16 @@ int CStreamInfo2::doSignalStrengthLoop ()
 				g_Font[font_info]->RenderString (dx1 + average_bitrate_offset + sw , average_bitrate_pos, sw *2, tmp_str, COL_INFOBAR_TEXT);
 
 			}
-			showSNR ();
-			if(pmt_version != current_pmt_version && delay_counter > delay){
+			if (!mp)
+				showSNR ();
+			if(!mp && pmt_version != current_pmt_version && delay_counter > delay){
 				current_pmt_version = pmt_version;
 				paint_techinfo (x + 10, y+ hheight +5);
 			}
 			delay_counter++;
 		}
 		rate.short_average = abit_s;
+
 		if (signal.max_ber < signal.ber)
 			signal.max_ber = signal.ber;
 
@@ -260,9 +271,13 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	int y1;
 	int xd = w/4;
 
-	int tuner = 1 + frontend->getNumber();
 	char tname[255];
-	snprintf(tname, sizeof(tname), "%s: %d: %s", g_Locale->getText(LOCALE_STREAMINFO_SIGNAL), tuner, frontend->getInfo()->name);
+	if (mp) {
+		snprintf(tname, sizeof(tname), "%s: %s", g_Locale->getText(LOCALE_STREAMINFO_SIGNAL), g_Locale->getText(LOCALE_WEBTV_HEAD));
+	} else {
+		int tuner = 1 + frontend->getNumber();
+		snprintf(tname, sizeof(tname), "%s: %d: %s", g_Locale->getText(LOCALE_STREAMINFO_SIGNAL), tuner, frontend->getInfo()->name);
+	}
 
 	g_Font[font_small]->RenderString(_x, _y+iheight+15, width-_x-10, tname /*tuner_name.c_str()*/, COL_INFOBAR_TEXT, 0, true);
 
@@ -276,14 +291,16 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	int fw = g_Font[font_small]->getWidth();
 
 
-	frameBuffer->paintBoxRel(_x+xd*0,y1- 12,16,2, COL_RED); //red
-	g_Font[font_small]->RenderString(_x+20+xd*0, y1, fw*4, "BER", COL_INFOBAR_TEXT, 0, true);
+	if (!mp) {
+		frameBuffer->paintBoxRel(_x+xd*0,y1- 12,16,2, COL_RED); //red
+		g_Font[font_small]->RenderString(_x+20+xd*0, y1, fw*4, "BER", COL_INFOBAR_TEXT, 0, true);
 
-	frameBuffer->paintBoxRel(_x+xd*1,y1- 12,16,2,COL_BLUE); //blue
-	g_Font[font_small]->RenderString(_x+20+xd*1, y1, fw*4, "SNR", COL_INFOBAR_TEXT, 0, true);
+		frameBuffer->paintBoxRel(_x+xd*1,y1- 12,16,2,COL_BLUE); //blue
+		g_Font[font_small]->RenderString(_x+20+xd*1, y1, fw*4, "SNR", COL_INFOBAR_TEXT, 0, true);
 
-	frameBuffer->paintBoxRel(_x+8+xd*2,y1- 12,16,2, COL_GREEN); //green
-	g_Font[font_small]->RenderString(_x+28+xd*2, y1, fw*4, "SIG", COL_INFOBAR_TEXT, 0, true);
+		frameBuffer->paintBoxRel(_x+8+xd*2,y1- 12,16,2, COL_GREEN); //green
+		g_Font[font_small]->RenderString(_x+28+xd*2, y1, fw*4, "SIG", COL_INFOBAR_TEXT, 0, true);
+	}
 
 	frameBuffer->paintBoxRel(_x+xd*3,y1- 12,16,2,COL_YELLOW); // near yellow
 	g_Font[font_small]->RenderString(_x+20+xd*3, y1, fw*5, "Bitrate", COL_INFOBAR_TEXT, 0, true);
@@ -330,7 +347,7 @@ void CStreamInfo2::paint_signal_fe(struct bitrate br, struct feSignal s)
 	SignalRenderStr(value,     sig_text_rate_x, yt + sheight);
 	SignalRenderStr(br.max_short_average/ 1000ULL, sig_text_rate_x, yt);
 	SignalRenderStr(br.min_short_average/ 1000ULL, sig_text_rate_x, yt + (sheight * 2));
-	if ( g_RemoteControl->current_PIDs.PIDs.vpid > 0 ){
+	if (mp || g_RemoteControl->current_PIDs.PIDs.vpid > 0 ){
 		yd = y_signal_fe (value, scaling, sigBox_h);// Video + Audio
 	} else {
 		yd = y_signal_fe (value, 512, sigBox_h); // Audio only
@@ -344,31 +361,33 @@ void CStreamInfo2::paint_signal_fe(struct bitrate br, struct feSignal s)
 		old_y = sigBox_y+sigBox_h-yd;
 	}
 
-	if (s.ber != s.old_ber) {
-		SignalRenderStr(s.ber,     sig_text_ber_x, yt + sheight);
-		SignalRenderStr(s.max_ber, sig_text_ber_x, yt);
-		SignalRenderStr(s.min_ber, sig_text_ber_x, yt + (sheight * 2));
+	if (!mp) {
+		if (s.ber != s.old_ber) {
+			SignalRenderStr(s.ber,     sig_text_ber_x, yt + sheight);
+			SignalRenderStr(s.max_ber, sig_text_ber_x, yt);
+			SignalRenderStr(s.min_ber, sig_text_ber_x, yt + (sheight * 2));
+		}
+		yd = y_signal_fe (s.ber, 4000, sigBox_h);
+		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_RED); //red
+
+
+		if (s.sig != s.old_sig) {
+			SignalRenderStr(s.sig,     sig_text_sig_x, yt + sheight);
+			SignalRenderStr(s.max_sig, sig_text_sig_x, yt);
+			SignalRenderStr(s.min_sig, sig_text_sig_x, yt + (sheight * 2));
+		}
+		yd = y_signal_fe (s.sig, 65000, sigBox_h);
+		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_GREEN); //green
+
+
+		if (s.snr != s.old_snr) {
+			SignalRenderStr(s.snr,     sig_text_snr_x, yt + sheight);
+			SignalRenderStr(s.max_snr, sig_text_snr_x, yt);
+			SignalRenderStr(s.min_snr, sig_text_snr_x, yt + (sheight * 2));
+		}
+		yd = y_signal_fe (s.snr, 65000, sigBox_h);
+		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_BLUE); //blue
 	}
-	yd = y_signal_fe (s.ber, 4000, sigBox_h);
-	frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_RED); //red
-
-
-	if (s.sig != s.old_sig) {
-		SignalRenderStr(s.sig,     sig_text_sig_x, yt + sheight);
-		SignalRenderStr(s.max_sig, sig_text_sig_x, yt);
-		SignalRenderStr(s.min_sig, sig_text_sig_x, yt + (sheight * 2));
-	}
-	yd = y_signal_fe (s.sig, 65000, sigBox_h);
-	frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_GREEN); //green
-
-
-	if (s.snr != s.old_snr) {
-		SignalRenderStr(s.snr,     sig_text_snr_x, yt + sheight);
-		SignalRenderStr(s.max_snr, sig_text_snr_x, yt);
-		SignalRenderStr(s.min_snr, sig_text_snr_x, yt + (sheight * 2));
-	}
-	yd = y_signal_fe (s.snr, 65000, sigBox_h);
-	frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_BLUE); //blue
 }
 
 // -- calc y from max_range and max_y
@@ -450,9 +469,6 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	CZapitChannel * channel = CZapit::getInstance()->GetCurrentChannel();
 	if(!channel)
 		return;
-
-	transponder t;
-	CServiceManager::getInstance()->GetTransponder(channel->getTransponderId(), t);
 
 	int array[5]={g_Font[font_info]->getRenderWidth(g_Locale->getText (LOCALE_STREAMINFO_RESOLUTION)),
 		      g_Font[font_info]->getRenderWidth(g_Locale->getText (LOCALE_STREAMINFO_ARATIO)),
@@ -558,19 +574,26 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR_TEXT, 0, true);	// UTF-8
 
+	const char *p;
+
 	//satellite
-	ypos += iheight;
-	if(t.deltype == FE_QPSK)
-		sprintf (buf, "%s:",g_Locale->getText (LOCALE_SATSETUP_SATELLITE));//swiped locale
-	else if(t.deltype == FE_QAM)
-		sprintf (buf, "%s:",g_Locale->getText (LOCALE_CHANNELLIST_PROVS));
-	else
-		snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA));
+	transponder t;
+	if (!mp) {
+		CServiceManager::getInstance()->GetTransponder(channel->getTransponderId(), t);
 
-	g_Font[font_info]->RenderString(xpos, ypos, box_width, buf, COL_INFOBAR_TEXT, 0, true); // UTF-8
+		ypos += iheight;
+		if(t.deltype == FE_QPSK)
+			sprintf (buf, "%s:",g_Locale->getText (LOCALE_SATSETUP_SATELLITE));//swiped locale
+		else if(t.deltype == FE_QAM)
+			sprintf (buf, "%s:",g_Locale->getText (LOCALE_CHANNELLIST_PROVS));
+		else
+			snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA));
 
-	const char *p = CServiceManager::getInstance()->GetSatelliteName(channel->getSatellitePosition()).c_str();
-	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true);	// UTF-8
+		g_Font[font_info]->RenderString(xpos, ypos, box_width, buf, COL_INFOBAR_TEXT, 0, true); // UTF-8
+
+		p = CServiceManager::getInstance()->GetSatelliteName(channel->getSatellitePosition()).c_str();
+		g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true);	// UTF-8
+	}
 
 	//channel
 	ypos += iheight;
@@ -579,16 +602,20 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	p = channel->getName().c_str();
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, p, COL_INFOBAR_TEXT, 0, true);	// UTF-8
 
-	//tsfrequenz
-	ypos += iheight;
+	if (mp) {
+		scaling = 8000;
+	} else {
+		//tsfrequenz
+		ypos += iheight;
 
-	scaling = 27000;
-	if (t.deltype == FE_QPSK && t.feparams.dvb_feparams.u.qpsk.fec_inner < FEC_S2_QPSK_1_2)
-		scaling = 15000;
+		scaling = 27000;
+		if (t.deltype == FE_QPSK && t.feparams.dvb_feparams.u.qpsk.fec_inner < FEC_S2_QPSK_1_2)
+			scaling = 15000;
 
-	p = g_Locale->getText (LOCALE_SCANTS_FREQDATA);
-	g_Font[font_info]->RenderString(xpos, ypos, box_width, p , COL_INFOBAR_TEXT, 0, true); // UTF-8
-	g_Font[font_info]->RenderString(xpos+spaceoffset, ypos, box_width, t.description().c_str(), COL_INFOBAR_TEXT, 0, true); // UTF-8
+		p = g_Locale->getText (LOCALE_SCANTS_FREQDATA);
+		g_Font[font_info]->RenderString(xpos, ypos, box_width, p , COL_INFOBAR_TEXT, 0, true); // UTF-8
+		g_Font[font_info]->RenderString(xpos+spaceoffset, ypos, box_width, t.description().c_str(), COL_INFOBAR_TEXT, 0, true); // UTF-8
+	}
 	
 	// paint labels
 	int fontW = g_Font[font_small]->getWidth();
@@ -666,7 +693,8 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	if(box_h == 0)
 		box_h = ypos - ypos1;
 	yypos = ypos;
-	paintCASystem(xpos,ypos);
+	if (!mp)
+		paintCASystem(xpos,ypos);
 }
 
 #define NUM_CAIDS 11
@@ -812,60 +840,69 @@ static cDemux * dmx;
 
 int CStreamInfo2::ts_setup ()
 {
+	if (mp) {
+		mp->GetReadCount();
+	} else {
 #if 0
-	if (g_RemoteControl->current_PIDs.PIDs.vpid == 0)
-		return -1;
+		if (g_RemoteControl->current_PIDs.PIDs.vpid == 0)
+			return -1;
 #endif
-	unsigned short vpid, apid = 0;
+		unsigned short vpid, apid = 0;
 
-	vpid = g_RemoteControl->current_PIDs.PIDs.vpid;
-	if( !g_RemoteControl->current_PIDs.APIDs.empty() )
-		apid = g_RemoteControl->current_PIDs.APIDs[g_RemoteControl->current_PIDs.PIDs.selected_apid].pid;
+		vpid = g_RemoteControl->current_PIDs.PIDs.vpid;
+		if( !g_RemoteControl->current_PIDs.APIDs.empty() )
+			apid = g_RemoteControl->current_PIDs.APIDs[g_RemoteControl->current_PIDs.PIDs.selected_apid].pid;
 
-	short ret = -1;
-	if(vpid == 0 && apid == 0)
-		return ret;
+		short ret = -1;
+		if(vpid == 0 && apid == 0)
+			return ret;
 
-	dmx = new cDemux(0);
-	if(!dmx)
-		return ret;
+		dmx = new cDemux(0);
+		if(!dmx)
+			return ret;
 #define TS_LEN			188
 #define TS_BUF_SIZE		(TS_LEN * 2048)	/* fix dmx buffer size */
 
-	dmxbuf = new unsigned char[TS_BUF_SIZE];
-	if(!dmxbuf){
-		delete dmx;
-		dmx = NULL;
-		return ret;
+		dmxbuf = new unsigned char[TS_BUF_SIZE];
+		if(!dmxbuf){
+			delete dmx;
+			dmx = NULL;
+			return ret;
+		}
+		dmx->Open(DMX_TP_CHANNEL, NULL, 3 * 3008 * 62);
+
+		if(vpid > 0) {
+			dmx->pesFilter(vpid);
+			if(apid > 0)
+				dmx->addPid(apid);
+		} else
+			dmx->pesFilter(apid);
+
+		dmx->Start(true);
 	}
-	dmx->Open(DMX_TP_CHANNEL, NULL, 3 * 3008 * 62);
-
-	if(vpid > 0) {
-		dmx->pesFilter(vpid);
-		if(apid > 0)
-			dmx->addPid(apid);
-	} else
-		dmx->pesFilter(apid);
-
-	dmx->Start(true);
 
 	gettimeofday (&first_tv, NULL);
 	last_tv.tv_sec = first_tv.tv_sec;
 	last_tv.tv_usec = first_tv.tv_usec;
-	ret = b_total = 0;
-	return ret;
+	b_total = 0;
+	return 0;
 }
 
 int CStreamInfo2::update_rate ()
 {
 
-	if(!dmx)
+	if(!mp && !dmx)
 		return 0;
 
 	int ret = 0;
 	int timeout = 100;
 
-	int b_len = dmx->Read(dmxbuf, TS_BUF_SIZE, timeout);
+	int b_len;
+	if (mp) {
+		usleep(timeout * 1000);
+		b_len = mp->GetReadCount();
+	} else
+		b_len = dmx->Read(dmxbuf, TS_BUF_SIZE, timeout);
 	//printf("ts: read %d\n", b_len);
 
 	long b = b_len;

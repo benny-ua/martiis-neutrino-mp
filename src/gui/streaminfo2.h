@@ -28,6 +28,7 @@
 #include <driver/framebuffer.h>
 #include <gui/components/cc.h>
 #include <gui/components/cc.h>
+#include <gui/movieplayer.h>
 #include <zapit/femanager.h>
 
 
@@ -37,7 +38,8 @@ class CStreamInfo2 : public CMenuTarget
 
 		CFrameBuffer	*frameBuffer;
 		CFrontend	*frontend;
-		CComponentsPIP  * pip;
+		CComponentsPIP  *pip;
+		CMoviePlayerGui	*mp;
 		int x;
 		int y;
 		int width;
