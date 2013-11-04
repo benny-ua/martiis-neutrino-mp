@@ -873,8 +873,10 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			currentapid = apids[0];
 			currentac3 = ac3flags[0];
 		}
-		int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
-		CZapit::getInstance()->SetVolumePercent(percent);
+		if (p_movie_info) {
+			int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
+			CZapit::getInstance()->SetVolumePercent(percent);
+		}
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, true);
 		if(timeshift) {
