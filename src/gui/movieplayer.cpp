@@ -658,7 +658,7 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 	CHintBox *hintbox = NULL;
 	if(!caller->pretty_name.empty() && (caller->isYT || caller->isWebTV )){
 		neutrino_locale_t title = caller->isYT ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
-		hintbox = new CHintBox(title, caller->pretty_name.c_str(), 450, NEUTRINO_ICON_MOVIEPLAYER);
+		hintbox = new CHintBox(title, caller->pretty_name.c_str(), 450, NEUTRINO_ICON_STREAMING);
 		hintbox->paint();
 	}
 	while (caller->showStartingHint && caller->playback) {
