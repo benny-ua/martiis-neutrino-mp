@@ -130,11 +130,6 @@ void CVolume::setVolume(const neutrino_msg_t key)
 					hideVolscale();
 					if (do_vol) {
 						CAudioMute::getInstance()->AudioMute(false, true);
-						if (mode == CNeutrinoApp::mode_audio) {
-							CAudioPlayerGui *cap = CMediaPlayerMenu::getInstance()->getPlayerInstance();
-							if (cap != NULL)
-								cap->refreshMuteIcon();
-						}
 						setVolume(msg);
 						return;
 					}
@@ -152,11 +147,6 @@ void CVolume::setVolume(const neutrino_msg_t key)
 						if (g_settings.show_mute_icon) {
 							hideVolscale();
 							CAudioMute::getInstance()->AudioMute(true, true);
-							if (mode == CNeutrinoApp::mode_audio) {
-								CAudioPlayerGui *cap = CMediaPlayerMenu::getInstance()->getPlayerInstance();
-									if (cap != NULL)
-										cap->refreshMuteIcon();
-							}
 							setVolume(msg);
 							return;
 						}

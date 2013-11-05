@@ -653,8 +653,7 @@ int CPictureViewerGui::show()
 	hide();
 	g_RCInput->setAllowRepeat(old_repeatkeys);
 
-	if (!audioplayer)
-		CAudioMute::getInstance()->enableMuteIcon(true);
+	CAudioMute::getInstance()->enableMuteIcon(true);
 
 	return(res);
 }

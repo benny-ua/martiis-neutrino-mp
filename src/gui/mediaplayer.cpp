@@ -92,13 +92,11 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	CAudioMute *audiomute = CAudioMute::getInstance();
 	if (actionKey == "audioplayer")
 	{
-		audiomute->enableMuteIcon(false);
 		if (audioPlayer == NULL)
 			audioPlayer = new CAudioPlayerGui();
 		if (!g_settings.show_background_picture)
 			videoDecoder->setBlank(true);
 		int res = audioPlayer->exec(NULL, "init");
-		audiomute->enableMuteIcon(true);
 		return res /*menu_return::RETURN_REPAINT*/;
 	}
 #if ENABLE_SHAIRPLAY
@@ -111,13 +109,11 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 #endif
 	else if	(actionKey == "inetplayer")
 	{
-		audiomute->enableMuteIcon(false);
 		if (inetPlayer == NULL)
 			inetPlayer = new CAudioPlayerGui(true);
 		if (!g_settings.show_background_picture)
 			videoDecoder->setBlank(true);
 		int res = inetPlayer->exec(NULL, "init");
-		audiomute->enableMuteIcon(true);
 		return res; //menu_return::RETURN_REPAINT;
 	}
 	else if (actionKey == "movieplayer")

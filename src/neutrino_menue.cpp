@@ -71,7 +71,9 @@
 #include "gui/sleeptimer.h"
 #include "gui/update_menue.h"
 #include "gui/streaminfo2.h"
+#ifdef ENABLE_TEST_MENU
 #include "gui/test_menu.h"
+#endif
 #include "gui/update.h"
 #include "gui/vfd_setup.h"
 #include "driver/record.h"
@@ -231,8 +233,8 @@ void CNeutrinoApp::InitMenuMain()
 		personalize.addItem(MENU_MAIN, mf, &g_settings.personalize[SNeutrinoSettings::P_MAIN_CISETTINGS]);
 	}
 
-#ifdef TEST_MENU
-	personalize.addItem(MENU_MAIN, new CMenuForwarder("Test menu", true, NULL, new CTestMenu()), NULL, false, CPersonalizeGui::PERSONALIZE_SHOW_NO);
+#ifdef ENABLE_TEST_MENU
+	personalize.addItem(MENU_MAIN, new CMenuForwarderNonLocalized("Test menu", true, NULL, new CTestMenu()), NULL, false, CPersonalizeGui::PERSONALIZE_SHOW_NO);
 #endif
 }
 

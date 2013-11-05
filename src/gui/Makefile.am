@@ -100,7 +100,6 @@ libneutrino_gui_a_SOURCES = \
 	start_wizard.cpp \
 	streaminfo2.cpp \
 	subchannel_select.cpp \
-	test_menu.cpp \
 	themes.cpp \
 	timeosd.cpp \
 	user_menue.cpp \
@@ -142,6 +141,11 @@ endif
 
 libneutrino_gui_a_SOURCES += \
 	luainstance.cpp
+
+if ENABLE_TEST_MENU
+libneutrino_gui_a_SOURCES += \
+	test_menu.cpp
+endif
 
 libneutrino_gui2_a_SOURCES = \
 	cam_menu.cpp \
