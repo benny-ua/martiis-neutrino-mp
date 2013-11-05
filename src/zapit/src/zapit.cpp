@@ -525,8 +525,9 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 		if (MoviePlayerZapto(newchannel->getUrl(), newchannel->getName(), channel_id)) {
 			current_channel = newchannel;
 			lastChannelTV = channel_id;
+			return true;
 		}
-		return true;
+		return false;
 	}
 	MoviePlayerStop();
 
