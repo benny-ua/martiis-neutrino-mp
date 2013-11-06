@@ -237,6 +237,8 @@ class CMenuForwarder : public CMenuItem
 			return active;
 		}
 	void setOption(const std::string &Option);
+	void setName(const std::string& text);
+	void setName(const neutrino_locale_t text);
 };
 
 class CMenuDForwarder : public CMenuForwarder
