@@ -772,7 +772,7 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	int ChanNumWidth = 0;
 	int ChannelLogoMode = 0;
 	bool logo_ok = false;
-	if (ChanNum != 0)
+	if (ChanNum) /* !fileplay */
 	{
 		char strChanNum[10];
 		snprintf (strChanNum, sizeof(strChanNum), "%d", ChanNum);
@@ -863,8 +863,19 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 		}
 	}
 
-	if (fileplay || webplay) {
+	if (!ChanNum) {
 		show_Data ();
+	} else if (IS_WEBTV(new_channel_id)) {
+		CZapitChannel * channel = CServiceManager::getInstance()->FindChannel(new_channel_id);
+		if (channel) {
+			const char *current = channel->getDesc().c_str();
+			const char *next = channel->getUrl().c_str();
+			if (!current) {
+				current = next;
+				next = "";
+			}
+			display_Info(current, next, true, false, 0, NULL, NULL, NULL, NULL, true, true);
+		}
 	} else {
 		show_current_next(new_chan,epgpos);
 	}
@@ -1479,14 +1490,15 @@ void CInfoViewer::sendNoEpg(const t_channel_id for_channel_id)
 void CInfoViewer::getEPG(const t_channel_id for_channel_id, CSectionsdClient::CurrentNextInfo &info)
 {
 	/* to clear the oldinfo for channels without epg, call getEPG() with for_channel_id = 0 */
-	if (for_channel_id == 0)
+	if (for_channel_id == 0 || IS_WEBTV(for_channel_id))
 	{
 		oldinfo.current_uniqueKey = 0;
 		return;
 	}
+
 	CEitManager::getInstance()->getCurrentNextServiceKey(for_channel_id, info);
 
-	/* of there is no EPG, send an event so that parental lock can work */
+	/* if there is no EPG, send an event so that parental lock can work */
 	if (info.current_uniqueKey == 0 && info.next_uniqueKey == 0) {
 		sendNoEpg(for_channel_id);
 		oldinfo = info;
