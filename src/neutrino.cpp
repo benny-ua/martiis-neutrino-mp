@@ -430,6 +430,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 #endif
 
 	g_settings.make_hd_list = configfile.getInt32("make_hd_list", 0);
+	g_settings.make_webtv_list = configfile.getInt32("make_webtv_list", 0);
 	g_settings.make_new_list = configfile.getInt32("make_new_list", 1);
 	g_settings.make_removed_list = configfile.getInt32("make_removed_list", 1);
 	g_settings.keep_channel_numbers = configfile.getInt32("keep_channel_numbers", 0);
@@ -1033,6 +1034,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("ci_ignore_messages", g_settings.ci_ignore_messages);
 
 	configfile.setInt32( "make_hd_list", g_settings.make_hd_list);
+	configfile.setInt32( "make_webtv_list", g_settings.make_webtv_list);
 	configfile.setInt32( "make_new_list", g_settings.make_new_list);
 	configfile.setInt32( "make_removed_list", g_settings.make_removed_list);
 	configfile.setInt32( "keep_channel_numbers", g_settings.keep_channel_numbers);
@@ -1560,6 +1562,15 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 				hdBouquet->channelList->SetChannelList(&zapitList);
 				TVallList->Bouquets.push_back(hdBouquet);
 				printf("[neutrino] got %d HD channels\n", (int)zapitList.size()); fflush(stdout);
+			}
+		}
+		/* all WebTV channels */
+		if (g_settings.make_webtv_list) {
+			if (CServiceManager::getInstance()->GetAllWebTVChannels(zapitList)) {
+				CBouquet* webtvBouquet = new CBouquet(0, g_Locale->getText(LOCALE_BOUQUETNAME_WEBTV), false, true);
+				webtvBouquet->channelList->SetChannelList(&zapitList);
+				TVallList->Bouquets.push_back(webtvBouquet);
+				printf("[neutrino] got %d WebTV channels\n", (int)zapitList.size()); fflush(stdout);
 			}
 		}
 		/* new channels */
@@ -3334,9 +3345,10 @@ _repeat:
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::RELOAD_SETUP ) {
-		bool tmp = g_settings.make_hd_list;
+		bool tmp1 = g_settings.make_hd_list;
+		bool tmp2 = g_settings.make_webtv_list;
 		loadSetup(NEUTRINO_SETTINGS_FILE);
-		if(tmp != g_settings.make_hd_list)
+		if(tmp1 != g_settings.make_hd_list || tmp2 != g_settings.make_webtv_list)
 			g_Zapit->reinitChannels();
 
 		return messages_return::handled;

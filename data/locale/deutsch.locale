@@ -229,6 +229,7 @@ bouquetname.hdtv HD Kanäle
 bouquetname.new Neue Kanäle
 bouquetname.other Unbekannter Provider
 bouquetname.removed Gelöschte Kanäle
+bouquetname.webtv WebTV Kanäle
 cablesetup.provider Kabelanbieter
 channellist.additional Zusatzinformationen
 channellist.additional_off aus
@@ -254,6 +255,7 @@ channellist.keep_numbers Dauerhafte Kanalnummern
 channellist.make_hdlist Erzeuge Bouquet mit HD-Kanälen
 channellist.make_newlist Erzeuge Bouquet mit neuen Kanälen
 channellist.make_removedlist Erzeuge Bouquet mit gelöschten Kanälen
+channellist.make_webtvlist Erzeuge Bouquet mit WebTV-Kanälen
 channellist.new_zap_mode Quickzap in Liste
 channellist.new_zap_mode_active aktiv
 channellist.new_zap_mode_allow erlauben
@@ -1037,6 +1039,7 @@ menu.hint_load Laden der Neutrino-HD-Einstellungen aus einer Datei
 menu.hint_make_hdlist Bei aktiver Option wird ein Bouquet namens 'HD' erzeugt, in dem alle HD-Sender zusammengefasst sind
 menu.hint_make_newlist Nach einer Kanalsuche wird ein Bouquet namens 'neue Kanäle' erzeugt
 menu.hint_make_removedlist Nach einer Kanalsuche wird ein Bouquet namens 'gelöschte Kanäle' erzeugt
+menu.hint_make_webtvlist Bei aktiver Option wird ein Bouquet namens 'WebTV' erzeugt, in dem alle WebTV-Sender zusammengefasst sind
 menu.hint_manage_settings Sichern, Wiederherstellen und Auslieferungszustand wiederherstellen
 menu.hint_mb Ihre Aufnahmen
 menu.hint_media Abspielen von Musik, Internetradio und Filmen; Betrachten Sie Bilder

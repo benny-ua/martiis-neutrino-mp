@@ -145,6 +145,7 @@ struct SNeutrinoSettings
 	int cpufreq;
 	int standby_cpufreq;
 	int make_hd_list;
+	int make_webtv_list;
 	int make_new_list;
 	int make_removed_list;
 	int keep_channel_numbers;

@@ -229,6 +229,7 @@ bouquetname.hdtv HD channels
 bouquetname.new New channels
 bouquetname.other Unknown provider
 bouquetname.removed Removed channels
+bouquetname.webtv WebTV channels
 cablesetup.provider cable provider
 channellist.additional Additional informations
 channellist.additional_off off
@@ -255,6 +256,7 @@ channellist.make_hdlist Create list of HD channels
 channellist.make_newlist Create list of new channels
 channellist.make_others Create list of other channels
 channellist.make_removedlist Create list of removed channels
+channellist.make_webtvlist Create list of WebTV channels
 channellist.new_zap_mode Quickzap in list
 channellist.new_zap_mode_active active
 channellist.new_zap_mode_allow allow
@@ -1038,6 +1040,7 @@ menu.hint_load Load Neutrino-HD GUI settings from file
 menu.hint_make_hdlist Auto-create HD channel list based on\nchannel type and name
 menu.hint_make_newlist Create list of recently added channels
 menu.hint_make_removedlist Create list of recently removed channels
+menu.hint_make_webtvlist Auto-create WebTV channel list based on\nchannel type and name
 menu.hint_manage_settings Backup, restore, revert to defaults\nFactory box reset
 menu.hint_mb Your recordings
 menu.hint_media Play movies, audio files\nWatch pictures

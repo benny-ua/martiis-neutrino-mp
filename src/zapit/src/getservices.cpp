@@ -280,6 +280,16 @@ bool CServiceManager::GetAllHDChannels(ZapitChannelList &list, int flags)
 	return (!list.empty());
 }
 
+bool CServiceManager::GetAllWebTVChannels(ZapitChannelList &list, int flags)
+{
+	list.clear();
+	for (channel_map_iterator_t it = allchans.begin(); it != allchans.end(); ++it) {
+		if ((it->second.flags & flags) && !it->second.getUrl().empty())
+			list.push_back(&(it->second));
+	}
+	return (!list.empty());
+}
+
 bool CServiceManager::GetAllUnusedChannels(ZapitChannelList &list, int flags)
 {
 	list.clear();
