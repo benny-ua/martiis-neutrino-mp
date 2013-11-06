@@ -51,10 +51,14 @@ CZapitChannel::CZapitChannel(const std::string & p_name, t_channel_id p_channel_
 }
 
 // For WebTV ...
-CZapitChannel::CZapitChannel(const std::string & p_name, t_channel_id p_channel_id, const std::string & p_url)
+CZapitChannel::CZapitChannel(const char *p_name, t_channel_id p_channel_id, const char *p_url, const char *p_desc)
 {
-	name = p_name;
-	url = p_url;
+	if (!p_name || !p_url)
+		return;
+	name = std::string(p_name);
+	url = std::string(p_url);
+	if (p_desc)
+		desc = std::string(p_desc);
 	channel_id = p_channel_id;
 	service_id = 0;
 	transport_stream_id = 0;
@@ -353,8 +357,9 @@ void CZapitChannel::dumpBouquetXml(FILE * fd)
 					getSatellitePosition(),
 					getFreqId());
 		else
-			fprintf(fd, "\t\t<S n=\"%s\" u=\"%s\"/>\n",
+			fprintf(fd, "\t\t<S n=\"%s\" u=\"%s\" d=\"%s\"/>\n",
 					convert_UTF8_To_UTF8_XML(getName().c_str()).c_str(),
+					convert_UTF8_To_UTF8_XML(url.c_str()).c_str(),
 					convert_UTF8_To_UTF8_XML(url.c_str()).c_str());
 	} else {
 		if (url.empty())
