@@ -717,7 +717,6 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	showButtonBar = !calledFromNumZap;
 
 	fileplay = (ChanNum == 0) && !CMoviePlayerGui::getInstance().Playing();
-	bool webplay = !IS_WEBTV(new_channel_id);
 	newfreq = true;
 
 	reset_allScala();
