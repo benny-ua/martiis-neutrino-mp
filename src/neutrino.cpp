@@ -705,7 +705,21 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	g_settings.logo_hdd_dir_2 = configfile.getString( "logo_hdd_dir_2", "/share/tuxbox/neutrino/icons/logo");
 	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "");
-	g_settings.webtv_xml = configfile.getString("webtv_xml", WEBTV_XML);
+
+	int webtv_count = configfile.getInt32("webtv_xml_count", 0);
+	if (webtv_count) {
+		for (int i = 0; i < webtv_count; i++) {
+			std::string k = "webtv_xml_" + to_string(i);
+			std::string webtv_xml = configfile.getString(k, "");
+			if (webtv_xml.empty())
+				continue;
+			g_settings.webtv_xml.push_back(webtv_xml);
+		}
+	} else {
+		std::string webtv_xml = configfile.getString("webtv_xml", WEBTV_XML);
+		if (!access(webtv_xml, R_OK))
+			g_settings.webtv_xml.push_back(webtv_xml);
+	}
 
 	loadKeys();
 
@@ -1253,7 +1267,13 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString ( "logo_hdd_dir_2", g_settings.logo_hdd_dir_2 );
 
 	configfile.setString ( "streaming_server_url", g_settings.streaming_server_url);
-	configfile.setString ( "webtv_xml", g_settings.webtv_xml);
+	int webtv_count = 0;
+	for (std::list<std::string>::iterator it = g_settings.webtv_xml.begin(); it != g_settings.webtv_xml.end(); ++it) {
+		std::string k = "webtv_xml_" + to_string(webtv_count);
+		configfile.setString(k, *it);
+		webtv_count++;
+	}
+	configfile.setInt32 ( "webtv_xml_count", g_settings.webtv_xml.size());
 
 	saveKeys();
 

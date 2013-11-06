@@ -42,7 +42,6 @@
 #include <gui/movieinfo.h>
 #include <gui/widget/hintbox.h>
 #include <gui/timeosd.h>
-#include <gui/webtv.h>
 #include <driver/record.h>
 #include <zapit/channel.h>
 #include <playback.h>
@@ -142,7 +141,6 @@ class CMoviePlayerGui : public CMenuTarget
 	bool isYT;
 	bool showStartingHint;
 	CMovieBrowser* moviebrowser;
-	CWebTV* webtv;
 	MI_MOVIE_INFO * p_movie_info;
 	MI_MOVIE_INFO mi;
 #if HAVE_SPARK_HARDWARE

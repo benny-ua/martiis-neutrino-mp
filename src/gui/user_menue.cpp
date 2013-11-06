@@ -435,14 +435,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu->addItem(menu_item, 0);
 			break;
 #endif
-		case SNeutrinoSettings::ITEM_WEBTV:
-			menu_items++;
-			menu_prev = SNeutrinoSettings::ITEM_WEBTV;
-			keyhelper.get(&key,&icon);
-			//keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, CNeutrinoApp::getInstance(), "webtv", key, icon);
-			menu->addItem(menu_item, 0);
-			break;
 		case SNeutrinoSettings::ITEM_RASS:
 			if (CNeutrinoApp::getInstance()->getMode() == CNeutrinoApp::mode_radio && g_Radiotext && g_Radiotext->haveRASS()) {
 				menu_items++;

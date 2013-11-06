@@ -106,7 +106,6 @@ CMoviePlayerGui::~CMoviePlayerGui()
 	delete moviebrowser;
 	delete filebrowser;
 	delete bookmarkmanager;
-	delete webtv;
 	instance_mp = NULL;
 }
 
@@ -169,7 +168,6 @@ void CMoviePlayerGui::Init(void)
 
 	moviebrowser = new CMovieBrowser();
 	bookmarkmanager = new CBookmarkManager();
-	webtv = new CWebTV();
 
 	tsfilefilter.addFilter("ts");
 #if HAVE_TRIPLEDRAGON
@@ -330,10 +328,6 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		isBookmark = true;
 	}
 #endif
-	else if (actionKey == "webtv")
-	{
-		isWebTV = true;
-	}
 	else if (actionKey == "netstream")
 	{
 		isHTTP = true;
@@ -556,12 +550,6 @@ bool CMoviePlayerGui::SelectFile()
 			}
 		} else
 			menu_ret = moviebrowser->getMenuRet();
-	} else if (isWebTV) {
-		if (webtv->getFile(pretty_name, file_name)) {
-			is_file_player = true;
-			fillPids();
-			ret = true;
-		}
 	} else if (filelist.size() > 0 && repeat_mode == REPEAT_TRACK) {
 		--filelist_it;
 		is_file_player = true;
