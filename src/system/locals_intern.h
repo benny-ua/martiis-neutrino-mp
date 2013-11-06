@@ -2252,6 +2252,8 @@ const char * locale_real_names[] =
 	"videomenu.videomode",
 	"webtv.head",
 	"webtv.xml",
+	"webtv.xml.add",
+	"webtv.xml.del",
 	"window_size",
 	"wizard.initial_settings",
 	"wizard.install_settings",

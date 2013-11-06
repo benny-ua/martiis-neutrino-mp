@@ -44,6 +44,7 @@
 #include <hardware_caps.h>
 
 #include <string>
+#include <list>
 
 #ifdef BOXMODEL_APOLLO
 #define VIDEOMENU_VIDEOMODE_OPTION_COUNT 14
@@ -183,7 +184,7 @@ struct SNeutrinoSettings
 
 	std::string streaming_server_url;
 	std::string streaming_server_name;
-	std::string webtv_xml;
+	std::list<std::string> webtv_xml;
 #if ENABLE_SHAIRPLAY
 	int shairplay_enabled;
 	int shairplay_port;
@@ -769,7 +770,7 @@ struct SNeutrinoSettings
                 ITEM_EMU_RESTART = 23,
                 ITEM_TUNER_RESTART = 24,
                 ITEM_THREE_D_MODE = 25,
-                ITEM_WEBTV = 26,
+                //ITEM_WEBTV = 26,
                 ITEM_RASS = 27,
                 ITEM_YOUTUBE = 28,
 		ITEM_MAX   // MUST be always the last in the list

@@ -44,7 +44,7 @@ typedef struct ZAPIT_start_arg
         int video_mode;
 	int volume;
         int ci_clock;
-	std::string *webtv_xml;
+	std::list<std::string> *webtv_xml;
 } Z_start_arg;
 
 typedef struct Zapit_config {
@@ -116,7 +116,7 @@ class CZapit : public OpenThreads::Thread
 		int current_volume;
 		int volume_percent;
 
-		std::string *webtv_xml;
+		std::list<std::string> *webtv_xml;
 
 		int currentMode;
 		bool playbackStopForced;
@@ -270,6 +270,6 @@ class CZapit : public OpenThreads::Thread
 		void unlockPlayBack(const bool sendpmt = true);
 		void setStandby(const bool enable);
 		void Rezap(void);
-		std::string *GetWebTVXML(void) { return webtv_xml; }
+		std::list<std::string> *GetWebTVXML(void) { return webtv_xml; }
 };
 #endif /* __zapit_h__ */

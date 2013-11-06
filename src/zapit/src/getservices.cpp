@@ -706,7 +706,7 @@ bool CServiceManager::LoadServices(bool only_current)
 	service_count = 0;
 	printf("[zapit] Loading services, channel size %d ..\n", (int)sizeof(CZapitChannel));
 	//frontendType = CFEManager::getInstance()->getLiveFE()->getInfo()->type;
-	std::string *webtv_xml = CZapit::getInstance()->GetWebTVXML();
+	std::list<std::string> *webtv_xml = CZapit::getInstance()->GetWebTVXML();
 
 	if(only_current)
 		goto do_current;
@@ -771,33 +771,36 @@ bool CServiceManager::LoadServices(bool only_current)
 		parser = NULL;
 	}
 
-	if (webtv_xml && !access(*webtv_xml, R_OK)) {
-		INFO("Loading webtv...");
-		parser = parseXmlFile(webtv_xml->c_str());
-	}
+	if (webtv_xml)
+		for (std::list<std::string>::iterator it = webtv_xml->begin(); it != webtv_xml->end(); ++it) {
+			if (!access(*it, R_OK)) {
+				INFO("Loading webtv...");
+				parser = parseXmlFile((*it).c_str());
+			}
 
-	if (parser != NULL) {
-		xmlNodePtr l0 = NULL;
-		xmlNodePtr l1 = NULL;
-		l0 = xmlDocGetRootElement(parser);
-		l1 = l0->xmlChildrenNode;
-		if (l1) {
-			while ((xmlGetNextOccurence(l1, "webtv"))) {
-				char *title = xmlGetAttribute(l1, "title");
-				char *url = xmlGetAttribute(l1, "url");
-				char *desc = xmlGetAttribute(l1, "description");
-				if (title && url) {
-					t_channel_id chid = create_channel_id64(0, 0, 0, 0, 0, url);
-					CZapitChannel * channel = new CZapitChannel(title, chid, url, desc);
-					AddChannel(channel);
-					channel->flags = CZapitChannel::PRESENT;
+			if (parser != NULL) {
+				xmlNodePtr l0 = NULL;
+				xmlNodePtr l1 = NULL;
+				l0 = xmlDocGetRootElement(parser);
+				l1 = l0->xmlChildrenNode;
+				if (l1) {
+					while ((xmlGetNextOccurence(l1, "webtv"))) {
+						char *title = xmlGetAttribute(l1, "title");
+						char *url = xmlGetAttribute(l1, "url");
+						char *desc = xmlGetAttribute(l1, "description");
+						if (title && url) {
+							t_channel_id chid = create_channel_id64(0, 0, 0, 0, 0, url);
+							CZapitChannel * channel = new CZapitChannel(title, chid, url, desc);
+							AddChannel(channel);
+							channel->flags = CZapitChannel::PRESENT;
+						}
+
+						l1 = l1->xmlNextNode;
+					}
 				}
-
-				l1 = l1->xmlNextNode;
+				xmlFreeDoc(parser);
 			}
 		}
-		xmlFreeDoc(parser);
-	}
 
 #if 0
 	if (CFEManager::getInstance()->haveSat()) {

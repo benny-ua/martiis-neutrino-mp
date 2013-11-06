@@ -1,7 +1,7 @@
 /*
 	WebTV setup menue
 
-	Copyright (C) 2012 martii
+	Copyright (C) 2012-2013 martii
 
 	License: GPL
 
@@ -25,12 +25,16 @@
 
 #include <sys/types.h>
 #include <string.h>
+#include <gui/widget/menue.h>
 
 class CWebTVSetup : public CMenuTarget
 {
 	private:
 		int width;
 		int selected;
+		int item_offset;
+		bool changed;
+		CMenuWidget *m;
 	public:
 		CWebTVSetup();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
