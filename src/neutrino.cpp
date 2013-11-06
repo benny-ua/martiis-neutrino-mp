@@ -2594,7 +2594,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			}
 			else if( msg == CRCInput::RC_record) {
 				if (mode != mode_webtv) {
-fprintf(stderr, "######## mode == %d (should be: != %d\n", mode, mode_webtv);
 					StopSubtitles();
 					if (recordingstatus)
 						CRecordManager::getInstance()->exec(NULL, "Stop_record");
