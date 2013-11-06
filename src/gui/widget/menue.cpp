@@ -446,8 +446,10 @@ void CMenuWidget::insertItem(const uint& item_id, CMenuItem* menuItem)
 void CMenuWidget::removeItem(const uint& item_id)
 {
 	items.erase(items.begin()+item_id);
-	if ((unsigned int) selected > items.size())
+	if ((unsigned int) selected >= items.size())
 		selected = items.size() - 1;
+	while (selected > 0 && !items[selected]->active)
+		selected--;
 }
 
 bool CMenuWidget::hasItem()
@@ -1783,6 +1785,18 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	iconName = IconName ? IconName : "";
 	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
 	isStatic = IsStatic;
+}
+
+void CMenuForwarder::setName(const std::string& t)
+{
+	name = NONEXISTANT_LOCALE;
+	nameString = t;
+}
+
+void CMenuForwarder::setName(const neutrino_locale_t t)
+{
+	name = t;
+	nameString = "";
 }
 
 void CMenuForwarder::setOption(const std::string &Option)
