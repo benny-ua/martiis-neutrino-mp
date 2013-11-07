@@ -1983,3 +1983,18 @@ size_t CMoviePlayerGui::GetReadCount()
 	last_read = this_read;
 	return (size_t) res;
 }
+
+void CMoviePlayerGui::Pause(bool b)
+{
+	LockPlayback(__func__);
+	if (b && (playstate == CMoviePlayerGui::PAUSE))
+		b = !b;
+	if (b) {
+		playback->SetSpeed(0);
+		playstate = CMoviePlayerGui::PAUSE;
+	} else {
+		playback->SetSpeed(1);
+		playstate = CMoviePlayerGui::PLAY;
+	}
+	UnlockPlayback();
+}

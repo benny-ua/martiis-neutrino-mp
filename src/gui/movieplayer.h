@@ -241,6 +241,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void StopSubtitles(bool b);
 	void StartSubtitles(bool show = true);
 	void setLastMode(int m) { m_LastMode = m; }
+	void Pause(bool b = true);
 };
 
 #endif

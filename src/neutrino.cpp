@@ -2583,7 +2583,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				g_PluginList->start_plugin_by_name(g_settings.onekey_plugin.c_str(), 0);
 			}
 			else if(msg == (neutrino_msg_t) g_settings.key_timeshift) {
-				if (mode != mode_webtv)
+				if (mode == mode_webtv) {
+					CMoviePlayerGui::getInstance().Pause();
+				} else
 					CRecordManager::getInstance()->StartTimeshift();
 			}
 			else if (msg == (neutrino_msg_t) g_settings.key_current_transponder){
@@ -2646,20 +2648,24 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				media->exec(NULL, "");
 			}
 			else if(msg == (uint32_t) g_settings.key_tsplayback) {
-				//open moviebrowser via media player menu object
+				if (mode == mode_webtv) {
+					CMoviePlayerGui::getInstance().Pause(false);
+				} else {
+					//open moviebrowser via media player menu object
 #ifdef ENABLE_GRAPHLCD
-				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
+					nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
 #endif
-				if(g_settings.mode_clock)
-					InfoClock->StopClock();
-				StopSubtitles();
-				CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
-				StartSubtitles(0);
-				if(g_settings.mode_clock)
-					InfoClock->StartClock();
+					if(g_settings.mode_clock)
+						InfoClock->StopClock();
+					StopSubtitles();
+					CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
+					StartSubtitles(0);
+					if(g_settings.mode_clock)
+						InfoClock->StartClock();
 #ifdef ENABLE_GRAPHLCD
-				nGLCD::unlockChannel();
+					nGLCD::unlockChannel();
 #endif
+				}
 			}
 			else if (msg == (uint32_t) g_settings.key_fileplayback) {
 #ifdef ENABLE_GRAPHLCD
