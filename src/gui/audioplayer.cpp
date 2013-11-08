@@ -623,7 +623,7 @@ int CAudioPlayerGui::show()
 			if (m_key_level == 1)
 				stop();
 		}
-		else if (msg == CRCInput::RC_green)
+		else if ((msg == CRCInput::RC_rewind) || (msg == CRCInput::RC_green))
 		{
 			if (m_key_level == 0)
 			{
@@ -665,7 +665,7 @@ int CAudioPlayerGui::show()
 				}
 			}
 		}
-		else if (msg == CRCInput::RC_yellow)
+		else if ((msg == CRCInput::RC_pause) || (msg == CRCInput::RC_yellow))
 		{
 			if (m_key_level == 0)
 			{
@@ -689,7 +689,7 @@ int CAudioPlayerGui::show()
 				paint();
 			}
 		}
-		else if (msg == CRCInput::RC_blue)
+		else if ((msg == CRCInput::RC_forward) || (msg == CRCInput::RC_blue))
 		{
 			if (m_key_level == 0)
 			{
@@ -1670,10 +1670,10 @@ void CAudioPlayerGui::paintHead()
 const struct button_label AudioPlayerButtons[][4] =
 {
 	{
-		{ NEUTRINO_ICON_BUTTON_RED   , LOCALE_AUDIOPLAYER_STOP                        },
-		{ NEUTRINO_ICON_BUTTON_GREEN , LOCALE_AUDIOPLAYER_REWIND                      },
-		{ NEUTRINO_ICON_BUTTON_YELLOW, LOCALE_AUDIOPLAYER_PAUSE                       },
-		{ NEUTRINO_ICON_BUTTON_BLUE  , LOCALE_AUDIOPLAYER_FASTFORWARD                 },
+		{ NEUTRINO_ICON_BUTTON_STOP    , LOCALE_AUDIOPLAYER_STOP                      },
+		{ NEUTRINO_ICON_BUTTON_BACKWARD, LOCALE_AUDIOPLAYER_REWIND                    },
+		{ NEUTRINO_ICON_BUTTON_PAUSE   , LOCALE_AUDIOPLAYER_PAUSE                     },
+		{ NEUTRINO_ICON_BUTTON_FORWARD , LOCALE_AUDIOPLAYER_FASTFORWARD               },
 	},
 	{
 		{ NEUTRINO_ICON_BUTTON_RED   , LOCALE_AUDIOPLAYER_DELETE                      },
@@ -1698,8 +1698,8 @@ const struct button_label AudioPlayerButtons[][4] =
 		{ NEUTRINO_ICON_BUTTON_YELLOW, LOCALE_AUDIOPLAYER_BUTTON_SELECT_TITLE_BY_NAME },
 	},
 	{
-		{ NEUTRINO_ICON_BUTTON_RED   , LOCALE_AUDIOPLAYER_STOP                        },
-		{ NEUTRINO_ICON_BUTTON_YELLOW, LOCALE_AUDIOPLAYER_PAUSE                       },
+		{ NEUTRINO_ICON_BUTTON_STOP  , LOCALE_AUDIOPLAYER_STOP                        },
+		{ NEUTRINO_ICON_BUTTON_PAUSE , LOCALE_AUDIOPLAYER_PAUSE                       },
 	},
 	{
 		{ NEUTRINO_ICON_BUTTON_GREEN , LOCALE_AUDIOPLAYER_ADD                         },
