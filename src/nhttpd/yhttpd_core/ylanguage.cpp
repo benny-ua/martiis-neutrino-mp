@@ -17,6 +17,9 @@
 #include "ytypes_globals.h"
 #include "ylanguage.h"
 #include "yconnection.h"
+
+#include <global.h>
+
 //=============================================================================
 // Instance Handling - like Singelton Pattern
 //=============================================================================
@@ -26,6 +29,7 @@
 CLanguage* CLanguage::instance = NULL;
 CConfigFile* CLanguage::DefaultLanguage = NULL;
 CConfigFile* CLanguage::ConfigLanguage = NULL;
+CConfigFile* CLanguage::NeutrinoLanguage = NULL;
 std::string CLanguage::language = "";
 std::string CLanguage::language_dir = "";
 //-----------------------------------------------------------------------------
@@ -51,6 +55,7 @@ CLanguage::CLanguage(void)
 {
 	DefaultLanguage = new CConfigFile(',');
 	ConfigLanguage = new CConfigFile(',');
+	NeutrinoLanguage = new CConfigFile(',');
 	language = "";
 	language_dir =getLanguageDir();
 }
@@ -60,6 +65,7 @@ CLanguage::~CLanguage(void)
 {
 	delete DefaultLanguage;
 	delete ConfigLanguage;
+	delete NeutrinoLanguage;
 }
 
 //=============================================================================
@@ -69,6 +75,23 @@ void CLanguage::setLanguage(std::string _language){
 	language=_language;
 	ConfigLanguage->loadConfig(language_dir + "/" + _language);
 	DefaultLanguage->loadConfig(language_dir + "/" + HTTPD_DEFAULT_LANGUAGE);
+
+	const char * path[2] = { CONFIGDIR "/locale/", DATADIR "/neutrino/locale/"};
+	for (int i = 0; i < 2; i++)
+	{
+		std::string filename = path[i];
+		filename += g_settings.language;
+		filename += ".locale";
+
+		if(access(filename.c_str(), F_OK) == 0) {
+			NeutrinoLanguage->loadConfig(filename, ' ');
+			break;
+		}
+		else if (i == 2) {
+			// load neutrino default language
+			NeutrinoLanguage->loadConfig(DATADIR "/neutrino/locale/english.locale", ' ');
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -76,6 +99,8 @@ void CLanguage::setLanguage(std::string _language){
 //-----------------------------------------------------------------------------
 std::string CLanguage::getTranslation(std::string id){
 	std::string trans=ConfigLanguage->getString(id,"");
+	if(trans=="")
+		trans=NeutrinoLanguage->getString(id,"");
 	if(trans=="")
 		trans=DefaultLanguage->getString(id,"");
 	return trans;
