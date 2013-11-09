@@ -18,6 +18,9 @@ else
 AM_CPPFLAGS += -I$(top_srcdir)/lib/libcoolstream
 endif
 endif
+if USE_STB_HAL
+AM_CPPFLAGS += -I$(STB_HAL_INC)
+endif
 
 AM_CPPFLAGS += -fno-rtti -fno-exceptions
 
