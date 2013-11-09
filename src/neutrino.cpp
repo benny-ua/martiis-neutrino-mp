@@ -61,8 +61,13 @@
 #include <driver/volume.h>
 #include <driver/streamts.h>
 #include <driver/display.h>
+#include <driver/radiotext.h>
 #include <driver/scanepg.h>
+#include <driver/shairplay.h>
 
+#include "gui/3dsetup.h"
+#include "gui/adzap.h"
+#include "gui/psisetup.h"
 #include "gui/audiomute.h"
 #include "gui/audioplayer.h"
 #include "gui/bouquetlist.h"

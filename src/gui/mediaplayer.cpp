@@ -48,6 +48,7 @@
 #include <gui/widget/icons.h>
 
 #include <driver/screen_max.h>
+#include <driver/shairplay.h>
 
 #include <system/debug.h>
 #include <mymenu.h>

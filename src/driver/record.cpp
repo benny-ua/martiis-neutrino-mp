@@ -57,6 +57,7 @@
 #if HAVE_SPARK_HARDWARE
 #include <driver/display.h>
 #endif
+#include <driver/radiotext.h>
 #include <driver/streamts.h>
 #include <zapit/capmt.h>
 #include <zapit/channel.h>

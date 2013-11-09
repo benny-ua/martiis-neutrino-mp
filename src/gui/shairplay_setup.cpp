@@ -28,6 +28,7 @@
 #include <libgen.h>
 #include <neutrino.h>
 #include <driver/screen_max.h>
+#include <driver/shairplay.h>
 #include "mymenu.h"
 #include "shairplay_setup.h"
 

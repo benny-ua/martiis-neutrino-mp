@@ -47,6 +47,7 @@
 #include <sectionsdclient/sectionsdclient.h>
 #include <zapit/zapit.h>
 #include <zapit/channel.h>
+#include <gui/psisetup.h>
 #include <gui/widget/menue.h>
 #include <gui/widget/messagebox.h>
 #include <gui/widget/hintbox.h>

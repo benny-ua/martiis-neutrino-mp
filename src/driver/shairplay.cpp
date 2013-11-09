@@ -60,6 +60,7 @@
 #include <system/settings.h>
 #include <libmd5sum/libmd5sum.h>
 #include <driver/fontrenderer.h>
+#include <gui/infoviewer.h>
 #include <shairplay/dnssd.h>
 #include <shairplay/raop.h>
 

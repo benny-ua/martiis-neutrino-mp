@@ -49,14 +49,11 @@
 #include "gui/user_menue.h"
 #include "gui/timerlist.h"
 
-#include <gui/adzap.h>
-#if HAVE_SPARK_HARDWARE
-#include <gui/psisetup.h>
-#include <gui/3dsetup.h>
-#endif
-#if ENABLE_SHAIRPLAY
-#include <driver/shairplay.h>
-#endif
+// Forward declarations instead of includes:
+class CAdZapMenu;
+class CPSISetup;
+class C3DSetup;
+class CShairPlay;
 
 #include <string>
 
