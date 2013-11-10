@@ -32,6 +32,10 @@
 #include <config.h>
 #endif
 
+#if HAVE_SPARK_HARDWARE
+#include <system/settings.h>
+#endif
+
 #define LCDDIR_VAR "/var/share/tuxbox/neutrino/lcdd"
 
 typedef enum
@@ -187,10 +191,16 @@ class CLCD
 		unsigned int	timeout_cnt;
 		sem_t		sem;
 #endif
+#if HAVE_SPARK_HARDWARE
+		int led_mode[SNeutrinoSettings::LED_MODE_COUNT];
+#endif
 	public:
 		bool has_lcd;
 		void wake_up();
-		void setled(void) { return; };
+		void setled(void);
+#if HAVE_SPARK_HARDWARE
+		void setledmode(SNeutrinoSettings::LED_MODE m, bool onoff);
+#endif
 		void setlcdparameter(void);
 		void setlcdparameter(int, int);
 		void setBacklight(bool) { return; };

@@ -823,6 +823,17 @@ ledcontroler.off LED1 & LED2 aus
 ledcontroler.on.all LED1 & LED2 an
 ledcontroler.on.led1 LED1 an
 ledcontroler.on.led2 LED2 an
+ledcontroller.mode.deepstandby Im Deep-Standby
+ledcontroller.mode.deepstandby_timer Im Deep-Standby mit Timer
+ledcontroller.mode.playback Beim Abspielen
+ledcontroller.mode.record Beim Aufnehmen
+ledcontroller.mode.standby Im Standby
+ledcontroller.mode.tv Im TV-Betrieb
+ledcontroller.off Aus
+ledcontroller.on.both Grün und rot
+ledcontroller.on.green Grün
+ledcontroller.on.red Rot
+ledcontroller.title LEDs
 mainmenu.audioplayer Audioplayer
 mainmenu.channels Kanalliste
 mainmenu.clearsectionsd Lösche EPG Cache

@@ -57,7 +57,9 @@ CVfdSetup::CVfdSetup()
 {
 	width = w_max (40, 10);
 	dim_time = NULL;
+#if !HAVE_SPARK_HARDWARE
 	vfd_enabled = (cs_get_revision() != 10) && (cs_get_revision() != 11);
+#endif
 }
 
 CVfdSetup::~CVfdSetup()
@@ -66,11 +68,12 @@ CVfdSetup::~CVfdSetup()
 }
 
 
-int CVfdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
+int CVfdSetup::exec(CMenuTarget* parent, const std::string &actionKey __attribute__((unused)))
 {
 	dprintf(DEBUG_DEBUG, "init lcd setup\n");
 	if(parent != NULL)
 		parent->hide();
+#if !HAVE_SPARK_HARDWARE
 	if(actionKey=="def")
 	{
 		brightness		= DEFAULT_VFD_BRIGHTNESS;
@@ -82,7 +85,7 @@ int CVfdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		CVFD::getInstance()->setBrightnessDeepStandby(brightnessdeepstandby);
 		return menu_return::RETURN_REPAINT;
 	}
-
+#endif
 	int res = showSetup();
 
 	return res;
@@ -99,10 +102,17 @@ const CMenuOptionChooser::keyval LCDMENU_STATUSLINE_OPTIONS[LCDMENU_STATUSLINE_O
 #define LEDMENU_OPTION_COUNT 4
 const CMenuOptionChooser::keyval LEDMENU_OPTIONS[LEDMENU_OPTION_COUNT] =
 {
+#if HAVE_SPARK_HARDWARE
+	{ 0, LOCALE_LEDCONTROLLER_OFF },
+	{ 1 /* = 1 << LED_RED */, LOCALE_LEDCONTROLLER_ON_RED },
+	{ 2 /* = 1 << LED_GREEN */, LOCALE_LEDCONTROLLER_ON_GREEN },
+	{ 3 /* = 1|2 */ , LOCALE_LEDCONTROLLER_ON_BOTH }
+#else
 	{ 0, LOCALE_LEDCONTROLER_OFF },
 	{ 1, LOCALE_LEDCONTROLER_ON_ALL },
 	{ 2, LOCALE_LEDCONTROLER_ON_LED1 },
 	{ 3, LOCALE_LEDCONTROLER_ON_LED2   }
+#endif
 };
 
 #define LCD_INFO_OPTION_COUNT 2
@@ -139,6 +149,33 @@ int CVfdSetup::showSetup()
 	vfds->addItem(new CMenuOptionChooser(LOCALE_LCDMENU_DISPLAYMODE_STANDBY,
 		&g_settings.lcd_setting[SNeutrinoSettings::LCD_STANDBY_DISPLAYMODE],
 		OPTIONS_LCD_DISPLAYMODE_OPTIONS, 2, true));
+
+	vfds->addItem(new CMenuSeparator(CMenuSeparator::STRING | CMenuSeparator::LINE, LOCALE_LEDCONTROLLER_TITLE));
+	CMenuOptionChooser * mc;
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_TV, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_TV], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true, this);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_TV);
+	vfds->addItem(mc);
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_STANDBY, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_STANDBY], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_STANDBY);
+	vfds->addItem(mc);
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_DEEPSTANDBY, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_DEEPSTANDBY);
+	vfds->addItem(mc);
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_DEEPSTANDBY_TIMER, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY_TIMER], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_DEEPSTANDBY_TIMER);
+	vfds->addItem(mc);
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_RECORD, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_RECORD], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true, this);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_RECORD);
+	vfds->addItem(mc);
+
+	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_PLAYBACK, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_PLAYBACK], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true, this);
+	//mc->setHint("", LOCALE_MENU_HINT_LEDS_PLAYBACK);
+	vfds->addItem(mc);
 #ifdef ENABLE_GRAPHLCD
 	vfds->addItem(GenericMenuSeparatorLine);
 	GLCD_Menu glcdMenu;
@@ -188,6 +225,7 @@ int CVfdSetup::showSetup()
 	return res;
 }
 
+#if !HAVE_SPARK_HARDWARE
 void CVfdSetup::showBrightnessSetup(CMenuWidget *mn_widget)
 {
 	CMenuOptionNumberChooser * nc;
@@ -273,16 +311,29 @@ void CVfdSetup::showBacklightSetup(CMenuWidget *mn_led_widget)
 	mc->setHint("", LOCALE_MENU_HINT_LEDS_DEEPSTANDBY);
 	mn_led_widget->addItem(mc);
 }
+#endif
 
-bool CVfdSetup::changeNotify(const neutrino_locale_t OptionName, void */* data */)
+bool CVfdSetup::changeNotify(const neutrino_locale_t OptionName, void * /* data */)
 {
 #if HAVE_SPARK_HARDWARE
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_RUNNING) ||
 	    ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDMENU_DISPLAYMODE_STANDBY)) {
 		CVFD::getInstance()->ShowText(NULL);
 		CVFD::getInstance()->setlcdparameter();
-	} else
-#endif
+	}
+	else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LEDCONTROLLER_MODE_TV))
+	{
+		CVFD::getInstance()->setled();
+	}
+	else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LEDCONTROLLER_MODE_RECORD))
+	{
+		CVFD::getInstance()->setled();
+	}
+	else if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LEDCONTROLLER_MODE_PLAYBACK))
+	{
+		CVFD::getInstance()->setled();
+	}
+#else
 	if (ARE_LOCALES_EQUAL(OptionName, LOCALE_LCDCONTROLER_BRIGHTNESS))
 	{
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
@@ -305,5 +356,6 @@ bool CVfdSetup::changeNotify(const neutrino_locale_t OptionName, void */* data *
 	{
 		CVFD::getInstance()->setBacklight(g_settings.backlight_tv);
 	}
+#endif
 	return false;
 }

@@ -673,11 +673,24 @@ struct SNeutrinoSettings
 	int lcd_info_line;
 	std::string lcd_setting_dim_time; //FIXME
 	int lcd_setting_dim_brightness;
+#if HAVE_SPARK_HARDWARE
+	enum LED_MODE {
+		LED_MODE_TV = 0,
+		LED_MODE_STANDBY,
+		LED_MODE_DEEPSTANDBY,
+		LED_MODE_DEEPSTANDBY_TIMER,
+		LED_MODE_RECORD,
+		LED_MODE_PLAYBACK,
+		LED_MODE_COUNT
+	};
+	int led_mode[LED_MODE_COUNT];
+#else
 	int led_tv_mode;
 	int led_standby_mode;
 	int led_deep_mode;
 	int led_rec_mode;
 	int led_blink;
+#endif
 	int backlight_tv;
 	int backlight_standby;
 	int backlight_deepstandby;

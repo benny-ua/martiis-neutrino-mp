@@ -824,6 +824,17 @@ ledcontroler.off Led1 & Led2 off
 ledcontroler.on.all Led1 & Led2 on
 ledcontroler.on.led1 Led1 on
 ledcontroler.on.led2 Led2 on
+ledcontroller.mode.deepstandby In deep standby
+ledcontroller.mode.deepstandby_timer In deep standby, if timer set
+ledcontroller.mode.playback During playback
+ledcontroller.mode.record While recording
+ledcontroller.mode.standby In Standby
+ledcontroller.mode.tv In TV mode
+ledcontroller.off Off
+ledcontroller.on.both Green and red
+ledcontroller.on.green Green
+ledcontroller.on.red Red
+ledcontroller.title LEDs
 mainmenu.audioplayer Audioplayer
 mainmenu.channels Channels
 mainmenu.clearsectionsd Clear EPG Cache

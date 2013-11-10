@@ -31,6 +31,10 @@
 #ifndef __lcd_setup__
 #define __lcd_setup__
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <gui/widget/menue.h>
 #include <gui/widget/stringinput.h>
 
@@ -42,15 +46,19 @@
 		int width;
 		
 		int showSetup();
+#if !HAVE_SPARK_HARDWARE
 		void showBrightnessSetup(CMenuWidget *mn_widget);
 		void showLedSetup(CMenuWidget *mn_led_widget);
 		void showBacklightSetup(CMenuWidget *mn_led_widget);
+#endif
 		virtual bool changeNotify(const neutrino_locale_t OptionName, void *data);
+#if !HAVE_SPARK_HARDWARE
 		int brightness;
 		int brightnessstandby;
 		int brightnessdeepstandby;
 		
 		bool vfd_enabled; 
+#endif
 		
 		CStringInput * dim_time;
 

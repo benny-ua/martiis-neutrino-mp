@@ -65,6 +65,9 @@ CLCD::CLCD()
 	sem_init(&sem, 0, 0);
 
 	showclock = true;
+#if HAVE_SPARK_HARDWARE
+	memset(led_mode, 0, sizeof(led_mode));
+#endif
 
 	if (pthread_create (&thrTime, NULL, TimeThread, NULL))
 		perror("[lcdd]: pthread_create(TimeThread)");
@@ -408,18 +411,16 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 	int which;
 	switch (icon) {
 		case FP_ICON_PLAY:
-			which = LED_GREEN;
+			which = SNeutrinoSettings::LED_MODE_PLAYBACK;
 			break;
 		case FP_ICON_RECORD:
-			which = LED_RED;
+			which = SNeutrinoSettings::LED_MODE_RECORD;
 			break;
 		default:
 			return;
 	}
-	struct aotom_ioctl_data vData;
-	vData.u.led.led_nr = which;
-	vData.u.led.on = show ? LOG_ON : LOG_OFF;
-	ioctl(fd, VFDSETLED, &vData);
+	led_mode[which] = show ? g_settings.led_mode[which] : 0;
+	setled();
 #endif
 }
 
@@ -479,4 +480,37 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 
 void CLCD::setEPGTitle(const std::string)
 {
+}
+
+#if HAVE_SPARK_HARDWARE
+void CVFD::setledmode(SNeutrinoSettings::LED_MODE m, bool onoff)
+{
+	if (m >= 0 && m < SNeutrinoSettings::LED_MODE_COUNT) {
+		led_mode[m] = onoff ? g_settings.led_mode[m] : 0;
+		setled();
+	}
+}
+#endif
+
+void CVFD::setled(void)
+{
+#if HAVE_SPARK_HARDWARE
+	if(mode == MODE_MENU_UTF8 || mode == MODE_TVRADIO) {
+		led_mode[SNeutrinoSettings::LED_MODE_STANDBY] = 0;
+		led_mode[SNeutrinoSettings::LED_MODE_TV] = g_settings.led_mode[SNeutrinoSettings::LED_MODE_TV];
+	} else if(mode == MODE_STANDBY) {
+		led_mode[SNeutrinoSettings::LED_MODE_STANDBY] = g_settings.led_mode[SNeutrinoSettings::LED_MODE_STANDBY];
+		led_mode[SNeutrinoSettings::LED_MODE_TV] = 0;
+	}
+	int on = 0;
+	for (unsigned int i = 0; i < SNeutrinoSettings::LED_MODE_COUNT; i++)
+		on |= led_mode[i];
+	struct aotom_ioctl_data vData;
+	vData.u.led.led_nr = 0;
+	vData.u.led.on = (on & 1) ? LOG_ON : LOG_OFF;
+	ioctl(fd, VFDSETLED, &vData);
+	vData.u.led.led_nr = 1;
+	vData.u.led.on = (on & 2) ? LOG_ON : LOG_OFF;
+	ioctl(fd, VFDSETLED, &vData);
+#endif
 }

@@ -445,11 +445,20 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.rotor_swap = configfile.getInt32( "rotor_swap", 0);
 
 	//led
+#if HAVE_SPARK_HARDWARE
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_TV]			= configfile.getInt32( "led_mode_tv",		0 /* off */);
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_STANDBY]		= configfile.getInt32( "led_mode_standby",	2 /* green */);
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY]		= configfile.getInt32( "led_mode_deep",		1 /* red */);
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY_TIMER] 	= configfile.getInt32( "led_mode_deep_timer",	3 /* red|green */);
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_RECORD]			= configfile.getInt32( "led_mode_rec",		1 /* red */);
+	g_settings.led_mode[SNeutrinoSettings::LED_MODE_PLAYBACK]		= configfile.getInt32( "led_mode_play",		2 /* green */);
+#else
 	g_settings.led_tv_mode = configfile.getInt32( "led_tv_mode", 2);
 	g_settings.led_standby_mode = configfile.getInt32( "led_standby_mode", 3);
 	g_settings.led_deep_mode = configfile.getInt32( "led_deep_mode", 3);
 	g_settings.led_rec_mode = configfile.getInt32( "led_rec_mode", 1);
 	g_settings.led_blink = configfile.getInt32( "led_blink", 1);
+#endif
 	g_settings.backlight_tv = configfile.getInt32( "backlight_tv", 1);
 	g_settings.backlight_standby = configfile.getInt32( "backlight_standby", 0);
 	g_settings.backlight_deepstandby = configfile.getInt32( "backlight_deepstandby", 0);
@@ -1046,11 +1055,20 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "make_removed_list", g_settings.make_removed_list);
 	configfile.setInt32( "keep_channel_numbers", g_settings.keep_channel_numbers);
 	//led
+#if HAVE_SPARK_HARDWARE
+	configfile.setInt32( "led_mode_tv",		g_settings.led_mode[SNeutrinoSettings::LED_MODE_TV]);
+	configfile.setInt32( "led_mode_standby",	g_settings.led_mode[SNeutrinoSettings::LED_MODE_STANDBY]);
+	configfile.setInt32( "led_mode_deep",		g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY]);
+	configfile.setInt32( "led_mode_deep_timer",	g_settings.led_mode[SNeutrinoSettings::LED_MODE_DEEPSTANDBY_TIMER]);
+	configfile.setInt32( "led_mode_rec",		g_settings.led_mode[SNeutrinoSettings::LED_MODE_RECORD]);
+	configfile.setInt32( "led_mode_play",		g_settings.led_mode[SNeutrinoSettings::LED_MODE_PLAYBACK]);
+#else
 	configfile.setInt32( "led_tv_mode", g_settings.led_tv_mode);
 	configfile.setInt32( "led_standby_mode", g_settings.led_standby_mode);
 	configfile.setInt32( "led_deep_mode", g_settings.led_deep_mode);
 	configfile.setInt32( "led_rec_mode", g_settings.led_rec_mode);
 	configfile.setInt32( "led_blink", g_settings.led_blink);
+#endif
 	configfile.setInt32( "backlight_tv", g_settings.backlight_tv);
 	configfile.setInt32( "backlight_standby", g_settings.backlight_standby);
 	configfile.setInt32( "backlight_deepstandby", g_settings.backlight_deepstandby);
@@ -3661,9 +3679,19 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 					fprintf(f, "%ld\n", timer_minutes * 60);
 					fclose(f);
 				}
-				else
+				else {
 					perror("fopen /tmp/.timer");
+					timer_minutes = 0;
+				}
 			}
+#if HAVE_SPARK_HARDWARE
+			FILE *f = fopen("/tmp/.fp_leds", "w");
+			if (f) {
+				int led_mode = g_settings.led_mode[timer_minutes ? SNeutrinoSettings::LED_MODE_DEEPSTANDBY_TIMER : SNeutrinoSettings::LED_MODE_DEEPSTANDBY];
+				fprintf(f, "-%c 0 -%c 1", (led_mode & 1) ? 'l' : 'L', (led_mode & 2) ? 'l' : 'L');
+				fclose(f);
+			}
+#endif
 
 			delete g_RCInput;
 			g_RCInput = NULL;
@@ -3857,7 +3885,11 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(true);
 #endif
+#if HAVE_SPARK_HARDWARE
+		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, true);
+#else
 		CVFD::getInstance()->ShowText("standby...        ");
+#endif
 		if( mode == mode_scart ) {
 			//g_Controld->setScartMode( 0 );
 		}
@@ -3932,7 +3964,11 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		// Active standby off
 		powerManager->SetStandby(false, false);
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
+#if HAVE_SPARK_HARDWARE
+		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, true);
+#else
 		CVFD::getInstance()->ShowText("resume...        ");
+#endif
 		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		videoDecoder->Standby(false);
 		CSectionsdClient::CurrentNextInfo dummy;
