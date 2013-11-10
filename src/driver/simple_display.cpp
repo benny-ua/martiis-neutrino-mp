@@ -361,8 +361,9 @@ void CLCD::togglePower(void)
 {
 }
 
-void CLCD::setMuted(bool /*mu*/)
+void CLCD::setMuted(bool mu)
 {
+	ShowIcon(FP_ICON_MUTE, mu);
 }
 
 void CLCD::resume(bool showServiceName)
@@ -408,18 +409,72 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 #if HAVE_SPARK_HARDWARE
 	if (fd < 0)
 		return;
-	int which;
-	switch (icon) {
-		case FP_ICON_PLAY:
-			which = SNeutrinoSettings::LED_MODE_PLAYBACK;
+
+	int leds = 0;
+
+	switch (g_info.hw_caps->display_type) {
+		case HW_DISPLAY_LINE_TEXT: {
+			int aotom_icon = 0;
+			switch (icon) {
+				case FP_ICON_HDD:
+					aotom_icon = AOTOM_HDD_FULL;
+					break;
+				case FP_ICON_MP3:
+					aotom_icon = AOTOM_MP3;
+					break;
+				case FP_ICON_MUTE:
+					aotom_icon = AOTOM_MUTE;
+					break;
+				case FP_ICON_PLAY:
+					aotom_icon = AOTOM_PLAY_LOG;
+					break;
+				case FP_ICON_RECORD:
+					aotom_icon = AOTOM_REC1;
+					break;
+				case FP_ICON_PAUSE:
+					aotom_icon = AOTOM_PLAY_PAUSE;
+					break;
+				case FP_ICON_RADIO:
+					aotom_icon = AOTOM_AUDIO;
+					break;
+				case FP_ICON_TIMESHIFT:
+					aotom_icon = AOTOM_TIMESHIFT;
+					break;
+				case FP_ICON_TV:
+					aotom_icon = AOTOM_TVMODE_LOG;
+					break;
+				case FP_ICON_USB:
+					aotom_icon = AOTOM_USB;
+					break;
+				// incomplete.
+				default:
+					break;
+			}
+			if (aotom_icon) {
+				struct aotom_ioctl_data vData;
+				vData.u.icon.icon_nr = aotom_icon;
+				vData.u.icon.on = show;
+				ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+			}
 			break;
-		case FP_ICON_RECORD:
-			which = SNeutrinoSettings::LED_MODE_RECORD;
+		}
+		default: {
+			switch (icon) {
+				case FP_ICON_PLAY:
+					leds = SNeutrinoSettings::LED_MODE_PLAYBACK;
+					break;
+				case FP_ICON_RECORD:
+					leds = SNeutrinoSettings::LED_MODE_RECORD;
+					break;
+				default:
+					break;
+			}
 			break;
-		default:
-			return;
+		}
 	}
-	led_mode[which] = show ? g_settings.led_mode[which] : 0;
+
+	if (leds)
+		led_mode[leds] = show ? g_settings.led_mode[leds] : 0;
 	setled();
 #endif
 }
