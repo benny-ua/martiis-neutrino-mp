@@ -2193,7 +2193,7 @@ void CAudioPlayerGui::updateMetaData(bool screen_saver)
 		std::string cover = m_curr_audiofile.Filename.substr(0, m_curr_audiofile.Filename.rfind('/')) + "/folder.jpg";
 
 		if (!meta.cover.empty())
-			cover = "/tmp/cover.jpg";
+			cover = meta.cover;
 
 		if ((access(cover.c_str(), F_OK) == 0) && !screen_saver)
 		{
