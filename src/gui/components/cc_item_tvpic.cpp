@@ -49,7 +49,8 @@ CComponentsPIP::CComponentsPIP(	const int x_pos, const int y_pos, const int perc
 	//CComponentsPIP
 	screen_w = frameBuffer->getScreenWidth(true);
 	screen_h = frameBuffer->getScreenHeight(true);
-	pic_name = DATADIR "/neutrino/icons/start.jpg";
+	pic_name = DATADIR;
+	pic_name += "/neutrino/icons/start.jpg";
 
 	//CComponents
 	x 		= x_pos;
@@ -86,6 +87,9 @@ void CComponentsPIP::paint(bool do_save_bg)
 		pig_w -= pig_w*25/100;
 		pig_x += tmpw/2-pig_w/2; 
 	}
+
+	if (!cc_allow_paint)
+		return;
 	
 	if(CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_tv || CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_webtv){
 #if HAVE_SPARK_HARDWARE
@@ -102,7 +106,6 @@ void CComponentsPIP::paint(bool do_save_bg)
 		CComponentsPicture pic = CComponentsPicture (pig_x, pig_y, pig_w, pig_h, pic_name, CC_ALIGN_HOR_CENTER | CC_ALIGN_VER_CENTER);
 		pic.paint(CC_SAVE_SCREEN_NO);
 	}
-	
 }
 
 
