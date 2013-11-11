@@ -801,7 +801,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.screen_width = configfile.getInt32("screen_width", 0);
 	g_settings.screen_height = configfile.getInt32("screen_height", 0);
 
+#if 0
 	g_settings.bigFonts = configfile.getInt32("bigFonts", 0);
+#else
+	g_settings.bigFonts = 1;
+#endif
 	g_settings.window_size = configfile.getInt32("window_size", 100);
 	g_settings.window_width = configfile.getInt32("window_width", g_settings.window_size);
 	g_settings.window_height = configfile.getInt32("window_height", g_settings.window_size);
@@ -1445,7 +1449,9 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		configfile.setString(txt1, g_settings.usermenu_text[button]);
 	}
 
+#if 0
 	configfile.setInt32("bigFonts", g_settings.bigFonts);
+#endif
 	configfile.setInt32("window_size", g_settings.window_size);
 	configfile.setInt32("window_width", g_settings.window_width);
 	configfile.setInt32("window_height", g_settings.window_height);
