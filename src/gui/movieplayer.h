@@ -45,6 +45,7 @@
 #include <driver/record.h>
 #include <zapit/channel.h>
 #include <playback.h>
+#include <audio_td.h>
 
 #include <stdio.h>
 
@@ -117,6 +118,7 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string currentttxsub;
 
 	bool probePids;
+	AUDIO_FORMAT StreamType;
 	
 	repeat_mode_enum repeat_mode;
 
@@ -226,6 +228,8 @@ class CMoviePlayerGui : public CMenuTarget
 	void getAPID(int &apid, unsigned int &is_ac3);
 	bool getAPID(unsigned int i, int &apid, unsigned int &is_ac3);
 	bool setAPID(unsigned int i);
+	AUDIO_FORMAT GetStreamType(void) { return StreamType; }
+	void SetStreamType(void);
 	cPlayback *getPlayback() { return playback; }
 	unsigned int getAPIDCount(void);
 	std::string getAPIDDesc(unsigned int i);

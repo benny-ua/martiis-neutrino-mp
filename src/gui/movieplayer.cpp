@@ -75,11 +75,8 @@
 #define LCD_MODE CVFD::MODE_MENU_UTF8
 #endif
 
-extern cVideo * videoDecoder;
 extern CRemoteControl *g_RemoteControl;	/* neutrino.cpp */
 extern CInfoClock *InfoClock;
-extern bool has_hdd;
-extern cAudio * audioDecoder;
 
 #define TIMESHIFT_SECONDS 3
 
@@ -220,6 +217,8 @@ void CMoviePlayerGui::Init(void)
 	showStartingHint = false;
 
 	filelist_it = filelist.end();
+
+	StreamType = AUDIO_FMT_AUTO;
 }
 
 void CMoviePlayerGui::cutNeutrino()
@@ -276,6 +275,7 @@ void CMoviePlayerGui::restoreNeutrino()
 		if (channel && channel->scrambled)
 			 CZapit::getInstance()->Rezap();
 	}
+	CVFD::getInstance()->setAudioMode();
 }
 
 static bool running = false;
@@ -504,8 +504,6 @@ bool CMoviePlayerGui::SelectFile()
 	file_name = "";
 
 	printf("CMoviePlayerGui::SelectFile: isBookmark %d timeshift %d isMovieBrowser %d\n", isBookmark, timeshift, isMovieBrowser);
-	if (has_hdd)
-		wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
 
 	if (timeshift) {
 		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
@@ -860,10 +858,16 @@ bool CMoviePlayerGui::PlayFileStart(void)
 				pids.epgAudioPidName = language[i];
 				p_movie_info->audioPids.push_back(pids);
 			}
+
 		if (currentapid < 0 && numpida > 0) {
 			currentapid = apids[0];
 			currentac3 = ac3flags[0];
-		}
+			SetStreamType();
+		} else
+			StreamType = AUDIO_FMT_AUTO;
+
+		CVFD::getInstance()->setAudioMode(StreamType);
+
 		if (p_movie_info && p_movie_info->epgId) {
 			int percent = CZapit::getInstance()->GetPidVolume(p_movie_info->epgId, currentapid, currentac3 == 1);
 			CZapit::getInstance()->SetVolumePercent(percent);
@@ -1405,7 +1409,7 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool& en
 	enabled = true;
 	switch(ac3flags[count])
 	{
-		case 1: /*AC3,EAC3*/
+		case 1: /*AC3*/
 			if (apidtitle.find("AC3") == std::string::npos)
 				apidtitle.append(" (AC3)");
 			break;
@@ -1430,8 +1434,9 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool& en
 #endif
 				enabled = false;
 			break;
-		case 7: /*MLP*/
-			apidtitle.append(" (MLP)");
+		case 7: /*EAC3*/
+			if (apidtitle.find("EAC3") == std::string::npos)
+				apidtitle.append(" (EAC3)");
 			break;
 		default:
 			break;
@@ -1850,6 +1855,7 @@ bool CMoviePlayerGui::setAPID(unsigned int i) {
 	if (currentapid != apids[i]) {
 		currentapid = apids[i];
 		currentac3 = ac3flags[i];
+		SetStreamType();
 		playback->SetAPid(currentapid, currentac3);
 	}
 	return (i < numpida);
@@ -1958,7 +1964,7 @@ t_channel_id CMoviePlayerGui::getChannelId(void)
 
 void CMoviePlayerGui::getAPID(int &apid, unsigned int &is_ac3)
 {
-	apid = currentapid; is_ac3 = currentac3;
+	apid = currentapid, is_ac3 = (currentac3 == AUDIO_FMT_DOLBY_DIGITAL || currentac3 == AUDIO_FMT_DD_PLUS);
 }
 
 bool CMoviePlayerGui::getAPID(unsigned int i, int &apid, unsigned int &is_ac3)
@@ -2000,4 +2006,33 @@ void CMoviePlayerGui::Pause(bool b)
 		playstate = CMoviePlayerGui::PLAY;
 	}
 	UnlockPlayback();
+}
+
+void CMoviePlayerGui::SetStreamType(void)
+{
+	switch(currentac3)
+	{
+		case 0:
+		case 3:
+			StreamType = AUDIO_FMT_MPEG;
+			break;
+		case 1: /*AC3*/
+			StreamType = AUDIO_FMT_DOLBY_DIGITAL;
+			break;
+		case 4: /*MP3*/
+			StreamType = AUDIO_FMT_MP3;
+			break;
+		case 5: /*AAC*/
+			StreamType = AUDIO_FMT_AAC;
+			break;
+		case 6: /*DTS*/
+			StreamType = AUDIO_FMT_DTS;
+			break;
+		case 7: /*EAC3*/
+			StreamType = AUDIO_FMT_DD_PLUS;
+			break;
+		default:
+			StreamType = AUDIO_FMT_AUTO;
+			break;
+	}
 }

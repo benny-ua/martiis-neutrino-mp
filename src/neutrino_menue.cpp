@@ -86,7 +86,6 @@
 extern CPlugins       * g_PluginList;
 extern CRemoteControl * g_RemoteControl;
 extern CCAMMenuHandler * g_CamHandler;
-// extern bool has_hdd;
 // extern char current_timezone[50];
 // extern bool autoshift;
 

@@ -32,6 +32,7 @@
 
 #if HAVE_SPARK_HARDWARE
 #include <system/settings.h>
+#include <audio_td.h>
 #endif
 
 #define LCDDIR_VAR "/var/share/tuxbox/neutrino/lcdd"
@@ -208,6 +209,8 @@ class CLCD
 		          const char * fontfile3=NULL, const char * fontname3=NULL); 
 
 		void setMode(const MODES m, const char * const title = "");
+		void setAudioMode(AUDIO_FORMAT streamtype);
+		void setAudioMode(void);
 		MODES getMode() { return mode; };
 
 		void showServicename(const std::string name, const bool clear_epg = false);

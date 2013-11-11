@@ -340,24 +340,21 @@ void CRecordSetup::showRecordTimeShiftSetup(CMenuWidget *menu_ts)
 	fTsDir->setHint("", LOCALE_MENU_HINT_RECORD_TDIR);
 	menu_ts->addItem(fTsDir);
 
-	if (1) //has_hdd
-	{
-		CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_TIMESHIFT_PAUSE, &g_settings.timeshift_pause, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-		mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_PAUSE);
-		menu_ts->addItem(mc);
+	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_EXTRA_TIMESHIFT_PAUSE, &g_settings.timeshift_pause, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_PAUSE);
+	menu_ts->addItem(mc);
 
-		CMenuOptionNumberChooser * mn = new CMenuOptionNumberChooser(LOCALE_EXTRA_AUTO_TIMESHIFT, &g_settings.auto_timeshift, true, 0, 300, NULL);
-		mn->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_AUTO);
-		menu_ts->addItem(mn);
+	CMenuOptionNumberChooser * mn = new CMenuOptionNumberChooser(LOCALE_EXTRA_AUTO_TIMESHIFT, &g_settings.auto_timeshift, true, 0, 300, NULL);
+	mn->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_AUTO);
+	menu_ts->addItem(mn);
 
-		mc = new CMenuOptionChooser(LOCALE_EXTRA_AUTO_DELETE, &g_settings.auto_delete, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-		mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_DELETE);
-		menu_ts->addItem(mc);
+	mc = new CMenuOptionChooser(LOCALE_EXTRA_AUTO_DELETE, &g_settings.auto_delete, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_DELETE);
+	menu_ts->addItem(mc);
 
-		mc = new CMenuOptionChooser(LOCALE_EXTRA_TEMP_TIMESHIFT, &g_settings.temp_timeshift, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-		mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_TEMP);
-		menu_ts->addItem(mc);
-	}
+	mc = new CMenuOptionChooser(LOCALE_EXTRA_TEMP_TIMESHIFT, &g_settings.temp_timeshift, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_RECORD_TIMESHIFT_TEMP);
+	menu_ts->addItem(mc);
 }
 
 bool CRecordSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*/)

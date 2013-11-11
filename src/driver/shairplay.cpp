@@ -47,6 +47,7 @@
  */
 
 #include <driver/shairplay.h>
+#include <driver/display.h>
 #include <math.h>
 #include <linux/dvb/audio.h>
 #include <global.h>
@@ -480,6 +481,7 @@ void CShairPlay::unlock(pthread_mutex_t *_m)
 
 void CShairPlay::exec(void)
 {
+	CVFD::getInstance()->setAudioMode(AUDIO_FMT_MP3);
 	g_Zapit->lockPlayBack();
 
 	showingCoverArt = false;
@@ -585,4 +587,5 @@ void CShairPlay::exec(void)
 	firstAudioPacket = true;
 	unlock(&videoMutex);
 	g_Zapit->Rezap();
+	CVFD::getInstance()->setAudioMode();
 }

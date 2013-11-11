@@ -41,7 +41,9 @@
 #include <gui/widget/menue.h>
 #include <driver/screen_max.h>
 #include <driver/volume.h>
+#include <driver/display.h>
 #include <zapit/zapit.h>
+#include <audio_td.h>
 
 extern CRemoteControl		* g_RemoteControl; /* neutrino.cpp */
 extern CAudioSetupNotifier	* audioSetupNotifier;
@@ -84,10 +86,13 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 
 	int sel= atoi(actionkey.c_str());
 	if(sel >= 0) {
-		if (mp->Playing())
+		if (mp->Playing()) {
 			mp->setAPID(sel);
-		else if (g_RemoteControl->current_PIDs.PIDs.selected_apid!= (unsigned int) sel )
+			CVFD::getInstance()->setAudioMode(mp->GetStreamType());
+		} else if (g_RemoteControl->current_PIDs.PIDs.selected_apid!= (unsigned int) sel ) {
 			g_RemoteControl->setAPID(sel);
+			CVFD::getInstance()->setAudioMode();
+		}
 		return menu_return::RETURN_EXIT;
 	}
 

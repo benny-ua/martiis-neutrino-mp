@@ -42,6 +42,7 @@
 
 #if HAVE_SPARK_HARDWARE
 #include <aotom_main.h>
+#include <audio_td.h>
 #endif
 
 extern CRemoteControl * g_RemoteControl; /* neutrino.cpp */
@@ -567,5 +568,54 @@ void CVFD::setled(void)
 	vData.u.led.led_nr = 1;
 	vData.u.led.on = (on & 2) ? LOG_ON : LOG_OFF;
 	ioctl(fd, VFDSETLED, &vData);
+#endif
+}
+
+void CVFD::setAudioMode(void)
+{
+	extern cAudio *audioDecoder;
+	setAudioMode(audioDecoder->GetStreamType());
+}
+
+void CVFD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
+{
+#if HAVE_SPARK_HARDWARE
+	int dubi = 0;
+	int mp3 = 0;
+	int ac3 = 0;
+	switch (streamtype) {
+		case AUDIO_FMT_MP3:
+			mp3 = 1;
+			break;
+		case AUDIO_FMT_DOLBY_DIGITAL:
+		case AUDIO_FMT_DD_PLUS:
+			ac3 = 1;
+			break;
+		case AUDIO_FMT_DTS:
+			dubi = 1;
+			break;
+		case AUDIO_FMT_AUTO:
+		case AUDIO_FMT_MPEG:
+		case AUDIO_FMT_AAC:
+		case AUDIO_FMT_AAC_PLUS:
+		case AUDIO_FMT_AVS:
+		case AUDIO_FMT_MLP:
+		case AUDIO_FMT_WMA:
+		case AUDIO_FMT_MPG1:
+		default:
+			;
+	}
+	struct aotom_ioctl_data vData;
+	vData.u.icon.icon_nr = AOTOM_DUBI;
+	vData.u.icon.on = dubi;
+	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+
+	vData.u.icon.icon_nr = AOTOM_MP3;
+	vData.u.icon.on = mp3;
+	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+
+	vData.u.icon.icon_nr = AOTOM_AC3;
+	vData.u.icon.on = ac3;
+	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
 #endif
 }

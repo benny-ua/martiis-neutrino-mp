@@ -146,7 +146,6 @@
 
 int old_b_id = -1;
 CHintBox * reloadhintBox = 0;
-bool has_hdd;
 
 CInfoClock      *InfoClock;
 int allow_flash = 1;
@@ -2850,6 +2849,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		}
 #endif
 		g_RCInput->killTimer(scrambled_timer);
+		CVFD::getInstance()->setAudioMode();
 
 		if (mode != mode_webtv) {
 			scrambled_timer = g_RCInput->addTimer(10*1000*1000, true);
@@ -3326,9 +3326,7 @@ _repeat:
 					break;
 				}
 			}
-			if(has_hdd) {
-				wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
-			}
+			// wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
 		}
 
 		if( g_settings.recording_zap_on_announce && (mode != mode_standby) && (eventinfo->channel_id != CZapit::getInstance()->GetCurrentChannelID())) {

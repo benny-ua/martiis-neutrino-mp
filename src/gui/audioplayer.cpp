@@ -72,6 +72,7 @@
 #include <system/helpers.h>
 #include <driver/screen_max.h>
 #include <zapit/zapit.h>
+#include <audio_td.h>
 
 #include <algorithm>
 #include <sys/time.h>
@@ -362,6 +363,7 @@ int CAudioPlayerGui::show()
 	m_frameBuffer->paintBackground();
 
 	CVFD::getInstance()->setMode(CVFD::MODE_AUDIO);
+	CVFD::getInstance()->setAudioMode(AUDIO_FMT_MP3);
 	paintLCD();
 
 	bool loop = true;
@@ -921,6 +923,7 @@ int CAudioPlayerGui::show()
 	if (m_state != CAudioPlayerGui::STOP)
 		stop();
 
+	CVFD::getInstance()->setAudioMode();
 	return ret;
 }
 
