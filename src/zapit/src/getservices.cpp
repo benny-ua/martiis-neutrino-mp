@@ -802,7 +802,7 @@ bool CServiceManager::LoadServices(bool only_current)
 							t_channel_id chid = create_channel_id64(0, 0, 0, 0, 0, url);
 							CZapitChannel * channel = new CZapitChannel(title, chid, url, desc);
 							AddChannel(channel);
-							channel->flags = CZapitChannel::PRESENT;
+							channel->flags = CZapitChannel::UPDATED;
 						}
 
 						l1 = l1->xmlNextNode;
