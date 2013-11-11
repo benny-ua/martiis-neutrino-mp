@@ -40,7 +40,6 @@
 #include <system/flashtool.h>
 #include "version.h"
 
-#include "git_version.h"
 #define GIT_DESC "GIT Desc.:"
 #define GIT_REV "GIT Build:"
 #include <gui/buildinfo.h>
@@ -246,10 +245,10 @@ void CImageInfo::InitInfoData()
 {
 	v_info.clear();
 
-#ifdef GITVERSION
-	const char * builddate = GITVERSION;
+#ifdef BUILT_DATE
+	const char * builddate = BUILT_DATE;
 #else
-	const char * builddate = config.getString("builddate", BUILT_DATE).c_str();
+	const char * builddate = config.getString("builddate", "n/a").c_str();
 #endif
 
 	std::string version_string;

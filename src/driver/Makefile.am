@@ -12,7 +12,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/libconfigfile \
 	-I$(top_srcdir)/lib/connection \
 	-I$(top_srcdir)/lib/libeventserver \
-	@FREETYPE_CFLAGS@
+	@FREETYPE_CFLAGS@ \
+	@HWLIB_CFLAGS@
 
 noinst_LIBRARIES = libneutrino_driver.a libneutrino_driver_netfile.a
 
@@ -55,11 +56,6 @@ if BOXTYPE_COOL
 libneutrino_driver_a_SOURCES += \
 	vfd.cpp
 
-if BOXMODEL_APOLLO
-AM_CPPFLAGS += -I$(top_srcdir)/lib/libcoolstream2
-else
-AM_CPPFLAGS += -I$(top_srcdir)/lib/libcoolstream
-endif
 endif
 if BOXTYPE_TRIPLE
 libneutrino_driver_a_SOURCES += \
@@ -81,7 +77,6 @@ libneutrino_driver_a_SOURCES += \
 endif
 if USE_STB_HAL
 AM_CPPFLAGS += \
-	-I$(STB_HAL_INC) \
 	@DIRECTFB_CFLAGS@
 endif
 
