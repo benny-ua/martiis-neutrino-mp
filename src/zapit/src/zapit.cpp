@@ -509,6 +509,7 @@ extern void MoviePlayerStop(void);
 
 bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplayback)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(zapit_mutex);
 	bool transponder_change = false;
 	bool failed = false;
 	CZapitChannel* newchannel;

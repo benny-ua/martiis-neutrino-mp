@@ -99,6 +99,7 @@ class CZapit : public OpenThreads::Thread
 		};
 
 		OpenThreads::ReentrantMutex	mutex;
+		OpenThreads::Mutex zapit_mutex;
 		bool started;
 		bool event_mode;
 		bool firstzap;
