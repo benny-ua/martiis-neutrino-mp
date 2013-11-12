@@ -646,6 +646,8 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 							pos -= dir * items.size();
 						wrap = true;
 				}
+				if (pos >= (int)items.size())
+					pos = (int)items.size() - 1;
 				do {
 					CMenuItem* item = items[pos];
 					if (item->isSelectable()) {

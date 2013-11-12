@@ -2248,6 +2248,7 @@ webtv.head WebTV
 webtv.xml WebTV XML files
 webtv.xml.add Add XML file
 webtv.xml.del Remove XML file
+webtv.xml.del.hint Please select the file to remove, then press RED.
 window_size Window size in %
 wizard.initial_settings Initial settings found
 wizard.install_settings Do you want to install channels for Astra 19.2°E?

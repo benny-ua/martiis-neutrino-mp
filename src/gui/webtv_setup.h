@@ -35,6 +35,7 @@ class CWebTVSetup : public CMenuTarget
 		int item_offset;
 		bool changed;
 		CMenuWidget *m;
+		CMenuForwarder *del_fw;
 	public:
 		CWebTVSetup();
 		int exec(CMenuTarget* parent, const std::string & actionKey);

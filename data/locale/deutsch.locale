@@ -2246,6 +2246,7 @@ webtv.head WebTV
 webtv.xml WebTV-XML-Dateien
 webtv.xml.add XML-Datei hinzufügen
 webtv.xml.del XML-Datei entfernen
+webtv.xml.del.hint Bitte die zu entfernende Datei auswählen, dann ROT drücken.
 window_size Fenstergröße in %
 wizard.initial_settings Grundeinstellungen gefunden
 wizard.install_settings Kanalliste für Astra 19.2°E installieren?
