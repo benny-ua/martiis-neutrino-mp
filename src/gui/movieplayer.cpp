@@ -488,6 +488,8 @@ void CMoviePlayerGui::Cleanup()
 		tlanguage[i].clear();
 	}
 	numpidt = 0; currentttxsub = "";
+	vpid = 0;
+	vtype = 0;
 
 	startposition = 0;
 	is_file_player = false;

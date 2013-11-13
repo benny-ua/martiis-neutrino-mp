@@ -28,6 +28,7 @@
 #include <system/fsmounter.h>
 #include <system/helpers.h>
 #include <eitd/sectionsd.h>
+#include <driver/display.h>
 
 #include <stdio.h>
 #include <unistd.h>

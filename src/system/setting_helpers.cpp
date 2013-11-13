@@ -53,6 +53,7 @@
 #include <neutrino.h>
 #include <gui/widget/stringinput.h>
 #include <gui/infoclock.h>
+#include <gui/infoviewer.h>
 #include <gui/movieplayer.h>
 #include <driver/volume.h>
 #include <driver/display.h>
