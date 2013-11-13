@@ -1981,6 +1981,7 @@ bool CMoviePlayerGui::getAPID(unsigned int i, int &apid, unsigned int &is_ac3)
 
 size_t CMoviePlayerGui::GetReadCount()
 {
+#if HAVE_SPARK_HARDWARE
 	unsigned long long this_read = 0;
 	LockPlayback(__func__);
 	if (playback)
@@ -1993,6 +1994,9 @@ size_t CMoviePlayerGui::GetReadCount()
 		res = this_read - last_read;
 	last_read = this_read;
 	return (size_t) res;
+#else
+	return 0;
+#endif
 }
 
 void CMoviePlayerGui::Pause(bool b)

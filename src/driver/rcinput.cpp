@@ -57,6 +57,7 @@
 #include <neutrinoMessages.h>
 #include <timerd/timermanager.h>
 #include <timerdclient/timerdclient.h>
+#include <sectionsdclient/sectionsdclient.h>
 #include <cs_api.h>
 
 #if HAVE_SPARK_HARDWARE

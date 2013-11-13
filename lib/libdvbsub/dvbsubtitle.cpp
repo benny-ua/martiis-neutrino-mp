@@ -486,7 +486,9 @@ dbgconverter("cDvbSubtitleConverter::Action: PTS: %012llx STC: %012llx (%lld) ti
 				}
 				if(sb->Count()) {
 					WaitMs = MIN_DISPLAY_TIME;
+#if HAVE_SPARK_HARDWARE
 					painted = true;
+#endif
 				}
 				bitmaps->Del(sb, true);
 //				shown = true;

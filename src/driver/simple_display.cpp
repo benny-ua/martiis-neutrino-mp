@@ -573,8 +573,10 @@ void CVFD::setled(void)
 
 void CVFD::setAudioMode(void)
 {
+#if HAVE_SPARK_HARDWARE
 	extern cAudio *audioDecoder;
 	setAudioMode(audioDecoder->GetStreamType());
+#endif
 }
 
 void CVFD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))

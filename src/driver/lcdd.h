@@ -30,10 +30,8 @@
 #include <config.h>
 #endif
 
-#if HAVE_SPARK_HARDWARE
 #include <system/settings.h>
 #include <audio_td.h>
-#endif
 
 #define LCDDIR_VAR "/var/share/tuxbox/neutrino/lcdd"
 
