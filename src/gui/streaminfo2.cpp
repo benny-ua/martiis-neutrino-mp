@@ -230,7 +230,7 @@ int CStreamInfo2::doSignalStrengthLoop ()
 			paint (paint_mode);
 			continue;
 		}
-		else if(msg == CRCInput::RC_setup) {
+		else if(msg == CRCInput::RC_setup || msg == CRCInput::RC_home) {
 			res = menu_return::RETURN_EXIT_ALL;
 			break;
 		}
