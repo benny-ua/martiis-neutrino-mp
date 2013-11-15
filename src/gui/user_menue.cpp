@@ -463,7 +463,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_prev = SNeutrinoSettings::ITEM_NETZKINO;
 			keyhelper.get(&key,&icon);
 			//keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback", key, icon);
+			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
 		default:
@@ -596,6 +596,10 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 				locCheck(LOCALE_SERVICEMENU_RESTART_TUNER);
                         case SNeutrinoSettings::ITEM_THREE_D_MODE:
 				locCheck(LOCALE_THREE_D_SETTINGS);
+                        case SNeutrinoSettings::ITEM_YOUTUBE:
+				locCheck(LOCALE_MOVIEPLAYER_YTPLAYBACK);
+                        case SNeutrinoSettings::ITEM_NETZKINO:
+				locCheck(LOCALE_MOVIEPLAYER_NKPLAYBACK);
                 }
         }
 
