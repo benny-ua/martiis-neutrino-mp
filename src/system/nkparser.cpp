@@ -186,18 +186,42 @@ void cNKFeedParser::removeHTMLMarkup(std::string &s)
 				p++;
 			continue;
 		}
-		if (!strncasecmp(p, "&#8211;", 7)) {
-			p += 7;
-			*u++ = 0xE2;
-			*u++ = 0x80;
-			*u++ = 0x93;
-			continue;
-		}
-		if (!strncasecmp(p, "&#8230;", 7)) {
-			p += 7;
-			*u++ = 0xE2;
-			*u++ = 0x80;
-			*u++ = 0xA6;
+		if (p[0] == '&' && p[1] == '#') {
+			p += 2;
+			const char *format;
+			if (p[0] == 'x' || p[0] == 'X') {
+				format = "%x";
+				p++;
+			} else
+				format = "%d";
+			unsigned int r = 0;
+			if (1 == sscanf(p, format, &r)) {
+				if (r < 0x80) {
+					*u++ = r & 0x7f;
+				} else if (r < 0x800) {
+					*u++ = 0x80 & (r & 0x3f);
+					r >>= 6;
+					*u++ = 0xC0 & r;
+				} else if (r < 0x10000) {
+					*u++ = 0x80 | (0x3f & r);
+					r >>= 6;
+					*u++ = 0x80 | (0x3f & r);
+					r >>= 6;
+					*u++ = 0xE0 | r;
+				} else if (r < 0x110000) {
+					*u++ = 0x80 | (0x3f & r);
+					r >>= 6;
+					*u++ = 0x80 | (0x3f & r);
+					r >>= 6;
+					*u++ = 0x80 | (0x3f & r);
+					r >>= 6;
+					*u++ = 0xF0 | r;
+				}
+			}
+			while(*p && *p != ';')
+				p++;
+			if (*p)
+				p++;
 			continue;
 		}
 		if (!strncasecmp(p, "&hellip;", 8)) {
