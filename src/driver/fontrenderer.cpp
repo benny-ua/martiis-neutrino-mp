@@ -530,6 +530,7 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 
 		if (*text=='\n')
 		{
+#if 0
 			/* a '\n' in the text is basically an error, it should not have come
 			   until here. To find the offenders, we replace it with a paragraph
 			   marker */
@@ -539,6 +540,9 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 			x  = left;
 			y += step_y;
 			 */
+#else
+			unicode_value = ' ';
+#endif
 		}
 
 		int index = FT_Get_Char_Index(face, unicode_value);
