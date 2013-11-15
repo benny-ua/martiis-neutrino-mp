@@ -616,7 +616,7 @@ void CMovieBrowser::initGlobalSettings(void)
 	m_settings.ytquality = 37;
 	m_settings.ytconcconn = 4;
 	m_settings.nkcategory = 1;
-	m_settings.nkresults = 20;
+	m_settings.nkresults = 0;
 	m_settings.nkconcconn = 4;
 	m_settings.nkcategoryname = "Actionkino";
 }
@@ -798,7 +798,7 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->ytsearch_history_size = settings->ytsearch_history.size();
 
 	settings->nkmode = configfile.getInt32("mb_nkmode", cNKFeedParser::CATEGORY);
-	settings->nkresults = configfile.getInt32("mb_nkresults", 20);
+	settings->nkresults = configfile.getInt32("mb_nkresults", 0);
 	settings->nkconcconn = configfile.getInt32("mb_nkconcconn", 4); // concurrent connections
 	settings->nksearch = configfile.getString("mb_nksearch", "");
 	settings->nkthumbnaildir = configfile.getString("mb_nkthumbnaildir", "/media/sda1/netzkino-thumbnails"); // FIXME, add GUI option
@@ -1345,8 +1345,8 @@ void CMovieBrowser::refreshMovieInfo(void)
 		int pich = m_cBoxFrameInfo.iHeight;
 
 		std::string fname;
-printf("CMovieBrowser::refreshMovieInfo\n");
-		if (show_mode == MB_SHOW_YT || show_mode == MB_SHOW_NK) {
+//printf("CMovieBrowser::refreshMovieInfo\n");
+		if ((show_mode == MB_SHOW_YT || show_mode == MB_SHOW_NK) && !access(m_movieSelectionHandler->tfile, R_OK)) {
 			fname = m_movieSelectionHandler->tfile;
 		} else {
 			fname = getScreenshotName(m_movieSelectionHandler->file.Name);
@@ -3764,7 +3764,7 @@ void CMovieBrowser::autoFindSerie(void)
 void CMovieBrowser::loadNKTitles(int mode, std::string search, int id)
 {
 	printf("CMovieBrowser::%s: parsed %d old mode %d new mode %d region %s\n", __func__, ytparser.Parsed(), ytparser.GetFeedMode(), m_settings.ytmode, m_settings.ytregion.c_str());
-	nkparser.SetMaxResults(m_settings.nkresults ? m_settings.nkresults : 10000);
+	nkparser.SetMaxResults(m_settings.nkresults ? m_settings.nkresults : 100000);
 	nkparser.SetConcurrentDownloads(m_settings.ytconcconn);
 	nkparser.setThumbnailDir(m_settings.nkthumbnaildir);
 
@@ -4153,7 +4153,7 @@ bool CMovieBrowser::showNKMenu()
 		mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_YT_HISTORY, true, NULL, &nkHistory, "", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
 
 	mainMenu.addItem(GenericMenuSeparatorLine);
-	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_RESULTS, &m_settings.nkresults, true, 10, 50, NULL));
+	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_RESULTS, &m_settings.nkresults, true, 0, 1000, NULL));
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_HISTORY, &m_settings.nksearch_history_max, true, 10, 50, NULL));
 
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_CONCURRENT_CONNECTIONS, &m_settings.nkconcconn, true, 1, 8));

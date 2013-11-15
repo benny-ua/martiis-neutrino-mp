@@ -64,10 +64,14 @@ class cNKFeedParser
 		int max_results;
 		int concurrent_downloads;
 		bool parsed;
+		bool stopThumbnailDownload;
+
 		nk_video_list_t videos;
 
 		CURL *curl_handle;
 		OpenThreads::Mutex mutex;
+		OpenThreads::Mutex thumbnailthread_mutex;
+		int threadCount;
 		int worker_index;
 		static void* DownloadThumbnailsThread(void*);
 
@@ -80,6 +84,7 @@ class cNKFeedParser
 		bool parseCategoriesJSON(std::string &answer);
 		bool ParseFeed(std::string &url);
 		void removeHTMLMarkup(std::string &s);
+		void DownloadThumbnailsEnd(void);
 	public:
 		enum nk_feed_mode_t
 		{
@@ -103,6 +108,7 @@ class cNKFeedParser
 		void SetMaxResults(int count) { max_results = count; }
 		void SetConcurrentDownloads(int count) { concurrent_downloads = count; }
 		void setThumbnailDir(std::string &_thumbnail_dir);
+		int ThreadCount(int what = 0);
 };
 
 #endif
