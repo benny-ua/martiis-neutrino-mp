@@ -3692,7 +3692,7 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			FILE *f = fopen("/tmp/.fp_leds", "w");
 			if (f) {
 				int led_mode = g_settings.led_mode[timer_minutes ? SNeutrinoSettings::LED_MODE_DEEPSTANDBY_TIMER : SNeutrinoSettings::LED_MODE_DEEPSTANDBY];
-				fprintf(f, "-%c 0 -%c 1", (led_mode & 1) ? 'l' : 'L', (led_mode & 2) ? 'l' : 'L');
+				fprintf(f, "-%c 0 -%c 1 -%c 33 -i 36", (led_mode & 1) ? 'l' : 'L', (led_mode & 2) ? 'l' : 'L', timer_minutes ? 'i' : 'I');
 				fclose(f);
 			}
 #endif
