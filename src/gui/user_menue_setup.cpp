@@ -64,8 +64,7 @@ CUserMenuSetup::~CUserMenuSetup()
 	delete ums;
 }
 
-#define USERMENU_ITEM_OPTION_COUNT SNeutrinoSettings::ITEM_MAX
-const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUNT] =
+const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[] =
 {
 	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE },
 	{ SNeutrinoSettings::ITEM_BAR,			LOCALE_USERMENU_ITEM_BAR },
@@ -97,6 +96,7 @@ const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[USERMENU_ITEM_OPTION_COUN
         { SNeutrinoSettings::ITEM_NETZKINO,		LOCALE_MOVIEPLAYER_NKPLAYBACK },
 	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD }
 };
+#define USERMENU_ITEM_OPTION_COUNT (sizeof(USERMENU_ITEM_OPTIONS)/sizeof(CMenuOptionChooser::keyval))
 
 int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &)
 {
