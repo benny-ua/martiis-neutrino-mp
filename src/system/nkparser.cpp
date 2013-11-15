@@ -246,7 +246,7 @@ void cNKFeedParser::removeHTMLMarkup(std::string &s)
 			*u++ = '>';
 			continue;
 		}
-		if (!strncasecmp(p, "&#038;", 6)) {
+		if (!strncasecmp(p, "&#amp;", 6)) {
 			p += 6;
 			*u++ = '&';
 			continue;
