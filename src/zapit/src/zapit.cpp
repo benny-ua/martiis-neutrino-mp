@@ -77,7 +77,6 @@
 #include <driver/abstime.h>
 #include <libdvbsub/dvbsub.h>
 #include <libtuxtxt/teletext.h>
-#include <OpenThreads/ScopedLock>
 
 #ifdef PEDANTIC_VALGRIND_SETUP
 #define VALGRIND_PARANOIA(x) memset(&x, 0, sizeof(x))
