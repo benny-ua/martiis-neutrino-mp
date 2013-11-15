@@ -24,6 +24,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #include <set>
 #include <map>
@@ -37,6 +41,7 @@
 #include <global.h>
 #include "set_threadname.h"
 #include <json/json.h>
+#include <libmd5sum/md5.h>
 
 #include "nkparser.h"
 
@@ -79,6 +84,33 @@ size_t cNKFeedParser::CurlWriteToString(void *ptr, size_t size, size_t nmemb, vo
 
 bool cNKFeedParser::getUrl(std::string &url, std::string &answer, CURL *_curl_handle)
 {
+	const char hex[] = "0123456789abcdef";
+	char filename[33];
+	unsigned char md5sum[16];
+	md5_buffer (url.data(), url.length(), md5sum);
+	for (unsigned int i = 0; i < sizeof(md5sum); i++) {
+		filename[2 * i] = hex[(md5sum[i] >> 4) & 0x0f];
+		filename[2 * i + 1] = hex[md5sum[i] & 0x0f];
+	}
+	filename[32] = 0;
+
+	std::string cached_file;
+	if (thumbnail_dir)
+		cached_file = *thumbnail_dir + "/" + filename;
+	else {
+		mkdir("/tmp/nkcache", 0755);
+		cached_file = std::string("/tmp/nkcache/") + filename;
+	}
+	struct stat st;
+	if (!stat(cached_file.c_str(), &st) && st.st_mtime + 4 * 3600 /* FIXME, should be configurable */ < time(NULL)) {
+		std::ifstream in(cached_file.c_str());
+		std::stringstream buf;
+		buf << in.rdbuf();
+		answer = buf.str();
+		return true;
+	} else
+		unlink(cached_file.c_str());
+
 	if (!_curl_handle)
 		_curl_handle = curl_handle;
 
@@ -109,6 +141,10 @@ bool cNKFeedParser::getUrl(std::string &url, std::string &answer, CURL *_curl_ha
 		printf("error: %s\n", cerror);
 		return false;
 	}
+	std::ofstream o;
+	o.open(cached_file.c_str());
+	o << answer;
+	o.close();
 	return true;
 }
 
