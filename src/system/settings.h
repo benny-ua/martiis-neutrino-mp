@@ -291,6 +291,7 @@ struct SNeutrinoSettings
 		P_MPLAYER_FILEPLAY,
 		P_MPLAYER_INETPLAY,
 		P_MPLAYER_YTPLAY,
+		P_MPLAYER_NKPLAY,
 		
 		//feature keys
 		P_FEAT_KEY_FAVORIT,
@@ -789,6 +790,7 @@ struct SNeutrinoSettings
                 //ITEM_WEBTV = 26,
                 ITEM_RASS = 27,
                 ITEM_YOUTUBE = 28,
+		ITEM_NETZKINO = 29,
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];
