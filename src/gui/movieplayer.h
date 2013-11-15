@@ -141,6 +141,7 @@ class CMoviePlayerGui : public CMenuTarget
 	bool isUPNP;
 	bool isWebTV;
 	bool isYT;
+	bool isNK;
 	bool showStartingHint;
 	CMovieBrowser* moviebrowser;
 	MI_MOVIE_INFO * p_movie_info;

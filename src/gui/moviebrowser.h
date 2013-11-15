@@ -82,6 +82,7 @@
 #include <driver/fb_window.h>
 #include <driver/pictureviewer/pictureviewer.h>
 #include <system/ytparser.h>
+#include <system/nkparser.h>
 
 #define MAX_NUMBER_OF_BOOKMARK_ITEMS MI_MOVIE_BOOK_USER_MAX // we just use the same size as used in Movie info (MAX_NUMBER_OF_BOOKMARK_ITEMS is used for the number of menu items)
 #define MOVIEBROWSER_SETTINGS_FILE          CONFIGDIR "/moviebrowser.conf"
@@ -187,7 +188,8 @@ typedef enum
 {
 	MB_SHOW_RECORDS,
 	MB_SHOW_FILES,
-	MB_SHOW_YT
+	MB_SHOW_YT,
+	MB_SHOW_NK
 } MB_SHOW_MODE;
 
 #define MB_MAX_ROWS 6
@@ -241,6 +243,17 @@ typedef struct
 	std::string ytvid;
 	std::string ytsearch;
 	std::list<std::string> ytsearch_history;
+
+	int nkmode;
+	int nkcategory;
+	std::string nkcategoryname;
+	int nkresults;
+	int nkconcconn;
+	int nksearch_history_size;
+	int nksearch_history_max;
+	std::string nksearch;
+	std::string nkthumbnaildir;
+	std::list<std::string> nksearch_history;
 } MB_SETTINGS;
 
 class CMovieBrowser;
@@ -338,6 +351,9 @@ class CMovieBrowser : public CMenuTarget
 		//bool restart_mb_timeout;
 		int menu_ret;
 
+		cNKFeedParser nkparser;
+		std::string nkcategory_name;
+
 		cYTFeedParser ytparser;
 		int show_mode;
 		CMenuWidget *yt_menue;
@@ -352,6 +368,8 @@ class CMovieBrowser : public CMenuTarget
 		void loadYTitles(int mode, std::string search = "", std::string id = "");
 		bool showYTMenu(void);
 		void refreshYTMenu();
+		void loadNKTitles(int mode, std::string search, int id);
+		bool showNKMenu();
 
 	public:  // Functions //////////////////////////////////////////////////////////7
 		CMovieBrowser(const char* path); //P1

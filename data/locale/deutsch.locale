@@ -1294,7 +1294,7 @@ menu.hint_volume_digits Zifferndarstellung der Lautstärkeanzeige ein- oder auss
 menu.hint_volume_pos Wählen Sie die Position der Lautstärkeanzeige aus
 menu.hint_volume_size Wählen Sie die Höhe der Lautstärkeanzeige
 menu.hint_window_size Kanalliste, EPG-Infos und einige andere Fenster werden mit diesem Faktor skaliert
-menu.hint_ytplay Wiedergabe von ausgewählten Youtube Feeds
+menu.hint_ytplay Wiedergabe von ausgewählten Youtube-Feeds
 menu.hint_zap_cycle Wählen Sie, ob nur innerhalb des aktiven Bouquets umgeschaltet werden kann
 menu.next Weiter (Menü zum Beenden)
 menu.numbers_as_icons Menü-Zahlen als Icons
@@ -1515,6 +1515,8 @@ moviebrowser.menu_parental_lock_head Jugendschutz
 moviebrowser.menu_parental_lock_rate_head Filme sperren ab
 moviebrowser.menu_save Veränderungen speichern
 moviebrowser.menu_save_all Starte Übernahme in allen sichtbaren Filminfos
+moviebrowser.nk_categories Kategorie-Auswahl
+moviebrowser.nk_error Fehler beim Laden des Netzkino-Feeds
 moviebrowser.option_browser Anzeigeoptionen
 moviebrowser.reload_at_start Filminfos neu laden bei Start
 moviebrowser.remount_at_start Filmdepot verbinden bei Start
@@ -1558,7 +1560,7 @@ moviebrowser.yt_charts Charts
 moviebrowser.yt_clear Liste leeren
 moviebrowser.yt_completed Vollständige Downloads
 moviebrowser.yt_concurrent_connections Gleichzeitige Verbindungen 
-moviebrowser.yt_error Fehler beim laden des Youtube Feed
+moviebrowser.yt_error Fehler beim Laden des Youtube-Feeds
 moviebrowser.yt_failed Fehlgeschlagene Downloads
 moviebrowser.yt_history Frühere Suchen
 moviebrowser.yt_max_history Max. Anzahl früherer Suchen
@@ -1591,6 +1593,7 @@ movieplayer.bookmarkname_hint2
 movieplayer.defplugin Start-Plugin
 movieplayer.fileplayback Datei-Browser
 movieplayer.head Movieplayer
+movieplayer.nkplayback Netzkino
 movieplayer.starting Wiedergabe starten...
 movieplayer.toomanybookmarks Sie haben bereits zu viele Lesezeichen angelegt.\nEs muß erst ein anderes gelöscht werden.
 movieplayer.tshelp1 Stopp
@@ -1606,7 +1609,7 @@ movieplayer.tshelp7 ca. 1 Minute vor
 movieplayer.tshelp8 ca. 5 Minuten zurück
 movieplayer.tshelp9 ca. 5 Minuten vor
 movieplayer.tsplayback Abspielen
-movieplayer.ytplayback Youtube-Feeds
+movieplayer.ytplayback Youtube
 mpkey.audio Audiotrack
 mpkey.bookmark Speichere Lesezeichen
 mpkey.forward Vorlauf

@@ -1516,6 +1516,8 @@ moviebrowser.menu_parental_lock_head Parental Lock
 moviebrowser.menu_parental_lock_rate_head Lock movies from
 moviebrowser.menu_save Save changes
 moviebrowser.menu_save_all Start update of movie info files
+moviebrowser.nk_categories Select category
+moviebrowser.nk_error Failed to load Netzkino feed
 moviebrowser.option_browser Browser Options
 moviebrowser.reload_at_start Reload movie info at start
 moviebrowser.remount_at_start Remount at start
@@ -1592,6 +1594,7 @@ movieplayer.bookmarkname_hint2
 movieplayer.defplugin Start-Plugin
 movieplayer.fileplayback File play
 movieplayer.head Movieplayer
+movieplayer.nkplayback Netzkino
 movieplayer.starting Starting playback...
 movieplayer.toomanybookmarks There are too many bookmarks.\nYou need to delete one of them first.
 movieplayer.tshelp1 Stop
@@ -1607,7 +1610,7 @@ movieplayer.tshelp7 skip approx. 1 minute
 movieplayer.tshelp8 approx. 5 minutes back
 movieplayer.tshelp9 skip approx. 5 minutes
 movieplayer.tsplayback Play
-movieplayer.ytplayback Youtube videoplayer
+movieplayer.ytplayback Youtube
 mpkey.audio Audio track
 mpkey.bookmark save bookmark
 mpkey.forward Forward

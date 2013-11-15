@@ -4259,6 +4259,17 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		StartSubtitles();
 		return menu_return::RETURN_EXIT_ALL;
 	}
+	else if(actionKey=="nkplayback") {
+		StopSubtitles();
+		if(g_settings.mode_clock)
+			InfoClock->StopClock();
+		frameBuffer->Clear();
+		CMoviePlayerGui::getInstance().exec(NULL, "nkplayback");
+		if(g_settings.mode_clock)
+			InfoClock->StartClock();
+		StartSubtitles();
+		return menu_return::RETURN_EXIT_ALL;
+	}
 	else if(actionKey=="ytplayback") {
 		StopSubtitles();
 		if(g_settings.mode_clock)

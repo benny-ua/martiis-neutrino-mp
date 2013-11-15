@@ -299,6 +299,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	isMovieBrowser = false;
 	isWebTV = false;
 	isYT = false;
+	isNK = false;
 	isBookmark = false;
 	timeshift = 0;
 	isHTTP = false;
@@ -314,6 +315,13 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		isMovieBrowser = true;
 		moviebrowser->setMode(MB_SHOW_YT);
 		isYT = true;
+	}
+	else if (actionKey == "nkplayback") {
+		frameBuffer->Clear();
+		CAudioMute::getInstance()->enableMuteIcon(false);
+		isMovieBrowser = true;
+		moviebrowser->setMode(MB_SHOW_NK);
+		isNK = true;
 	}
 	else if (actionKey == "fileplayback") {
 	}
@@ -354,7 +362,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	std::string oldservicename = CVFD::getInstance()->getServicename();
 	while(!isHTTP && !isUPNP && SelectFile()) {
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
-		if (isWebTV || isYT)
+		if (isWebTV || isYT || isNK)
 			CVFD::getInstance()->showServicename(pretty_name.c_str());
 		else
 			CVFD::getInstance()->showServicename(file_name.c_str());
@@ -380,7 +388,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 	running = false;
 
-	if (isYT)
+	if (isYT || isNK)
 		CAudioMute::getInstance()->enableMuteIcon(true);
 
 	if (timeshift){
@@ -538,7 +546,7 @@ bool CMoviePlayerGui::SelectFile()
 				if (moviebrowser->getMode() == MB_SHOW_RECORDS) {
 					file_name = file->Name;
 				}
-				else if (isYT) {
+				else if (isYT || isNK) {
 					pretty_name = file->Name;
 					file_name = file->Url;
 					is_file_player = true;
@@ -648,7 +656,7 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 	CMoviePlayerGui *caller = (CMoviePlayerGui *)arg;
 	CHintBox *hintbox = NULL;
 	if(!caller->pretty_name.empty() && (caller->isYT || caller->isWebTV )){
-		neutrino_locale_t title = caller->isYT ? LOCALE_MOVIEPLAYER_YTPLAYBACK : LOCALE_WEBTV_HEAD;
+		neutrino_locale_t title = caller->isYT ? LOCALE_MOVIEPLAYER_YTPLAYBACK : caller->isNK ? LOCALE_MOVIEPLAYER_NKPLAYBACK : LOCALE_WEBTV_HEAD;
 		hintbox = new CHintBox(title, caller->pretty_name.c_str(), 450, NEUTRINO_ICON_STREAMING);
 		hintbox->paint();
 	}
@@ -729,6 +737,7 @@ bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::st
 	isMovieBrowser = false;
 	isWebTV = true;
 	isYT = false;
+	isNK = false;
 	isBookmark = false;
 	timeshift = 0;
 	isHTTP = true;
@@ -943,7 +952,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 		g_RCInput->getMsg(&msg, &data, 10);	// 1 secs..
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
-			if (isWebTV || isYT) {
+			if (isWebTV || isYT || isNK) {
 				if (!playback->GetPosition(position, duration))
 					g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
 			} else {
@@ -1008,7 +1017,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			--filelist_it;
 			playstate = CMoviePlayerGui::STOPPED;
 			playback->RequestAbort();
-		} else if(!timeshift && !isWebTV && !isYT && (msg == (neutrino_msg_t) g_settings.mpkey_next_repeat_mode)) {
+		} else if(!timeshift && !isWebTV && !isYT && !isNK && (msg == (neutrino_msg_t) g_settings.mpkey_next_repeat_mode)) {
 			repeat_mode = (repeat_mode_enum)((int)repeat_mode + 1);
 			if (repeat_mode > (int) REPEAT_ALL)
 				repeat_mode = REPEAT_OFF;
@@ -1303,7 +1312,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 		} else if (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites) {
 			//FIXME do nothing ?
 #if 0
-		} else if ((msg == CRCInput::RC_record) && !isWebTV && !isYT) {
+		} else if ((msg == CRCInput::RC_record) && !isWebTV && !isYT && !isNK) {
 			std::string shot = file_name;
 			size_t found = shot.rfind(".ts");
 			if (found == (shot.length() - 3)) {
@@ -1543,7 +1552,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			p_movie_info->dateOfLastPlay = current_time.time;
 			current_time.time = time(NULL);
 			p_movie_info->bookmarks.lastPlayStop = position / 1000;
-			if (!isWebTV && !isYT)
+			if (!isWebTV && !isYT && !isNK)
 				cMovieInfo.saveMovieInfo(*p_movie_info);
 			//p_movie_info->fileInfoStale(); //TODO: we might to tell the Moviebrowser that the movie info has changed, but this could cause long reload times  when reentering the Moviebrowser
 		}
@@ -1648,7 +1657,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 		}
 		return;
 	}
-	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark && !isWebTV && !isYT) {
+	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark && !isWebTV && !isYT && !isNK) {
 		if (newComHintBox.isPainted() == true) {
 			// yes, let's get the end pos of the jump forward
 			new_bookmark.length = play_sec - new_bookmark.pos;
@@ -1713,7 +1722,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				/* Moviebrowser plain bookmark */
 				new_bookmark.pos = play_sec;
 				new_bookmark.length = 0;
-				if (!isWebTV && !isYT && cMovieInfo.addNewBookmark(p_movie_info, new_bookmark) == true)
+				if (!isWebTV && !isYT && !isNK && cMovieInfo.addNewBookmark(p_movie_info, new_bookmark) == true)
 					cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
 				new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
 				cSelectedMenuBookStart[1].selected = false;	// clear for next bookmark menu
@@ -1729,13 +1738,13 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
 				newLoopHintBox.paint();
 				cSelectedMenuBookStart[3].selected = false;	// clear for next bookmark menu
-			} else if (!isWebTV &&!isYT && cSelectedMenuBookStart[4].selected == true) {
+			} else if (!isWebTV && !isNK && !isYT && cSelectedMenuBookStart[4].selected == true) {
 				/* Moviebrowser movie start bookmark */
 				p_movie_info->bookmarks.start = play_sec;
 				TRACE("[mp] New movie start pos: %d\r\n", p_movie_info->bookmarks.start);
 				cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
 				cSelectedMenuBookStart[4].selected = false;	// clear for next bookmark menu
-			} else if (!isWebTV &&!isYT && cSelectedMenuBookStart[5].selected == true) {
+			} else if (!isWebTV && !isNK && !isYT && cSelectedMenuBookStart[5].selected == true) {
 				/* Moviebrowser movie end bookmark */
 				p_movie_info->bookmarks.end = play_sec;
 				TRACE("[mp]  New movie end pos: %d\r\n", p_movie_info->bookmarks.start);
