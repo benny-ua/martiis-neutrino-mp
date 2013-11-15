@@ -102,14 +102,14 @@ bool cNKFeedParser::getUrl(std::string &url, std::string &answer, CURL *_curl_ha
 		cached_file = std::string("/tmp/nkcache/") + filename;
 	}
 	struct stat st;
-	if (!stat(cached_file.c_str(), &st) && st.st_mtime + 4 * 3600 /* FIXME, should be configurable */ < time(NULL)) {
+	if (!stat(cached_file.c_str(), &st) && st.st_mtime + 4 * 3600 /* FIXME, should be configurable */ > time(NULL)) {
 		std::ifstream in(cached_file.c_str());
 		std::stringstream buf;
 		buf << in.rdbuf();
 		answer = buf.str();
 		return true;
-	} else
-		unlink(cached_file.c_str());
+	}
+	unlink(cached_file.c_str());
 
 	if (!_curl_handle)
 		_curl_handle = curl_handle;
