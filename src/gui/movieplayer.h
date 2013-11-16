@@ -79,7 +79,9 @@ class CMoviePlayerGui : public CMenuTarget
 	std::string	file_name;
 	std::string    	currentaudioname;
 	bool		playing;
-	bool		first_start_timeshift;
+	bool		first_start;
+	bool		time_forced;
+	bool		update_lcd;
 	CMoviePlayerGui::state playstate;
 	int speed;
 	int startposition;

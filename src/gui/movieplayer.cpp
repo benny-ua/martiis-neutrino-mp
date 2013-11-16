@@ -794,7 +794,9 @@ bool CMoviePlayerGui::PlayFileStart(void)
 {
 	menu_ret = menu_return::RETURN_REPAINT;
 
-	first_start_timeshift = false;
+	bool first_start = true;
+	bool time_forced = false;
+	bool update_lcd = true;
 
 	//CTimeOSD FileTime;
 	position = 0, duration = 0;
@@ -886,7 +888,6 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, true);
 		if(timeshift) {
-			first_start_timeshift = true;
 			startposition = -1;
 			int towait = (timeshift == 1) ? TIMESHIFT_SECONDS+1 : TIMESHIFT_SECONDS;
 			for(unsigned int i = 0; i < 500; i++) {
@@ -942,9 +943,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			update_lcd = false;
 			updateLcd();
 		}
-		if (first_start_timeshift) {
+		if (first_start) {
 			callInfoViewer(/*duration, position*/);
-			first_start_timeshift = false;
+			first_start = false;
 		}
 
 		neutrino_msg_t msg;
@@ -961,6 +962,8 @@ void CMoviePlayerGui::PlayFileLoop(void)
 						file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
 					CVFD::getInstance()->showPercentOver(file_prozent, true, CVFD::MODE_MOVIE);
+#else
+					CVFD::getInstance()->showPercentOver(file_prozent);
 #endif
 
 					playback->GetSpeed(speed);
@@ -1392,13 +1395,14 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 	getCurrentAudioName( is_file_player, currentaudioname);
 
 	if (isMovieBrowser && p_movie_info) {
-		g_InfoViewer->showMovieTitle(playstate, p_movie_info->epgChannel, p_movie_info->epgTitle, p_movie_info->epgInfo1,
+		g_InfoViewer->showMovieTitle(playstate, GET_CHANNEL_ID_FROM_EVENT_ID(p_movie_info->epgEpgId),
+					     p_movie_info->epgChannel, p_movie_info->epgTitle, p_movie_info->epgInfo1,
 					     duration, position, repeat_mode);
 		return;
 	}
 
 	/* not moviebrowser => use the filename as title */
-	g_InfoViewer->showMovieTitle(playstate, pretty_name, "", "", duration, position, repeat_mode);
+	g_InfoViewer->showMovieTitle(playstate, 0, pretty_name, "", "", duration, position, repeat_mode);
 }
 
 bool CMoviePlayerGui::getAudioName(int apid, std::string &apidtitle)
