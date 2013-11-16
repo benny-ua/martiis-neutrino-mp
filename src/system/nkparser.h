@@ -37,7 +37,7 @@ struct sNKVideoInfo
 	std::string id;
 	std::string title;
 	std::string description;// content
-	std::string url;	// stream url
+	std::string streaming;	// streaming path
 	std::string thumbnail;	// thumbnail url
 	std::string tfile;	// thumbnail local file
 	std::string published;	// modified, actually
@@ -109,6 +109,7 @@ class cNKFeedParser
 		void SetConcurrentDownloads(int count) { concurrent_downloads = count; }
 		void setThumbnailDir(std::string &_thumbnail_dir);
 		int ThreadCount(int what = 0);
+		std::string GetUrl(std::string &s, bool rtmp = false);
 };
 
 #endif

@@ -916,6 +916,8 @@ void CMovieInfo::clearMovieInfo(MI_MOVIE_INFO * movie_info)
 	movie_info->ytdate = "";
 	movie_info->ytid = "";
 	movie_info->ytitag = 0;
+	movie_info->nkrtmp = true;
+	movie_info->nkstreaming = "";
 }
 
 /************************************************************************

@@ -251,6 +251,7 @@ typedef struct
 	int nkconcconn;
 	int nksearch_history_size;
 	int nksearch_history_max;
+	int nkrtmp;
 	std::string nksearch;
 	std::string nkthumbnaildir;
 	std::list<std::string> nksearch_history;

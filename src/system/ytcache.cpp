@@ -220,6 +220,9 @@ bool cYTCache::addToCache(MI_MOVIE_INFO *mi)
 {
 	{
 		OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
+		for (std::vector<MI_MOVIE_INFO>::iterator it = pending.begin(); it != pending.end(); ++it)
+			if (compareMovieInfo(&(*it), mi))
+				return true;
 		pending.push_back(*mi);
 	}
 
