@@ -171,9 +171,9 @@ Value::CommentInfo::setComment( const char *text )
 // Notes: index_ indicates if the string was allocated when
 // a string is stored.
 
-Value::CZString::CZString( int index )
+Value::CZString::CZString( int i )
    : cstr_( 0 )
-   , index_( index )
+   , index_( i )
 {
 }
 
@@ -265,15 +265,15 @@ Value::CZString::isStaticString() const
  * memset( this, 0, sizeof(Value) )
  * This optimization is used in ValueInternalMap fast allocator.
  */
-Value::Value( ValueType type )
-   : type_( type )
+Value::Value( ValueType t )
+   : type_( t )
    , allocated_( 0 )
    , comments_( 0 )
 # ifdef JSON_VALUE_USE_INTERNAL_MAP
    , itemIsUsed_( 0 )
 #endif
 {
-   switch ( type )
+   switch ( t )
    {
    case nullValue:
       break;
@@ -532,7 +532,7 @@ Value::type() const
 
 
 int 
-Value::compare( const Value &other )
+Value::compare( const Value &other __attribute__((unused)))
 {
    /*
    int typeDelta = other.type_ - type_;
@@ -1600,7 +1600,7 @@ Path::makePath( const std::string &path,
 
 
 void 
-Path::addPathInArg( const std::string &path, 
+Path::addPathInArg( const std::string &path __attribute__((unused)), 
                     const InArgs &in, 
                     InArgs::const_iterator &itInArg, 
                     PathArgument::Kind kind )
@@ -1621,8 +1621,8 @@ Path::addPathInArg( const std::string &path,
 
 
 void 
-Path::invalidPath( const std::string &path, 
-                   int location )
+Path::invalidPath( const std::string &path __attribute__((unused)), 
+                   int location  __attribute__((unused)))
 {
    // Error: invalid path.
 }

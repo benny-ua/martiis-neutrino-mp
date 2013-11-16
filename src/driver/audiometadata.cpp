@@ -59,7 +59,8 @@ CAudioMetaData::CAudioMetaData( const CAudioMetaData& src )
 	hasInfoOrXingTag( src.hasInfoOrXingTag ), artist( src.artist ),
 	title( src.title ), album( src.album ), sc_station( src.sc_station ),
 	date( src.date ), genre( src.genre ), track( src.track ),cover(src.cover),
-	changed( src.changed ), cover_temporary(false)
+	cover_temporary( false ),
+	changed( src.changed )
 {
 }
 
