@@ -794,9 +794,9 @@ bool CMoviePlayerGui::PlayFileStart(void)
 {
 	menu_ret = menu_return::RETURN_REPAINT;
 
-	bool first_start = true;
-	bool time_forced = false;
-	bool update_lcd = true;
+	first_start = true;
+	time_forced = false;
+	update_lcd = true;
 
 	//CTimeOSD FileTime;
 	position = 0, duration = 0;
@@ -930,8 +930,8 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 void CMoviePlayerGui::PlayFileLoop(void)
 {
-	bool time_forced = false;
-	bool update_lcd = true;
+	time_forced = false;
+	update_lcd = true;
 
 	while (playstate >= CMoviePlayerGui::PLAY)
 	{
