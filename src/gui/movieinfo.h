@@ -178,6 +178,9 @@ class MI_MOVIE_INFO
 	std::string ytdate; // yt published
 	std::string ytid; // yt published
 	int ytitag; // youtube quality profile
+
+	enum miSource { UNKNOWN = 0, YT, NK };
+	miSource source;
 };
 
 
