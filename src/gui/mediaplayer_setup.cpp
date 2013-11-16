@@ -109,6 +109,8 @@ int CMediaPlayerSetup::showMediaPlayerSetup()
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, &msetup, "show_menu", CRCInput::convertDigitToKey(shortcut++)));
 	CFileBrowserSetup fsetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &fsetup, "show_menu", CRCInput::convertDigitToKey(shortcut++)));
+	mediaSetup->addItem(new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, &msetup, "show_ytmenu", CRCInput::convertDigitToKey(shortcut++)));
+	mediaSetup->addItem(new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, &msetup, "show_nkmenu", CRCInput::convertDigitToKey(shortcut++)));
 	CWebTVSetup wsetup;
 	mediaSetup->addItem(new CMenuForwarder(LOCALE_WEBTV_HEAD, true, NULL, &wsetup, "show_menu", CRCInput::convertDigitToKey(shortcut++)));
 

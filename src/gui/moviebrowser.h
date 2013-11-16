@@ -369,10 +369,10 @@ class CMovieBrowser : public CMenuTarget
 		std::vector<MI_MOVIE_INFO> yt_completed;
 		std::vector<MI_MOVIE_INFO> yt_failed;
 		void loadYTitles(int mode, std::string search = "", std::string id = "");
-		bool showYTMenu(void);
+		bool showYTMenu(bool calledExternally = false);
 		void refreshYTMenu();
 		void loadNKTitles(int mode, std::string search, int id);
-		bool showNKMenu();
+		bool showNKMenu(bool calledExternally = false);
 
 	public:  // Functions //////////////////////////////////////////////////////////7
 		CMovieBrowser(const char* path); //P1
