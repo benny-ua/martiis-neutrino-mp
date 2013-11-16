@@ -558,6 +558,8 @@ void CTextBox::refreshText(void)
 	int ay = /*m_cFrameTextRel.iY+*/m_cFrame.iY;
 	int dx = m_cFrameTextRel.iWidth;
 	int dy = m_cFrameTextRel.iHeight;
+	if (m_has_scrolled)
+		dx = m_nMaxTextWidth;
 	
 	//find changes
 	bool has_changed = hasChanged(&ax, &ay, &dx, &dy);
@@ -606,7 +608,7 @@ void CTextBox::refreshText(void)
 	if (has_changed){
 		//TRACE("[CTextBox] %s set current values %d\r\n", __FUNCTION__, __LINE__);
 		reInitToCompareVar(&ax, &ay, &dx, &dy);
-	} else if (m_old_cText == m_cText)
+	} else if (!m_has_scrolled && m_old_cText == m_cText)
 		return;
 	m_has_scrolled = false;
 
