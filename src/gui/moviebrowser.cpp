@@ -802,8 +802,8 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->nkconcconn = configfile.getInt32("mb_nkconcconn", 4); // concurrent connections
 	settings->nksearch = configfile.getString("mb_nksearch", "");
 	settings->nkthumbnaildir = configfile.getString("mb_nkthumbnaildir", "/media/sda1/netzkino-thumbnails"); // FIXME, add GUI option
-	settings->nkcategory = configfile.getInt32("mb_nkcategory", 0);
-	settings->nkcategoryname = configfile.getString("mb_nkcategoryname", "");
+	settings->nkcategory = configfile.getInt32("mb_nkcategory", 1);
+	settings->nkcategoryname = configfile.getString("mb_nkcategoryname", "Actionkino");
 	settings->nksearch_history_max = configfile.getInt32("mb_nksearch_history_max", 10);
 	settings->nksearch_history_size = configfile.getInt32("mb_nksearch_history_size", 0);
 	if (settings->nksearch_history_size > settings->nksearch_history_max)
