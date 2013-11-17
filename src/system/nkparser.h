@@ -99,7 +99,7 @@ class cNKFeedParser
 		bool ParseCategories(void);
 		bool DownloadThumbnail(sNKVideoInfo &vinfo, CURL *_curl_handle = NULL);
 		bool DownloadThumbnails();
-		void Cleanup(bool delete_thumbnails = true);
+		void Cleanup(bool delete_thumbnails = false);
 
 		nk_video_list_t &GetVideoList() { return videos; }
 		nk_category_list_t &GetCategoryList() { ParseCategories(); return categories; }
