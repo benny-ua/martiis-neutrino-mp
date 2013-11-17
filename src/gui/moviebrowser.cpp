@@ -366,6 +366,7 @@ CMovieBrowser::~CMovieBrowser()
 	m_vHandleRecordList.clear();
 	m_vHandlePlayList.clear();
 	m_vHandleSerienames.clear();
+	m_movieSelectionHandler = NULL;
 
 	for(int i = 0; i < LF_MAX_ROWS; i++)
 	{
@@ -395,6 +396,7 @@ void CMovieBrowser::fileInfoStale(void)
 	m_vHandleRecordList.clear();
 	m_vHandlePlayList.clear();
 	m_vHandleSerienames.clear();
+	m_movieSelectionHandler = NULL;
 
 	for(int i = 0; i < LF_MAX_ROWS; i++)
 	{
@@ -1026,6 +1028,7 @@ int CMovieBrowser::exec(const char* path)
 	m_vHandleBrowserList.clear();
 	m_vHandleRecordList.clear();
 	m_vHandlePlayList.clear();
+	m_movieSelectionHandler = NULL;
 
 	for(int i = 0; i < LF_MAX_ROWS; i++)
 	{
@@ -1659,6 +1662,7 @@ void CMovieBrowser::refreshBrowserList(void) //P1
 		m_browserListLines.Icon.clear();
 	}
 	m_vHandleBrowserList.clear();
+	m_movieSelectionHandler = NULL;
 
 	if(m_vMovieInfo.empty())
 	{
