@@ -242,6 +242,7 @@ typedef struct
 	std::string ytregion;
 	std::string ytvid;
 	std::string ytsearch;
+	std::string ytthumbnaildir;
 	std::list<std::string> ytsearch_history;
 
 	int nkmode;

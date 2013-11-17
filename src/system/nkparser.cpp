@@ -68,7 +68,7 @@ cNKFeedParser::~cNKFeedParser()
 	curl_easy_cleanup(curl_handle);
 }
 
-void cNKFeedParser::setThumbnailDir(std::string &_thumbnail_dir)
+void cNKFeedParser::SetThumbnailDir(std::string &_thumbnail_dir)
 {
 	thumbnail_dir = &_thumbnail_dir;
 }
@@ -102,7 +102,7 @@ bool cNKFeedParser::getUrl(std::string &url, std::string &answer, CURL *_curl_ha
 		cached_file = std::string("/tmp/nkcache/") + filename;
 	}
 	struct stat st;
-	if (!stat(cached_file.c_str(), &st) && st.st_mtime + 4 * 3600 /* FIXME, should be configurable */ > time(NULL)) {
+	if (!stat(cached_file.c_str(), &st) && st.st_mtime + 6 * 3600 /* FIXME, should be configurable */ > time(NULL)) {
 		std::ifstream in(cached_file.c_str());
 		std::stringstream buf;
 		buf << in.rdbuf();

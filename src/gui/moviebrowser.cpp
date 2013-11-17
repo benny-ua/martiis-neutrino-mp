@@ -785,6 +785,7 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->ytconcconn = configfile.getInt32("mb_ytconcconn", 4); // concurrent connections
 	settings->ytregion = configfile.getString("mb_ytregion", "default");
 	settings->ytsearch = configfile.getString("mb_ytsearch", "");
+	settings->ytthumbnaildir = configfile.getString("mb_ytthumbnaildir", "/tmp/ytparser");
 	settings->ytvid = configfile.getString("mb_ytvid", "");
 	settings->ytsearch_history_max = configfile.getInt32("mb_ytsearch_history_max", 10);
 	settings->ytsearch_history_size = configfile.getInt32("mb_ytsearch_history_size", 0);
@@ -802,7 +803,7 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->nkresults = configfile.getInt32("mb_nkresults", 0);
 	settings->nkconcconn = configfile.getInt32("mb_nkconcconn", 4); // concurrent connections
 	settings->nksearch = configfile.getString("mb_nksearch", "");
-	settings->nkthumbnaildir = configfile.getString("mb_nkthumbnaildir", "/media/sda1/netzkino-thumbnails"); // FIXME, add GUI option
+	settings->nkthumbnaildir = configfile.getString("mb_nkthumbnaildir", "/media/sda1/netzkino-thumbnails");
 	settings->nkrtmp = configfile.getInt32("mb_nkrtmp", 1);
 	settings->nkcategory = configfile.getInt32("mb_nkcategory", 1);
 	settings->nkcategoryname = configfile.getString("mb_nkcategoryname", "Actionkino");
@@ -871,6 +872,7 @@ bool CMovieBrowser::saveSettings(MB_SETTINGS* settings)
 	configfile.setInt32("mb_ytconcconn", settings->ytconcconn);
 	configfile.setString("mb_ytregion", settings->ytregion);
 	configfile.setString("mb_ytsearch", settings->ytsearch);
+	configfile.setString("mb_ytthumbnaildir", settings->ytthumbnaildir);
 	configfile.setString("mb_ytvid", settings->ytvid);
 
 	settings->ytsearch_history_size = settings->ytsearch_history.size();
@@ -3775,10 +3777,9 @@ void CMovieBrowser::autoFindSerie(void)
 
 void CMovieBrowser::loadNKTitles(int mode, std::string search, int id)
 {
-	printf("CMovieBrowser::%s: parsed %d old mode %d new mode %d region %s\n", __func__, ytparser.Parsed(), ytparser.GetFeedMode(), m_settings.ytmode, m_settings.ytregion.c_str());
 	nkparser.SetMaxResults(m_settings.nkresults ? m_settings.nkresults : 100000);
 	nkparser.SetConcurrentDownloads(m_settings.nkconcconn);
-	nkparser.setThumbnailDir(m_settings.nkthumbnaildir);
+	nkparser.SetThumbnailDir(m_settings.nkthumbnaildir);
 
 	if (nkparser.ParseFeed((cNKFeedParser::nk_feed_mode_t)mode, search, id)) {
 		nkparser.DownloadThumbnails();
@@ -3822,6 +3823,7 @@ void CMovieBrowser::loadYTitles(int mode, std::string search, std::string id)
 
 	ytparser.SetMaxResults(m_settings.ytresults);
 	ytparser.SetConcurrentDownloads(m_settings.ytconcconn);
+	ytparser.SetThumbnailDir(m_settings.nkthumbnaildir);
 
 	if (!ytparser.Parsed() || (ytparser.GetFeedMode() != mode)) {
 		if (ytparser.ParseFeed((cYTFeedParser::yt_feed_mode_t)mode, search, id, (cYTFeedParser::yt_feed_orderby_t)m_settings.ytorderby)) {
@@ -4208,6 +4210,9 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_CONCURRENT_CONNECTIONS, &m_settings.nkconcconn, true, 1, 8));
 	mainMenu.addItem(new CMenuOptionChooser(LOCALE_MOVIEBROWSER_NK_PROTOCOL, &m_settings.nkrtmp, NK_PROTOCOL_OPTIONS, NK_PROTOCOL_OPTION_COUNT, true));
 
+	CFileChooser fc(&m_settings.nkthumbnaildir);
+	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_CACHE_DIR, true, m_settings.nkthumbnaildir, &fc));
+
 	yt_menue = &mainMenu;
 	yt_menue_end = yt_menue->getItemsCount();
 	CYTCacheSelectorTarget ytcache_sel(this);
@@ -4222,6 +4227,8 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 	mainMenu.exec(NULL, "");
 
 	nkparser.SetConcurrentDownloads(m_settings.nkconcconn);
+	nkparser.SetThumbnailDir(m_settings.nkthumbnaildir);
+
 	delete selector;
 
 	if (calledExternally)
@@ -4337,6 +4344,9 @@ bool CMovieBrowser::showYTMenu(bool calledExternally)
 	mainMenu.addItem(new CMenuOptionChooser(LOCALE_MOVIEBROWSER_YT_PREF_QUALITY, &m_settings.ytquality, YT_QUALITY_OPTIONS, YT_QUALITY_OPTION_COUNT, true, NULL, CRCInput::RC_nokey, "", true));
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_CONCURRENT_CONNECTIONS, &m_settings.ytconcconn, true, 1, 8));
 
+	CFileChooser fc(&m_settings.ytthumbnaildir);
+	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_CACHE_DIR, true, m_settings.ytthumbnaildir, &fc));
+
 	yt_menue = &mainMenu;
 	yt_menue_end = yt_menue->getItemsCount();
 	CYTCacheSelectorTarget ytcache_sel(this);
@@ -4347,6 +4357,8 @@ bool CMovieBrowser::showYTMenu(bool calledExternally)
 	mainMenu.exec(NULL, "");
 
 	ytparser.SetConcurrentDownloads(m_settings.ytconcconn);
+	ytparser.SetThumbnailDir(m_settings.ytthumbnaildir);
+
 	delete selector;
 
 	bool reload = false;
@@ -4507,14 +4519,11 @@ int CFileChooser::exec(CMenuTarget* parent, const std::string & /*actionKey*/)
 
     CFileBrowser browser;
     browser.Dir_Mode=true;
-    if (browser.exec(dirPath->c_str()))
-    {
+    std::string oldPath = *dirPath;
+    if (browser.exec(dirPath->c_str())) {
         *dirPath = browser.getSelectedFile()->Name;
-        short a = dirPath->compare(0,5,"/mnt/");
-        short b = dirPath->compare(0,7,"/media/");
-        short c = dirPath->compare(0,5,"/tmp/");
-        if(a != 0 && b != 0 && c != 0)
-            *dirPath ="";   // We clear the  string if the selected folder is not at leaset /mnt/ or /hdd (There is no other possibility to clear this)
+	if (check_dir(dirPath->c_str(), true))
+            *dirPath = oldPath;
     }
 
     return menu_return::RETURN_REPAINT;

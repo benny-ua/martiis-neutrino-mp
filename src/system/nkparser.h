@@ -107,7 +107,7 @@ class cNKFeedParser
 
 		void SetMaxResults(int count) { max_results = count; }
 		void SetConcurrentDownloads(int count) { concurrent_downloads = count; }
-		void setThumbnailDir(std::string &_thumbnail_dir);
+		void SetThumbnailDir(std::string &_thumbnail_dir);
 		int ThreadCount(int what = 0);
 		std::string GetUrl(std::string &s, bool rtmp = false);
 };
