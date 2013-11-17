@@ -189,6 +189,7 @@ class CLCD
 #endif
 #if HAVE_SPARK_HARDWARE
 		int led_mode[SNeutrinoSettings::LED_MODE_COUNT];
+		void setLED(int nr, bool onoff);
 #endif
 	public:
 		bool has_lcd;
@@ -228,6 +229,7 @@ class CLCD
 		void showAudioProgress(const char perc, bool isMuted);
 		void setBrightness(int);
 		int getBrightness();
+		void setLiveFE(char fe);
 
 		void setBrightnessStandby(int);
 		int getBrightnessStandby();

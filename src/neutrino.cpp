@@ -2842,6 +2842,24 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if(g_settings.audio_AnalogMode < 0 || g_settings.audio_AnalogMode > 2)
 			g_settings.audio_AnalogMode = 0;
 
+		char delsys;
+		if (mode == mode_webtv)
+			delsys = 'w';
+		else
+			switch (CFEManager::getInstance()->getLiveFE()->getInfo()->type) {
+				case FE_QPSK:
+					delsys = 's';
+					break;
+				case FE_OFDM:
+					delsys = 't';
+					break;
+				case FE_QAM:
+				default:
+					delsys = 'c';
+					break;
+			}
+		CVFD::getInstance()->setLiveFE(delsys);
+
 #if HAVE_SPARK_HARDWARE
 		threeDSetup->exec(NULL, "zapped");
 #endif

@@ -87,6 +87,16 @@ CLCD::~CLCD()
 		close(fd);
 }
 
+#if HAVE_SPARK_HARDWARE
+void CLCD::setLED(int nr, bool onoff)
+{
+	struct aotom_ioctl_data vData;
+	vData.u.icon.icon_nr = nr;
+	vData.u.icon.on = onoff;
+	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+}
+#endif
+
 CLCD* CLCD::getInstance()
 {
 	static CLCD* lcdd = NULL;
@@ -421,7 +431,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 					aotom_icon = AOTOM_HDD_FULL;
 					break;
 				case FP_ICON_MP3:
-					aotom_icon = AOTOM_MP3;
+					aotom_icon = AOTOM_AUDIO;
 					break;
 				case FP_ICON_MUTE:
 					aotom_icon = AOTOM_MUTE;
@@ -451,12 +461,8 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 				default:
 					break;
 			}
-			if (aotom_icon) {
-				struct aotom_ioctl_data vData;
-				vData.u.icon.icon_nr = aotom_icon;
-				vData.u.icon.on = show;
-				ioctl(fd, VFDICONDISPLAYONOFF, &vData);
-			}
+			if (aotom_icon)
+				setLED(aotom_icon, show);
 			break;
 		}
 		default: {
@@ -539,7 +545,7 @@ void CLCD::setEPGTitle(const std::string)
 }
 
 #if HAVE_SPARK_HARDWARE
-void CVFD::setledmode(SNeutrinoSettings::LED_MODE m, bool onoff)
+void CLCD::setledmode(SNeutrinoSettings::LED_MODE m, bool onoff)
 {
 	if (m >= 0 && m < SNeutrinoSettings::LED_MODE_COUNT) {
 		led_mode[m] = onoff ? g_settings.led_mode[m] : 0;
@@ -548,7 +554,7 @@ void CVFD::setledmode(SNeutrinoSettings::LED_MODE m, bool onoff)
 }
 #endif
 
-void CVFD::setled(void)
+void CLCD::setled(void)
 {
 #if HAVE_SPARK_HARDWARE
 	if(mode == MODE_MENU_UTF8 || mode == MODE_TVRADIO) {
@@ -571,7 +577,7 @@ void CVFD::setled(void)
 #endif
 }
 
-void CVFD::setAudioMode(void)
+void CLCD::setAudioMode(void)
 {
 #if HAVE_SPARK_HARDWARE
 	extern cAudio *audioDecoder;
@@ -579,13 +585,14 @@ void CVFD::setAudioMode(void)
 #endif
 }
 
-void CVFD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
+void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 {
 #if HAVE_SPARK_HARDWARE
 	int dubi = 0;
 	int mp3 = 0;
 	int ac3 = 0;
 	switch (streamtype) {
+		case AUDIO_FMT_MPEG:
 		case AUDIO_FMT_MP3:
 			mp3 = 1;
 			break;
@@ -597,7 +604,6 @@ void CVFD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 			dubi = 1;
 			break;
 		case AUDIO_FMT_AUTO:
-		case AUDIO_FMT_MPEG:
 		case AUDIO_FMT_AAC:
 		case AUDIO_FMT_AAC_PLUS:
 		case AUDIO_FMT_AVS:
@@ -607,17 +613,17 @@ void CVFD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 		default:
 			;
 	}
-	struct aotom_ioctl_data vData;
-	vData.u.icon.icon_nr = AOTOM_DUBI;
-	vData.u.icon.on = dubi;
-	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+	setLED(AOTOM_DUBI, dubi);
+	setLED(AOTOM_MP3, mp3);
+	setLED(AOTOM_AC3, ac3);
+#endif
+}
 
-	vData.u.icon.icon_nr = AOTOM_MP3;
-	vData.u.icon.on = mp3;
-	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
-
-	vData.u.icon.icon_nr = AOTOM_AC3;
-	vData.u.icon.on = ac3;
-	ioctl(fd, VFDICONDISPLAYONOFF, &vData);
+void CLCD::setLiveFE(char fe)
+{
+#if HAVE_SPARK_HARDWARE
+	setLED(AOTOM_SAT, fe == 's');
+	setLED(AOTOM_TER, fe == 't');
+	setLED(AOTOM_CAB, fe == 'c');
 #endif
 }
