@@ -1097,9 +1097,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 
 			int newspeed;
 			if (msg == (neutrino_msg_t) g_settings.mpkey_rewind) {
-				newspeed = (speed >= 0) ? -1 : speed - 1;
+				newspeed = (speed >= 0) ? -1 : (speed - 1);
 			} else {
-				newspeed = (speed <= 0) ? 2 : speed + 1;
+				newspeed = (speed <= 0) ? 2 : (speed + 1);
 			}
 			/* if paused, playback->SetSpeed() start slow motion */
 			if (playback->SetSpeed(newspeed)) {
@@ -1395,6 +1395,15 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 	getCurrentAudioName( is_file_player, currentaudioname);
 
 	if (isMovieBrowser && p_movie_info) {
+		std::string channelName = p_movie_info->epgChannel;
+		if (channelName.empty()) {
+			if (isYT)
+				channelName = g_Locale->getText(LOCALE_MOVIEPLAYER_YTPLAYBACK);
+			else if (isNK)
+				channelName = g_Locale->getText(LOCALE_MOVIEPLAYER_NKPLAYBACK);
+			else if (isWebTV)
+				channelName = g_Locale->getText(LOCALE_WEBTV_HEAD);
+		}
 		g_InfoViewer->showMovieTitle(playstate, GET_CHANNEL_ID_FROM_EVENT_ID(p_movie_info->epgEpgId),
 					     p_movie_info->epgChannel, p_movie_info->epgTitle, p_movie_info->epgInfo1,
 					     duration, position, repeat_mode);

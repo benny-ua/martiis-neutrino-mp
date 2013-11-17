@@ -1314,7 +1314,8 @@ CFile* CMovieBrowser::getSelectedFile(void)
 	//TRACE("[mb]->getSelectedFile: %s\r\n",m_movieSelectionHandler->file.Name.c_str());
 
 	if(m_movieSelectionHandler != NULL) {
-		m_movieSelectionHandler->file.Url = nkparser.GetUrl(m_movieSelectionHandler->nkstreaming, m_settings.nkrtmp);
+		if (show_mode == MB_SHOW_NK)
+			m_movieSelectionHandler->file.Url = nkparser.GetUrl(m_movieSelectionHandler->nkstreaming, m_settings.nkrtmp);
 		return(&m_movieSelectionHandler->file);
 	} else
 		return(NULL);
