@@ -1412,7 +1412,7 @@ void CMovieBrowser::refreshMovieInfo(void)
 
 void CMovieBrowser::info_hdd_level(bool paint_hdd)
 {
-	if (show_mode == MB_SHOW_YT)
+	if (show_mode == MB_SHOW_YT || show_mode == MB_SHOW_NK)
 		return;
 
 	struct statfs s;
@@ -3063,6 +3063,8 @@ void CMovieBrowser::loadMovies(bool doRefresh)
 	CHintBox loadBox((show_mode == MB_SHOW_YT)?LOCALE_MOVIEPLAYER_YTPLAYBACK:(show_mode == MB_SHOW_NK)?LOCALE_MOVIEPLAYER_NKPLAYBACK:LOCALE_MOVIEBROWSER_HEAD,
 		g_Locale->getText(LOCALE_MOVIEBROWSER_SCAN_FOR_MOVIES));
 	loadBox.paint();
+
+	m_movieSelectionHandler = NULL;
 
 //clock_act = clock()/10000;TRACE("[mb] *1: time %9ld  clock %6ld  dclock %6ld*\n",(long)time(NULL),clock_act,clock_act - clock_prev);clock_prev = clock_act;
 	if (show_mode == MB_SHOW_YT) {
