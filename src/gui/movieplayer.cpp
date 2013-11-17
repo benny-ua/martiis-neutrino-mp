@@ -1405,7 +1405,7 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 				channelName = g_Locale->getText(LOCALE_WEBTV_HEAD);
 		}
 		g_InfoViewer->showMovieTitle(playstate, GET_CHANNEL_ID_FROM_EVENT_ID(p_movie_info->epgEpgId),
-					     p_movie_info->epgChannel, p_movie_info->epgTitle, p_movie_info->epgInfo1,
+					     channelName, p_movie_info->epgTitle, p_movie_info->epgInfo1,
 					     duration, position, repeat_mode);
 		return;
 	}
