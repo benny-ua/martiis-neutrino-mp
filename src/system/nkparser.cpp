@@ -302,8 +302,17 @@ bool cNKFeedParser::parseCategoriesJSON(std::string &answer)
 		return false;
 
 	v = root.get("status", "");
-	if (v.type() != Json::stringValue || v.asString() != "ok")
+	if (v.type() != Json::stringValue)
 		return false;
+	if (v.asString() != "ok") {
+		lasterror = "";
+		if (v.asString() == "error") {
+			v = root.get("error", "");
+			if (v.type() == Json::stringValue)
+				lasterror = v.asString();
+		}
+		return false;
+	}
 
 	Json::Value cats = root.get("categories", "");
 	if (cats.type() != Json::arrayValue)
@@ -339,8 +348,17 @@ bool cNKFeedParser::parseFeedJSON(std::string &answer)
 		return false;
 
 	v = root.get("status", "" );
-	if (v.type() != Json::stringValue || v.asString() != "ok")
+	if (v.type() != Json::stringValue)
 		return false;
+	if (v.asString() != "ok") {
+		lasterror = "";
+		if (v.asString() == "error") {
+			v = root.get("error", "");
+			if (v.type() == Json::stringValue)
+				lasterror = v.asString();
+		}
+		return false;
+	}
 
 	Json::Value posts = root.get("posts", "");
 	if (posts.type() != Json::arrayValue)

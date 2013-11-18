@@ -60,6 +60,7 @@ class cNKFeedParser
 		std::vector<sNKCategory> categories;
 
 		std::string *thumbnail_dir;
+		std::string lasterror;
 
 		int max_results;
 		int concurrent_downloads;
@@ -110,6 +111,7 @@ class cNKFeedParser
 		void SetThumbnailDir(std::string &_thumbnail_dir);
 		int ThreadCount(int what = 0);
 		std::string GetUrl(std::string &s, bool rtmp = false);
+		std::string &GetError(void) { return lasterror; }
 };
 
 #endif

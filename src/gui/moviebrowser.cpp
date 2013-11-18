@@ -3791,8 +3791,10 @@ void CMovieBrowser::loadNKTitles(int mode, std::string search, int id)
 	if (nkparser.ParseFeed((cNKFeedParser::nk_feed_mode_t)mode, search, id)) {
 		nkparser.DownloadThumbnails();
 	} else {
-		//FIXME show error
-		DisplayErrorMessage(g_Locale->getText(LOCALE_MOVIEBROWSER_YT_ERROR));
+		std::string e = nkparser.GetError();
+		if (!e.empty())
+			e = ":\n" + e;
+		DisplayErrorMessage((std::string(g_Locale->getText(LOCALE_MOVIEBROWSER_NK_ERROR)) + e).c_str());
 		return;
 	}
 	m_vMovieInfo.clear();
