@@ -627,3 +627,10 @@ void CLCD::setLiveFE(char fe)
 	setLED(AOTOM_CAB, fe == 'c');
 #endif
 }
+
+void CLCD::setCA(bool onoff)
+{
+#if HAVE_SPARK_HARDWARE
+	setLED(AOTOM_CA, onoff);
+#endif
+}

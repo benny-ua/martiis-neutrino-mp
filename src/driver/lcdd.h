@@ -230,6 +230,7 @@ class CLCD
 		void setBrightness(int);
 		int getBrightness();
 		void setLiveFE(char fe);
+		void setCA(bool onoff);
 
 		void setBrightnessStandby(int);
 		int getBrightnessStandby();

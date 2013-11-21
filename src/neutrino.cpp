@@ -2859,6 +2859,8 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 					break;
 			}
 		CVFD::getInstance()->setLiveFE(delsys);
+		CZapitChannel *chan = CZapit::getInstance()->GetCurrentChannel();
+		CVFD::getInstance()->setCA(chan ? chan->scrambled : false);
 
 #if HAVE_SPARK_HARDWARE
 		threeDSetup->exec(NULL, "zapped");
