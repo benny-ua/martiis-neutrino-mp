@@ -794,7 +794,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 {
 	menu_ret = menu_return::RETURN_REPAINT;
 
-	first_start = true;
+	first_start_timeshift = false;
 	time_forced = false;
 	update_lcd = true;
 
@@ -888,6 +888,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, true);
 		if(timeshift) {
+			first_start_timeshift = true;
 			startposition = -1;
 			int towait = (timeshift == 1) ? TIMESHIFT_SECONDS+1 : TIMESHIFT_SECONDS;
 			for(unsigned int i = 0; i < 500; i++) {
@@ -943,9 +944,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			update_lcd = false;
 			updateLcd();
 		}
-		if (first_start) {
+		if (first_start_timeshift) {
 			callInfoViewer(/*duration, position*/);
-			first_start = false;
+			first_start_timeshift = false;
 		}
 
 		neutrino_msg_t msg;
