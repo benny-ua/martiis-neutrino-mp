@@ -752,7 +752,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.minimode = configfile.getInt32( "minimode",  0);
 	g_settings.mode_clock = configfile.getInt32( "mode_clock",  0);
 	g_settings.infoclock_with_seconds = configfile.getInt32("infoclock_with_seconds", 1);
-	g_settings.infoclock_blinking_dot = configfile.getInt32("infoclock_blinking_dot", 1);
 	g_settings.infoclock_no_background = configfile.getInt32("infoclock_no_background", 0);
 	g_settings.zapto_pre_time = configfile.getInt32( "zapto_pre_time",  0);
 	g_settings.spectrum         = configfile.getBool("spectrum"          , false);
@@ -1326,7 +1325,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "minimode", g_settings.minimode );
 	configfile.setInt32( "mode_clock", g_settings.mode_clock );
 	configfile.setInt32( "infoclock_with_seconds", g_settings.infoclock_with_seconds);
-	configfile.setInt32( "infoclock_blinking_dot", g_settings.infoclock_blinking_dot);
 	configfile.setInt32( "infoclock_no_background", g_settings.infoclock_no_background);
 	configfile.setInt32( "zapto_pre_time", g_settings.zapto_pre_time );
 	configfile.setBool("spectrum", g_settings.spectrum);
@@ -2453,7 +2451,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 
 	InfoClock = CInfoClock::getInstance();
 	if(g_settings.mode_clock)
-		InfoClock->StartClock();
+		g_settings.mode_clock = InfoClock->StartClock();
 
 	//cCA::GetInstance()->Ready(true);
 
@@ -2491,8 +2489,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 
 			else if( msg == CRCInput::RC_text) {
 				g_RCInput->clearRCMsg();
-				if(g_settings.mode_clock)
-					InfoClock->StopClock();
+				InfoClock->enableInfoClock(false);
 				StopSubtitles();
 				tuxtx_stop_subtitle();
 
@@ -2508,18 +2505,19 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				//if(!g_settings.cacheTXT)
 				//	tuxtxt_stop();
 				g_RCInput->clearRCMsg();
-				if(g_settings.mode_clock)
-					InfoClock->StartClock();
+				InfoClock->enableInfoClock(true);
 				StartSubtitles();
 			}
 			else if( msg == CRCInput::RC_setup ) {
 				if(!g_settings.minimode) {
 					StopSubtitles();
+					InfoClock->enableInfoClock(false);
 					if(g_settings.mode_clock)
 						InfoClock->StopClock();
 					mainMenu->exec(NULL, "");
 					if(g_settings.mode_clock)
 						InfoClock->StartClock();
+					InfoClock->enableInfoClock(true);
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
 					if (!g_settings.epg_scan)
@@ -2584,8 +2582,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			else if( msg == (neutrino_msg_t) g_settings.key_zaphistory ) {
 				// Zap-History "Bouquet"
 				if(g_settings.mode_clock && g_settings.key_zaphistory == CRCInput::RC_home) {
-					g_settings.mode_clock=false;
-					InfoClock->StopClock();
+					InfoClock->enableInfoClock(false);
+					g_settings.mode_clock = false;
 				} else {
 					numericZap( msg );
 				}
@@ -2809,8 +2807,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			else {
 				if (msg == CRCInput::RC_home) {
 					if(g_settings.mode_clock && g_settings.key_zaphistory == CRCInput::RC_home) {
-						g_settings.mode_clock=false;
-						InfoClock->StopClock();
+						InfoClock->enableInfoClock(false);
+						g_settings.mode_clock = false;
 					}
 					CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 				}
@@ -2830,6 +2828,99 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			}
 		}
 	}
+}
+
+int CNeutrinoApp::showChannelList(const neutrino_msg_t _msg, bool from_menu)
+{
+	neutrino_msg_t msg = _msg;
+	InfoClock->enableInfoClock(false);
+
+	StopSubtitles();
+
+_show:
+	int nNewChannel = -1;
+	int old_b = bouquetList->getActiveBouquetNumber();
+	t_channel_id old_id = 0;
+	if(!bouquetList->Bouquets.empty())
+		old_id = bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->getActiveChannel_ChannelID();
+	//int old_mode = g_settings.channel_mode;
+	int old_mode = GetChannelMode();
+	printf("************************* ZAP START: bouquetList %p size %d old_b %d\n", bouquetList, (int)bouquetList->Bouquets.size(), old_b);fflush(stdout);
+
+#if 0
+	int old_num = 0;
+	if(!bouquetList->Bouquets.empty()) {
+		old_num = bouquetList->Bouquets[old_b]->channelList->getSelected();
+	}
+#endif
+	//_show:
+	if(msg == CRCInput::RC_ok)
+	{
+		if (g_settings.channellist_new_zap_mode > 0) /* allow or active */
+			g_audioMute->enableMuteIcon(false);
+		if( !bouquetList->Bouquets.empty() && bouquetList->Bouquets[old_b]->channelList->getSize() > 0)
+			nNewChannel = bouquetList->Bouquets[old_b]->channelList->exec();//with ZAP!
+		else
+			nNewChannel = bouquetList->exec(true);
+		if (g_settings.channellist_new_zap_mode > 0) /* allow or active */
+			g_audioMute->enableMuteIcon(true);
+	} else if(msg == CRCInput::RC_sat) {
+		SetChannelMode(LIST_MODE_SAT);
+		nNewChannel = bouquetList->exec(true);
+	} else if(msg == CRCInput::RC_favorites) {
+		SetChannelMode(LIST_MODE_FAV);
+		nNewChannel = bouquetList->exec(true);
+	}
+_repeat:
+	CVFD::getInstance ()->showServicename(channelList->getActiveChannelName());
+	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
+	printf("************************* ZAP RES: nNewChannel %d\n", nNewChannel);fflush(stdout);
+	if(nNewChannel == -1) { // restore orig. bouquet and selected channel on cancel
+		/* FIXME if mode was changed while browsing,
+		 * other modes selected bouquet not restored */
+		SetChannelMode(old_mode);
+		bouquetList->activateBouquet(old_b, false);
+#if 0
+		if(!bouquetList->Bouquets.empty())
+			bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->setSelected(old_num);
+#endif
+		if(!bouquetList->Bouquets.empty()) {
+			bouquetList->Bouquets[bouquetList->getActiveBouquetNumber()]->channelList->adjustToChannelID(old_id, false);
+		}
+		StartSubtitles(mode == mode_tv);
+	}
+	else if(nNewChannel == -3) { // list mode changed
+		printf("************************* ZAP NEW MODE: bouquetList %p size %d\n", bouquetList, (int)bouquetList->Bouquets.size());fflush(stdout);
+		nNewChannel = bouquetList->exec(true);
+		goto _repeat;
+	}
+	//else if(nNewChannel == -4)
+	if(g_channel_list_changed)
+	{
+		/* don't change bouquet after adding a channel to favorites */
+		if (nNewChannel != -5)
+			SetChannelMode(old_mode);
+		g_channel_list_changed = false;
+		if(old_b_id < 0) old_b_id = old_b;
+		//g_Zapit->saveBouquets();
+		/* lets do it in sync */
+		reloadhintBox->paint();
+		CServiceManager::getInstance()->SaveServices(true, true);
+		g_bouquetManager->saveBouquets();
+		g_bouquetManager->saveUBouquets();
+		g_bouquetManager->renumServices();
+		channelsInit(/*true*/);
+		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+		channelList->adjustToChannelID(live_channel_id);//FIXME what if deleted ?
+		bouquetList->activateBouquet(old_b_id, false);
+		msg = CRCInput::RC_ok;
+		goto _show;
+	}
+
+	if (!from_menu)
+		InfoClock->enableInfoClock(true);
+
+	return ((nNewChannel >= 0) ? menu_return::RETURN_EXIT_ALL : menu_return::RETURN_REPAINT);
 }
 
 int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
@@ -3963,9 +4054,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		}
 		CVFD::getInstance()->setBacklight(g_settings.backlight_standby);
 
-		if(g_settings.mode_clock) {
-			InfoClock->StopClock();
-		}
+		InfoClock->enableInfoClock(false);
 
 		//remember tuned channel-id
 		standby_channel_id = CZapit::getInstance()->GetCurrentChannelID();
@@ -4068,8 +4157,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		g_Sectionsd->setPauseScanning(false);
 		//g_Sectionsd->setServiceChanged(live_channel_id, true );
 
-		if(g_settings.mode_clock)
-			InfoClock->StartClock();
+		InfoClock->enableInfoClock(true);
 
 		g_audioMute->AudioMute(current_muted, true);
 		StartSubtitles();
@@ -4139,11 +4227,11 @@ void CNeutrinoApp::switchTvRadioMode(const int prev_mode)
 void CNeutrinoApp::switchClockOnOff()
 {
 	if(g_settings.mode_clock) {
-		g_settings.mode_clock=false;
-		InfoClock->StopClock();
+		InfoClock->enableInfoClock(false);
+		g_settings.mode_clock = false;
 	} else {
-		g_settings.mode_clock=true;
-		InfoClock->StartClock();
+		g_settings.mode_clock = true;
+		InfoClock->enableInfoClock(true);
 	}
 }
 

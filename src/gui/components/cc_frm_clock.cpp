@@ -60,12 +60,11 @@ CComponentsFrmClock::CComponentsFrmClock( const int x_pos, const int y_pos, cons
 	col_body	= color_body;
 	col_shadow	= color_shadow;
 
+	cl_format_str	= format_str;
 	paintClock	= false;
 	activeClock	= activ;
 	if (activeClock)
 		startThread();
-
-	cl_format_str	= format_str;
 }
 
 void CComponentsFrmClock::initVarClock()
@@ -252,8 +251,6 @@ void* CComponentsFrmClock::initClockThread(void *arg)
 	time_t count = time(0);
 	//start loop for paint
 	while(1) {
-		sleep(clock->cl_interval);
-
 		if (clock->paintClock) {
 			//refresh item property values
 			clock->refresh();
@@ -266,6 +263,7 @@ void* CComponentsFrmClock::initClockThread(void *arg)
 			clock->cl_thread = 0;
 			break;
 		}
+		sleep(clock->cl_interval);
 	}
 	return 0;
 }

@@ -54,6 +54,7 @@
 #include <gui/components/cc.h>
 #include <gui/widget/buttons.h>
 #include <gui/widget/icons.h>
+#include <gui/infoclock.h>
 #include <gui/widget/menue.h>
 #include <gui/widget/messagebox.h>
 
@@ -75,6 +76,7 @@
 
 #include <video.h>
 extern cVideo * videoDecoder;
+extern CInfoClock *InfoClock;
 
 //------------------------------------------------------------------------
 bool comparePictureByDate (const CPicture& a, const CPicture& b)
@@ -257,6 +259,7 @@ int CPictureViewerGui::show()
 		m_currentTitle = m_audioPlayer->getAudioPlayerM_current();
 
 	CAudioMute::getInstance()->enableMuteIcon(false);
+	InfoClock->enableInfoClock(false);
 
 	uint32_t repeatkeys[] = { CRCInput::RC_1, CRCInput::RC_2, CRCInput::RC_3, CRCInput::RC_4, CRCInput::RC_6, CRCInput::RC_8, CRCInput::RC_nokey };
 	uint32_t *old_repeatkeys = g_RCInput->setAllowRepeat(NULL);
@@ -655,6 +658,7 @@ int CPictureViewerGui::show()
 	g_RCInput->setAllowRepeat(old_repeatkeys);
 
 	CAudioMute::getInstance()->enableMuteIcon(true);
+	InfoClock->enableInfoClock(true);
 
 	return(res);
 }
