@@ -3872,15 +3872,8 @@ void CMovieBrowser::loadYTitles(int mode, std::string search, std::string id)
 
 const CMenuOptionChooser::keyval YT_FEED_OPTIONS[] =
 {
-        { cYTFeedParser::TOP_RATED, LOCALE_MOVIEBROWSER_YT_TOP_RATED },
-        { cYTFeedParser::TOP_FAVORITES, LOCALE_MOVIEBROWSER_YT_TOP_FAVORITES },
-        { cYTFeedParser::MOST_SHARED, LOCALE_MOVIEBROWSER_YT_MOST_SHARED },
+        { cYTFeedParser::MOST_POPULAR_ALL_TIME, LOCALE_MOVIEBROWSER_YT_MOST_POPULAR_ALL_TIME },
         { cYTFeedParser::MOST_POPULAR, LOCALE_MOVIEBROWSER_YT_MOST_POPULAR },
-        { cYTFeedParser::MOST_RECENT, LOCALE_MOVIEBROWSER_YT_MOST_RECENT },
-        { cYTFeedParser::MOST_DISCUSSED, LOCALE_MOVIEBROWSER_YT_MOST_DISCUSSED },
-        { cYTFeedParser::MOST_RESPONDED, LOCALE_MOVIEBROWSER_YT_MOST_RESPONDED },
-        { cYTFeedParser::RECENTLY_FEATURED, LOCALE_MOVIEBROWSER_YT_RECENTLY_FEATURED },
-        { cYTFeedParser::ON_THE_WEB, LOCALE_MOVIEBROWSER_YT_ON_THE_WEB },
 };
 
 #define YT_FEED_OPTION_COUNT (sizeof(YT_FEED_OPTIONS)/sizeof(CMenuOptionChooser::keyval))
@@ -4087,6 +4080,8 @@ int CYTHistory::exec(CMenuTarget* parent, const std::string &actionKey)
 	return menu_return::RETURN_EXIT;
 }
 
+#if 0
+// Disabled as Google deprecated all but two feeds :-(
 class CYTChartsMenu : public CMenuTarget
 {
 	private:
@@ -4127,6 +4122,7 @@ int CYTChartsMenu::exec(CMenuTarget *parent, const std::string & /*actionKey*/)
 
 	return menu_return::RETURN_REPAINT;
 }
+#endif
 
 class CNKCategoriesMenu : public CMenuTarget
 {
@@ -4293,9 +4289,16 @@ bool CMovieBrowser::showYTMenu(bool calledExternally)
 	int select = -1;
 	CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 
+#if 0
 	CYTChartsMenu ytChartsMenue(select, m_settings.ytmode);
+#endif
 	if (!calledExternally) {
+#if 0
 		mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_YT_CHARTS, true, NULL, &ytChartsMenue));
+#else
+		for (unsigned i = 0; i < YT_FEED_OPTION_COUNT; i++)
+			mainMenu.addItem(new CMenuForwarder(YT_FEED_OPTIONS[i].value, true, NULL, selector, to_string(YT_FEED_OPTIONS[i].key).c_str(), CRCInput::convertDigitToKey(i + 1)), m_settings.ytmode == (int) YT_FEED_OPTIONS[i].key);
+#endif
 		mainMenu.addItem(GenericMenuSeparatorLine);
 
 		char cnt[5];
