@@ -514,7 +514,7 @@ bool cYTFeedParser::ParseFeed(yt_feed_mode_t mode, std::string search, std::stri
 			default:
 				curfeed = "most_popular";
 				break;
-			case MOST_RESENT:
+			case MOST_RECENT:
 				curfeed = "most_recent";
 				break;
 			case MOST_DISCUSSED:

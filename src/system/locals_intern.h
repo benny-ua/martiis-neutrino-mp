@@ -1597,7 +1597,7 @@ const char * locale_real_names[] =
 	"moviebrowser.yt_max_results",
 	"moviebrowser.yt_most_discussed",
 	"moviebrowser.yt_most_popular",
-	"moviebrowser.yt_most_resent",
+	"moviebrowser.yt_most_recent",
 	"moviebrowser.yt_most_responded",
 	"moviebrowser.yt_most_shared",
 	"moviebrowser.yt_next_results",

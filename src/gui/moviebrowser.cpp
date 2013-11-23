@@ -3832,7 +3832,7 @@ void CMovieBrowser::loadYTitles(int mode, std::string search, std::string id)
 
 	ytparser.SetMaxResults(m_settings.ytresults);
 	ytparser.SetConcurrentDownloads(m_settings.ytconcconn);
-	ytparser.SetThumbnailDir(m_settings.nkthumbnaildir);
+	ytparser.SetThumbnailDir(m_settings.ytthumbnaildir);
 
 	if (!ytparser.Parsed() || (ytparser.GetFeedMode() != mode)) {
 		if (ytparser.ParseFeed((cYTFeedParser::yt_feed_mode_t)mode, search, id, (cYTFeedParser::yt_feed_orderby_t)m_settings.ytorderby)) {
@@ -3876,7 +3876,7 @@ const CMenuOptionChooser::keyval YT_FEED_OPTIONS[] =
         { cYTFeedParser::TOP_FAVORITES, LOCALE_MOVIEBROWSER_YT_TOP_FAVORITES },
         { cYTFeedParser::MOST_SHARED, LOCALE_MOVIEBROWSER_YT_MOST_SHARED },
         { cYTFeedParser::MOST_POPULAR, LOCALE_MOVIEBROWSER_YT_MOST_POPULAR },
-        { cYTFeedParser::MOST_RESENT, LOCALE_MOVIEBROWSER_YT_MOST_RESENT },
+        { cYTFeedParser::MOST_RECENT, LOCALE_MOVIEBROWSER_YT_MOST_RECENT },
         { cYTFeedParser::MOST_DISCUSSED, LOCALE_MOVIEBROWSER_YT_MOST_DISCUSSED },
         { cYTFeedParser::MOST_RESPONDED, LOCALE_MOVIEBROWSER_YT_MOST_RESPONDED },
         { cYTFeedParser::RECENTLY_FEATURED, LOCALE_MOVIEBROWSER_YT_RECENTLY_FEATURED },

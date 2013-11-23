@@ -1570,7 +1570,7 @@ moviebrowser.yt_max_history Max search history size
 moviebrowser.yt_max_results Max results to fetch
 moviebrowser.yt_most_discussed Most discussed
 moviebrowser.yt_most_popular Most popular
-moviebrowser.yt_most_resent Most resent
+moviebrowser.yt_most_recent Most recent
 moviebrowser.yt_most_responded Most responded
 moviebrowser.yt_most_shared Most shared
 moviebrowser.yt_next_results Next results
