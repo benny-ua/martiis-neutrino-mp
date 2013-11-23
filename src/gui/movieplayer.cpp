@@ -1333,6 +1333,8 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				my_system(4, "/bin/grab", "-vbr", "360", shot.c_str());
 			}
 #endif
+		} else if (msg == (neutrino_msg_t) g_settings.key_showclock) {
+			CNeutrinoApp::getInstance()->switchClockOnOff();
 		} else {
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all) {
 				printf("CMoviePlayerGui::PlayFile: neutrino handleMsg messages_return::cancel_all\n");
