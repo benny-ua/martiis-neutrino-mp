@@ -58,6 +58,7 @@
 #include <gui/customcolor.h>
 #include <gui/pictureviewer.h>
 #include <gui/movieplayer.h>
+#include <gui/infoclock.h>
 #include <gui/components/cc.h>
 
 #include <system/helpers.h>
@@ -78,6 +79,7 @@ extern CRemoteControl *g_RemoteControl;	/* neutrino.cpp */
 extern CBouquetList * bouquetList;       /* neutrino.cpp */
 extern CPictureViewer * g_PicViewer;
 extern cVideo * videoDecoder;
+extern CInfoClock *InfoClock;
 
 #define LEFT_OFFSET 5
 
@@ -1203,6 +1205,7 @@ void CInfoViewer::killRadiotext()
 	if (g_Radiotext->S_RtOsd)
 		frameBuffer->paintBackgroundBox(rt_x, rt_y, rt_w, rt_h);
 	rt_x = rt_y = rt_h = rt_w = 0;
+	InfoClock->enableInfoClock(true);
 }
 
 void CInfoViewer::showRadiotext()
@@ -1214,6 +1217,7 @@ void CInfoViewer::showRadiotext()
 	infoViewerBB->showIcon_RadioText(g_Radiotext->haveRadiotext());
 
 	if (g_Radiotext->S_RtOsd) {
+		InfoClock->enableInfoClock(false);
 		// dimensions of radiotext window
 		int /*yoff = 8,*/ ii = 0;
 		rt_dx = BoxEndX - BoxStartX;
