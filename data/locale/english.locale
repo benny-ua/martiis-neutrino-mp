@@ -711,7 +711,6 @@ imageinfo.vcs Git:
 imageinfo.version Version:
 inetradio.name Internetradio
 infoclock OSD clock
-infoclock.blinking_dot Blinking dot
 infoclock.no_background Transparent background
 infoclock.with_seconds Show seconds
 infoviewer.epgnotload EPG not loaded....

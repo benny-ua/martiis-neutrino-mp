@@ -627,7 +627,6 @@ int COsdSetup::showOsdSetup()
 	// infoclock
 	osd_menu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_INFOCLOCK));
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_WITH_SECONDS, &g_settings.infoclock_with_seconds, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
- 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_BLINKING_DOT, &g_settings.infoclock_blinking_dot, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_NO_BACKGROUND, &g_settings.infoclock_no_background, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
 	int oldVolumeSize = g_settings.volume_size;

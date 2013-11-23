@@ -35,6 +35,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <errno.h>
+#include <driver/framebuffer.h>
 
 using namespace std;
 
@@ -258,6 +259,7 @@ void* CComponentsFrmClock::initClockThread(void *arg)
 			//paint segements, but wihtout saved backgrounds
 			clock->paint(CC_SAVE_SCREEN_NO);
 			count = time(0);
+			clock->frameBuffer->blit();
 		}
 		if (time(0) >= count+30) {
 			clock->cl_thread = 0;
