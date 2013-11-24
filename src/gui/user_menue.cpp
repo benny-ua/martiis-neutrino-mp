@@ -59,6 +59,7 @@
 #include "dboxinfo.h"
 #include "cam_menu.h"
 #include "pluginlist.h"
+#include "infoclock.h"
 
 #include <global.h>
 #include <neutrino.h>
@@ -492,6 +493,9 @@ bool CUserMenu::showUserMenu(int button)
 #endif
 	}
 
+	extern CInfoClock *InfoClock;
+	InfoClock->enableInfoClock(false);
+
 	// show menu if there are more than 2 items only
 	// otherwise, we start the item directly (must be the last one)
 	if (menu_items > 1 ) {
@@ -500,6 +504,8 @@ bool CUserMenu::showUserMenu(int button)
 	else if (menu_item != NULL)
 		menu_item->exec( NULL );
 	
+	InfoClock->enableInfoClock(true);
+
 	user_menu[button].selected = menu->getSelected();
 
 	// restore mute symbol
