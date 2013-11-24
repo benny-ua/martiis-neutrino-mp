@@ -1553,9 +1553,9 @@ void tuxtx_pause_subtitle(bool pause)
 		ttx_paused = 0;
 		if(!reader_running && sub_pid && sub_page)
 #if HAVE_SPARK_HARDWARE
-			tuxtx_main(0, sub_pid, sub_page, 0, isTtxEplayer);
+			tuxtx_main(sub_pid, sub_page, 0, isTtxEplayer);
 #else
-			tuxtx_main(0, sub_pid, sub_page);
+			tuxtx_main(sub_pid, sub_page);
 #endif
 	}
 	else {
@@ -1594,7 +1594,7 @@ void tuxtx_set_pid(int pid, int page, const char * cc)
 #if 0
 	ttx_paused = 1;
 	if(sub_pid && sub_page)
-		tuxtx_main(0, sub_pid, sub_page);
+		tuxtx_main(sub_pid, sub_page);
 #endif
 }
 
@@ -1616,9 +1616,9 @@ int tuxtx_subtitle_running(int *pid, int *page, int *running)
 }
 
 #if HAVE_SPARK_HARDWARE
-int tuxtx_main(int /*rc*/, int pid, int page, int source, bool isEplayer)
+int tuxtx_main(int pid, int page, int source, bool isEplayer)
 #else
-int tuxtx_main(int /*rc*/, int pid, int page, int source)
+int tuxtx_main(int pid, int page, int source)
 #endif
 {
 	char cvs_revision[] = "$Revision: 1.95 $";

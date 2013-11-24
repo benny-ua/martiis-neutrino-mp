@@ -437,14 +437,14 @@ printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 			playback->SetTeletextPid(pid);
 			tuxtx_set_pid(pid, page, ptr);
 #if HAVE_SPARK_HARDWARE
-			tuxtx_main(-1, pid, page, 0, true);
+			tuxtx_main(pid, page, 0, true);
 #else
-			tuxtx_main(-1, pid, page, 0);
+			tuxtx_main(pid, page, 0);
 #endif
 			mp->setCurrentTTXSub(actionKey.c_str());
 		} else {
 			tuxtx_set_pid(pid, page, ptr);
-			tuxtx_main(-1, pid, page);
+			tuxtx_main(pid, page);
 		}
 	} else if(is_mp && !strncmp(actionKey.c_str(), "SUB", 3)){
 		tuxtx_stop_subtitle();
@@ -489,7 +489,7 @@ int CStreamFeaturesChangeExec::exec(CMenuTarget* parent, const std::string & act
 		g_RCInput->postMsg(CRCInput::RC_text, 0);
 #if 0
 		g_RCInput->clearRCMsg();
-		tuxtx_main(g_RCInput->getFileHandle(), frameBuffer->getFrameBufferPointer(), g_RemoteControl->current_PIDs.PIDs.vtxtpid);
+		tuxtx_main(frameBuffer->getFrameBufferPointer(), g_RemoteControl->current_PIDs.PIDs.vtxtpid);
 		frameBuffer->paintBackground();
 		if(!g_settings.cacheTXT)
 			tuxtxt_stop();

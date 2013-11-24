@@ -1218,7 +1218,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 					tuxtxt_stop();
 				playback->SetTeletextPid(pid);
 				tuxtx_stop_subtitle();
-				tuxtx_main(g_RCInput->getFileHandle(), pid, 0, 2, true);
+				tuxtx_main(pid, 0, 2, true);
 				tuxtxt_stop();
 				playback->SetTeletextPid(-1);
 				if (currentttxsub != "") {
@@ -1234,7 +1234,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			} else if (g_RemoteControl->current_PIDs.PIDs.vtxtpid) {
 				StopSubtitles(true);
 				// The playback stream doesn't come with teletext.
-				tuxtx_main(-1, g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
+				tuxtx_main(g_RemoteControl->current_PIDs.PIDs.vtxtpid, 0, 2);
 				frameBuffer->paintBackground();
 				StartSubtitles(true);
 				//purge input queue
