@@ -1843,6 +1843,9 @@ void CNeutrinoApp::SetupFonts(int fmode)
 	/* recalculate infobar position */
 	if (g_InfoViewer)
 		g_InfoViewer->start();
+	/* update InfoClock font to avoid crashes*/
+	if (InfoClock)
+		InfoClock->setClockFont(g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]);
 }
 
 /**************************************************************************************
