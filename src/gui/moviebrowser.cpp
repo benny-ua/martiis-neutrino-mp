@@ -4228,6 +4228,7 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 
 	int oldcat = m_settings.nkcategory;
 	int oldmode = m_settings.nkmode;
+	int oldresults = m_settings.nkresults;
 
 	mainMenu.exec(NULL, "");
 
@@ -4260,7 +4261,7 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 			if (m_settings.nksearch_history_size > m_settings.nksearch_history_max)
 			m_settings.nksearch_history_size = m_settings.nksearch_history_max;
 		}
-	} else if (oldmode != m_settings.nkmode || oldcat != m_settings.nkcategory) {
+	} else if (oldmode != m_settings.nkmode || oldcat != m_settings.nkcategory || oldresults < m_settings.nkresults || (oldresults && !m_settings.nkresults)) {
 		reload = true;
 	}
 	if (reload) {
