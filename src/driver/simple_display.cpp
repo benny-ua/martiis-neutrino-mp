@@ -165,7 +165,7 @@ void CLCD::setlcdparameter(int dimm, const int power)
 	if(!power)
 		dimm = 0;
 
-#if HAVE_SPARK_HARDWARE
+#if 0 // HAVE_SPARK_HARDWARE
 	struct aotom_ioctl_data vData;
 	vData.u.brightness.level = dimm;
 	int ret = ioctl(fd, VFDBRIGHTNESS, &vData);
