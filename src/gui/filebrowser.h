@@ -191,6 +191,7 @@ class CFileBrowser
 
 	protected:
 		void commonInit();
+		void fontInit();
 
 	public:
 		CFileList		filelist;
