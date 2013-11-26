@@ -178,6 +178,10 @@ struct SNeutrinoSettings
 	std::string epg_dir;
 	int epg_scan;
 
+	int epg_search_history_size;
+	int epg_search_history_max;
+	std::list<std::string> epg_search_history;
+
 	int epg_enable_freesat;
 	int epg_enable_viasat;
 	int batchepg_run_at_shutdown;
