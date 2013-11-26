@@ -67,6 +67,7 @@
 #include <gui/widget/stringinput_ext.h>
 #include <gui/screensetup.h>
 #include <system/set_threadname.h>
+#include <OpenThreads/ScopedLock>
 
 //extern CPlugins *g_PluginList;
 #ifndef HAVE_COOL_HARDWARE
@@ -99,13 +100,11 @@ CMoviePlayerGui::CMoviePlayerGui()
 
 CMoviePlayerGui::~CMoviePlayerGui()
 {
-	LockPlayback(__func__);
-	if (playback && !playback->isPlaying())
-		PlayFileEnd();
-	UnlockPlayback();
+	PlayFileEnd();
 	delete moviebrowser;
 	delete filebrowser;
 	delete bookmarkmanager;
+	delete playback;
 	instance_mp = NULL;
 }
 
@@ -152,10 +151,7 @@ uint64_t CMoviePlayerGui::GetPts(void)
 #define INVALID_PTS_VALUE 0x200000000ull
 #endif
 	uint64_t pts = INVALID_PTS_VALUE;
-	LockPlayback(__func__);
-	if (playback)
-		playback->GetPts(pts);
-	UnlockPlayback();
+	playback->GetPts(pts);
 	return pts;
 }
 
@@ -219,6 +215,9 @@ void CMoviePlayerGui::Init(void)
 	filelist_it = filelist.end();
 
 	StreamType = AUDIO_FMT_AUTO;
+
+	playback = new cPlayback(3, &framebuffer_callback);
+	stopped = true;
 }
 
 void CMoviePlayerGui::cutNeutrino()
@@ -667,15 +666,12 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 		hintbox = new CHintBox(title, caller->pretty_name.c_str(), 450, NEUTRINO_ICON_STREAMING);
 		hintbox->paint();
 	}
-	while (caller->showStartingHint && caller->playback) {
+	while (caller->showStartingHint) {
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
 		g_RCInput->getMsg(&msg, &data, 1);
 		if (msg == CRCInput::RC_home || msg == CRCInput::RC_stop) {
-			caller->LockPlayback(__func__);
-			if(caller->playback)
-				caller->playback->RequestAbort();
-			caller->UnlockPlayback();
+			caller->playback->RequestAbort();
 		} else if (caller->isWebTV)
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
 	}
@@ -690,21 +686,7 @@ void CMoviePlayerGui::PlayFile(void)
 {
 	PlayFileStart();
 	PlayFileLoop();
-	LockPlayback(__func__);
 	PlayFileEnd();
-	UnlockPlayback();
-}
-
-void CMoviePlayerGui::LockPlayback(const char *fun __attribute__((unused)))
-{
-//fprintf(stderr, "##%s by %s\n", __func__, fun);
-	mutex.lock();
-}
-
-void CMoviePlayerGui::UnlockPlayback(void)
-{
-//fprintf(stderr, "##%s\n", __func__);
-	mutex.unlock();
 }
 
 void* CMoviePlayerGui::bgPlayThread(void *arg)
@@ -712,13 +694,9 @@ void* CMoviePlayerGui::bgPlayThread(void *arg)
 	set_threadname(__func__);
 	CMoviePlayerGui *mp = (CMoviePlayerGui *) arg;
 
-	while (mp->playback) {
+	while (mp->playback->isPlaying())
 		usleep(400000);
-		mp->LockPlayback(__func__);
-		if (mp->playback && !mp->playback->isPlaying())
-			mp->PlayFileEnd();
-		mp->UnlockPlayback();
-	}
+	mp->PlayFileEnd();
 	pthread_exit(NULL);
 }
 
@@ -787,14 +765,11 @@ extern void MoviePlayerStop(void)
 
 void CMoviePlayerGui::stopPlayBack(void)
 {
-	LockPlayback(__func__);
-	if (playback) {
-		playback->RequestAbort();
-		filelist.clear();
-		repeat_mode = REPEAT_OFF;
-		PlayFileEnd();
-	}
-	UnlockPlayback();
+	playback->RequestAbort();
+	filelist.clear();
+	repeat_mode = REPEAT_OFF;
+	while (!stopped)
+		usleep(100000);
 }
 
 bool CMoviePlayerGui::PlayFileStart(void)
@@ -808,20 +783,22 @@ bool CMoviePlayerGui::PlayFileStart(void)
 	//CTimeOSD FileTime;
 	position = 0, duration = 0;
 
-	LockPlayback(__func__);
-	if (playback) {
-		playback->RequestAbort();
-		filelist.clear();
-		repeat_mode = REPEAT_OFF;
-		PlayFileEnd(false);
-	} else
-		cutNeutrino();
+	bool _playing = playing;
+	playing = false; // don't restore neutrino
+	playback->RequestAbort();
+	filelist.clear();
+	repeat_mode = REPEAT_OFF;
+	while (!stopped)
+		usleep(100000);
+	playing = _playing;
+	cutNeutrino();
+
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 
 	playstate = CMoviePlayerGui::STOPPED;
 	printf("Startplay at %d seconds\n", startposition/1000);
 	handleMovieBrowser(CRCInput::RC_nokey, position);
 
-	playback = new cPlayback(3, &framebuffer_callback);
 	playback->SetTeletextPid(-1);
 
 	playback->Open(is_file_player ? PLAYMODE_FILE : PLAYMODE_TS);
@@ -866,7 +843,9 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 	if(!res) {
 		playback->Close();
+		stopped = true;
 	} else {
+		stopped = false;
 		numpida = REC_MAX_APIDS;
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
 		if (p_movie_info)
@@ -933,7 +912,6 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 	CAudioMute::getInstance()->enableMuteIcon(true);
 	InfoClock->enableInfoClock(true);
-	UnlockPlayback();
 	return res;
 }
 
@@ -1360,6 +1338,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 
 void CMoviePlayerGui::PlayFileEnd(bool restore)
 {
+	if (stopped)
+		return;
+
 	CSubtitleChangeExec SubtitleChanger(playback);
 	SubtitleChanger.exec(NULL, "off");
 
@@ -1374,8 +1355,6 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 	FileTime.hide();
 	playback->SetSpeed(1);
 	playback->Close();
-	delete playback;
-	playback = NULL;
 #if HAVE_SPARK_HARDWARE
 	CScreenSetup cSS;
 	cSS.showBorder(CZapit::getInstance()->GetCurrentChannelID());
@@ -1389,6 +1368,7 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 
 	CAudioMute::getInstance()->enableMuteIcon(false);
 	InfoClock->enableInfoClock(false);
+	stopped = true;
 }
 
 void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
@@ -1479,14 +1459,7 @@ void CMoviePlayerGui::addAudioFormat(int count, std::string &apidtitle, bool& en
 void CMoviePlayerGui::getCurrentAudioName( bool file_player, std::string &audioname)
 {
 	numpida = REC_MAX_APIDS;
-	LockPlayback(__func__);
-	if (playback)
-		playback->FindAllPids(apids, ac3flags, &numpida, language);
-	else {
-		UnlockPlayback();
-		return;
-	}
-	UnlockPlayback();
+	playback->FindAllPids(apids, ac3flags, &numpida, language);
 	if(numpida)
 		currentapid = apids[0];
 	bool dumm = true;
@@ -1814,8 +1787,6 @@ void CMoviePlayerGui::StopSubtitles(bool b)
 void CMoviePlayerGui::StopSubtitles(bool)
 #endif
 {
-	if (!playback)
-		return;
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s\n", __FUNCTION__);
 	int ttx, ttxpid, ttxpage;
@@ -1839,8 +1810,6 @@ void CMoviePlayerGui::StopSubtitles(bool)
 
 void CMoviePlayerGui::StartSubtitles(bool show)
 {
-	if (!playback)
-		return;
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
 #ifdef ENABLE_GRAPHLCD
@@ -2014,10 +1983,7 @@ size_t CMoviePlayerGui::GetReadCount()
 {
 #if HAVE_SPARK_HARDWARE
 	unsigned long long this_read = 0;
-	LockPlayback(__func__);
-	if (playback)
-		this_read = playback->GetReadCount();
-	UnlockPlayback();
+	this_read = playback->GetReadCount();
 	unsigned long long res;
 	if (this_read < last_read)
 		res = 0;
@@ -2032,7 +1998,6 @@ size_t CMoviePlayerGui::GetReadCount()
 
 void CMoviePlayerGui::Pause(bool b)
 {
-	LockPlayback(__func__);
 	if (b && (playstate == CMoviePlayerGui::PAUSE))
 		b = !b;
 	if (b) {
@@ -2042,7 +2007,6 @@ void CMoviePlayerGui::Pause(bool b)
 		playback->SetSpeed(1);
 		playstate = CMoviePlayerGui::PLAY;
 	}
-	UnlockPlayback();
 }
 
 void CMoviePlayerGui::SetStreamType(void)

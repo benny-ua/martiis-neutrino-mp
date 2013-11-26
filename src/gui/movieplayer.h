@@ -145,6 +145,7 @@ class CMoviePlayerGui : public CMenuTarget
 	bool isYT;
 	bool isNK;
 	bool showStartingHint;
+	bool stopped;
 	CMovieBrowser* moviebrowser;
 	MI_MOVIE_INFO * p_movie_info;
 	MI_MOVIE_INFO mi;
@@ -241,8 +242,6 @@ class CMoviePlayerGui : public CMenuTarget
 	int getCurrentSubPid(CZapitAbsSub::ZapitSubtitleType st);
 	void setCurrentTTXSub(const char *s) { currentttxsub = s; }
 	t_channel_id getChannelId(void);
-	void LockPlayback(const char *);
-	void UnlockPlayback(void);
 	bool PlayBackgroundStart(const std::string &file, const std::string &name, t_channel_id chan);
 	void stopPlayBack(void);
 	void StopSubtitles(bool b);
