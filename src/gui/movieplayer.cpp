@@ -695,7 +695,7 @@ void* CMoviePlayerGui::bgPlayThread(void *arg)
 	CMoviePlayerGui *mp = (CMoviePlayerGui *) arg;
 
 	while (mp->playback->isPlaying())
-		usleep(400000);
+		usleep(100000);
 	mp->PlayFileEnd();
 	pthread_exit(NULL);
 }
@@ -786,8 +786,6 @@ bool CMoviePlayerGui::PlayFileStart(void)
 	bool _playing = playing;
 	playing = false; // don't restore neutrino
 	playback->RequestAbort();
-	filelist.clear();
-	repeat_mode = REPEAT_OFF;
 	while (!stopped)
 		usleep(100000);
 	playing = _playing;
