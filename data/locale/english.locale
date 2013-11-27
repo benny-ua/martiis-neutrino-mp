@@ -698,6 +698,9 @@ hdd_removable_device Removable device
 hdd_settings Hard Disk Drive/USB
 hdd_sleep Switch off after...
 hdd_slow Slow
+hdd_statfs Fill level query
+hdd_statfs_always always
+hdd_statfs_recording while recording only
 hdd_umount unmount
 hdd_umount_warn unmount device
 imageinfo.creator Creator:

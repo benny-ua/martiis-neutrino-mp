@@ -211,6 +211,7 @@ class CLCD
 		void setAudioMode(AUDIO_FORMAT streamtype);
 		void setAudioMode(void);
 		MODES getMode() { return mode; };
+		void setHddUsage(int perc);
 
 		void showServicename(const std::string name, const bool clear_epg = false);
 		std::string getServicename(void) { return servicename; }

@@ -65,6 +65,7 @@
 #include <driver/record.h>
 #include <driver/display.h>
 #include <system/helpers.h>
+#include <system/hddstat.h>
 #include <system/ytcache.h>
 
 extern CPictureViewer * g_PicViewer;
@@ -2649,6 +2650,7 @@ void CMovieBrowser::updateDir(void)
     if(!g_settings.network_nfs_recordingdir.empty())
     {
         addDir(g_settings.network_nfs_recordingdir, &m_settings.storageDirRecUsed);
+	cHddStat::getInstance()->statOnce();
     }
 
     for(int i = 0; i < MB_MAX_DIRS; i++)

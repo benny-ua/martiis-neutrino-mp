@@ -634,3 +634,44 @@ void CLCD::setCA(bool onoff)
 	setLED(AOTOM_CA, onoff);
 #endif
 }
+
+void CLCD::setHddUsage(int perc)
+{
+#if HAVE_SPARK_HARDWARE
+	if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
+		return;
+
+	if (perc < 0) {
+		setLED(AOTOM_HDD_A1, 0);
+		setLED(AOTOM_HDD_A2, 0);
+		setLED(AOTOM_HDD_A3, 0);
+		setLED(AOTOM_HDD_A4, 0);
+		setLED(AOTOM_HDD_A5, 0);
+		setLED(AOTOM_HDD_A6, 0);
+		setLED(AOTOM_HDD_A7, 0);
+		setLED(AOTOM_HDD_A8, 0);
+		setLED(AOTOM_HDD_FULL, 0);
+		setLED(AOTOM_HDD_A9, 0);
+	} else {
+		setLED(AOTOM_HDD_A9, 1);
+		if (perc > 10)
+			setLED(AOTOM_HDD_A1, 1);
+		if (perc > 21)
+			setLED(AOTOM_HDD_A2, 1);
+		if (perc > 32)
+			setLED(AOTOM_HDD_A3, 1);
+		if (perc > 43)
+			setLED(AOTOM_HDD_A4, 1);
+		if (perc > 54)
+			setLED(AOTOM_HDD_A5, 1);
+		if (perc > 65)
+			setLED(AOTOM_HDD_A6, 1);
+		if (perc > 76)
+			setLED(AOTOM_HDD_A7, 1);
+		if (perc > 87)
+			setLED(AOTOM_HDD_A8, 1);
+		if (perc > 98)
+			setLED(AOTOM_HDD_FULL, 1);
+	}
+#endif
+}

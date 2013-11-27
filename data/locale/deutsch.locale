@@ -697,6 +697,9 @@ hdd_removable_device Wechseldatenträger
 hdd_settings Laufwerke
 hdd_sleep Ausschalten nach...
 hdd_slow Langsam
+hdd_statfs Füllstands-Abfrage
+hdd_statfs_always immer
+hdd_statfs_recording nur während Aufnahme
 hdd_umount aushängen
 hdd_umount_warn Laufwerk aushängen
 imageinfo.creator Ersteller:
