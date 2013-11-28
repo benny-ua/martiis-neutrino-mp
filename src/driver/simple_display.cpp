@@ -112,7 +112,15 @@ void CLCD::wake_up()
 void* CLCD::TimeThread(void *)
 {
         set_threadname("CLCD::TimeThread");
+
 	CLCD *cvfd = CLCD::getInstance();
+#if HAVE_SPARK_HARDWARE
+	// disable spinner
+	struct aotom_ioctl_data vData;
+	vData.u.led.led_nr = 2;
+	vData.u.led.on = 0;
+	ioctl(cvfd->fd, VFDSETLED, &vData);
+#endif
 	cvfd->timeThreadRunning = true;
 	cvfd->waitSec = 0;
 	while (cvfd->timeThreadRunning) {
@@ -615,10 +623,10 @@ void CLCD::setled(void)
 		on |= led_mode[i];
 	struct aotom_ioctl_data vData;
 	vData.u.led.led_nr = 0;
-	vData.u.led.on = (on & 1) ? LOG_ON : LOG_OFF;
+	vData.u.led.on = on & 1;
 	ioctl(fd, VFDSETLED, &vData);
 	vData.u.led.led_nr = 1;
-	vData.u.led.on = (on & 2) ? LOG_ON : LOG_OFF;
+	vData.u.led.on = on & 2;
 	ioctl(fd, VFDSETLED, &vData);
 #endif
 }
