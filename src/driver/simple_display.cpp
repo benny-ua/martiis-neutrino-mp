@@ -531,6 +531,52 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 		}
 		if (s.length() > 0 && (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM || lastOutput != s)) {
 			lastOutput = s;
+			// utf-8 -> ascii
+			s = "";
+			unsigned char *t = (unsigned char *) lastOutput.c_str();
+			while (*t) {
+				if ((*t & 0x80) == 0x0) {
+					s += (char)*t;
+					t += 1;
+					continue;
+					
+				}
+				if ((*t & 0xe0) == 0xc0) {
+					t += 1;
+					const char *c380[] = {
+					//	 À    Á    Â    Ã    Ä     Å    Æ     Ç 
+						"A", "A", "A", "A", "Ae", "A", "AE", "C",
+					//	 È    É    Ê    Ë    Ì    Í    Î    Ï
+						"E", "E", "E", "E", "I", "I", "I", "I",
+					//	 Ð    Ñ    Ò    Ó    Ô    Õ    Ö     ×
+						"D", "N", "O", "O", "O", "O", "Oe", "*",
+					//	 Ø    Ù    Ú    Û    Ü     Ý    Þ    ß
+						"O", "U", "U", "U", "Ue", "Y", "P", "ss",
+					//	 à    á    â    ã     ä     å    æ    ç
+						"a", "a", "a", "a", "ae", "a", "ae", "c",
+					//	 è    é    ê    ë    ì    í    î    ï
+						"e", "e", "e", "e", "i", "i", "i", "i",
+					//	 ð    ñ    ò    ó    ô    õ    ö     ÷
+						"d", "n", "o", "o", "o", "o", "oe", "/",
+					//	 ø    ù    ú    û    ü     ý    þ    ÿ
+						"o", "u", "u", "u", "ue", "y", "p", "y"
+					};
+					if (*t > 0x7f && *t < 0xc0)
+						s += c380[*t - 0x80];
+					t += 1;
+					continue;
+				}
+				if ((*t & 0xf0) == 0xe0) {
+					t += 3;
+					continue;
+				}
+				if ((*t & 0xf8) == 0xf0) {
+					t += 4;
+					continue;
+				}
+				// malformed 
+				break;
+			}
 			if (write(fd , s.c_str(), s.length()) < 0)
 				perror("write to vfd failed");
 			waitSec = 8;
