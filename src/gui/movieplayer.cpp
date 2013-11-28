@@ -684,7 +684,9 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 
 void CMoviePlayerGui::PlayFile(void)
 {
+	mutex.lock();
 	PlayFileStart();
+	mutex.unlock();
 	PlayFileLoop();
 	PlayFileEnd();
 }
@@ -702,6 +704,7 @@ void* CMoviePlayerGui::bgPlayThread(void *arg)
 
 bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::string &name, t_channel_id chan)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 	if (g_settings.parentallock_prompt != PARENTALLOCK_PROMPT_NEVER) {
 		int age = -1;
 		const char *ages[] = { "18+", "16+", "12+", "6+", "0+", NULL };
@@ -790,8 +793,6 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		usleep(100000);
 	playing = _playing;
 	cutNeutrino();
-
-	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
 
 	playstate = CMoviePlayerGui::STOPPED;
 	printf("Startplay at %d seconds\n", startposition/1000);
