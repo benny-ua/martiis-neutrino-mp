@@ -985,6 +985,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.pip_width = configfile.getInt32("pip_width", 365);
 	g_settings.pip_height = configfile.getInt32("pip_height", 200);
 #endif
+
+	g_settings.infoClockFontSize = configfile.getInt32("infoClockFontSize", 34);
+
 	if(erg)
 		configfile.setModifiedFlag(true);
 	return erg;
@@ -1487,6 +1490,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("pip_width", g_settings.pip_width);
 	configfile.setInt32("pip_height", g_settings.pip_height);
 #endif
+	configfile.setInt32("infoClockFontSize", g_settings.infoClockFontSize);
 	if(strcmp(fname, NEUTRINO_SETTINGS_FILE))
 		configfile.saveConfig(fname);
 
@@ -1866,9 +1870,6 @@ void CNeutrinoApp::SetupFonts(int fmode)
 	/* recalculate infobar position */
 	if (g_InfoViewer)
 		g_InfoViewer->start();
-	/* update InfoClock font to avoid crashes*/
-	if (InfoClock)
-		InfoClock->setClockFont(g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]);
 }
 
 /**************************************************************************************
