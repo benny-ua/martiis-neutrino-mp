@@ -319,7 +319,8 @@ void *insertEventsfromFile(void * data)
 			event = service->xmlChildrenNode;
 
 			while (event) {
-				SIevent e(onid,tsid,sid,xmlGetNumericAttribute(event, "id", 32));
+
+				SIevent e(onid,tsid,sid,xmlGetNumericAttribute(event, "id", 16));
 				uint8_t tid = xmlGetNumericAttribute(event, "tid", 16);
 				if(tid)
 					e.table_id = tid;

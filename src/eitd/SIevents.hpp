@@ -364,7 +364,7 @@ class SIevent
 		t_service_id          service_id;
 		t_original_network_id original_network_id;
 		t_transport_stream_id transport_stream_id;
-		unsigned int eventID;
+		unsigned short eventID;
 		//time_t vps;
 		unsigned char table_id;
 		unsigned char version;
@@ -381,7 +381,7 @@ class SIevent
 		std::string contentClassification; // Aus dem Content Descriptor, als String, da mehrere vorkommen koennen
 		std::string userClassification; // Aus dem Content Descriptor, als String, da mehrere vorkommen koennen
 
-		SIevent(const t_original_network_id, const t_transport_stream_id, const t_service_id, const unsigned int);
+		SIevent(const t_original_network_id, const t_transport_stream_id, const t_service_id, const unsigned short);
 		SIevent(void) {
 			service_id = 0;
 			original_network_id = 0;

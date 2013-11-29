@@ -133,6 +133,7 @@ bool CBatchEPG_Menu::Run(int i)
 	string mhwVersion = "1";
 
 	switch(epgChannels[i].type) {
+#if 0
 		case BATCHEPG_MHW2:
 			mhwVersion = "2";
 		case BATCHEPG_MHW1:
@@ -177,6 +178,7 @@ bool CBatchEPG_Menu::Run(int i)
 			unlink(tmpfile);
 			break;
 		}
+#endif
 		case BATCHEPG_STANDARD:
 		{
 			AbortableSleep(g_settings.batchepg_standard_waittime);
@@ -355,12 +357,14 @@ void CBatchEPG_Menu::Save()
 	}
 }
 
-#define EPG_BATCH_TYPES_COUNT 4
+#define EPG_BATCH_TYPES_COUNT 2
 static const CMenuOptionChooser::keyval EPG_BATCH_TYPES[EPG_BATCH_TYPES_COUNT] = {
 	{ CBatchEPG_Menu::BATCHEPG_OFF, LOCALE_BATCHEPG_EPG_OFF },
 	{ CBatchEPG_Menu::BATCHEPG_STANDARD, LOCALE_BATCHEPG_EPG_STANDARD },
+#if 0
 	{ CBatchEPG_Menu::BATCHEPG_MHW1, LOCALE_BATCHEPG_EPG_MHW1 },
 	{ CBatchEPG_Menu::BATCHEPG_MHW2, LOCALE_BATCHEPG_EPG_MHW2 }
+#endif
 };
 
 #define ONOFF_OPTION_COUNT 2
