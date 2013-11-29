@@ -155,10 +155,6 @@ class CSignalNoiseRatioBar : public CSignalBar
 		///refresh current item properties, use this before paintScale().
 		void Refresh();
 
-	protected:
-		///initialize all needed basic attributes and objects
-		void initVarSnrBar();
-
 	public:
 		CSignalNoiseRatioBar();
 		///basic component class constructor for signal noise ratio.
