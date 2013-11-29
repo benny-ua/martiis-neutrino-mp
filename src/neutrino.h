@@ -57,8 +57,6 @@ class CShairPlay;
 
 #include <string>
 
-#define widest_number "2"
-
 #define ANNOUNCETIME (1 * 60)
 
 /**************************************************************************************

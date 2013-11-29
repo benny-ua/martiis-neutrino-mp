@@ -152,15 +152,9 @@ void CComponentsFrmClock::initCCLockItems()
 		}
 	}
 	
-	int minNumWidth = 0, w_tmp;
+	int w_tmp;
 	char b[2];
 	b[1] = 0;
-	for (int i = 0; i < 10; i++) {
-		b[0] = '0' + i;
-		w_tmp = (*getClockFont())->getRenderWidth(b, true);
-		if (w_tmp > minNumWidth)
-			minNumWidth = w_tmp;
-	}
 	int minSepWidth = (*getClockFont())->getRenderWidth(":", true);
 	w_tmp = (*getClockFont())->getRenderWidth(".", true);
 	if (w_tmp > minSepWidth)
@@ -190,7 +184,7 @@ void CComponentsFrmClock::initCCLockItems()
 		char c = stmp.at(0);
 		switch (c) {
 			case '0' ... '9':
-				wtmp = minNumWidth;
+				wtmp = (*getClockFont())->getMaxDigitWidth();
 				break;
 			case '.':
 			case ':':
