@@ -153,8 +153,6 @@ void CComponentsFrmClock::initCCLockItems()
 	}
 	
 	int w_tmp;
-	char b[2];
-	b[1] = 0;
 	int minSepWidth = (*getClockFont())->getRenderWidth(":", true);
 	w_tmp = (*getClockFont())->getRenderWidth(".", true);
 	if (w_tmp > minSepWidth)
@@ -191,7 +189,6 @@ void CComponentsFrmClock::initCCLockItems()
 				wtmp = minSepWidth;
 				break;
 			default:
-				b[0] = c;
 				wtmp = (*getClockFont())->getRenderWidth(stmp, true);
 		}
 
