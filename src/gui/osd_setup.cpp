@@ -543,6 +543,13 @@ int COsdSetup::showOsdSetup()
 	mf->setHint("", LOCALE_MENU_HINT_MENUS);
 	osd_menu->addItem(mf);
 
+#if 0
+	//progressbar
+	mf = new CMenuDForwarder(LOCALE_MISCSETTINGS_PROGRESSBAR, true, NULL, new CProgressbarSetup(), NULL, CRCInput::convertDigitToKey(shortcut++));
+	mf->setHint("", LOCALE_MENU_HINT_PROGRESSBAR);
+	osd_menu->addItem(mf);
+#endif
+
 	//infobar
 	CMenuWidget osd_menu_infobar(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_INFOBAR);
 	showOsdInfobarSetup(&osd_menu_infobar);

@@ -95,7 +95,6 @@ void CSignalBar::initSBItems()
 
 void CSignalBar::initVarSigBar()
 {
-	initVarForm();
 	corner_rad 	= 0;
 	corner_type 	= 0;
 	append_h_offset = 2;
@@ -249,7 +248,9 @@ void CSignalBar::paint(bool do_save_bg)
 CSignalNoiseRatioBar::CSignalNoiseRatioBar()
 {
 	initVarSnrBar();
+#if 0  // called from base (CSignalBar) ctor
 	initSBItems();
+#endif
 }
 
 CSignalNoiseRatioBar::CSignalNoiseRatioBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref)
@@ -261,12 +262,16 @@ CSignalNoiseRatioBar::CSignalNoiseRatioBar(const int& xpos, const int& ypos, con
 	width 		= w;
 	height 		= h;
 
+#if 0  // called from base (CSignalBar) ctor
 	initSBItems();
+#endif
 }
 
 void CSignalNoiseRatioBar::initVarSnrBar()
 {
+#if 0  // called from base (CSignalBar) ctor
 	initVarSigBar();
+#endif
 	sb_name	= "SNR";
 }
 
@@ -307,7 +312,6 @@ CSignalBox::CSignalBox(const int& xpos, const int& ypos, const int& w, const int
 
 void CSignalBox::initVarSigBox()
 {
-	initVarForm();
 	corner_rad	= 0;
 
 	sbx_frontend 	= NULL;

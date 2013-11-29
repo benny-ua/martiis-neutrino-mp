@@ -71,7 +71,6 @@ CComponentsFrmClock::CComponentsFrmClock( const int x_pos, const int y_pos, cons
 
 void CComponentsFrmClock::initVarClock()
 {
-	initVarForm();
 	cc_item_type 		= CC_ITEMTYPE_FRM_CLOCK;
 	corner_rad		= RADIUS_SMALL;
 
@@ -89,7 +88,6 @@ void CComponentsFrmClock::initVarClock()
 
 CComponentsFrmClock::~CComponentsFrmClock()
 {
-	cleanCCForm();
 	if (activeClock)
 		stopThread();
 }

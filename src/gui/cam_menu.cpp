@@ -133,7 +133,7 @@ int CCAMMenuHandler::doMainMenu()
 		} else {
 			snprintf(str1, sizeof(str1), "%s %d", g_Locale->getText(LOCALE_CI_EMPTY), i);
 			tempMenu = new CMenuWidget(str1, NEUTRINO_ICON_SETTINGS);
-			cammenu->addItem(new CMenuForwarder(str1, false, NULL, tempMenu));
+			cammenu->addItem(new CMenuDForwarder(str1, false, NULL, tempMenu));
 			memset(str1,0,sizeof(str1));
 		}
 		if (i < (CiSlots - 1))
@@ -164,7 +164,7 @@ int CCAMMenuHandler::doMainMenu()
 		} else {
 			snprintf(str1, sizeof(str1), "%s %d", g_Locale->getText(LOCALE_SC_EMPTY), i);
 			tempMenu = new CMenuWidget(str1, NEUTRINO_ICON_SETTINGS);
-			cammenu->addItem(new CMenuForwarder(str1, false, NULL, tempMenu));
+			cammenu->addItem(new CMenuDForwarder(str1, false, NULL, tempMenu));
 			memset(str1,0,sizeof(str1));
 		}
 		if (i < (ScNum - 1))

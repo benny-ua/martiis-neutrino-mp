@@ -2338,9 +2338,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	dprintf( DEBUG_NORMAL, "registering as event client\n");
 
-#ifndef DISABLE_SECTIONSD
 	InitSectiondClient();
-#endif
 
 	/* wait until timerd is ready... */
 	time_t timerd_wait = time_monotonic_ms();
@@ -3518,9 +3516,9 @@ _repeat:
 			}
 		}
 		if (g_settings.shutdown_real && can_deepstandby)
-			ExitRun(true, can_deepstandby);
-		else if(mode != mode_standby)
-			standbyMode( true );
+			g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
+		else
+			g_RCInput->postMsg(NeutrinoMessages::STANDBY_ON, 0);
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::RELOAD_SETUP ) {

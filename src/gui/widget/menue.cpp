@@ -523,14 +523,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 			break;
 		pos++;
 	}
-#if 0
-	GenericMenuBack->setHint("", NONEXISTANT_LOCALE);
-#endif
 	checkHints();
-#if 0
-	if (has_hints)
-		GenericMenuBack->setHint(NEUTRINO_ICON_HINT_BACK, LOCALE_MENU_HINT_BACK);
-#endif
 
 	if(savescreen) {
 		calcSize();
@@ -838,11 +831,6 @@ void CMenuWidget::calcSize()
 		int tmpw = items[i]->getWidth() + 10 + 10 + wi; /* 10 pixels to the left and right of the text */
 		if (tmpw > width)
 			width = tmpw;
-#if 0
-		if(!items[i]->hintIcon.empty() || items[i]->hint != NONEXISTANT_LOCALE) {
-			has_hints = true;
-		}
-#endif
 	}
 	hint_height = 0;
 	if(g_settings.show_menu_hints && has_hints) {
@@ -1115,34 +1103,13 @@ void CMenuWidget::paintHint(int pos)
 	if (pos < 0 && !hint_painted)
 		return;
 	
-#if 0
-	if (hint_painted) {
-		/* clear detailsline line */
-		// TODO CComponents::hide with param restore ? or auto (if it have saved screens) ?
-		if (details_line != NULL) {
-			if (savescreen)
-				details_line->restore();
-			else
-				details_line->hide();
-		}
-		/* clear info box */
-		if (info_box != NULL) {
-			if (pos == -1) {
-				if (savescreen)
-					info_box->restore();
-				else
-					info_box->hide();
-			}
-		}
-		hint_painted = false;
-#endif
 	if (hint_painted) {
 		/* clear detailsline line */
 		if (details_line)
-			details_line->hide();
+			savescreen ? details_line->hide() : details_line->kill();
 		/* clear info box */
 		if ((info_box) && (pos == -1))
-			info_box->hide(true);
+			savescreen ? info_box->hide(true) : info_box->kill();
 		hint_painted = false;
 	}
 	if (pos < 0)
@@ -1151,18 +1118,8 @@ void CMenuWidget::paintHint(int pos)
 	CMenuItem* item = items[pos];
 	
 	if (item->hintIcon.empty() && item->hint == NONEXISTANT_LOCALE) {
-#if 0
-		if (info_box != NULL) {
-			if (savescreen)
-#endif
 		if (info_box)
 			info_box->hide(false);	
-#if 0				
-				info_box->restore();
-			else
-				info_box->hide();
-		}
-#endif
 		return;
 	}
 	
@@ -1191,9 +1148,6 @@ void CMenuWidget::paintHint(int pos)
 		details_line->setHMarkDown(markh);
 		details_line->syncSysColors();
 	}
-#if 0
-	details_line->paint(savescreen);
-#endif
 
 	//init infobox
 	std::string str = g_Locale->getText(item->hint);
@@ -1208,18 +1162,12 @@ void CMenuWidget::paintHint(int pos)
 		info_box->setShadowOnOff(CC_SHADOW_ON);
 		info_box->setPicture(item->hintIcon);
 	}
-#if 0	
-	/* force full paint - menu-over i.e. option chooser with pulldown can overwrite */
-	info_box->paint(savescreen, true);
-#endif
-
 	
 	//paint result
-	details_line->paint();
-	info_box->paint();
+	details_line->paint(savescreen);
+	info_box->paint(savescreen);
 	
 	hint_painted = true;
-	
 }
 
 void CMenuWidget::addKey(neutrino_msg_t key, CMenuTarget *menue, const std::string & action)

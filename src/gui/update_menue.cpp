@@ -115,7 +115,7 @@ int CSoftwareUpdate::showSoftwareUpdate()
 #ifdef BOXMODEL_APOLLO
 	softUpdate.addItem(GenericMenuSeparatorLine);
 
-	mf = new CMenuForwarder(LOCALE_FLASHUPDATE_CREATEIMAGE_MENU, true, NULL, new CFlashExpertSetup(), NULL, CRCInput::convertDigitToKey(1));
+	mf = new CMenuDForwarder(LOCALE_FLASHUPDATE_CREATEIMAGE_MENU, true, NULL, new CFlashExpertSetup(), NULL, CRCInput::convertDigitToKey(1));
 	mf->setHint("", LOCALE_MENU_HINT_SOFTUPDATE_CREATEIMAGE_MENU);
 	softUpdate.addItem(mf);
 #endif
