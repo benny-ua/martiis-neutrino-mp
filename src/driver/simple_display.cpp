@@ -445,7 +445,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 					aotom_icon = AOTOM_MUTE;
 					break;
 				case FP_ICON_PLAY:
-					aotom_icon = AOTOM_PLAY_LOG;
+					aotom_icon = AOTOM_PLAY;
 					break;
 				case FP_ICON_RECORD:
 					aotom_icon = AOTOM_REC1;
@@ -460,7 +460,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 					aotom_icon = AOTOM_TIMESHIFT;
 					break;
 				case FP_ICON_TV:
-					aotom_icon = AOTOM_TVMODE_LOG;
+					aotom_icon = AOTOM_TV;
 					break;
 				case FP_ICON_USB:
 					aotom_icon = AOTOM_USB;
@@ -667,7 +667,7 @@ void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 		default:
 			;
 	}
-	setLED(AOTOM_DUBI, dubi);
+	setLED(AOTOM_DOLBYDIGITAL, dubi);
 	setLED(AOTOM_MP3, mp3);
 	setLED(AOTOM_AC3, ac3);
 #endif
@@ -676,9 +676,9 @@ void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 void CLCD::setLiveFE(char fe)
 {
 #if HAVE_SPARK_HARDWARE
-	setLED(AOTOM_SAT, fe == 's');
-	setLED(AOTOM_TER, fe == 't');
-	setLED(AOTOM_CAB, fe == 'c');
+	setLED(AOTOM_SATELLITE, fe == 's');
+	setLED(AOTOM_TERRESTRIAL, fe == 't');
+	setLED(AOTOM_CABLE, fe == 'c');
 #endif
 }
 
@@ -695,7 +695,7 @@ void CLCD::setHddUsage(int perc)
 	if (g_info.hw_caps->display_type == HW_DISPLAY_LED_NUM)
 		return;
 
-	setLED(AOTOM_HDD_A9, perc > -1);
+	setLED(AOTOM_HDD_FRAME, perc > -1);
 	setLED(AOTOM_HDD_A1, perc > 11);
 	setLED(AOTOM_HDD_A2, perc > 23);
 	setLED(AOTOM_HDD_A3, perc > 35);
