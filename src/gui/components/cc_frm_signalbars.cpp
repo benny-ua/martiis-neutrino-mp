@@ -42,7 +42,7 @@ CSignalBar::CSignalBar()
 	initSBItems();
 }
 
-CSignalBar::CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref)
+CSignalBar::CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref, const char *sbname)
 {
 	initVarSigBar();
 	sb_frontend 	= frontend_ref;
@@ -50,6 +50,8 @@ CSignalBar::CSignalBar(const int& xpos, const int& ypos, const int& w, const int
 	y 		= ypos;
 	width 		= w;
 	height 		= h;
+	if (sbname)
+		sb_name	= sbname;
 
 	initSBItems();
 }
@@ -115,7 +117,8 @@ void CSignalBar::initVarSigBar()
 	sb_scale 	= NULL;
 	sb_vlbl		= NULL;
 	sb_lbl		= NULL;
-	sb_name		= "SIG";
+	if (sb_name.empty())
+		sb_name = "SIG";
 }
 
 void CSignalBar::initSBarScale()
@@ -247,32 +250,10 @@ void CSignalBar::paint(bool do_save_bg)
 //*******************************************************************************************************************************
 CSignalNoiseRatioBar::CSignalNoiseRatioBar()
 {
-	initVarSnrBar();
-#if 0  // called from base (CSignalBar) ctor
-	initSBItems();
-#endif
 }
 
-CSignalNoiseRatioBar::CSignalNoiseRatioBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref)
+CSignalNoiseRatioBar::CSignalNoiseRatioBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref) : CSignalBar(xpos, ypos, w, h, frontend_ref, "SNR")
 {
-	initVarSnrBar();
-	sb_frontend 	= frontend_ref;
-	x 		= xpos;
-	y 		= ypos;
-	width 		= w;
-	height 		= h;
-
-#if 0  // called from base (CSignalBar) ctor
-	initSBItems();
-#endif
-}
-
-void CSignalNoiseRatioBar::initVarSnrBar()
-{
-#if 0  // called from base (CSignalBar) ctor
-	initVarSigBar();
-#endif
-	sb_name	= "SNR";
 }
 
 void CSignalNoiseRatioBar::Refresh()

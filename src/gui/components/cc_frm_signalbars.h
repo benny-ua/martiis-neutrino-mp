@@ -116,7 +116,7 @@ class CSignalBar : public CComponentsForm
 	public:
 		CSignalBar();
 		///basic component class constructor for signal.
-		CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref);
+		CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref, const char *sbname = NULL);
 
 		///assigns the current used frontend, simplified a tuner object, see frontend_c.h
 		virtual void setFrontEnd(CFrontend *frontend_ref){sb_frontend = frontend_ref;};
