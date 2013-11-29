@@ -1274,9 +1274,6 @@ int CMenuOptionNumberChooser::paint(bool selected)
 int CMenuOptionNumberChooser::getWidth(void)
 {
 	int width = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(getName(), true);
-
-	char tmp[20], *t;
-
 	int _lower_bound = lower_bound;
 	int _upper_bound = upper_bound;
 	int m = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getMaxDigitWidth();
