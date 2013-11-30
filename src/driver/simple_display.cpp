@@ -642,7 +642,7 @@ void CLCD::setAudioMode(void)
 void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 {
 #if HAVE_SPARK_HARDWARE
-	int dubi = 0;
+	int dd = 0;
 	int mp3 = 0;
 	int ac3 = 0;
 	switch (streamtype) {
@@ -655,7 +655,7 @@ void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 			ac3 = 1;
 			break;
 		case AUDIO_FMT_DTS:
-			dubi = 1;
+			dd = 1;
 			break;
 		case AUDIO_FMT_AUTO:
 		case AUDIO_FMT_AAC:
@@ -667,7 +667,7 @@ void CLCD::setAudioMode(AUDIO_FORMAT streamtype __attribute__((unused)))
 		default:
 			;
 	}
-	setLED(AOTOM_DOLBYDIGITAL, dubi);
+	setLED(AOTOM_DOLBYDIGITAL, dd);
 	setLED(AOTOM_MP3, mp3);
 	setLED(AOTOM_AC3, ac3);
 #endif
