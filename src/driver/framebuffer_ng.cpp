@@ -531,7 +531,31 @@ void CFrameBuffer::setTransparency( int /*tr*/ )
 }
 #endif
 
-#if !HAVE_TRIPLEDRAGON
+#if HAVE_SPARK_HARDWARE
+/* original interfaceL: 1 == pixel alpha, 2 == global alpha premultiplied */
+void CFrameBuffer::setBlendMode(uint8_t mode)
+{
+	/* mode = 1 => reset to no extra transparency */
+	if (mode == 1)
+		setBlendLevel(0);
+}
+
+/* level = 100 -> transparent, level = 0 -> nontransperent */
+void CFrameBuffer::setBlendLevel(int level)
+{
+	struct stmfbio_var_screeninfo_ex v;
+	memset(&v, 0, sizeof(v));
+	/* set to 0 already...
+	 v.layerid = 0;
+	 v.activate = STMFBIO_ACTIVATE_IMMEDIATE; // == 0
+	 v.premultiplied_alpha = 0;
+	*/
+	v.caps = STMFBIO_VAR_CAPS_OPACITY | STMFBIO_VAR_CAPS_PREMULTIPLIED;
+	v.opacity = 0xff - (level * 0xff / 100);
+	if (ioctl(fd, STMFBIO_SET_VAR_SCREENINFO_EX, &v) < 0)
+	perror("[fb:setBlendLevel] STMFBIO");
+}
+#elif !HAVE_TRIPLEDRAGON
 void CFrameBuffer::setBlendMode(uint8_t mode)
 {
 	(void)mode;
