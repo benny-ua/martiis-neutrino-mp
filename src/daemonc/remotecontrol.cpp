@@ -720,7 +720,7 @@ void CRemoteControl::startvideo()
 	{
 		is_video_started= true;
 		//g_Zapit->startPlayBack();
-		CZapit::getInstance()->unlockPlayBack(false); //g_Zapit->unlockPlayBack(false);
+		CZapit::getInstance()->unlockPlayBack(true); /* TODO: check if sendpmt=false is correct in stopvideo() */
 	}
 }
 
