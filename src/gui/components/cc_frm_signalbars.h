@@ -31,8 +31,7 @@
 #include <config.h>
 #endif
 
-// #include <global.h>
-// #include <neutrino.h>
+
 #include <gui/components/cc_frm.h>
 #include <gui/components/cc_item_progressbar.h>
 #include <gui/components/cc_item_text.h>
@@ -116,7 +115,7 @@ class CSignalBar : public CComponentsForm
 	public:
 		CSignalBar();
 		///basic component class constructor for signal.
-		CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref, const char *sbname = NULL);
+		CSignalBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref, const std::string& sb_name = "SIG");
 
 		///assigns the current used frontend, simplified a tuner object, see frontend_c.h
 		virtual void setFrontEnd(CFrontend *frontend_ref){sb_frontend = frontend_ref;};
@@ -156,9 +155,10 @@ class CSignalNoiseRatioBar : public CSignalBar
 		void Refresh();
 
 	public:
-		CSignalNoiseRatioBar();
+		CSignalNoiseRatioBar(){};
 		///basic component class constructor for signal noise ratio.
-		CSignalNoiseRatioBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref);
+		CSignalNoiseRatioBar(const int& xpos, const int& ypos, const int& w, const int& h, CFrontend *frontend_ref)
+					: CSignalBar(xpos, ypos, w, h, frontend_ref, "SNR"){};
 };
 
 /// Class CSignalBox() provides CSignalBar(), CSignalNoiseRatioBar() scales at once.
@@ -168,7 +168,7 @@ additional of CSignalBar()- and CSignalNoiseRatioBar()-objects.
 
 
 To add a signalbox object to your code add this to a header file:
-#include <gui/widget/signalbars.h>
+#include <gui/components/cc_frm_signalbars.h>
 
 class CSampleClass
 {

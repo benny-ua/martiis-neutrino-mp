@@ -55,8 +55,6 @@ class CPSISetup;
 class C3DSetup;
 class CShairPlay;
 
-#include <string>
-
 #define ANNOUNCETIME (1 * 60)
 
 /**************************************************************************************
