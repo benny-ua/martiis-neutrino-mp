@@ -137,7 +137,6 @@ class CMoviePlayerGui : public CMenuTarget
 	time_t end_time;
 #endif
 
-	/* playback from MB */
 	bool isMovieBrowser;
 	bool isHTTP;
 	bool isUPNP;
@@ -155,14 +154,14 @@ class CMoviePlayerGui : public CMenuTarget
 
 	const static int MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
 
-	/* playback from file */
-	bool is_file_player;
 	CFileBrowser * filebrowser;
 	CFileFilter tsfilefilter;
 	CFileList filelist;
 	CFileList::iterator filelist_it;
 	std::string Path_local;
 	int menu_ret;
+
+        CHintBox *hintBox;
 
 	/* playback from bookmark */
 	CBookmarkManager * bookmarkmanager;
@@ -187,7 +186,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void fillPids();
 	bool getAudioName(int pid, std::string &apidtitle);
 	void selectAudioPid(void);
-	void getCurrentAudioName( bool file_player, std::string &audioname);
+	void getCurrentAudioName(std::string &audioname);
 	void addAudioFormat(int count, std::string &apidtitle, bool& enabled );
 
 	void handleMovieBrowser(neutrino_msg_t msg, int position = 0);
@@ -195,6 +194,8 @@ class CMoviePlayerGui : public CMenuTarget
 	void updateLcd();
 
 	static void *ShowWebTVHint(void *arg);
+	void ShowAbortHintBox(void);
+	void HideHintBox(void);
 
 #if 0
 	void selectSubtitle();
@@ -248,6 +249,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void StartSubtitles(bool show = true);
 	void setLastMode(int m) { m_LastMode = m; }
 	void Pause(bool b = true);
+	void RequestAbort(void);
 };
 
 #endif

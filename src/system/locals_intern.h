@@ -1629,6 +1629,7 @@ const char * locale_real_names[] =
 	"movieplayer.head",
 	"movieplayer.nkplayback",
 	"movieplayer.starting",
+	"movieplayer.stopping",
 	"movieplayer.toomanybookmarks",
 	"movieplayer.tshelp1",
 	"movieplayer.tshelp10",

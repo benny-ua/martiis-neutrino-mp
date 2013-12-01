@@ -1600,7 +1600,8 @@ movieplayer.defplugin Start-Plugin
 movieplayer.fileplayback Datei-Browser
 movieplayer.head Movieplayer
 movieplayer.nkplayback Netzkino
-movieplayer.starting Wiedergabe starten...
+movieplayer.starting Wiedergabe starten ...
+movieplayer.stopping Wiedergabe wird beendet ...
 movieplayer.toomanybookmarks Sie haben bereits zu viele Lesezeichen angelegt.\nEs muß erst ein anderes gelöscht werden.
 movieplayer.tshelp1 Stopp
 movieplayer.tshelp10 ca. 10 Minuten zurück
