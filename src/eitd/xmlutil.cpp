@@ -301,7 +301,6 @@ void *insertEventsfromFile(void * data)
 
 	while (eventfile) {
 		filename = xmlGetAttribute(eventfile, "name");
-fprintf(stderr, "### eventfile is %s\n",filename.c_str());
 		epgname = epg_dir + filename;
 		if (!(event_parser = parseXmlFile(epgname.c_str()))) {
 			dprintf("unable to open %s for reading\n", epgname.c_str());
