@@ -1279,21 +1279,17 @@ int CMenuOptionNumberChooser::getWidth(void)
 	int m = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getMaxDigitWidth();
 
 	int w1 = 0;
-	if (_lower_bound < 0) {
+	if (_lower_bound < 0)
 		w1 += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("-", true);
-		_lower_bound *= -1;
-	}
-	while (_lower_bound > 0) {
+	while (_lower_bound) {
 		w1 += m;
 		_lower_bound /= 10;
 	}
 
 	int w2 = 0;
-	if (_upper_bound < 0) {
+	if (_upper_bound < 0)
 		w2 += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("-", true);
-		_upper_bound *= -1;
-	}
-	while (_upper_bound > 0) {
+	while (_upper_bound) {
 		w1 += m;
 		_upper_bound /= 10;
 	}
