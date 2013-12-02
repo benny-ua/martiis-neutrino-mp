@@ -493,6 +493,7 @@ neutrino_msg_t CScanTs::handleMsg(neutrino_msg_t msg, neutrino_msg_data_t data)
 	}
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
 		delete[] (unsigned char*) data;
+
 	/* almost all messages paint something, so blit here */
 	frameBuffer->blit();
 	return msg;
