@@ -227,8 +227,8 @@ class CMenuForwarder : public CMenuItem
 	int paint(bool selected=false);
 	int getHeight(void) const;
 	int getWidth(void);
-	neutrino_locale_t getTextLocale(){return name;}
-	CMenuTarget* getTarget(){return jumpTarget;}
+	neutrino_locale_t getTextLocale() const {return name;}
+	CMenuTarget* getTarget() const {return jumpTarget;}
 	std::string getActionKey(){return actionKey;}
 
 	int exec(CMenuTarget* parent);
@@ -358,7 +358,7 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 	int getWidth(void);
 
 	int paint(bool selected);
-	std::string getOptionName() {return nameString;};
+	std::string getOptionName()const {return nameString;};
 
 	int exec(CMenuTarget* parent);
 	int isMenueOptionChooser(void) const{return 1;}
@@ -494,16 +494,16 @@ class CMenuWidget : public CMenuTarget
 		void insertItem(const uint& item_id, CMenuItem* menuItem);
 		void removeItem(const uint& item_id);
 		int getItemId(CMenuItem* menuItem);
-		int getItemsCount(){return items.size();};
+		int getItemsCount()const{return items.size();};
 		CMenuItem* getItem(const uint& item_id);
 		virtual void paint();
 		virtual void hide();
 		virtual int exec(CMenuTarget* parent, const std::string & actionKey);
 		virtual const char *getName();
 		void setSelected(const int &Preselected){ preselected = Preselected; };
-		int getSelected(){ return selected; };
+		int getSelected()const { return selected; };
 		void move(int xoff, int yoff);
-		int getSelectedLine(void){return exit_pressed ? -1 : selected;};
+		int getSelectedLine(void)const {return exit_pressed ? -1 : selected;};
 		void setWizardMode(bool _from_wizard) { from_wizard = _from_wizard;};		
 		void enableFade(bool _enable) { fade = _enable; };
 		void enableSaveScreen(bool enable);
