@@ -4124,6 +4124,9 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		nGLCD::StandbyMode(false);
 #endif
 #if HAVE_SPARK_HARDWARE
+		// we *may* have been woken up by something like xupnpd
+		if (access("/tmp/.timer_wakeup", F_OK) == 0)
+			timer_wakeup = true;
 		if (!timer_wakeup) {
 			CCECSetup cecsetup;
 			cecsetup.setCECSettings(true);
