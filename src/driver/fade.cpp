@@ -89,13 +89,14 @@ void COSDFader::Stop()
 {
 	if ( fadeIn || fadeOut ) {
 		g_RCInput->killTimer(fadeTimer);
-#if defined(BOXMODELL_APOLLO) || HAVE_SPARK_HARDWARE
-		usleep(40000);
-#endif
 #ifdef BOXMODEL_APOLLO
+		usleep(40000);
 		frameBuffer->setBlendMode(CNXTFB_BLEND_MODE_PER_PIXEL); // Global alpha multiplied with pixel alpha
 #else
 		frameBuffer->setBlendMode(1); // Global alpha multiplied with pixel alpha
+#if HAVE_SPARK_HARDWARE
+		usleep(60000);
+#endif
 #endif
 		fadeIn = fadeOut = false;
 	}

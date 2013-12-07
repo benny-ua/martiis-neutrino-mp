@@ -553,7 +553,7 @@ void CFrameBuffer::setBlendLevel(int level)
 	v.caps = STMFBIO_VAR_CAPS_OPACITY | STMFBIO_VAR_CAPS_PREMULTIPLIED;
 	v.opacity = 0xff - (level * 0xff / 100);
 	if (ioctl(fd, STMFBIO_SET_VAR_SCREENINFO_EX, &v) < 0)
-	perror("[fb:setBlendLevel] STMFBIO");
+		perror("[fb:setBlendLevel] STMFBIO");
 }
 #elif !HAVE_TRIPLEDRAGON
 void CFrameBuffer::setBlendMode(uint8_t mode)
