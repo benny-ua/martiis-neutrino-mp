@@ -62,9 +62,16 @@ void CInfoClock::Init()
 		setClockFontSize(g_settings.infoClockFontSize);
 	}
 
-	//use current theme colors
-	if (!g_settings.infoclock_no_background)
+	if (g_settings.infoclock_no_background)
+		setColorAll(0, 0, 0);
+	else
+		//use current theme colors
 		syncSysColors();
+
+	if (g_settings.infoclock_with_seconds)
+		setClockFormat("%H:%M:%S");
+	else
+		setClockFormat("%H:%M");
 
 	int x_old = x, y_old = y, width_old = width, height_old = height;
 	CVolumeHelper::getInstance()->refresh(cl_font);
@@ -88,20 +95,6 @@ void CInfoClock::ClearDisplay()
 
 bool CInfoClock::StartClock()
 {
-	if (g_settings.infoclock_no_background) {
-		setFrameColor(0);
-		setBodyColor(0);
-		setShadowColor(0);
-	} else {
-		setFrameColor(COL_LIGHT_GRAY);
-		setBodyColor(COL_MENUCONTENT_PLUS_0);
-		setShadowColor(COL_MENUCONTENTDARK_PLUS_0);
-	}
-	if (g_settings.infoclock_with_seconds) {
-		setClockFormat("%H:%M:%S");
-	} else {
-		setClockFormat("%H:%M");
-	}
 	Init();
 	return Start();
 }
