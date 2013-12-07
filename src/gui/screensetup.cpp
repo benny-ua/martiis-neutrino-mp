@@ -194,11 +194,11 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &action)
 	if (action == "u" || action == "d" || action == "l" || action == "r") {
 		if ((action == "u") && (((selected == 0) && (y_coord[0] > 0)) || ((selected == 1) && (y_coord[1] > y_coord[0] - 100))))
 			y_coord[selected]--;
-		else if ((action == "d") && (((selected == 0) && (y_coord[0] < y_coord[1] - 100)) || ((selected == 1) && (y_coord[1] < screenheight))))
+		else if ((action == "d") && (((selected == 0) && (y_coord[0] < y_coord[1] - 100)) || ((selected == 1) && (y_coord[1] < screenheight - 1))))
 			y_coord[selected]++;
 		else if ((action == "l") && (((selected == 0) && (x_coord[0] > 0)) || ((selected == 1) && (x_coord[1] > x_coord[0] - 100))))
 			x_coord[selected]--;
-		else if ((action == "r") && (((selected == 0) && (x_coord[0] < x_coord[1] - 100)) || ((selected == 1) && (x_coord[1] < screenwidth))))
+		else if ((action == "r") && (((selected == 0) && (x_coord[0] < x_coord[1] - 100)) || ((selected == 1) && (x_coord[1] < screenwidth - 1))))
 			x_coord[selected]++;
 		else
 			return menu_return::RETURN_NONE;
@@ -490,9 +490,9 @@ void CScreenSetup::updateCoords()
 {
 	coord[0] = "(" + to_string(x_coord[0]) + "," + to_string(y_coord[0]) + ")";
 	if (coord_abs)
-		coord[1] = "(" + to_string(x_coord[1]) + "," + to_string(y_coord[1]);
+		coord[1] = "(" + to_string(x_coord[1]) + "," + to_string(y_coord[1]) + ")";
 	else
-		coord[1] = "(" + to_string(screenwidth - x_coord[1]) + "," + to_string(screenheight - y_coord[1]);
+		coord[1] = "(" + to_string(screenwidth - x_coord[1]) + "," + to_string(screenheight - y_coord[1]) + ")";
 }
 #else
 void CScreenSetup::paintBorder( int pselected )
