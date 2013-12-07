@@ -63,7 +63,8 @@ void CInfoClock::Init()
 	}
 
 	//use current theme colors
-	syncSysColors();
+	if (!g_settings.infoclock_no_background)
+		syncSysColors();
 
 	int x_old = x, y_old = y, width_old = width, height_old = height;
 	CVolumeHelper::getInstance()->refresh(cl_font);
