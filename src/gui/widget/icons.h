@@ -103,6 +103,8 @@
 #define NEUTRINO_ICON_MP3		"mp3"
 #define NEUTRINO_ICON_MULTIMEDIA	"multimedia"
 #define NEUTRINO_ICON_MOVIEPLAYER	"icon_movieplayer"
+#define NEUTRINO_ICON_NKPLAY		"icon_nkplay"
+#define NEUTRINO_ICON_YTPLAY		"icon_ytplay"
 #define NEUTRINO_ICON_NOT_MOUNTED	"not_mounted"
 #define NEUTRINO_ICON_PAUSE		"mp_pause"
 #define NEUTRINO_ICON_PLAY 		"mp_play"
@@ -277,7 +279,9 @@
 #define NEUTRINO_ICON_GREEN_9		"9-green"
 
 /* misc */
+#define NEUTRINO_ICON_HINT_NKPLAY	"hint_nkplay"
 #define NEUTRINO_ICON_HINT_YTPLAY	"hint_ytplay"
+#define NEUTRINO_ICON_HINT_SPARK	"hint_spark"
 
 #define NEUTRINO_ICON_VARPATH		"/var/share/tuxbox/neutrino/icons/"  //alternatively path for user-defined icons 
 

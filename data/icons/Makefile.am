@@ -126,6 +126,7 @@ install_DATA += \
 	hint_media.png \
 	hint_movie.png \
 	hint_network.png \
+	hint_nkplay.png \
 	hint_osd.png \
 	hint_personalize.png \
 	hint_picview.png \
@@ -142,6 +143,7 @@ install_DATA += \
 	hint_settings.png \
 	hint_shutdown.png \
 	hint_sleeptimer.png \
+	hint_spark.png \
 	hint_streaminfo.png \
 	hint_swupdate.png \
 	hint_timers.png \
@@ -153,8 +155,10 @@ install_DATA += \
 	home.png \
 	icon_green.png \
 	icon_movieplayer.png \
+	icon_nkplay.png \
 	icon_red.png \
 	icon_yellow.png \
+	icon_ytplay.png \
 	important.png \
 	info.png \
 	info_small.png \

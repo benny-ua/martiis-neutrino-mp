@@ -1726,6 +1726,7 @@ void CMovieBrowser::refreshBookmarkList(void) // P3
 void CMovieBrowser::refreshTitle(void)
 {
 	std::string title = m_textTitle.c_str();
+	const char *icon = NEUTRINO_ICON_MOVIEPLAYER;
 	if (show_mode == MB_SHOW_YT) {
 		title = g_Locale->getText(LOCALE_MOVIEPLAYER_YTPLAYBACK);
 		title += ": ";
@@ -1733,6 +1734,7 @@ void CMovieBrowser::refreshTitle(void)
 		title += g_Locale->getText(loc);
 		if (loc == LOCALE_MOVIEBROWSER_YT_RELATED || loc == LOCALE_MOVIEBROWSER_YT_SEARCH)
 			title += " \"" + m_settings.ytsearch + "\"";
+		icon = NEUTRINO_ICON_YTPLAY;
 	} else if (show_mode == MB_SHOW_NK) {
 		title = g_Locale->getText(LOCALE_MOVIEPLAYER_NKPLAYBACK);
 		if (m_settings.nkmode == cNKFeedParser::SEARCH) {
@@ -1743,6 +1745,7 @@ void CMovieBrowser::refreshTitle(void)
 			title += ": ";
 			title += m_settings.nkcategoryname;
 		}
+		icon = NEUTRINO_ICON_NKPLAY;
 	}
 	
 	TRACE("[mb]->refreshTitle : %s\r\n", title.c_str());
@@ -1751,8 +1754,8 @@ void CMovieBrowser::refreshTitle(void)
 	int y = m_cBoxFrameTitleRel.iY + m_cBoxFrame.iY;
 	int w = m_cBoxFrameTitleRel.iWidth;
 	int h = m_cBoxFrameTitleRel.iHeight;
-	
-	CComponentsHeader header(x, y, w, h, title.c_str(), NEUTRINO_ICON_MOVIEPLAYER);
+
+	CComponentsHeader header(x, y, w, h, title.c_str(), icon);
 	header.paint(CC_SAVE_SCREEN_NO);
 
 	info_hdd_level(true);
@@ -4048,17 +4051,20 @@ int CYTHistory::exec(CMenuTarget* parent, const std::string &actionKey)
 {
 	std::list<std::string> *sh;
 	int *sz;
+	const char *icon = NULL;
 	if (is_nk) {
 		sh = &settings->nksearch_history;
 		sz = &settings->nksearch_history_size;
+		icon = NEUTRINO_ICON_NKPLAY;
 	} else {
 		sh = &settings->ytsearch_history;
 		sz = &settings->ytsearch_history_size;
+		icon = NEUTRINO_ICON_YTPLAY;
 	}
 	if (actionKey == "") {
 		if (parent)
 			parent->hide();
-		CMenuWidget* m = new CMenuWidget(LOCALE_MOVIEBROWSER_YT_HISTORY, NEUTRINO_ICON_MOVIEPLAYER, width);
+		CMenuWidget* m = new CMenuWidget(LOCALE_MOVIEBROWSER_YT_HISTORY, icon, width);
 		m->addKey(CRCInput::RC_spkr, this, "clearYThistory");
 		m->setSelected(selected);
 		m->addItem(GenericMenuSeparator);
@@ -4165,7 +4171,7 @@ int CNKCategoriesMenu::exec(CMenuTarget *parent, const std::string &actionKey)
 	if(parent)
 		parent->hide();
 
-	CMenuWidget m(LOCALE_MOVIEBROWSER_NK_CATEGORIES, NEUTRINO_ICON_MOVIEPLAYER);
+	CMenuWidget m(LOCALE_MOVIEBROWSER_NK_CATEGORIES, NEUTRINO_ICON_NKPLAY);
 	m.addIntroItems();
 	for (unsigned i = 0; i < cats.size(); i++)
 		m.addItem(new CMenuForwarder(cats[i].title, true, ("(" + to_string(cats[i].post_count) + ")").c_str(), this, to_string(i).c_str(), CRCInput::convertDigitToKey(i + 1)), cats[i].id == *nkcategory);
@@ -4178,7 +4184,7 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 {
 	m_pcWindow->paintBackground();
 
-	CMenuWidget mainMenu(LOCALE_MOVIEPLAYER_NKPLAYBACK, NEUTRINO_ICON_MOVIEPLAYER);
+	CMenuWidget mainMenu(LOCALE_MOVIEPLAYER_NKPLAYBACK, NEUTRINO_ICON_NKPLAY);
 	mainMenu.addIntroItems(LOCALE_MOVIEBROWSER_OPTION_BROWSER);
 
 	int select = -1;
@@ -4286,7 +4292,7 @@ bool CMovieBrowser::showYTMenu(bool calledExternally)
 {
 	m_pcWindow->paintBackground();
 
-	CMenuWidget mainMenu(LOCALE_MOVIEPLAYER_YTPLAYBACK, NEUTRINO_ICON_MOVIEPLAYER);
+	CMenuWidget mainMenu(LOCALE_MOVIEPLAYER_YTPLAYBACK, NEUTRINO_ICON_YTPLAY);
 	mainMenu.addIntroItems(LOCALE_MOVIEBROWSER_OPTION_BROWSER);
 
 	int select = -1;

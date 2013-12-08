@@ -404,25 +404,33 @@ void CNeutrinoApp::InitMenuService()
 
 	//scripts 
 	bool show_scripts = g_PluginList->hasPlugin(CPlugins::P_TYPE_SCRIPT);
-	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_MAINMENU_SCRIPTS, show_scripts, NULL, new CPluginList(LOCALE_MAINMENU_SCRIPTS,CPlugins::P_TYPE_SCRIPT)), &g_settings.personalize[SNeutrinoSettings::P_MSER_SCRIPTS]);
+	mf = new CMenuForwarder(LOCALE_MAINMENU_SCRIPTS, show_scripts, NULL, new CPluginList(LOCALE_MAINMENU_SCRIPTS, CPlugins::P_TYPE_SCRIPT));
+	mf->setHint(NEUTRINO_ICON_HINT_SCRIPTS, LOCALE_MENU_HINT_SCRIPTS);
+	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SCRIPTS]);
 	
 	//restart tuner
-	personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, this, "restarttuner") , &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_TUNER]);
+	mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, this, "restarttuner");
+	mf->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RESTART_TUNER);
+	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_TUNER]);
 
 	//restart cam
 	if (!access("/etc/init.d/cam", X_OK))
-		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, this, "restartcam") , &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_CAM]);
+		mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, this, "restartcam");
+		mf->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RESTART_CAM);
+		personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_CAM]);
 
-		//reload plugins
-		mf = new CMenuForwarder(LOCALE_SERVICEMENU_GETPLUGINS, true, NULL, this, "reloadplugins");
-		mf->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RELOAD_PLUGINS);
-		personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RELOAD_PLUGINS]);
+	//reload plugins
+	mf = new CMenuForwarder(LOCALE_SERVICEMENU_GETPLUGINS, true, NULL, this, "reloadplugins");
+	mf->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RELOAD_PLUGINS);
+	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RELOAD_PLUGINS]);
 
  	//separator
 	personalize.addSeparator(MENU_SERVICE);
 	//firmware update via opkg
 	if (COPKGManager::hasOpkgSupport()) {
-		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager()), &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
+		mf = new CMenuForwarder(LOCALE_SERVICEMENU_UPDATE, true, NULL, new COPKGManager());
+		mf->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_OPKG);
+		personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_SOFTUPDATE]);
 
  		//separator
 		personalize.addSeparator(MENU_SERVICE);
@@ -430,8 +438,11 @@ void CNeutrinoApp::InitMenuService()
 
 #if HAVE_SPARK_HARDWARE
 	//boot spark now
-	if (g_info.hw_caps->boxtype == 7111)
-		personalize.addItem(MENU_SERVICE, new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark") , &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
+	if (g_info.hw_caps->boxtype == 7111) {
+		mf = new CMenuForwarder(LOCALE_SERVICEMENU_BOOT_SPARK, true, NULL, this, "bootspark");
+		mf->setHint(NEUTRINO_ICON_HINT_SPARK, LOCALE_MENU_HINT_BOOT_SPARK);
+		personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_BOOT_SPARK]);
+	}
 #endif
 
 	//restart neutrino
