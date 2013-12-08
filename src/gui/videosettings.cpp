@@ -354,8 +354,10 @@ int CVideoSettings::showVideoSetup()
 	CMenuOptionChooser * vs_colorformat_hdmi = NULL;
 
 #if HAVE_SPARK_HARDWARE
-	vs_colorformat_analog = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_ANALOG, &g_settings.analog_mode1, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT, true, this);
-	vs_colorformat_hdmi = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_HDMI, &g_settings.hdmi_mode, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTION_COUNT, true, this);
+	vs_colorformat_analog = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_ANALOG, &g_settings.analog_mode1, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_ANALOG_OPTION_COUNT, true, this, CRCInput::RC_nokey, "", true);
+	vs_colorformat_analog->setHint("", LOCALE_MENU_HINT_VIDEO_COLORFORMAT_ANALOG);
+	vs_colorformat_hdmi = new CMenuOptionChooser(LOCALE_VIDEOMENU_COLORFORMAT_HDMI, &g_settings.hdmi_mode, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTIONS, VIDEOMENU_COLORFORMAT_TDT_HDMI_OPTION_COUNT, true, this, CRCInput::RC_nokey, "", true);
+	vs_colorformat_hdmi->setHint("", LOCALE_MENU_HINT_VIDEO_COLORFORMAT_HDMI);
 #else
 	if (system_rev == 0x06)
 	{
@@ -456,20 +458,47 @@ int CVideoSettings::showVideoSetup()
 		videosetup->addItem(vs_videomodes_fw);	  //video modes submenue
 
 #if HAVE_SPARK_HARDWARE
+	CMenuForwarder *mf;
+	CMenuOptionNumberChooser *mc;
+
 	videosetup->addItem(GenericMenuSeparatorLine);
-	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));;
-	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_STEP, (int *)&g_settings.psi_step, true, 1, 100, NULL));
+	mf = new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf->setHint("", LOCALE_MENU_HINT_VIDEO_PSI);
+	videosetup->addItem(mf);
+
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_STEP, (int *)&g_settings.psi_step, true, 1, 100, NULL);
+	mc->setHint("", LOCALE_MENU_HINT_VIDEO_PSI_STEP);
+	videosetup->addItem(mc);
+
 	CPSISetupNotifier psiNotifier(CNeutrinoApp::getInstance()->chPSISetup);
-	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, &psiNotifier));
-	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_SATURATION, (int *)&g_settings.psi_saturation, true, 0, 255, &psiNotifier));
-	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_BRIGHTNESS, (int *)&g_settings.psi_brightness, true, 0, 255, &psiNotifier));
-	videosetup->addItem(new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_TINT, (int *)&g_settings.psi_tint, true, 0, 255, &psiNotifier));
+
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, &psiNotifier);
+	mc->setHint("", LOCALE_MENU_HINT_VIDEO_CONTRAST);
+	videosetup->addItem(mc);
+
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_SATURATION, (int *)&g_settings.psi_saturation, true, 0, 255, &psiNotifier);
+	mc->setHint("", LOCALE_MENU_HINT_VIDEO_SATURATION);
+	videosetup->addItem(mc);
+
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_BRIGHTNESS, (int *)&g_settings.psi_brightness, true, 0, 255, &psiNotifier);
+	mc->setHint("", LOCALE_MENU_HINT_VIDEO_BRIGHTNESS);
+	videosetup->addItem(mc);
+
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_TINT, (int *)&g_settings.psi_tint, true, 0, 255, &psiNotifier);
+	mc->setHint("", LOCALE_MENU_HINT_VIDEO_TINT);
+	videosetup->addItem(mc);
+
 	videosetup->addItem(GenericMenuSeparatorLine);
-	videosetup->addItem(new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+
+	mf = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf->setHint("", LOCALE_MENU_HINT_VIDEO_THREE_D);
+	videosetup->addItem(mf);
 
 	CScreenSetup channelScreenSetup;
 	channelScreenSetup.loadBorder(CZapit::getInstance()->GetCurrentChannelID());
-	videosetup->addItem(new CMenuForwarder(LOCALE_VIDEOMENU_MASKSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
+	mf = new CMenuForwarder(LOCALE_VIDEOMENU_MASKSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf->setHint("", LOCALE_MENU_HINT_VIDEO_MASK);
+	videosetup->addItem(mf);
 #endif
 #ifdef BOXMODEL_APOLLO
 	/* values are from -128 to 127, but brightness really no sense after +/- 40. changeNotify multiply contrast and saturation to 3 */

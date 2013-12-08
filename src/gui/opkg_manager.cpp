@@ -222,6 +222,7 @@ int COPKGManager::showMenu()
 	menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
 	menu->addIntroItems();
 	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	upgrade_forwarder->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_OPKG_UPGRADE);
 	menu->addItem(upgrade_forwarder);
 	menu->addItem(GenericMenuSeparatorLine);
 
@@ -332,6 +333,7 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 						pkg_map[p.name] = p;
 						std::map<string, struct pkg>::iterator it = pkg_map.find(p.name); // don't use variables defined in local scope only
 						it->second.forwarder = new CMenuForwarder(it->second.description, true, NULL , this, it->second.name.c_str());
+						it->second.forwarder->setHint("", it->second.description);
 						break;
 					}
 					case OM_LIST_INSTALLED: //installed pkgs

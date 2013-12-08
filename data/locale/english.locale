@@ -887,6 +887,7 @@ mainsettings.video Video
 menu.back Back
 menu.cancel Cancel
 menu.hint_a_pic Configure audio player, picture viewer, movie player and more
+menu.hint_accept_other_remotes Disable to ignore other remote controls
 menu.hint_aplay Audio player
 menu.hint_aplay_setup Change title display, start directory, screen saver and more
 menu.hint_audio Audio output, DD\nSRS True volume options
@@ -957,7 +958,7 @@ menu.hint_fade Fade GUI windows
 menu.hint_fan_speed Control fan speed
 menu.hint_filebrowser_denydirectoryleave Deny filebrowser to leave initial directory
 menu.hint_filebrowser_showrights Show file permissions in file browser
-menu.hint_fileplay Play various video files
+menu.hint_fileplay Play video files
 menu.hint_fileplay_setup Set file selection options.
 menu.hint_filesystem_is_utf8 Filebrowser filesystem encoding
 menu.hint_font_gui Select font file to use for GUI
@@ -1071,7 +1072,7 @@ menu.hint_make_newlist Create list of recently added channels
 menu.hint_make_removedlist Create list of recently removed channels
 menu.hint_make_webtvlist Auto-create WebTV channel list based on\nchannel type and name
 menu.hint_manage_settings Backup, restore, revert to defaults\nFactory box reset
-menu.hint_mb Your recordings
+menu.hint_mb Play your recordings and other available movies.
 menu.hint_media Play movies, audio files\nWatch pictures
 menu.hint_menu_fonts Change menu font sizes
 menu.hint_menu_hints Show this hints. Also you can switch\nit any time using 'help' button
@@ -1120,9 +1121,11 @@ menu.hint_net_ushare Share connected HDD over uPnp
 menu.hint_net_xupnpd Share live channels over UPNP
 menu.hint_network IP address, gateway, DNS, Time sync\nNetwork shares and services
 menu.hint_new_zap_mode Allow channel switch while browsing\n(toggle mode with 'mute' in channel list)
+menu.hint_nkplay Play netzkino.de movies
 menu.hint_nkplayback_setup Configure Netzkino-specific options, e.g. an upper limit for search results
 menu.hint_numeric_adjust Adjust channel list mode on numeric zap
 menu.hint_opkg Install or update software packages
+menu.hint_opkg_upgrade Updates installed packages. (SETUP/MENUE switches to expert mode.)
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
@@ -1297,17 +1300,24 @@ menu.hint_vfd_infoline Choose what to display in main VFD line
 menu.hint_vfd_statusline Choose what to display in short\nVFD status line
 menu.hint_video Video output, resolution, format\nAspect ratio, fast mode switch options
 menu.hint_video_43mode Display mode for 4:3 content\non 16:9 TV
-menu.hint_video_analog_mode Select analog output mode\nfor SCART and CINCH connectors
+menu.hint_video_analog_mode Select analog output mode\nfor SCART and RCA connectors
 menu.hint_video_brightness Change picture brightness
 menu.hint_video_cinch_mode Select analog output mode for\ncomposite video out
+menu.hint_video_colorformat_analog Select color space for analog output (SCART/RCA)
+menu.hint_video_colorformat_hdmi Select color space for digital output (HDMI)
 menu.hint_video_contrast Change picture contrast
 menu.hint_video_dbdr MPEG2 enhancement filters
 menu.hint_video_format TV aspect ratio
+menu.hint_video_mask Define a channel-specific border to hide unwanted screen content
 menu.hint_video_mode HDMI output video mode
 menu.hint_video_modes VF key will cycle between enabled modes 
 menu.hint_video_pip Picture in picture size and position
+menu.hint_video_psi On-screen menue for changing color, contrast and more
+menu.hint_video_psi_step Set the increment for the on-screen menue
 menu.hint_video_saturation Change picture saturation
 menu.hint_video_scart_mode Select analog output mode for SCART connectors
+menu.hint_video_three_d Change the channel-specific 3D settings
+menu.hint_video_tint Change picture tint
 menu.hint_volume Configure Volume GUI options
 menu.hint_volume_digits Numeric display of the volumebar on/off
 menu.hint_volume_pos Select volume indicator position
@@ -2201,21 +2211,21 @@ videomenu.43mode 4:3 Content mode
 videomenu.analog_auto AUTO
 videomenu.analog_cvbs CVBS
 videomenu.analog_hd_rgb RGB (HD)
-videomenu.analog_hd_rgb_cinch RGB on cinch (HD)
+videomenu.analog_hd_rgb_cinch RGB on RCA (HD)
 videomenu.analog_hd_rgb_scart RGB on scart (HD)
 videomenu.analog_hd_yprpb YPbPr(HD)
-videomenu.analog_hd_yprpb_cinch YPbPr on cinch (HD)
+videomenu.analog_hd_yprpb_cinch YPbPr on RCA (HD)
 videomenu.analog_hd_yprpb_scart YPbPr on scart (HD)
 videomenu.analog_mode Analog Video Output
 videomenu.analog_sd_rgb RGB (SD)
-videomenu.analog_sd_rgb_cinch RGB on cinch (SD)
+videomenu.analog_sd_rgb_cinch RGB on RCA (SD)
 videomenu.analog_sd_rgb_scart RGB on scart (SD)
 videomenu.analog_sd_yprpb YPbPr (SD)
-videomenu.analog_sd_yprpb_cinch YPbPr on cinch (SD)
+videomenu.analog_sd_yprpb_cinch YPbPr on RCA (SD)
 videomenu.analog_sd_yprpb_scart YPbPr on scart (SD)
 videomenu.auto Auto
 videomenu.brightness Brightness
-videomenu.cinch Cinch
+videomenu.cinch RCA
 videomenu.colorformat Color space
 videomenu.colorformat.cvbs CVBS
 videomenu.colorformat.rgb RGB
@@ -2223,7 +2233,7 @@ videomenu.colorformat.svideo S-Video (Y/C)
 videomenu.colorformat.ycbcr422 YCbCr 4:2:2
 videomenu.colorformat.ycbcr444 YCbCr 4:4:4
 videomenu.colorformat.yuv YUV
-videomenu.colorformat_analog Cinch/Scart
+videomenu.colorformat_analog RCA/Scart
 videomenu.colorformat_hdmi HDMI
 videomenu.contrast Contrast
 videomenu.dbdr MPEG2 de-block/de-ring
