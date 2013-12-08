@@ -90,7 +90,6 @@ class CScanSetup : public CMenuTarget, public CChangeObserver
 
 		bool is_wizard;
 		
-		int fec_count;
 		int freq_length;
 		int r_system;
 
