@@ -1127,7 +1127,7 @@ menu.hint_nkplay Wiedergabe von netzkino.de-Filmen
 menu.hint_nkplayback_setup Konfigurieren Sie Netzkino-spezifische Optionen wie maximale Ergebnisse bei Suchen oder Cache-Verzeichnis
 menu.hint_numeric_adjust Adjust channel list mode on numeric zap
 menu.hint_opkg Hier können Sie neue Software-Pakete installieren oder vorhandene aktualisieren
-menu.hint_opkg_upgrade Aktualisiert alle installierten Pakete. (SETUP/MENUE aktiviert den Experten-Modus.)
+menu.hint_opkg_upgrade Aktualisiert alle installierten Pakete auf die neueste verfügbare Version
 menu.hint_osd Farben, Schriftarten, Anzeigegröße, Ansichtsoptionen der Menüs und mehr
 menu.hint_osd_language Wählen Sie ihre Menü-Sprache
 menu.hint_osd_preset Wählen Sie zwischen Röhren-TV (CRT) oder Flachbildschirm (LCD)
@@ -1720,6 +1720,11 @@ nvod.starting (Beginn in %d min)
 nvodselector.directormode Bildregie-Modus
 nvodselector.head Anfangszeit auswählen
 nvodselector.subservice Perspektiven
+opkg.button.expert_off Standard-Modus
+opkg.button.expert_on Experten-Modus
+opkg.button.info Paket-Informationen
+opkg.button.install Paket installieren
+opkg.button.uninstall Paket entfernen
 opkg.failure.install Installation fehlgeschlagen (%d)
 opkg.failure.update Update fehlgeschlagen (%d)
 opkg.failure.upgrade Upgrade fehlgeschlagen (%d)

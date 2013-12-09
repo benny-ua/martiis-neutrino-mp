@@ -107,8 +107,8 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 			parent->hide();
 		return showMenu(); 
 	}
+	int selected = menu->getSelected() - menu_offset;
 	if (expert_mode && actionKey == "rc_spkr") {
-		int selected = menu->getSelected() - menu_offset;
 		if (selected < 0 || !pkg_arr[selected]->installed)
 			return menu_return::RETURN_NONE;
 		char loc[200];
@@ -122,11 +122,10 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 		return res;
 	}
 	if (actionKey == "rc_info") {
-		if (parent)
-			parent->hide();
-		int selected = menu->getSelected() - menu_offset;
 		if (selected < 0)
 			return menu_return::RETURN_NONE;
+		if (parent)
+			parent->hide();
 		execCmd(pkg_types[OM_INFO] + pkg_arr[selected]->name, true, true);
 		return res;
 	}
@@ -177,6 +176,20 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 	return res;
 }
 
+#define COPKGManagerFooterButtonCount 3
+static const struct button_label COPKGManagerFooterButtons[COPKGManagerFooterButtonCount] = {
+	{ NEUTRINO_ICON_BUTTON_MENU_SMALL, LOCALE_OPKG_BUTTON_EXPERT_ON },
+	{ NEUTRINO_ICON_BUTTON_INFO_SMALL, LOCALE_OPKG_BUTTON_INFO },
+	{ NEUTRINO_ICON_BUTTON_OKAY,	   LOCALE_OPKG_BUTTON_INSTALL }
+};
+#define COPKGManagerFooterButtonCountExpert 4
+static const struct button_label COPKGManagerFooterButtonsExpert[COPKGManagerFooterButtonCountExpert] = {
+	{ NEUTRINO_ICON_BUTTON_MENU_SMALL, LOCALE_OPKG_BUTTON_EXPERT_OFF },
+	{ NEUTRINO_ICON_BUTTON_INFO_SMALL, LOCALE_OPKG_BUTTON_INFO },
+	{ NEUTRINO_ICON_BUTTON_OKAY,	   LOCALE_OPKG_BUTTON_INSTALL },
+	{ NEUTRINO_ICON_BUTTON_MUTE_SMALL, LOCALE_OPKG_BUTTON_UNINSTALL }
+};
+
 void COPKGManager::updateMenu()
 {
 	bool upgradesAvailable = false;
@@ -195,6 +208,11 @@ void COPKGManager::updateMenu()
 	}
 
 	upgrade_forwarder->setActive(upgradesAvailable);
+
+	if (expert_mode)
+		menu->setFooter(COPKGManagerFooterButtonsExpert, COPKGManagerFooterButtonCountExpert);
+	else
+		menu->setFooter(COPKGManagerFooterButtons, COPKGManagerFooterButtonCount);
 }
 
 void COPKGManager::refreshMenu() {
