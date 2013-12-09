@@ -936,7 +936,7 @@ void CMenuWidget::paint()
 	header.paint(CC_SAVE_SCREEN_NO);
 
 	// paint body shadow
-	frameBuffer->paintBoxRel(x+SHADOW_OFFSET, y + hheight + SHADOW_OFFSET, width + sb_width, height - hheight + RADIUS_LARGE, COL_MENUCONTENTDARK_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
+	frameBuffer->paintBoxRel(x+SHADOW_OFFSET, y + hheight + SHADOW_OFFSET, width + sb_width, height - hheight + (fbutton_count ? fbutton_height : RADIUS_LARGE), COL_MENUCONTENTDARK_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
 	// paint body background
 	frameBuffer->paintBoxRel(x ,y+hheight, width + sb_width, height-hheight + RADIUS_LARGE ,COL_MENUCONTENT_PLUS_0 ,RADIUS_LARGE, CORNER_BOTTOM);
 
