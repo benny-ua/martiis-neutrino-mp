@@ -640,11 +640,6 @@ int COsdSetup::showOsdSetup()
 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_MENU_NUMBERS_AS_ICONS, &g_settings.menu_numbers_as_icons, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_OPTIONS_SHOW_BACKGROUND_PICTURE, &g_settings.show_background_picture, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
-	// infoclock
-	osd_menu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_INFOCLOCK));
- 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_WITH_SECONDS, &g_settings.infoclock_with_seconds, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
- 	osd_menu->addItem(new CMenuOptionChooser(LOCALE_INFOCLOCK_NO_BACKGROUND, &g_settings.infoclock_no_background, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-
 	int oldVolumeSize = g_settings.volume_size;
 	int oldInfoClockSize = g_settings.infoClockFontSize;
 
@@ -1089,6 +1084,14 @@ void COsdSetup::showOsdInfoclockSetup(CMenuWidget *menu_infoclock)
 	CMenuOptionNumberChooser* mn = new CMenuOptionNumberChooser(LOCALE_CLOCK_SIZE_HEIGHT, &g_settings.infoClockFontSize, true, 30, 120);
 	mn->setHint("", LOCALE_MENU_HINT_CLOCK_SIZE);
 	menu_infoclock->addItem(mn);
+
+ 	CMenuOptionChooser *mc = new CMenuOptionChooser(LOCALE_INFOCLOCK_WITH_SECONDS, &g_settings.infoclock_with_seconds, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_CLOCK_SECONDS);
+	menu_infoclock->addItem(mc);
+
+ 	mc = new CMenuOptionChooser(LOCALE_INFOCLOCK_NO_BACKGROUND, &g_settings.infoclock_no_background, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_CLOCK_NO_BACKGROUND);
+	menu_infoclock->addItem(mc);
 }
 
 bool COsdSetup::changeNotify(const neutrino_locale_t OptionName, void * data)

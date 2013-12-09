@@ -931,6 +931,8 @@ menu.hint_channellist_foot Show additional information\nin bottom box
 menu.hint_channellist_setup Configure channel list GUI options
 menu.hint_channels Open channel list
 menu.hint_ci Conditional access menu\nto setup your CI CAM or embeded Conax card
+menu.hint_clock_no_background Change the clock background color to transparent.
+menu.hint_clock_seconds Change the time format to hide seconds.
 menu.hint_clock_size Set the size of the info clock.
 menu.hint_colors Configure GUI colors
 menu.hint_content_back Change GUI window background color
@@ -973,6 +975,7 @@ menu.hint_hdd_check Check filesystem (fsck)
 menu.hint_hdd_format Create HDD partition and format it
 menu.hint_hdd_noise Set Automatic Acoustic Management\nnot all drives support this
 menu.hint_hdd_sleep Select time to stop hdd on inactivity
+menu.hint_hdd_statfs Specify when the recording directory fill level in infoviewer and, if available, on VFD, may be updated
 menu.hint_hdd_tools Initialize HDD, check filesystem
 menu.hint_head_back Change GUI title background color
 menu.hint_head_textcolor Change GUI window title text color

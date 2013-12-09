@@ -191,6 +191,7 @@ int CHDDMenuHandler::doMenu ()
 	hddmenu->addItem(mc);
 
 	mc = new CMenuOptionChooser(LOCALE_HDD_STATFS, &g_settings.hdd_statfs_mode, HDD_STATFS_OPTIONS, HDD_STATFS_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_HDD_STATFS);
 	hddmenu->addItem(mc);
 
 	//if(n > 0)
