@@ -391,6 +391,9 @@ void CMenuWidget::Init(const std::string &Icon, const int mwidth, const mn_widge
 	has_hints	= false;
 	hint_painted	= false;
 	hint_height	= 0;
+	fbutton_count	= 0;
+	fbutton_labels	= NULL;
+	fbutton_height	= 0;
 }
 
 void CMenuWidget::move(int xoff, int yoff)
@@ -786,7 +789,7 @@ void CMenuWidget::hide()
 	if(savescreen && background)
 		restoreScreen();//FIXME
 	else {
-		frameBuffer->paintBackgroundBoxRel(x, y, full_width, full_height);
+		frameBuffer->paintBackgroundBoxRel(x, y, full_width, full_height + fbutton_height);
 		//paintHint(-1);
 	}
 	paintHint(-1);
@@ -845,7 +848,7 @@ void CMenuWidget::calcSize()
 	}
 	/* set the max height to 9/10 of usable screen height
 	   debatable, if the callers need a possibility to set this */
-	height = (frameBuffer->getScreenHeight() - hint_height) / 20 * 18; /* make sure its a multiple of 2 */
+	height = (frameBuffer->getScreenHeight() - fbutton_height - hint_height) / 20 * 18; /* make sure its a multiple of 2 */
 
 	if(height > ((int)frameBuffer->getScreenHeight() - 10))
 		height = frameBuffer->getScreenHeight() - 10;
@@ -940,6 +943,8 @@ void CMenuWidget::paint()
 	item_start_y = y+hheight;
 	paintItems();
 	washidden = false;
+	if (fbutton_count)
+		::paintButtons(x, y + height, width + sb_width, fbutton_count, fbutton_labels, width, fbutton_height);
 }
 
 void CMenuWidget::setMenuPos(const int& menu_width)
@@ -949,7 +954,7 @@ void CMenuWidget::setMenuPos(const int& menu_width)
 	int scr_w = frameBuffer->getScreenWidth();
 	int scr_h = frameBuffer->getScreenHeight();
 
-	int real_h = full_height + hint_height;
+	int real_h = full_height + fbutton_height + hint_height;
 
 	//configured positions 
 	switch(g_settings.menu_pos) 
@@ -1075,14 +1080,14 @@ void CMenuWidget::saveScreen()
 
 	background = new fb_pixel_t [full_width * full_height];
 	if(background)
-		frameBuffer->SaveScreen(x /*-ConnectLineBox_Width*/, y, full_width, full_height, background);
+		frameBuffer->SaveScreen(x /*-ConnectLineBox_Width*/, y, full_width, full_height + fbutton_height, background);
 }
 
 void CMenuWidget::restoreScreen()
 {
 	if(background) {
 		if(savescreen)
-			frameBuffer->RestoreScreen(x /*-ConnectLineBox_Width*/, y, full_width, full_height, background);
+			frameBuffer->RestoreScreen(x /*-ConnectLineBox_Width*/, y, full_width, full_height + fbutton_height, background);
 	}
 }
 
@@ -1131,7 +1136,7 @@ void CMenuWidget::paintHint(int pos)
 	int iheight = item->getHeight();
 	int rad = RADIUS_LARGE;
 	int xpos  = x - ConnectLineBox_Width;
-	int ypos2 = y + height + rad + SHADOW_OFFSET + INFO_BOX_Y_OFFSET;
+	int ypos2 = y + height + fbutton_height + rad + SHADOW_OFFSET + INFO_BOX_Y_OFFSET;
 	int iwidth = width+sb_width;
 	
 	//init details line and infobox dimensions
@@ -1177,6 +1182,21 @@ void CMenuWidget::addKey(neutrino_msg_t key, CMenuTarget *menue, const std::stri
 	keyActionMap[key].menue = menue;
 	keyActionMap[key].action = action;
 }
+
+void CMenuWidget::setFooter(const struct button_label *_fbutton_labels, const int _fbutton_count, bool repaint)
+{
+	fbutton_count = _fbutton_count;
+	fbutton_labels = _fbutton_labels;
+	fbutton_height = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight() + 6;  // init min buttonbar height
+	int h = 0, w = 0;
+	for (int i = 0; i < fbutton_count; i++) {
+		frameBuffer->getIconSize(fbutton_labels[i].button, &w, &h);
+		fbutton_height = std::max(fbutton_height, h + 4);
+	}
+	if (repaint)
+		paint();
+}
+
 
 //-------------------------------------------------------------------------------------------------------------------------------
 CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
