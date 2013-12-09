@@ -40,9 +40,10 @@ CWebTVSetup::CWebTVSetup()
 	changed = false;
 }
 
-#define CWebTVSetupFooterButtonCount 1
+#define CWebTVSetupFooterButtonCount 2
 static const struct button_label CWebTVSetupFooterButtons[CWebTVSetupFooterButtonCount] = {
-	{ NEUTRINO_ICON_BUTTON_RED, LOCALE_WEBTV_XML_DEL }
+	{ NEUTRINO_ICON_BUTTON_RED, LOCALE_WEBTV_XML_DEL },
+	{ NEUTRINO_ICON_BUTTON_GREEN, LOCALE_WEBTV_XML_ADD }
 };
 
 int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
@@ -53,9 +54,6 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 		selected = m->getSelected();
 		if (selected >= item_offset) {
 			m->removeItem(selected);
-			if (item_offset == m->getItemsCount()) {
-				m->removeItem(selected - 1);
-			}
 		    m->hide();
 			selected = m->getSelected();
 			changed = true;
@@ -84,8 +82,6 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 		fileBrowser.Filter = &fileFilter;
 		if (fileBrowser.exec("/") == true) {
 			std::string s = fileBrowser.getSelectedFile()->Name;
-			if (item_offset == m->getItemsCount() + 1)
-				m->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_WEBTV_XML));
 			m->addItem(new CMenuForwarder(s, true, NULL, this, "c"));
 			changed = true;
 		}
@@ -105,18 +101,13 @@ void CWebTVSetup::Show()
 	item_offset = 0;
 
 	m = new CMenuWidget(LOCALE_WEBTV_HEAD, NEUTRINO_ICON_MOVIEPLAYER, width);
-	m->addKey(CRCInput::RC_spkr, this, "d");
 	m->addKey(CRCInput::RC_red, this, "d");
+	m->addKey(CRCInput::RC_green, this, "a");
 	m->setSelected(selected);
-	m->addIntroItems(LOCALE_EPGPLUS_OPTIONS);
-	m->addItem(new CMenuForwarder(LOCALE_WEBTV_XML_ADD, true, NULL, this, "a", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
-	for (std::list<std::string>::iterator it = g_settings.webtv_xml.begin(); it != g_settings.webtv_xml.end(); ++it) {
-		if (item_offset == 0) {
-			m->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_WEBTV_XML));
-			item_offset = m->getItemsCount();
-		}
+	m->addIntroItems(LOCALE_EPGPLUS_OPTIONS, LOCALE_WEBTV_XML);
+	item_offset = m->getItemsCount();
+	for (std::list<std::string>::iterator it = g_settings.webtv_xml.begin(); it != g_settings.webtv_xml.end(); ++it)
 		m->addItem(new CMenuForwarder(*it, true, NULL, this, "c"));
-	}
 	m->setFooter(CWebTVSetupFooterButtons, CWebTVSetupFooterButtonCount);
 	m->exec(NULL, "");
 	m->hide();

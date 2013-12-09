@@ -1324,8 +1324,8 @@ menu.hint_volume Configure Volume GUI options
 menu.hint_volume_digits Numeric display of the volumebar on/off
 menu.hint_volume_pos Select volume indicator position
 menu.hint_volume_size Select volume indicator height
-menu.hint_webtv_setup Select the XML files for WebTV. WebTV channels are part of the standard channel lists.
-menu.hint_window_size Channellist, EPG-infos and some other windows are scaled by this factor
+menu.hint_webtv_setup WebTV channels configured here will be available in the standard channel lists.
+menu.hint_window_size Channellist, EPG-info and some other windows are scaled by this factor
 menu.hint_ytplay Play selected youtube feeds
 menu.hint_ytplay_setup Configure YouTube-specific options, e.g. an upper limit for search results
 menu.hint_zap_cycle When swithing channels, stay in current bouquet
