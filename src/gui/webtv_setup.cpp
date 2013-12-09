@@ -28,6 +28,7 @@
 #include <libgen.h>
 #include <neutrino.h>
 #include <driver/screen_max.h>
+#include <driver/framebuffer.h>
 #include <gui/widget/hintbox.h>
 #include "webtv_setup.h"
 
@@ -39,6 +40,10 @@ CWebTVSetup::CWebTVSetup()
 	changed = false;
 }
 
+#define CWebTVSetupFooterButtonCount 1
+static const struct button_label CWebTVSetupFooterButtons[CWebTVSetupFooterButtonCount] = {
+	{ NEUTRINO_ICON_BUTTON_RED, LOCALE_WEBTV_XML_DEL }
+};
 
 int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 {
@@ -46,18 +51,14 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 
 	if(actionKey == "d" /* delete */) {
 		selected = m->getSelected();
-		if (selected < item_offset) {
-			CHintBox hintbox(LOCALE_WEBTV_XML_DEL, g_Locale->getText(LOCALE_WEBTV_XML_DEL_HINT));
-			hintbox.paint();
-			sleep(2);
-			hintbox.hide();
-		} else {
+		if (selected >= item_offset) {
 			m->removeItem(selected);
-			if (item_offset == m->getItemsCount())
+			if (item_offset == m->getItemsCount()) {
 				m->removeItem(selected - 1);
+			}
+		    m->hide();
 			selected = m->getSelected();
 			changed = true;
-			del_fw->active = m->getItemsCount() > item_offset;
 		}
 		return res;
 	}
@@ -87,7 +88,6 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 				m->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_WEBTV_XML));
 			m->addItem(new CMenuForwarder(s, true, NULL, this, "c"));
 			changed = true;
-			del_fw->active = m->getItemsCount() > item_offset;
 		}
 		return res;
 	}
@@ -109,8 +109,6 @@ void CWebTVSetup::Show()
 	m->addKey(CRCInput::RC_red, this, "d");
 	m->setSelected(selected);
 	m->addIntroItems(LOCALE_EPGPLUS_OPTIONS);
-	del_fw = new CMenuForwarder(LOCALE_WEBTV_XML_DEL, true, NULL, this, "d", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-	m->addItem(del_fw);
 	m->addItem(new CMenuForwarder(LOCALE_WEBTV_XML_ADD, true, NULL, this, "a", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 	for (std::list<std::string>::iterator it = g_settings.webtv_xml.begin(); it != g_settings.webtv_xml.end(); ++it) {
 		if (item_offset == 0) {
@@ -119,7 +117,7 @@ void CWebTVSetup::Show()
 		}
 		m->addItem(new CMenuForwarder(*it, true, NULL, this, "c"));
 	}
-	del_fw->active = m->getItemsCount() > item_offset;
+	m->setFooter(CWebTVSetupFooterButtons, CWebTVSetupFooterButtonCount);
 	m->exec(NULL, "");
 	m->hide();
 	if (changed) {
