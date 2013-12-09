@@ -486,6 +486,6 @@ std::string CNeutrinoAPI::getLogoFile(std::string _logoURL __attribute__((unused
 	std::string logoString;
 	if (g_PicViewer->GetLogoName(channelId, channelIdAsString, logoString, NULL, NULL))
 		return logoString;
-		return "";
+	return "";
 }
 
