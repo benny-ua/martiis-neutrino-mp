@@ -753,8 +753,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.cacheTXT = configfile.getInt32( "cacheTXT",  0);
 	g_settings.minimode = configfile.getInt32( "minimode",  0);
 	g_settings.mode_clock = configfile.getInt32( "mode_clock",  0);
-	g_settings.infoclock_with_seconds = configfile.getInt32("infoclock_with_seconds", 1);
-	g_settings.infoclock_no_background = configfile.getInt32("infoclock_no_background", 0);
 	g_settings.zapto_pre_time = configfile.getInt32( "zapto_pre_time",  0);
 	g_settings.spectrum         = configfile.getBool("spectrum"          , false);
 	g_settings.channellist_additional = configfile.getInt32("channellist_additional", 2); //default minitv
@@ -987,7 +985,13 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.pip_height = configfile.getInt32("pip_height", 200);
 #endif
 
-	g_settings.infoClockFontSize = configfile.getInt32("infoClockFontSize", 34);
+	g_settings.infoClockFontSize = configfile.getInt32("infoClockFontSize", 30);
+	g_settings.infoClockBackground = configfile.getInt32("infoClockBackground", 0);
+	g_settings.infoClockSeconds = configfile.getInt32("infoClockSeconds", 1);
+
+	// backwards compatibility with original implementation. FIXME, scheduled for removal in 02/2014
+	g_settings.infoClockSeconds = configfile.getInt32("infoclock_with_seconds", g_settings.infoClockSeconds);
+	g_settings.infoClockBackground = !configfile.getInt32("infoclock_no_background", g_settings.infoClockBackground);
 
 	if(erg)
 		configfile.setModifiedFlag(true);
@@ -1342,8 +1346,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "cacheTXT", g_settings.cacheTXT );
 	configfile.setInt32( "minimode", g_settings.minimode );
 	configfile.setInt32( "mode_clock", g_settings.mode_clock );
-	configfile.setInt32( "infoclock_with_seconds", g_settings.infoclock_with_seconds);
-	configfile.setInt32( "infoclock_no_background", g_settings.infoclock_no_background);
 	configfile.setInt32( "zapto_pre_time", g_settings.zapto_pre_time );
 	configfile.setBool("spectrum", g_settings.spectrum);
 	configfile.setInt32("eventlist_additional", g_settings.eventlist_additional);
@@ -1492,6 +1494,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("pip_height", g_settings.pip_height);
 #endif
 	configfile.setInt32("infoClockFontSize", g_settings.infoClockFontSize);
+	configfile.setInt32("infoClockBackground", g_settings.infoClockBackground);
+	configfile.setInt32("infoClockSeconds", g_settings.infoClockSeconds);
 	if(strcmp(fname, NEUTRINO_SETTINGS_FILE))
 		configfile.saveConfig(fname);
 

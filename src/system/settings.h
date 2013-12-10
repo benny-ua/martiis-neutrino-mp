@@ -534,9 +534,6 @@ struct SNeutrinoSettings
 	int minimode;
 	int mode_clock;
 
-	int infoclock_with_seconds;
-	int infoclock_no_background;
-
 	enum MODE_LEFT_RIGHT_KEY_TV_SETTINGS 
 	{
 		ZAP     = 0,
@@ -655,6 +652,8 @@ struct SNeutrinoSettings
 	};
 
 	int infoClockFontSize;
+	int infoClockSeconds;
+	int infoClockBackground;
 
 	// lcdd
 	enum LCD_SETTINGS {

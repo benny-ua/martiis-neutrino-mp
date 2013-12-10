@@ -1084,12 +1084,14 @@ void COsdSetup::showOsdInfoclockSetup(CMenuWidget *menu_infoclock)
 	mn->setHint("", LOCALE_MENU_HINT_CLOCK_SIZE);
 	menu_infoclock->addItem(mn);
 
- 	mc = new CMenuOptionChooser(LOCALE_INFOCLOCK_WITH_SECONDS, &g_settings.infoclock_with_seconds, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	// clock with seconds
+	mc = new CMenuOptionChooser(LOCALE_CLOCK_SECONDS, &g_settings.infoClockSeconds, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_CLOCK_SECONDS);
 	menu_infoclock->addItem(mc);
 
- 	mc = new CMenuOptionChooser(LOCALE_INFOCLOCK_NO_BACKGROUND, &g_settings.infoclock_no_background, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	mc->setHint("", LOCALE_MENU_HINT_CLOCK_NO_BACKGROUND);
+	// clock with background
+	mc = new CMenuOptionChooser(LOCALE_CLOCK_BACKGROUND, &g_settings.infoClockBackground, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_CLOCK_BACKGROUND);
 	menu_infoclock->addItem(mc);
 }
 

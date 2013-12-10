@@ -36,7 +36,7 @@
 
 
 
-CInfoClock::CInfoClock():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", true, CC_SHADOW_OFF, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
+CInfoClock::CInfoClock():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", true, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
 {
 	initVarInfoClock();
 }
@@ -62,16 +62,16 @@ void CInfoClock::Init()
 		setClockFontSize(g_settings.infoClockFontSize);
 	}
 
-	if (g_settings.infoclock_no_background)
-		setColorAll(0, 0, 0);
-	else
-		//use current theme colors
-		syncSysColors();
+	//use current theme colors
+	syncSysColors();
 
-	if (g_settings.infoclock_with_seconds)
+	paint_bg = g_settings.infoClockBackground;
+
+	if (g_settings.infoClockSeconds)
 		setClockFormat("%H:%M:%S");
 	else
 		setClockFormat("%H:%M");
+
 
 	int x_old = x, y_old = y, width_old = width, height_old = height;
 	CVolumeHelper::getInstance()->refresh(cl_font);
