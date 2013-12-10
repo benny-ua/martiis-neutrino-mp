@@ -931,6 +931,7 @@ menu.hint_channellist_foot Show additional information\nin bottom box
 menu.hint_channellist_setup Configure channel list GUI options
 menu.hint_channels Open channel list
 menu.hint_ci Conditional access menu\nto setup your CI CAM or embeded Conax card
+menu.hint_clock_mode Switch clock on or off
 menu.hint_clock_no_background Change the clock background color to transparent.
 menu.hint_clock_seconds Change the time format to hide seconds.
 menu.hint_clock_size Set the size of the info clock.

@@ -153,10 +153,15 @@ void CComponentsFrmClock::initCCLockItems()
 		}
 	}
 	
+	//calculate minimal separator width, we use char size of some possible chars
 	int minSepWidth = 0;
-	minSepWidth = max((*getClockFont())->getRenderWidth("\x20", true), minSepWidth);
-	minSepWidth = max((*getClockFont())->getRenderWidth(".", true), minSepWidth);
-	minSepWidth = max((*getClockFont())->getRenderWidth(":", true), minSepWidth);
+	const char *sep = " .:";
+	while (*sep) {
+		char b[2];
+		b[0] = *sep++;
+		b[1] = 0;
+		minSepWidth = max((*getClockFont())->getRenderWidth(b, true), minSepWidth);
+	}
 
 	//modify available label items with current segment chars
 	for (size_t i = 0; i < v_cc_items.size(); i++)

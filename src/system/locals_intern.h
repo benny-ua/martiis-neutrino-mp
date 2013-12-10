@@ -958,6 +958,7 @@ const char * locale_real_names[] =
 	"menu.hint_channellist_setup",
 	"menu.hint_channels",
 	"menu.hint_ci",
+	"menu.hint_clock_mode",
 	"menu.hint_clock_no_background",
 	"menu.hint_clock_seconds",
 	"menu.hint_clock_size",
