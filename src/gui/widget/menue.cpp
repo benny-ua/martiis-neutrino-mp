@@ -73,6 +73,8 @@ CMenuItem::CMenuItem()
 	name = NONEXISTANT_LOCALE;
 	nameString = "";
 	isStatic = false;
+	marked = false;
+	inert = false;
 }
 
 void CMenuItem::init(const int X, const int Y, const int DX, const int OFFX)
@@ -96,6 +98,20 @@ void CMenuItem::setActive(const bool Active)
 		paint();
 }
 
+void CMenuItem::setMarked(const bool Marked)
+{
+	marked = Marked;
+	if (used && x != -1)
+		paint();
+}
+
+void CMenuItem::setInert(const bool Inert)
+{
+	inert = Inert;
+	if (used && x != -1)
+		paint();
+}
+
 void CMenuItem::setItemButton(const std::string& icon_Name, const bool is_select_button)
 {
 	if (is_select_button)
@@ -111,10 +127,15 @@ void CMenuItem::initItemColors(const bool select_mode)
 		item_color   = COL_MENUCONTENTSELECTED_TEXT;
 		item_bgcolor = COL_MENUCONTENTSELECTED_PLUS_0;
 	}
-	else if (!active)
+	else if (!active || inert)
 	{
 		item_color   = COL_MENUCONTENTINACTIVE_TEXT;
 		item_bgcolor = COL_MENUCONTENTINACTIVE_PLUS_0;
+	}
+	else if (marked)
+	{
+		item_color   = COL_MENUCONTENT_TEXT;
+		item_bgcolor = COL_MENUCONTENT_PLUS_1;
 	}
 	else
 	{

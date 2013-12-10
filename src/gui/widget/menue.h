@@ -110,6 +110,8 @@ class CMenuItem
 		std::string nameString;
 	public:
 		bool           	active;
+		bool           	marked;
+		bool           	inert;
 		bool		isStatic;
 		neutrino_msg_t 	directKey;
 		neutrino_msg_t 	msg;
@@ -148,6 +150,8 @@ class CMenuItem
 			return 0;
 		}
 		virtual void setActive(const bool Active);
+		virtual void setMarked(const bool Marked);
+		virtual void setInert(const bool Inert);
 		
 		virtual void paintItemButton(const bool select_mode, const int &item_height, const std::string& icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
 		
