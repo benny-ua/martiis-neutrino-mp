@@ -238,7 +238,12 @@ int COPKGManager::showMenu()
 	getPkgData(OM_LIST_UPGRADEABLE);
 
 	menu = new CMenuWidget(g_Locale->getText(LOCALE_OPKG_TITLE), NEUTRINO_ICON_UPDATE, width, MN_WIDGET_ID_SOFTWAREUPDATE);
-	menu->addIntroItems();
+	CMenuForwarder menuBack(LOCALE_MENU_BACK, true, NULL, NULL, NULL, CRCInput::RC_nokey, NEUTRINO_ICON_BUTTON_LEFT, NULL, true);
+	menuBack.setItemButton(!g_settings.menu_left_exit ? NEUTRINO_ICON_BUTTON_HOME : NEUTRINO_ICON_BUTTON_LEFT); 
+	menu->addItem(&menuBack);
+	menuBack.setHint(NEUTRINO_ICON_HINT_BACK, LOCALE_MENU_HINT_BACK_BRIEF);
+	menu->addItem(GenericMenuSeparatorLine);
+
 	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 	upgrade_forwarder->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_OPKG_UPGRADE);
 	menu->addItem(upgrade_forwarder);

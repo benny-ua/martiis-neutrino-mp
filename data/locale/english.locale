@@ -656,7 +656,7 @@ glcd.color.yellow Yellow
 glcd.enable GraphLCD enabled
 glcd.font Font
 glcd.head GraphLCD
-glcd.mirror_osd Show OSD menue on GraphLCD
+glcd.mirror_osd Show OSD menu on GraphLCD
 glcd.mirror_video Show running video on GraphLCD
 glcd.restart Rescan
 glcd.scroll_speed Scrolling Speed
@@ -912,6 +912,7 @@ menu.hint_audioplayer_title Enable SMS-style title search in playlist
 menu.hint_auto_lang Auto-switch audio to preferred language
 menu.hint_auto_subs Auto-start subtitles for preferred language
 menu.hint_back Return to previous menu\nPress menu key to close all menus
+menu.hint_back_brief Return to previous menu
 menu.hint_backlight Configure buttons backlight
 menu.hint_backup Backup configs and channels to selected dir
 menu.hint_bedit Edit favorites and bouquets
@@ -1314,8 +1315,8 @@ menu.hint_video_mask Define a channel-specific border to hide unwanted screen co
 menu.hint_video_mode HDMI output video mode
 menu.hint_video_modes VF key will cycle between enabled modes 
 menu.hint_video_pip Picture in picture size and position
-menu.hint_video_psi On-screen menue for changing color, contrast and more
-menu.hint_video_psi_step Set the increment for the on-screen menue
+menu.hint_video_psi On-screen menu for changing color, contrast and more
+menu.hint_video_psi_step Set the increment for the on-screen menu
 menu.hint_video_saturation Change picture saturation
 menu.hint_video_scart_mode Select analog output mode for SCART connectors
 menu.hint_video_three_d Change the channel-specific 3D settings
@@ -1771,7 +1772,7 @@ personalize.button_red red
 personalize.button_yellow yellow
 personalize.disabled Disabled
 personalize.enabled Enabled
-personalize.features Features menue
+personalize.features Features menu
 personalize.head Personalization
 personalize.help Help
 personalize.help_line1 Personalization makes it possible to adapt the most
@@ -2205,12 +2206,12 @@ usermenu.button_red User menu red
 usermenu.button_yellow User menu yellow
 usermenu.head User menu
 usermenu.item_adzap Adzap
-usermenu.item_bar ---- Boarder ----
+usermenu.item_bar ---- Border ----
 usermenu.item_epg_misc EPG functions
 usermenu.item_none (empty)
 usermenu.item_vtxt Videotext
 usermenu.msg_info_is_empty You don't have definied a name for this menu!\nUsing default name:\n
-usermenu.msg_warning_name You have more than one items created for this menu,\nbut none new name for this menue defined.\nIt is recommended to enter a new name!
+usermenu.msg_warning_name You have more than one items created for this menu,\nbut none new name for this menu defined.\nIt is recommended to enter a new name!
 usermenu.msg_warning_no_items No items defined!\nThe menu name is reset!
 usermenu.name Name
 video_mode_ok Is this video mode working ok ?
