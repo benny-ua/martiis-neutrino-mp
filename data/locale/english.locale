@@ -1264,6 +1264,7 @@ menu.hint_selected_text Change selected item text color
 menu.hint_service Tuner setup, service scan,\nbouquet editor, software upgrade
 menu.hint_service_scan Auto / manual service scan
 menu.hint_settings Configure Neutrino\nNetwork, audio, video, OSD and more
+menu.hint_shairplay_reenable Shairplay was aborted. You can reactivate it here.
 menu.hint_shairplay_setup Configure ShairPlay options
 menu.hint_show_mute_icon Show mute icon, when volume set to 0
 menu.hint_shutdown Put your box in deep standby mode\nNo confirmation
@@ -1292,6 +1293,7 @@ menu.hint_timers Add/Remove/Edit scheduled\nrecording, reminders etc.
 menu.hint_timezone Select your timezone
 menu.hint_tvmode Switch box to TV mode
 menu.hint_tvradio_switch Switches between TV and Radio mode
+menu.hint_upnp Access UPNP servers available in your local network
 menu.hint_vfd Frontpanel LEDS, VFD options
 menu.hint_vfd_brightness Working brightness 
 menu.hint_vfd_brightness_setup Configure frontpanel display brightness\nfor different modes

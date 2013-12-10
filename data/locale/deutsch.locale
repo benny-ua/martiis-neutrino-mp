@@ -1263,6 +1263,7 @@ menu.hint_selected_text Ändern Sie die Textfarbe für ausgewählte Fensterinhal
 menu.hint_service Sendersuchlauf, Bouquet-Verwaltung, Software-Aktualisierung und mehr
 menu.hint_service_scan Automatischer / manueller Service Suchlauf
 menu.hint_settings Konfigurieren von Neutrino,\nNetzwerk, Video, Audio, OSD und mehr
+menu.hint_shairplay_reenable Sie hatten Shairplay abgebrochen. Reaktivieren Sie es hier.
 menu.hint_shairplay_setup Konfigurieren Sie hier die ShairPlay-Optionen
 menu.hint_show_mute_icon Definiert, ob bei einem Lautstärkewert von 0 das Stumm-Symbol eingeblendet werden soll
 menu.hint_shutdown Setzen Sie Ihre Box in den Standby-Modus oder schalten Sie die Box komplett aus
@@ -1291,6 +1292,7 @@ menu.hint_timers Hinzufügen, entfernen und bearbeiten geplanter Aufnahmen oder 
 menu.hint_timezone Wählen Sie ihre Zeitzone aus
 menu.hint_tvmode Schaltet zum TV-Modus
 menu.hint_tvradio_switch Schaltet zwischen TV- und Radio-Modus um
+menu.hint_upnp Zugriff auf UPNP-Server in Ihrem lokalen Netz
 menu.hint_vfd Frontdisplay und Power-LEDs
 menu.hint_vfd_brightness Definiert die Helligkeit im TV-Betrieb 
 menu.hint_vfd_brightness_setup Konfiguriert die Helligkeit des Frontdisplays für verschiedene Modi
