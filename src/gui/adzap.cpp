@@ -168,7 +168,7 @@ void *CAdZapMenu::Run(void *)
     return NULL;
 }
 
-int CAdZapMenu::exec(CMenuTarget *, const std::string & actionKey)
+int CAdZapMenu::exec(CMenuTarget *parent, const std::string & actionKey)
 {
     int res = menu_return::RETURN_EXIT_ALL;
 
@@ -207,13 +207,13 @@ int CAdZapMenu::exec(CMenuTarget *, const std::string & actionKey)
     if (actionKey.length() == 1) {
 	g_settings.adzap_zapBackPeriod = actionKey[0] - '0';
 	for (int shortcut = 1; shortcut < 10; shortcut++)
-	    forwarders[shortcut - 1]->iconName_Info_right =
-		(shortcut ==
-		 g_settings.
-		 adzap_zapBackPeriod) ? NEUTRINO_ICON_BUTTON_OKAY : "";
+	    forwarders[shortcut - 1]->setMarked(shortcut == g_settings.adzap_zapBackPeriod);
 	g_settings.adzap_zapBackPeriod *= 60;
 	return menu_return::RETURN_REPAINT;
     }
+
+    if (parent)
+	parent->hide();
 
     Settings();
 
@@ -241,9 +241,7 @@ void CAdZapMenu::Settings()
 	forwarders[shortcut - 1] =
 	    new CMenuForwarder(minute, true, NULL, this, actionKey,
 			       CRCInput::convertDigitToKey(shortcut));
-	if (selected)
-	    forwarders[shortcut - 1]->iconName_Info_right =
-		NEUTRINO_ICON_BUTTON_OKAY;
+	forwarders[shortcut - 1]->setMarked(selected);
 	menu->addItem(forwarders[shortcut - 1], selected);
 	minute = LOCALE_ADZAP_MINUTES;
     }
