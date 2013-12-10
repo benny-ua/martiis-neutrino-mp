@@ -1736,8 +1736,8 @@ opkg.failure.upgrade Upgrade fehlgeschlagen (%d)
 opkg.messagebox.reinstall %s erneut installieren?
 opkg.messagebox.remove %s entfernen?
 opkg.success.install Installation erfolgreich, Neustart von Neutrino kann erforderlich sein.
-opkg.title OPKG-Manager
-opkg.upgrade Upgrade
+opkg.title Paketverwaltung
+opkg.upgrade Installierte Pakete aktualisieren
 options.default Voreinstellungen benutzen
 options.fb framebuffer
 options.ntp_off DVB

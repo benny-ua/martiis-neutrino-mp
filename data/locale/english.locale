@@ -1738,8 +1738,8 @@ opkg.failure.upgrade Upgrade failed (%d)
 opkg.messagebox.reinstall Re-install %s?
 opkg.messagebox.remove Remove %s?
 opkg.success.install Install successful, restart of Neutrino might be required.
-opkg.title OPKG Manager
-opkg.upgrade Upgrade
+opkg.title Package Management
+opkg.upgrade Upgrade installed packages
 options.default Reset to defaults
 options.fb framebuffer
 options.ntp_off DVB
