@@ -885,6 +885,7 @@ void CMenuWidget::calcSize()
 	page_start.clear();
 	page_start.push_back(0);
 	total_pages=1;
+
 	for (unsigned int i= 0; i< items.size(); i++) {
 		int item_height=items[i]->getHeight();
 		heightCurrPage+=item_height;
@@ -918,6 +919,13 @@ void CMenuWidget::calcSize()
 	width += iconOffset;
 	if (width > (int)frameBuffer->getScreenWidth())
 		width = frameBuffer->getScreenWidth();
+
+	if (fbutton_count) {
+		int maxItemHeight = 0;
+		for (unsigned int i= 0; i< items.size(); i++)
+			maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
+		itemHeightTotal = items.size() * maxItemHeight;
+	}
 
 	// shrink menu if less items
 	if(hheight+itemHeightTotal < height)
