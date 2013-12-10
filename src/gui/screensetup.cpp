@@ -194,11 +194,11 @@ int CScreenSetup::exec(CMenuTarget* parent, const std::string &action)
 	if (action == "u" || action == "d" || action == "l" || action == "r") {
 		if ((action == "u") && (((selected == 0) && (y_coord[0] > 0)) || ((selected == 1) && (y_coord[1] > y_coord[0] - 100))))
 			y_coord[selected]--;
-		else if ((action == "d") && (((selected == 0) && (y_coord[0] < y_coord[1] - 100)) || ((selected == 1) && (y_coord[1] < screenheight - 1))))
+		else if ((action == "d") && (((selected == 0) && (y_coord[0] < y_coord[1] - 100)) || ((selected == 1) && (y_coord[1] < screenheight))))
 			y_coord[selected]++;
 		else if ((action == "l") && (((selected == 0) && (x_coord[0] > 0)) || ((selected == 1) && (x_coord[1] > x_coord[0] - 100))))
 			x_coord[selected]--;
-		else if ((action == "r") && (((selected == 0) && (x_coord[0] < x_coord[1] - 100)) || ((selected == 1) && (x_coord[1] < screenwidth - 1))))
+		else if ((action == "r") && (((selected == 0) && (x_coord[0] < x_coord[1] - 100)) || ((selected == 1) && (x_coord[1] < screenwidth))))
 			x_coord[selected]++;
 		else
 			return menu_return::RETURN_NONE;
