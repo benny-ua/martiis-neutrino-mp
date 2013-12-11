@@ -414,10 +414,11 @@ void CNeutrinoApp::InitMenuService()
 	personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_TUNER]);
 
 	//restart cam
-	if (!access("/etc/init.d/cam", X_OK))
+	if (!access("/etc/init.d/cam", X_OK)) {
 		mf = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, this, "restartcam");
 		mf->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RESTART_CAM);
 		personalize.addItem(MENU_SERVICE, mf, &g_settings.personalize[SNeutrinoSettings::P_MSER_RESTART_CAM]);
+	}
 
 	//reload plugins
 	mf = new CMenuForwarder(LOCALE_SERVICEMENU_GETPLUGINS, true, NULL, this, "reloadplugins");
