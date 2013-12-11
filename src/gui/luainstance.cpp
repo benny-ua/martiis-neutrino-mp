@@ -410,7 +410,7 @@ void CLuaInstance::registerFunctions()
 	lua_pop(lua, 1);
 
 	lua_register(lua, className, NewWindow);
-	MenueRegister(lua);
+	MenuRegister(lua);
 	HintboxRegister(lua);
 	MessageboxRegister(lua);
 }
@@ -674,7 +674,7 @@ bool CLuaInstance::tableLookup(lua_State *L, const char *what, int &value)
 	return res;
 }
 
-bool CLuaMenueChangeObserver::changeNotify(lua_State *L, const std::string &luaAction, const std::string &luaId, void *Data)
+bool CLuaMenuChangeObserver::changeNotify(lua_State *L, const std::string &luaAction, const std::string &luaId, void *Data)
 {
 	const char *optionValue = (const char *) Data;
 	lua_pushglobaltable(L);
@@ -688,54 +688,61 @@ bool CLuaMenueChangeObserver::changeNotify(lua_State *L, const std::string &luaA
 	return res == menu_return::RETURN_REPAINT || res == menu_return::RETURN_EXIT_REPAINT;
 }
 
-void CLuaInstance::MenueRegister(lua_State *L)
+void CLuaInstance::MenuRegister(lua_State *L)
 {
 	luaL_Reg meth[] = {
-		{ "new", CLuaInstance::MenueNew },
-		{ "addKey", CLuaInstance::MenueAddKey },
-		{ "addItem", CLuaInstance::MenueAddItem },
-		{ "exec", CLuaInstance::MenueExec },
-		{ "hide", CLuaInstance::MenueHide },
-		{ "__gc", CLuaInstance::MenueDelete },
+		{ "new", CLuaInstance::MenuNew },
+		{ "addKey", CLuaInstance::MenuAddKey },
+		{ "addItem", CLuaInstance::MenuAddItem },
+		{ "exec", CLuaInstance::MenuExec },
+		{ "hide", CLuaInstance::MenuHide },
+		{ "__gc", CLuaInstance::MenuDelete },
 		{ NULL, NULL }
 	};
 
-	luaL_newmetatable(L, "menue");
+	luaL_newmetatable(L, "menu");
+	luaL_setfuncs(L, meth, 0);
+	lua_pushvalue(L, -1);
+	lua_setfield(L, -1, "__index");
+	lua_setglobal(L, "menu");
+
+	// keep misspelled "menue" for backwards-compatibility
+	luaL_newmetatable(L, "menu");
 	luaL_setfuncs(L, meth, 0);
 	lua_pushvalue(L, -1);
 	lua_setfield(L, -1, "__index");
 	lua_setglobal(L, "menue");
 }
 
-CLuaMenue *CLuaInstance::MenueCheck(lua_State *L, int n)
+CLuaMenu *CLuaInstance::MenuCheck(lua_State *L, int n)
 {
-	return *(CLuaMenue **) luaL_checkudata(L, n, "menue");
+	return *(CLuaMenu **) luaL_checkudata(L, n, "menu");
 }
 
-CLuaMenue::CLuaMenue()
+CLuaMenu::CLuaMenu()
 {
 	m = NULL;
-	observ = new CLuaMenueChangeObserver();
+	observ = new CLuaMenuChangeObserver();
 }
 
-CLuaMenue::~CLuaMenue()
+CLuaMenu::~CLuaMenu()
 {
 	delete m;
 	delete observ;
 }
 
-CLuaMenueForwarder::CLuaMenueForwarder(lua_State *_L, std::string _luaAction, std::string _luaId)
+CLuaMenuForwarder::CLuaMenuForwarder(lua_State *_L, std::string _luaAction, std::string _luaId)
 {
 	L = _L;
 	luaAction = _luaAction;
 	luaId = _luaId;
 }
 
-CLuaMenueForwarder::~CLuaMenueForwarder()
+CLuaMenuForwarder::~CLuaMenuForwarder()
 {
 }
 
-int CLuaMenueForwarder::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
+int CLuaMenuForwarder::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
 {
 	int res = menu_return::RETURN_REPAINT;
 	if (!luaAction.empty()){
@@ -755,13 +762,13 @@ int CLuaMenueForwarder::exec(CMenuTarget* /*parent*/, const std::string & /*acti
 	return res;
 }
 
-CLuaMenueFilebrowser::CLuaMenueFilebrowser(lua_State *_L, std::string _luaAction, std::string _luaId, std::string *_value, bool _dirMode) : CLuaMenueForwarder(_L, _luaAction, _luaId)
+CLuaMenuFilebrowser::CLuaMenuFilebrowser(lua_State *_L, std::string _luaAction, std::string _luaId, std::string *_value, bool _dirMode) : CLuaMenuForwarder(_L, _luaAction, _luaId)
 {
 	value = _value;
 	dirMode = _dirMode;
 }
 
-int CLuaMenueFilebrowser::exec(CMenuTarget* /*parent*/, const std::string& /*actionKey*/)
+int CLuaMenuFilebrowser::exec(CMenuTarget* /*parent*/, const std::string& /*actionKey*/)
 {
 	CFileBrowser fileBrowser;
 	fileBrowser.Dir_Mode = dirMode;
@@ -786,7 +793,7 @@ int CLuaMenueFilebrowser::exec(CMenuTarget* /*parent*/, const std::string& /*act
 	return menu_return::RETURN_REPAINT;
 }
 
-CLuaMenueStringinput::CLuaMenueStringinput(lua_State *_L, std::string _luaAction, std::string _luaId, const char *_name, std::string *_value, int _size, std::string _valid_chars, CChangeObserver *_observ, const char *_icon, bool _sms) : CLuaMenueForwarder(_L, _luaAction, _luaId)
+CLuaMenuStringinput::CLuaMenuStringinput(lua_State *_L, std::string _luaAction, std::string _luaId, const char *_name, std::string *_value, int _size, std::string _valid_chars, CChangeObserver *_observ, const char *_icon, bool _sms) : CLuaMenuForwarder(_L, _luaAction, _luaId)
 {
 	name = _name;
 	value = _value;
@@ -797,7 +804,7 @@ CLuaMenueStringinput::CLuaMenueStringinput(lua_State *_L, std::string _luaAction
 	sms = _sms;
 }
 
-int CLuaMenueStringinput::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
+int CLuaMenuStringinput::exec(CMenuTarget* /*parent*/, const std::string & /*actionKey*/)
 {
 	CStringInput *i;
 	if (sms)
@@ -820,7 +827,7 @@ int CLuaMenueStringinput::exec(CMenuTarget* /*parent*/, const std::string & /*ac
 	return menu_return::RETURN_REPAINT;
 }
 
-int CLuaInstance::MenueNew(lua_State *L)
+int CLuaInstance::MenuNew(lua_State *L)
 {
 	CMenuWidget *m;
 
@@ -836,17 +843,17 @@ int CLuaInstance::MenueNew(lua_State *L)
 	} else
 		m = new CMenuWidget();
 
-	CLuaMenue **udata = (CLuaMenue **) lua_newuserdata(L, sizeof(CLuaMenue *));
-	*udata = new CLuaMenue();
+	CLuaMenu **udata = (CLuaMenu **) lua_newuserdata(L, sizeof(CLuaMenu *));
+	*udata = new CLuaMenu();
 	(*udata)->m = m;
-	luaL_getmetatable(L, "menue");
+	luaL_getmetatable(L, "menu");
 	lua_setmetatable(L, -2);
 	return 1;
 }
 
-int CLuaInstance::MenueDelete(lua_State *L)
+int CLuaInstance::MenuDelete(lua_State *L)
 {
-	CLuaMenue *m = MenueCheck(L, 1);
+	CLuaMenu *m = MenuCheck(L, 1);
 	if (!m)
 		return 0;
 
@@ -863,9 +870,9 @@ int CLuaInstance::MenueDelete(lua_State *L)
 	return 0;
 }
 
-int CLuaInstance::MenueAddKey(lua_State *L)
+int CLuaInstance::MenuAddKey(lua_State *L)
 {
-	CLuaMenue *m = MenueCheck(L, 1);
+	CLuaMenu *m = MenuCheck(L, 1);
 	if (!m)
 		return 0;
 	lua_assert(lua_istable(L, 2));
@@ -874,23 +881,23 @@ int CLuaInstance::MenueAddKey(lua_State *L)
 	std::string id;		tableLookup(L, "id", id);
 	int directkey = CRCInput::RC_nokey; tableLookup(L, "directkey", directkey);
 	if (action != "" && directkey != (int) CRCInput::RC_nokey) {
-		CLuaMenueForwarder *forwarder = new CLuaMenueForwarder(L, action, id);
+		CLuaMenuForwarder *forwarder = new CLuaMenuForwarder(L, action, id);
 		m->m->addKey(directkey, forwarder, action);
 		m->targets.push_back(forwarder);
 	}
 	return 0;
 }
 
-int CLuaInstance::MenueAddItem(lua_State *L)
+int CLuaInstance::MenuAddItem(lua_State *L)
 {
-	CLuaMenue *m = MenueCheck(L, 1);
+	CLuaMenu *m = MenuCheck(L, 1);
 	if (!m)
 		return 0;
 	lua_assert(lua_istable(L, 2));
 
-	CLuaMenueItem i;
+	CLuaMenuItem i;
 	m->items.push_back(i);
-	CLuaMenueItem *b = &m->items.back();
+	CLuaMenuItem *b = &m->items.back();
 
 	tableLookup(L, "name", b->name);
 	std::string icon;	tableLookup(L, "icon", icon);
@@ -920,7 +927,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 
 		if (type == "forwarder") {
 			b->str_val = value;
-			CLuaMenueForwarder *forwarder = new CLuaMenueForwarder(L, action, id);
+			CLuaMenuForwarder *forwarder = new CLuaMenuForwarder(L, action, id);
 			CMenuItem *mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			mi->setLua(L, action, id);
 			m->m->addItem(mi);
@@ -976,7 +983,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 			tableLookup(L, "valid_chars", valid_chars);
 			int sms = 0;	tableLookup(L, "sms", sms);
 			int size = 30;	tableLookup(L, "size", size);
-			CLuaMenueStringinput *stringinput = new CLuaMenueStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon.c_str(), sms);
+			CLuaMenuStringinput *stringinput = new CLuaMenuStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon.c_str(), sms);
 			CMenuItem *mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			mi->setLua(L, action, id);
 			m->m->addItem(mi);
@@ -984,7 +991,7 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 		} else if (type == "filebrowser") {
 			b->str_val = value;
 			int dirMode = 0; tableLookup(L, "dir_mode", dirMode);
-			CLuaMenueFilebrowser *filebrowser = new CLuaMenueFilebrowser(L, action, id, &b->str_val, dirMode);
+			CLuaMenuFilebrowser *filebrowser = new CLuaMenuFilebrowser(L, action, id, &b->str_val, dirMode);
 			lua_pushstring(L, "filter");
 			lua_gettable(L, -2);
 			if (lua_istable(L, -1))
@@ -1004,18 +1011,18 @@ int CLuaInstance::MenueAddItem(lua_State *L)
 	return 0;
 }
 
-int CLuaInstance::MenueHide(lua_State *L)
+int CLuaInstance::MenuHide(lua_State *L)
 {
-	CLuaMenue *m = MenueCheck(L, 1);
+	CLuaMenu *m = MenuCheck(L, 1);
 	if (!m)
 		return 0;
 	m->m->hide();
 	return 0;
 }
 
-int CLuaInstance::MenueExec(lua_State *L)
+int CLuaInstance::MenuExec(lua_State *L)
 {
-	CLuaMenue *m = MenueCheck(L, 1);
+	CLuaMenu *m = MenuCheck(L, 1);
 	if (!m)
 		return 0;
 	m->m->exec(NULL, "");
