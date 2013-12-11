@@ -958,30 +958,23 @@ void CMoviePlayerGui::PlayFileLoop(void)
 		g_RCInput->getMsg(&msg, &data, 10);	// 1 secs..
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
-			if (isWebTV || isYT || isNK) {
-				if (!playback->GetPosition(position, duration))
-					g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
-			} else {
-				if(playback->GetPosition(position, duration)) {
-					if(duration > 100)
-						file_prozent = (unsigned char) (position / (duration / 100));
+			if(playback->GetPosition(position, duration)) {
+				if(duration > 100)
+					file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
-					CVFD::getInstance()->showPercentOver(file_prozent, true, CVFD::MODE_MOVIE);
+				CVFD::getInstance()->showPercentOver(file_prozent, true, CVFD::MODE_MOVIE);
 #else
-					CVFD::getInstance()->showPercentOver(file_prozent);
+				CVFD::getInstance()->showPercentOver(file_prozent);
 #endif
 
-					playback->GetSpeed(speed);
-					/* at BOF lib set speed 1, check it */
-					if ((playstate != CMoviePlayerGui::PLAY) && (speed == 1)) {
-						playstate = CMoviePlayerGui::PLAY;
-						update_lcd = true;
-					}
-				} else
-					g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
-			}
-			handleMovieBrowser(0, position);
-			FileTime.update(position, duration);
+				playback->GetSpeed(speed);
+				/* at BOF lib set speed 1, check it */
+				if ((playstate != CMoviePlayerGui::PLAY) && (speed == 1)) {
+					playstate = CMoviePlayerGui::PLAY;
+					update_lcd = true;
+				}
+			} else
+				g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
 		}
 
 		if (msg == (neutrino_msg_t) g_settings.mpkey_plugin) {
