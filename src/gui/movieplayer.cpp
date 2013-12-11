@@ -759,8 +759,8 @@ extern void MoviePlayerStop(void)
 
 void CMoviePlayerGui::RequestAbort(void)
 {
-	playback->RequestAbort();
 	ShowAbortHintBox();
+	playback->RequestAbort();
 	while (!stopped)
 		usleep(100000);
 	HideHintBox();
@@ -988,8 +988,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			//g_PluginList->start_plugin_by_name (g_settings.movieplayer_plugin.c_str (), pidt);
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_stop || (filelist.size() > 0 && msg == (neutrino_msg_t) CRCInput::RC_right)) {
 			playstate = CMoviePlayerGui::STOPPED;
+			if (msg == (neutrino_msg_t) g_settings.mpkey_stop)
+				ShowAbortHintBox();
 			playback->RequestAbort();
-			ShowAbortHintBox();
 			if (filelist.size() > 0) {
 				if (filelist_it == filelist.end() && repeat_mode == REPEAT_ALL)
 					filelist_it = filelist.begin();
@@ -1010,8 +1011,8 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			}
 		} else if (msg == (neutrino_msg_t) CRCInput::RC_home) {
 			playstate = CMoviePlayerGui::STOPPED;
-			playback->RequestAbort();
 			ShowAbortHintBox();
+			playback->RequestAbort();
 			filelist.clear();
 			repeat_mode = REPEAT_OFF;
 #if HAVE_SPARK_HARDWARE
@@ -1025,8 +1026,8 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				filelist_it = filelist.end();
 			--filelist_it;
 			playstate = CMoviePlayerGui::STOPPED;
-			playback->RequestAbort();
 			ShowAbortHintBox();
+			playback->RequestAbort();
 		} else if(!timeshift && !isWebTV && !isYT && !isNK && (msg == (neutrino_msg_t) g_settings.mpkey_next_repeat_mode)) {
 			repeat_mode = (repeat_mode_enum)((int)repeat_mode + 1);
 			if (repeat_mode > (int) REPEAT_ALL)
