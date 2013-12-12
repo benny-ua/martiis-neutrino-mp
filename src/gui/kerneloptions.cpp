@@ -55,7 +55,7 @@ void KernelOptions_Menu::loadModule(int i)
 		if (modules[i].moduleList.back().second.empty())
 			my_system(2, "modprobe",  modules[i].moduleList.back().first.c_str());
 		else
-			my_system(3, "modprobe",  modules[i].moduleList.back().first.c_str(), modules[i].moduleList.back().second.c_str());
+			system(("modprobe " + modules[i].moduleList.back().first + " " + modules[i].moduleList.back().second).c_str());
 		return;
 	}
 
@@ -63,7 +63,7 @@ void KernelOptions_Menu::loadModule(int i)
 		if (modules[i].moduleList.back().second.empty())
 			my_system(2, "modprobe",  modules[i].moduleList[j].first.c_str());
 		else
-			my_system(3, "modprobe",  modules[i].moduleList[j].first.c_str(), modules[i].moduleList.back().second.c_str());
+			system(("modprobe " + modules[i].moduleList[j].first + " " + modules[i].moduleList.back().second).c_str());
 	}
 }
 
