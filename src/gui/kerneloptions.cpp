@@ -279,6 +279,9 @@ void KernelOptions_Menu::save()
 void KernelOptions_Menu::Settings()
 {
 	CMenuWidget* menu = new CMenuWidget(LOCALE_KERNELOPTIONS_HEAD, "settings");
+	menu->addKey(CRCInput::RC_red, this, "reset");
+	menu->addKey(CRCInput::RC_green, this, "apply");
+	menu->addKey(CRCInput::RC_yellow, this, "lsmod");
 	menu->addItem(GenericMenuSeparator);
 	menu->addItem(GenericMenuBack);
 	menu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KERNELOPTIONS_MODULES));
