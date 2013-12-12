@@ -470,21 +470,21 @@ int CVideoSettings::showVideoSetup()
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_PSI_STEP);
 	videosetup->addItem(mc);
 
-	CPSISetupNotifier psiNotifier(CNeutrinoApp::getInstance()->chPSISetup);
+	CPSISetup *psiSetup = CNeutrinoApp::getInstance()->chPSISetup;
 
-	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, &psiNotifier);
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, psiSetup);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_CONTRAST);
 	videosetup->addItem(mc);
 
-	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_SATURATION, (int *)&g_settings.psi_saturation, true, 0, 255, &psiNotifier);
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_SATURATION, (int *)&g_settings.psi_saturation, true, 0, 255, psiSetup);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_SATURATION);
 	videosetup->addItem(mc);
 
-	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_BRIGHTNESS, (int *)&g_settings.psi_brightness, true, 0, 255, &psiNotifier);
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_BRIGHTNESS, (int *)&g_settings.psi_brightness, true, 0, 255, psiSetup);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_BRIGHTNESS);
 	videosetup->addItem(mc);
 
-	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_TINT, (int *)&g_settings.psi_tint, true, 0, 255, &psiNotifier);
+	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_TINT, (int *)&g_settings.psi_tint, true, 0, 255, psiSetup);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_TINT);
 	videosetup->addItem(mc);
 

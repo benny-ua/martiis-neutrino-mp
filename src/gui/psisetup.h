@@ -32,7 +32,7 @@
 #include <string>
 
 
-class CPSISetup:public CMenuTarget
+class CPSISetup : public CMenuTarget, public CChangeObserver
 {
 private:
   CFrameBuffer * frameBuffer;
@@ -78,15 +78,6 @@ public:
   void writeProcPSI ();
   void writeProcPSI (int);
   void blankScreen (bool b = true);
-};
-
-class CPSISetupNotifier : public CChangeObserver
-{
-        private:
-                CPSISetup* psisetup;
-
-        public:
-                CPSISetupNotifier(CPSISetup*);
-                bool changeNotify(const neutrino_locale_t, void *);
+  bool changeNotify(const neutrino_locale_t, void *);
 };
 #endif

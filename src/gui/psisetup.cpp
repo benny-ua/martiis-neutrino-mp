@@ -285,12 +285,8 @@ CPSISetup::paintSlider (int i)
   needsBlit = true;
 }
 
-CPSISetupNotifier::CPSISetupNotifier (class CPSISetup *p) {
-	psisetup = p;
-}
-
 bool
-CPSISetupNotifier::changeNotify (const neutrino_locale_t OptionName, void *Data)
+CPSISetup::changeNotify (const neutrino_locale_t OptionName, void *Data)
 {
   for (int i = 0; i < PSI_RESET; i++)
     if (OptionName == psi_list[i].loc)
