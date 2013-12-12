@@ -740,13 +740,12 @@ infoviewer.waittime Waiting for time...
 ipsetup.hint_1 Use 0..9, or use Up/Down,
 ipsetup.hint_2 OK saves, Exit aborts
 kerneloptions.apply Apply
-kerneloptions.disabled disabled
-kerneloptions.enabled enabled
 kerneloptions.head Kernel Options
-kerneloptions.loaded loaded
-kerneloptions.lsmod Status
+kerneloptions.hint.disabled_loaded The kernel module is still loaded.
+kerneloptions.hint.disabled_not_loaded The kernel module isn't loaded.
+kerneloptions.hint.enabled_loaded The kernel module is loaded and may be used.
+kerneloptions.hint.enabled_not_loaded Apply the settings to load the module.
 kerneloptions.modules Kernel modules
-kerneloptions.not_loaded not loaded
 kerneloptions.reset Reset settings
 keybindingmenu.RC Tune Remote-Control
 keybindingmenu.accept_other_remotes Accept other remote controls

@@ -33,7 +33,7 @@
 #include <system/setting_helpers.h>
 #include <configfile.h>
 
-class KernelOptions_Menu : public CMenuTarget
+class KernelOptions_Menu : public CMenuTarget, public CChangeObserver
 {
 	private:
 		int width;
@@ -43,10 +43,12 @@ class KernelOptions_Menu : public CMenuTarget
 			int active_orig;
 			int active;
 			bool installed;
+			CMenuOptionChooser *mc;
 		};
 		std::vector<module> modules;
 		void load();
 		void save();
+		void updateStatus();
 		void loadModule(int i);
 		void unloadModule(int i);
 	public:
@@ -56,6 +58,7 @@ class KernelOptions_Menu : public CMenuTarget
 		void Settings();
 		bool isEnabled(std::string name);
 		bool Enable(std::string name, bool active);
+		bool changeNotify(const neutrino_locale_t /*OptionName*/, void * /*Data*/);
 };
 
 #endif //__kerneloptions_h__
