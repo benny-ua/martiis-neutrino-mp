@@ -923,7 +923,7 @@ void CMenuWidget::calcSize()
 		for (unsigned int i= 0; i< items.size(); i++)
 			maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
 		itemHeightTotal = items.size() * maxItemHeight;
-		int _footerwidth, _footerheight;
+		int _footerwidth;
 		paintButtons(fbutton_labels, fbutton_count, 0, 0, 0, 0, 0, false, &_footerwidth, &fbutton_height);
 		width = std::max(width, _footerwidth);
 	}
