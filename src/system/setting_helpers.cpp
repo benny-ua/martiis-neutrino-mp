@@ -115,6 +115,7 @@ bool CSectionsdConfigNotifier::changeNotify(const neutrino_locale_t, void *)
         return false;
 }
 
+#if 0
 bool CTouchFileNotifier::changeNotify(const neutrino_locale_t, void * data)
 {
 	if ((*(int *)data) != 0)
@@ -129,6 +130,7 @@ bool CTouchFileNotifier::changeNotify(const neutrino_locale_t, void * data)
 		remove(filename);
 	return true;
 }
+#endif
 
 void CColorSetupNotifier::setPalette()
 {
