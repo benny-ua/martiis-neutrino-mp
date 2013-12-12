@@ -30,30 +30,18 @@
 #include <system/setting_helpers.h>
 #include <driver/nglcd.h>
 
-class GLCD_Menu;
-
-class GLCD_Menu_Notifier : public CChangeObserver
-{
-	private:
-		GLCD_Menu* parent;
-	public:
-		GLCD_Menu_Notifier();
-		bool changeNotify(const neutrino_locale_t, void *);
-};
-
-
-class GLCD_Menu : public CMenuTarget
+class GLCD_Menu : public CMenuTarget, public CChangeObserver
 {
 	private:
 		int width;
 		int selected;
 		static int color2index(uint32_t color);
-		GLCD_Menu_Notifier *notifier;
 	public:
 		static uint32_t index2color(int i);
 		GLCD_Menu();
 		void hide();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
+		bool changeNotify(const neutrino_locale_t, void *);
 		void GLCD_Menu_Settings();
 };
 #endif // __glcdsetup_h__

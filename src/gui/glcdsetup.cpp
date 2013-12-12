@@ -83,8 +83,6 @@ GLCD_Menu::GLCD_Menu()
 {
 	width = w_max (40, 10);
 	selected = -1;
-
-	notifier = new GLCD_Menu_Notifier();
 }
 
 int GLCD_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
@@ -121,12 +119,8 @@ void GLCD_Menu::hide()
 {
 }
 
-GLCD_Menu_Notifier::GLCD_Menu_Notifier ()
-{
-}
-
 bool
-GLCD_Menu_Notifier::changeNotify (const neutrino_locale_t OptionName, void *Data)
+GLCD_Menu::changeNotify (const neutrino_locale_t OptionName, void *Data)
 {
 	if (!Data)
 		return false;
@@ -190,52 +184,52 @@ void GLCD_Menu::GLCD_Menu_Settings()
 	m.addItem(GenericMenuSeparatorLine);
 
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_ENABLE, &g_settings.glcd_enable,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier));
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this));
 	int shortcut = 1;
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_FG, &color_fg,
-				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
+				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, this,
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BG, &color_bg,
-				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
+				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, this,
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SELECT_BAR, &color_bar,
-				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, notifier,
+				GLCD_COLOR_OPTIONS, GLCD_COLOR_OPTION_COUNT, true, this,
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuForwarder(LOCALE_GLCD_FONT, true, g_settings.glcd_font, this, "select_font",
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_CHANNEL,
-				&g_settings.glcd_percent_channel, true, 0, 100, notifier));
+				&g_settings.glcd_percent_channel, true, 0, 100, this));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_EPG,
-				&g_settings.glcd_percent_epg, true, 0, 100, notifier));
+				&g_settings.glcd_percent_epg, true, 0, 100, this));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_BAR,
-				&g_settings.glcd_percent_bar, true, 0, 100, notifier));
+				&g_settings.glcd_percent_bar, true, 0, 100, this));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME,
-				&g_settings.glcd_percent_time, true, 0, 100, notifier));
+				&g_settings.glcd_percent_time, true, 0, 100, this));
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_SHOW_LOGO, &g_settings.glcd_show_logo,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_LOGO,
-				&g_settings.glcd_percent_logo, true, 0, 100, notifier));
+				&g_settings.glcd_percent_logo, true, 0, 100, this));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS,
-				&g_settings.glcd_brightness, true, 0, 100, notifier));
+				&g_settings.glcd_brightness, true, 0, 100, this));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_TIME_IN_STANDBY, &g_settings.glcd_time_in_standby,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
 				CRCInput::convertDigitToKey(shortcut++)));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SIZE_TIME_STANDBY,
-				&g_settings.glcd_percent_time_standby, true, 0, 100, notifier));
+				&g_settings.glcd_percent_time_standby, true, 0, 100, this));
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_BRIGHTNESS_STANDBY,
-				&g_settings.glcd_brightness_standby, true, 0, 100, notifier));
+				&g_settings.glcd_brightness_standby, true, 0, 100, this));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuOptionNumberChooser(LOCALE_GLCD_SCROLL_SPEED,
-				&g_settings.glcd_scroll_speed, true, 1, 63, notifier));
+				&g_settings.glcd_scroll_speed, true, 1, 63, this));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_OSD, &g_settings.glcd_mirror_osd,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
 				CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_VIDEO, &g_settings.glcd_mirror_video,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, notifier,
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
 				CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, NULL, this, "rescan",
