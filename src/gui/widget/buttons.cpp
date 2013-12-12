@@ -50,29 +50,29 @@
  * maxwidth	maximum horizontal space for the buttons
  * footerheight	set height of buttonbar as similar to footer, value 0 (default) means:
 		value calculates automaticly depends of maximal height of icon and caption
-
- * stuff below here was obviously not tested recently
- * vertical_paint	optional, default value is false (horizontal) sets direction of painted buttons
- * fcolor  		optional, default value is COL_INFOBAR_SHADOW_TEXT, use it to render font with other color
- * alt_buttontext	optional, default NULL, overwrites button caption at definied buttonlabel id (see parameter alt_buttontext_id) with this text
- * alt_buttontext_id	optional, default 0, means id from buttonlable struct which text you will change 
- * show			optional, default value is true (show button), if false, then no show and return the height of the button.
+ * show		optional, default value is true (show button), if false, then no show and return the height of the button.
  */
 
-int paintButtons(	const int &x,	
-			const int &y, 
-			const int &footerwidth, 
-			const uint &count, 
+int paintButtons(	const int &x,
+			const int &y,
+			const int &footerwidth,
+			const int &count,
 			const struct button_label * const content,
 			const int &maxwidth,
+			const int &footerheight) {
+	return paintButtons(content, count, x, y, footerwidth, footerheight, maxwidth, true, NULL, NULL);
+};
+
+int paintButtons(	const struct button_label * const content,
+			const int &count, 
+			const int &x,	
+			const int &y, 
+			const int &footerwidth, 
 			const int &footerheight,
-			std::string /* just to make sure nobody uses anything below */,
-			bool vertical_paint,
-			const uint32_t fcolor,
-			const char * alt_buttontext,
-			const uint &buttontext_id,
+			const int &maxwidth,
 			bool show,
-			const std::vector<neutrino_locale_t>& /*all_buttontext_id*/)
+			int *wantedwidth,
+			int *wantedheight)
 {
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
 	Font * font = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL];
@@ -154,8 +154,13 @@ int paintButtons(	const int &x,
 	//calculate footer heigth
 	h_footer = footerheight == 0 ? (h_button + 2*h_space) : footerheight;
 
-	if (!show)
+	if (!show) {
+		if (wantedheight)
+			*wantedheight = h_button + 2*h_space;
+		if (wantedwidth)
+			*wantedwidth = w_space * 2 + w_text + w_icons + (count_icons + count_labels - 1) * h_space;
 		return h_footer;
+	}
 
 	//paint footer
 	if (w_footer > 0)
@@ -189,10 +194,7 @@ int paintButtons(	const int &x,
 	{
 		const char * caption = NULL;
 		//set caption... 
-		if (alt_buttontext != NULL && j == buttontext_id) 
-			caption = alt_buttontext; //...with an alternate buttontext
-		else
-			caption = buttontext[j];
+		caption = buttontext[j];
 
 		const char * icon = content[j].button ? content[j].button : "";
 
@@ -202,33 +204,16 @@ int paintButtons(	const int &x,
 		// paint icon and text
 		frameBuffer->paintIcon(icon, x_button , y_base - iconh[j]/2);
 		x_caption = x_button + iconw[j] + h_space;
-		font->RenderString(x_caption, y_caption, fwidth[j], caption, fcolor, 0, true);
+		font->RenderString(x_caption, y_caption, fwidth[j], caption, COL_INFOBAR_SHADOW_TEXT, 0, true);
  		
  		/* 	set next startposition x, if text is length=0 then offset is =renderwidth of icon, 
   		* 	for generating buttons without captions, 
   		*/		
  		
- 		int lentext = strlen(caption);	
-		if (vertical_paint) 
-		// set x_icon for painting buttons with vertical arrangement 
-		{
-				if (lentext !=0)
-				{
-					x_button = x;	
-					y_base += h_footer;				
-				}
-				else
-				{
-					x_button = x_caption;		
-				}
-		}
-		else
-		{
-			/* increase x position */
-			x_button = x_caption;
-			if (fwidth[j])
-				x_button += fwidth[j] + spacing + h_space;
-		}	
+		/* increase x position */
+		x_button = x_caption;
+		if (fwidth[j])
+			x_button += fwidth[j] + spacing + h_space;
 	}
 
 	return h_footer;

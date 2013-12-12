@@ -917,15 +917,19 @@ void CMenuWidget::calcSize()
 
 	iconOffset += 10;
 	width += iconOffset;
-	if (width > (int)frameBuffer->getScreenWidth())
-		width = frameBuffer->getScreenWidth();
 
 	if (fbutton_count) {
 		int maxItemHeight = 0;
 		for (unsigned int i= 0; i< items.size(); i++)
 			maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
 		itemHeightTotal = items.size() * maxItemHeight;
+		int _footerwidth, _footerheight;
+		paintButtons(fbutton_labels, fbutton_count, 0, 0, 0, 0, 0, false, &_footerwidth, &fbutton_height);
+		width = std::max(width, _footerwidth);
 	}
+
+	if (width > (int)frameBuffer->getScreenWidth())
+		width = frameBuffer->getScreenWidth();
 
 	// shrink menu if less items
 	if(hheight+itemHeightTotal < height)
@@ -1216,12 +1220,6 @@ void CMenuWidget::setFooter(const struct button_label *_fbutton_labels, const in
 {
 	fbutton_count = _fbutton_count;
 	fbutton_labels = _fbutton_labels;
-	fbutton_height = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getHeight() + 6;  // init min buttonbar height
-	int h = 0, w = 0;
-	for (int i = 0; i < fbutton_count; i++) {
-		frameBuffer->getIconSize(fbutton_labels[i].button, &w, &h);
-		fbutton_height = std::max(fbutton_height, h + 4);
-	}
 	if (repaint)
 		paint();
 }
