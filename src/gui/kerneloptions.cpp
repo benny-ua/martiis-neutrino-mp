@@ -291,11 +291,11 @@ bool KernelOptions_Menu::changeNotify(const neutrino_locale_t /*OptionName */ , 
 
 void KernelOptions_Menu::Settings()
 {
-    CMenuWidget *menu = new CMenuWidget(LOCALE_KERNELOPTIONS_HEAD, "settings");
+    CMenuWidget *menu = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS);
     menu->addKey(CRCInput::RC_red, this, "reset");
     menu->addKey(CRCInput::RC_green, this, "apply");
     menu->setFooter(KernelOptionsButtons, KernelOptionsButtonCount);
-    menu->addIntroItems(NONEXISTANT_LOCALE, LOCALE_KERNELOPTIONS_MODULES);
+    menu->addIntroItems(LOCALE_KERNELOPTIONS_HEAD, LOCALE_KERNELOPTIONS_MODULES);
 
     load();
 

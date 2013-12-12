@@ -1084,10 +1084,12 @@ menu.hint_menu_pos Legen Sie die Anzeigeposition der Menüs fest
 menu.hint_menus Wählen Sie die Anzeigeoptionen für die Menüs
 menu.hint_misc_cec HDMI-CEC Optionen
 menu.hint_misc_channellist Erweiterte Einstellungen für die Kanallisten und Zapping-Einstellungen
+menu.hint_misc_cpufreq Legen Sie die Taktfrequenz der CPU fest
 menu.hint_misc_energy Energieverbrauchs- und Standby-Optionen, verzögertes Ausschalten, setzen bzw. ändern des Inaktivitätstimers
 menu.hint_misc_epg Diverse EPG-Einstellungen und Speicherverzeichnis für EPG-Daten
 menu.hint_misc_filebrowser Dateisystem, Dateirechte anzeigen im Dateibrowser, Startverzeichnisoptionen
 menu.hint_misc_general Standby-, Teletext- und Rotor-Einstellungen, Pluginverzeichnis auf externem Datenträger
+menu.hint_misc_kerneloptions Wählen Sie die Kernel-Module aus, die zusätzlich geladen werden sollen
 menu.hint_misc_zapit Verwaltung der Start-Kanäle für den TV/Radio-Modus
 menu.hint_movie Wiedergabe von Filmen
 menu.hint_moviebrowser_setup Legen Sie Auswahl- und Anzeigeoptionen des MovieBrowsers fest
@@ -1350,6 +1352,7 @@ miscsettings.channellist_epgtext_align Event-Text ausrichten
 miscsettings.colored_events_0 keine
 miscsettings.colored_events_1 aktuelle
 miscsettings.colored_events_2 nächste
+miscsettings.cpu CPU
 miscsettings.energy Energieverbrauch
 miscsettings.epg.batch.head EPG-Aktualisierung
 miscsettings.epg.batch.settings EPG-Aktualisierung

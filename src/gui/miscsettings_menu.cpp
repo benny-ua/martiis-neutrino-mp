@@ -298,13 +298,17 @@ int CMiscMenue::showMiscSettingsMenu()
 
 #ifdef CPU_FREQ
 	//CPU
-	CMenuWidget misc_menue_cpu("CPU", NEUTRINO_ICON_SETTINGS, width);
+	CMenuWidget misc_menue_cpu(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS, width);
 	showMiscSettingsMenuCPUFreq(&misc_menue_cpu);
-	misc_menue.addItem( new CMenuForwarder("CPU", true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4));
+	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CPU, true, NULL, &misc_menue_cpu, NULL, CRCInput::RC_4);
+	mf->setHint("", LOCALE_MENU_HINT_MISC_CPUFREQ);
+	misc_menue.addItem(mf);
 #endif /*CPU_FREQ*/
 #if HAVE_SPARK_HARDWARE
 	KernelOptions_Menu kernelOptions;
-	misc_menue.addItem(new CMenuForwarder(LOCALE_KERNELOPTIONS_HEAD, true, NULL, &kernelOptions, NULL, CRCInput::RC_5));
+	mf = new CMenuForwarder(LOCALE_KERNELOPTIONS_HEAD, true, NULL, &kernelOptions, NULL, CRCInput::RC_5);
+	mf->setHint("", LOCALE_MENU_HINT_MISC_KERNELOPTIONS);
+	misc_menue.addItem(mf);
 #endif
 
 	int res = misc_menue.exec(NULL, "");
@@ -514,7 +518,7 @@ int CMiscMenue::showMiscSettingsMenuChanlist()
 //CPU
 void CMiscMenue::showMiscSettingsMenuCPUFreq(CMenuWidget *ms_cpu)
 {
-	ms_cpu->addIntroItems();
+	ms_cpu->addIntroItems(LOCALE_MISCSETTINGS_CPU);
 
 	CCpuFreqNotifier * cpuNotifier = new CCpuFreqNotifier();
 	ms_cpu->addItem(new CMenuOptionChooser(LOCALE_CPU_FREQ_NORMAL, &g_settings.cpufreq, CPU_FREQ_OPTIONS, CPU_FREQ_OPTION_COUNT, true, cpuNotifier));
