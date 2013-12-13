@@ -98,7 +98,7 @@ int paintButtons(	const button_label_ext * const content,
 {
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
 	Font * font = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL];
-	uint cnt = count;
+	int cnt = count;
 	int x_footer = x;
 	int y_footer = y;
 	int w_footer = footerwidth;
@@ -144,9 +144,11 @@ int paintButtons(	const button_label_ext * const content,
 		print_stacktrace();
 	}
 
-	uint i;
 	bool maximize = false;
-	for (i = 0; i < cnt; i++)
+	for (int i = 0; i < cnt; i++)
+		maximize |= content[i].maximize;
+
+	for (int i = 0; i < cnt; i++)
 	{
 		//icon
 		int w = 0;
@@ -173,8 +175,7 @@ int paintButtons(	const button_label_ext * const content,
 			buttontext[i] = "";
 			fwidth[i] = 0;
 		}
-		maximize |= content[i].maximize;
-		if (i < cnt - 1)
+		if (maximize && i < cnt - 1)
 			fwidth[i] += w, w_text += w;
 	}
 
@@ -210,7 +211,7 @@ int paintButtons(	const button_label_ext * const content,
 
 	if (maximize) {
 		while (spacing > 0) {
-			for (i = 0; i < cnt && spacing > 0; i++) {
+			for (int i = 0; i < cnt && spacing > 0; i++) {
 				if (content[i].maximize) {
 					fwidth[i]++;
 					spacing--;
@@ -227,12 +228,12 @@ int paintButtons(	const button_label_ext * const content,
 	else
 	{
 		/* shorten captions relative to their length */
-		for (i = 0; i < cnt; i++)
+		for (int i = 0; i < cnt; i++)
 			fwidth[i] = (fwidth[i] * (w_text + spacing)) / w_text; /* spacing is negative...*/
 		spacing = 0;
 	}
 
-	for (uint j = 0; j < cnt; j++)
+	for (int j = 0; j < cnt; j++)
 	{
 		const char * caption = NULL;
 		//set caption... 
