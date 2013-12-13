@@ -1,7 +1,7 @@
 /*
 	KernelOptions Menu
 
-	Copyright (C) 2012 martii
+	Copyright (C) 2012-2013 martii
 
 	License: GPL
 
@@ -37,12 +37,12 @@ static const CMenuOptionChooser::keyval ONOFF_OPTIONS[ONOFF_OPTION_COUNT] = {
     {1, LOCALE_OPTIONS_ON}
 };
 
-KernelOptions_Menu::KernelOptions_Menu()
+CKernelOptions::CKernelOptions()
 {
     width = w_max(40, 10);
 }
 
-void KernelOptions_Menu::loadModule(int i)
+void CKernelOptions::loadModule(int i)
 {
     // check whether there are dependencies with options specified
     unsigned int j;
@@ -67,12 +67,12 @@ void KernelOptions_Menu::loadModule(int i)
     }
 }
 
-void KernelOptions_Menu::unloadModule(int i)
+void CKernelOptions::unloadModule(int i)
 {
     my_system(3, "modprobe", "-r", modules[i].moduleList.back().first.c_str());
 }
 
-void KernelOptions_Menu::updateStatus(void)
+void CKernelOptions::updateStatus(void)
 {
     for (unsigned int i = 0; i < modules.size(); i++)
 	modules[i].installed = false;
@@ -105,7 +105,7 @@ void KernelOptions_Menu::updateStatus(void)
 	}
 }
 
-int KernelOptions_Menu::exec(CMenuTarget * parent, const std::string & actionKey)
+int CKernelOptions::exec(CMenuTarget * parent, const std::string & actionKey)
 {
     int res = menu_return::RETURN_REPAINT;
 
@@ -140,11 +140,11 @@ int KernelOptions_Menu::exec(CMenuTarget * parent, const std::string & actionKey
     return res;
 }
 
-void KernelOptions_Menu::hide()
+void CKernelOptions::hide()
 {
 }
 
-bool KernelOptions_Menu::isEnabled(std::string name)
+bool CKernelOptions::isEnabled(std::string name)
 {
     load();
     for (unsigned int i = 0; i < modules.size(); i++)
@@ -153,7 +153,7 @@ bool KernelOptions_Menu::isEnabled(std::string name)
     return false;
 }
 
-bool KernelOptions_Menu::Enable(std::string name, bool active)
+bool CKernelOptions::Enable(std::string name, bool active)
 {
     load();
     for (unsigned int i = 0; i < modules.size(); i++)
@@ -167,7 +167,7 @@ bool KernelOptions_Menu::Enable(std::string name, bool active)
     return false;
 }
 
-void KernelOptions_Menu::load()
+void CKernelOptions::load()
 {
     modules.clear();
 
@@ -259,7 +259,7 @@ void KernelOptions_Menu::load()
     }
 }
 
-void KernelOptions_Menu::save()
+void CKernelOptions::save()
 {
     FILE *f = fopen("/etc/modules.extra", "w");
     if (f) {
@@ -283,13 +283,13 @@ static const struct button_label KernelOptionsButtons[KernelOptionsButtonCount] 
     {NEUTRINO_ICON_BUTTON_GREEN, LOCALE_KERNELOPTIONS_APPLY}
 };
 
-bool KernelOptions_Menu::changeNotify(const neutrino_locale_t /*OptionName */ , void * /*Data */ )
+bool CKernelOptions::changeNotify(const neutrino_locale_t /*OptionName */ , void * /*Data */ )
 {
     updateStatus();
     return true;
 }
 
-void KernelOptions_Menu::Settings()
+void CKernelOptions::Settings()
 {
     CMenuWidget *menu = new CMenuWidget(LOCALE_MAINSETTINGS_HEAD, NEUTRINO_ICON_SETTINGS);
     menu->addKey(CRCInput::RC_red, this, "reset");
@@ -311,5 +311,3 @@ void KernelOptions_Menu::Settings()
     menu->hide();
     delete menu;
 }
-
-// vim:ts=4

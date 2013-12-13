@@ -1,7 +1,7 @@
 /*
 		KernelOptions Menu
 
-		Copyright (C) 2012 martii
+		Copyright (C) 2012-2013 martii
 
 		Kommentar:
 
@@ -33,7 +33,7 @@
 #include <system/setting_helpers.h>
 #include <configfile.h>
 
-class KernelOptions_Menu : public CMenuTarget, public CChangeObserver
+class CKernelOptions : public CMenuTarget, public CChangeObserver
 {
 	private:
 		int width;
@@ -52,7 +52,7 @@ class KernelOptions_Menu : public CMenuTarget, public CChangeObserver
 		void loadModule(int i);
 		void unloadModule(int i);
 	public:
-		KernelOptions_Menu();
+		CKernelOptions();
 		void hide();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 		void Settings();

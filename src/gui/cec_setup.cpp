@@ -110,7 +110,7 @@ int CCECSetup::showMenu()
 
 	//cec
 #if HAVE_SPARK_HARDWARE
-	KernelOptions_Menu ko;
+	CKernelOptions ko;
 	g_settings.hdmi_cec_mode = ko.isEnabled("cec");
 	CMenuOptionChooser *cec_ch = new CMenuOptionChooser(LOCALE_VIDEOMENU_HDMI_CEC_MODE, &g_settings.hdmi_cec_mode, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	cec1 = new CMenuOptionChooser(LOCALE_VIDEOMENU_HDMI_CEC_STANDBY, &g_settings.hdmi_cec_standby, VIDEOMENU_HDMI_CEC_STANDBY_OPTIONS, VIDEOMENU_HDMI_CEC_STANDBY_OPTION_COUNT, g_settings.hdmi_cec_mode != 0, this);
@@ -182,7 +182,7 @@ bool CCECSetup::changeNotify(const neutrino_locale_t OptionName, void * /*data*/
 		printf("[neutrino CEC Settings] %s set CEC settings...\n", __FUNCTION__);
 		cec1->setActive(g_settings.hdmi_cec_mode != 0);
 		cec2->setActive(g_settings.hdmi_cec_mode != 0);
-		KernelOptions_Menu ko;
+		CKernelOptions ko;
 		ko.Enable("cec", g_settings.hdmi_cec_mode != 0);
 		g_settings.hdmi_cec_mode = ko.isEnabled("cec");
 	}
