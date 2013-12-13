@@ -57,7 +57,9 @@
 #include "plugins.h"
 #include "imageinfo.h"
 #include "dboxinfo.h"
+#if !HAVE_SPARK_HARDWARE
 #include "cam_menu.h"
+#endif
 #include "pluginlist.h"
 #include "infoclock.h"
 
@@ -74,7 +76,9 @@
 #include <daemonc/remotecontrol.h>
 extern CRemoteControl * g_RemoteControl; /* neutrino.cpp */
 // extern CPlugins * g_PluginList;
+#if !HAVE_SPARK_HARDWARE
 extern CCAMMenuHandler * g_CamHandler;
+#endif
 // 
 #include <system/debug.h>
 
@@ -360,6 +364,7 @@ bool CUserMenu::showUserMenu(int button)
 			keyhelper.get(&key,&icon);
 			menu->addItem( new CMenuForwarder(LOCALE_EXTRA_DBOXINFO, true, NULL, boxinfo, NULL, key, icon));
 			break;
+#if !HAVE_SPARK_HARDWARE
 		case SNeutrinoSettings::ITEM_CAM:
 			//if(cs_get_revision() != 10)
 			{
@@ -369,6 +374,7 @@ bool CUserMenu::showUserMenu(int button)
 				menu->addItem(new CMenuForwarder(LOCALE_CI_SETTINGS, true, NULL, g_CamHandler, NULL, key, icon));
 			}
 			break;
+#endif
 		case SNeutrinoSettings::ITEM_CLOCK:
 			{
 				menu_items++;

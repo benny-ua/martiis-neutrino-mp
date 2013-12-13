@@ -137,12 +137,16 @@ libneutrino_gui_a_SOURCES += \
 endif
 
 libneutrino_gui2_a_SOURCES = \
-	cam_menu.cpp \
 	color.cpp \
 	hdd_menu.cpp \
 	infoclock.cpp \
 	kerneloptions.cpp \
 	motorcontrol.cpp
+
+if !BOXTYPE_SPARK
+libneutrino_gui2_a_SOURCES += \
+	cam_menu.cpp
+endif
 
 if ENABLE_UPNP
 libneutrino_gui2_a_SOURCES += \
