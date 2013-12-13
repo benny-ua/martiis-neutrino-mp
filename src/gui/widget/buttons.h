@@ -29,13 +29,33 @@
 
 #include <vector>
 
-typedef struct button_label
+struct button_label
 {
 	const char *      button;
 	neutrino_locale_t locale;
-} button_label_struct;
+};
 
-int paintButtons(	const struct button_label * const content,
+struct button_label_ext
+{
+	const char *      button;
+	neutrino_locale_t locale;
+	const char *	  text;
+	int		  width;
+	bool		  maximize;
+};
+
+int paintButtons(	const button_label * const content,
+			const int &count, 
+			const int &x, 
+			const int &y, 
+			const int &footerheight,
+			const int &footerwidth, 
+			const int &maxwidth,
+			bool show = true,
+			int *wantedwidth = NULL,
+			int *wantedheight = NULL);
+
+int paintButtons(	const button_label_ext * const content,
 			const int &count, 
 			const int &x, 
 			const int &y, 
@@ -50,7 +70,7 @@ int paintButtons(	const int &x,
 			const int &y, 
 			const int &footerwidth, 
 			const int &count, 
-			const struct button_label * const content,
+			const button_label * const content,
 			const int &maxwidth,
 			const int &footerheight = 0);
 

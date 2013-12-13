@@ -57,13 +57,35 @@ int paintButtons(	const int &x,
 			const int &y,
 			const int &footerwidth,
 			const int &count,
-			const struct button_label * const content,
+			const button_label * const content,
 			const int &maxwidth,
 			const int &footerheight) {
 	return paintButtons(content, count, x, y, footerwidth, footerheight, maxwidth, true, NULL, NULL);
 };
 
-int paintButtons(	const struct button_label * const content,
+int paintButtons(	const button_label * const content,
+			const int &count, 
+			const int &x,	
+			const int &y, 
+			const int &footerwidth, 
+			const int &footerheight,
+			const int &maxwidth,
+			bool show,
+			int *wantedwidth,
+			int *wantedheight)
+{
+	button_label_ext content_ext[count];
+	for (int i = 0; i < count; i++) {
+		content_ext[i].button = content[i].button;
+		content_ext[i].locale = content[i].locale;
+		content_ext[i].text = NULL;
+		content_ext[i].width = 0;
+		content_ext[i].maximize = false;
+	}
+	return paintButtons(content_ext, count, x, y, footerwidth, footerheight, maxwidth, show, wantedwidth, wantedheight);
+}
+
+int paintButtons(	const button_label_ext * const content,
 			const int &count, 
 			const int &x,	
 			const int &y, 
@@ -123,6 +145,7 @@ int paintButtons(	const struct button_label * const content,
 	}
 
 	uint i;
+	bool maximize = false;
 	for (i = 0; i < cnt; i++)
 	{
 		//icon
@@ -136,16 +159,23 @@ int paintButtons(	const struct button_label * const content,
 		if (w)
 			count_icons++;
 
-		if (content[i].locale) {
+		if (content[i].text) {
+			buttontext[i] = content[i].text;
+			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i], true));
+			w_text += fwidth[i];
+			count_labels++;
+		} else if (content[i].locale) {
 			buttontext[i] = g_Locale->getText(content[i].locale);
-			//text width
-			fwidth[i] = font->getRenderWidth(buttontext[i], true);
+			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i], true));
 			w_text += fwidth[i];
 			count_labels++;
 		} else {
 			buttontext[i] = "";
 			fwidth[i] = 0;
 		}
+		maximize |= content[i].maximize;
+		if (i < cnt - 1)
+			fwidth[i] += w, w_text += w;
 	}
 
 	//calculate button heigth
@@ -177,6 +207,18 @@ int paintButtons(	const struct button_label * const content,
 #endif
 	if (fwidth[cnt - 1] == 0) /* divisor needs to be labels+1 unless rightmost icon has a label */
 		count_labels++;   /* side effect: we don't try to divide by 0 :-) */
+
+	if (maximize) {
+		while (spacing > 0) {
+			for (i = 0; i < cnt && spacing > 0; i++) {
+				if (content[i].maximize) {
+					fwidth[i]++;
+					spacing--;
+				}
+			}
+		}
+	}
+
 	if (spacing >= 0)
 	{				 /* add half of the inter-object space to the */
 		spacing /= count_labels; /* left and right (this might break vertical */
