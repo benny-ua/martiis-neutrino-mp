@@ -49,6 +49,7 @@
 #define writesize oobsize
 #endif
 
+#if !HAVE_SPARK_HARDWARE
 CFlashTool::CFlashTool()
 {
 	statusViewer = NULL;
@@ -444,6 +445,7 @@ void CFlashTool::reboot()
 	::reboot(RB_AUTOBOOT);
 	::exit(0);
 }
+#endif
 
 //-----------------------------------------------------------------------------------------------------------------
 CFlashVersionInfo::CFlashVersionInfo(const std::string & versionString)
@@ -538,6 +540,7 @@ int CFlashVersionInfo::getVersion(void) const
 
 //-----------------------------------------------------------------------------------------------------------------
 
+#if !HAVE_SPARK_HARDWARE
 CMTDInfo::CMTDInfo()
 {
 	getPartitionInfo();
@@ -683,3 +686,4 @@ printf("systemFS: %d dev %s\n", i, getMTDFileName(i).c_str());
 	}
 	return "";
 }
+#endif
