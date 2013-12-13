@@ -920,9 +920,11 @@ void CMenuWidget::calcSize()
 
 	if (fbutton_count) {
 		int maxItemHeight = 0;
-		for (unsigned int i= 0; i< items.size(); i++)
-			maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
-		itemHeightTotal = items.size() * maxItemHeight;
+		if (total_pages > 1) {
+			for (unsigned int i= 0; i< items.size(); i++)
+				maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
+			itemHeightTotal = items.size() * maxItemHeight;
+		}
 		int _footerwidth;
 		paintButtons(fbutton_labels, fbutton_count, 0, 0, 0, 0, 0, false, &_footerwidth, &fbutton_height);
 		width = std::max(width, _footerwidth);
