@@ -150,9 +150,9 @@ int CStreamInfo2::doSignalStrengthLoop ()
 		g_RCInput->getMsgAbsoluteTimeout (&msg, &data, &timeoutEnd);
 
 		if (!mp) {
-			signal.sig = frontend->getSignalStrength() & 0xFFFF;
-			signal.snr = frontend->getSignalNoiseRatio() & 0xFFFF;
-			signal.ber = frontend->getBitErrorRate();
+			signal.sig = 100 * (frontend->getSignalStrength() & 0xFFFF) >> 16;
+			signal.snr = 100 * (frontend->getSignalNoiseRatio() & 0xFFFF) >> 16;
+			signal.ber = 100 * (frontend->getBitErrorRate() & 0xFFFF) >> 16; // FIXME?
 		}
 
 		int ret = update_rate ();
@@ -369,7 +369,7 @@ void CStreamInfo2::paint_signal_fe(struct bitrate br, struct feSignal s)
 			SignalRenderStr(s.max_ber, sig_text_ber_x, yt);
 			SignalRenderStr(s.min_ber, sig_text_ber_x, yt + (sheight * 2));
 		}
-		yd = y_signal_fe (s.ber, 4000, sigBox_h);
+		yd = y_signal_fe (s.ber, 100, sigBox_h);
 		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_RED); //red
 
 
@@ -378,7 +378,7 @@ void CStreamInfo2::paint_signal_fe(struct bitrate br, struct feSignal s)
 			SignalRenderStr(s.max_sig, sig_text_sig_x, yt);
 			SignalRenderStr(s.min_sig, sig_text_sig_x, yt + (sheight * 2));
 		}
-		yd = y_signal_fe (s.sig, 65000, sigBox_h);
+		yd = y_signal_fe (s.sig, 100, sigBox_h);
 		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_GREEN); //green
 
 
@@ -387,7 +387,7 @@ void CStreamInfo2::paint_signal_fe(struct bitrate br, struct feSignal s)
 			SignalRenderStr(s.max_snr, sig_text_snr_x, yt);
 			SignalRenderStr(s.min_snr, sig_text_snr_x, yt + (sheight * 2));
 		}
-		yd = y_signal_fe (s.snr, 65000, sigBox_h);
+		yd = y_signal_fe (s.snr, 100, sigBox_h);
 		frameBuffer->paintPixel(sigBox_x+x_now, sigBox_y+sigBox_h-yd, COL_BLUE); //blue
 	}
 }
