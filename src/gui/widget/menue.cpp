@@ -1159,7 +1159,7 @@ void CMenuWidget::paintHint(int pos)
 	
 	if (item->hintIcon.empty() && item->hint == NONEXISTANT_LOCALE && item->hintText.empty()) {
 		if (info_box) {
-			info_box->kill();	
+			savescreen ? info_box->hide(false) : info_box->kill();
 			hint_painted = false;
 		}
 		return;

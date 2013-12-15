@@ -77,13 +77,11 @@ CBaseDec::RetCode CBaseDec::DecoderBase(CAudiofile* const in,
 
 	if ( Status == OK )
 	{
-		CFile::FileType ft;
+		CFile::FileType ft = in->FileType;
 		if( in->FileType == CFile::STREAM_AUDIO )
 		{
 			if ( fstatus( fp, ShoutcastCallback ) < 0 )
-			{
 				fprintf( stderr, "Error adding shoutcast callback: %s", err_txt );
-			}
 
 			if (ftype(fp, "ogg"))
 				ft = CFile::FILE_OGG;
@@ -98,10 +96,10 @@ CBaseDec::RetCode CBaseDec::DecoderBase(CAudiofile* const in,
 			if (!fstat(fileno(fp), &st))
 						in->MetaData.filesize = st.st_size;
 
-			ft = in->FileType;
 		}
+		in->MetaData.type = ft;
 
-		Status = CFfmpegDec::getInstance()->Decoder(fp, ft, OutputFd, state, &in->MetaData, t, secondsToSkip );
+		Status = CFfmpegDec::getInstance()->Decoder(fp, OutputFd, state, &in->MetaData, t, secondsToSkip );
 
 		if ( fclose( fp ) == EOF )
 		{
@@ -163,63 +161,19 @@ bool CBaseDec::GetMetaDataBase(CAudiofile* const in, const bool nice)
 		struct stat st;
 		if (!fstat(fileno(fp), &st))
 			in->MetaData.filesize = st.st_size;
+		in->MetaData.type = in->FileType;
 
 		CFfmpegDec d;
-		Status = d.GetMetaData(fp, in->FileType, nice, &in->MetaData);
+		Status = d.GetMetaData(fp, nice, &in->MetaData);
 		if (Status)
 			CacheMetaData(in);
-
 		if ( fclose( fp ) == EOF )
 		{
 			fprintf( stderr, "Could not close file %s.\n",
 					 in->Filename.c_str() );
 		}
 	}
-
 	return Status;
-}
-
-bool CBaseDec::SetDSP(int soundfd, int fmt, unsigned int dsp_speed, unsigned int channels)
-{
-	bool crit_error=false;
-
-	if (::ioctl(soundfd, SNDCTL_DSP_RESET))
-		printf("reset failed\n");
-	if(::ioctl(soundfd, SNDCTL_DSP_SETFMT, &fmt))
-		printf("setfmt failed\n");
-	if(::ioctl(soundfd, SNDCTL_DSP_CHANNELS, &channels))
-		printf("channel set failed\n");
-	if (dsp_speed != mSamplerate)
-	{
-		// mute audio to reduce pops when changing samplerate (avia_reset)
-		//bool was_muted = avs_mute(true);
-		if (::ioctl(soundfd, SNDCTL_DSP_SPEED, &dsp_speed))
-		{
-			printf("speed set failed\n");
-			crit_error=true;
-		}
-		else
-		{
-#if 0
-			unsigned int rs = 0;
-			::ioctl(soundfd, SNDCTL_DSP_SPEED, &rs);
-			mSamplerate = dsp_speed;
-			// disable iec aka digi out (avia reset enables it again)
-			//g_Zapit->IecOff();
-#endif
-		}
-		//usleep(400000);
-		//if (!was_muted)
-		//	avs_mute(false);
-	}
-//printf("Debug: SNDCTL_DSP_RESET %d / SNDCTL_DSP_SPEED %d / SNDCTL_DSP_CHANNELS %d / SNDCTL_DSP_SETFMT %d\n",
-//					SNDCTL_DSP_RESET, SNDCTL_DSP_SPEED, SNDCTL_DSP_CHANNELS, SNDCTL_DSP_SETFMT);
-	return crit_error;
-}
-
-bool CBaseDec::avs_mute(bool /*mute*/)
-{
-	return true;
 }
 
 void CBaseDec::Init()

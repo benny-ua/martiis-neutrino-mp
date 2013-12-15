@@ -34,6 +34,7 @@
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <unistd.h>
 #include <driver/audiometadata.h>
 
 // constructor
@@ -98,7 +99,7 @@ void CAudioMetaData::operator=( const CAudioMetaData& src )
 
 void CAudioMetaData::clear()
 {
-	type=NONE;
+	type=0;
 	type_info.clear();
 	filesize=0;
 	bitrate=0;
