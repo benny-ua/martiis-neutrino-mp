@@ -108,6 +108,7 @@
 #include "gui/screensetup.h"
 #endif
 #include <system/set_threadname.h>
+#include <system/ytcache.h>
 #if HAVE_COOL_HARDWARE
 #include "gui/widget/progressbar.h"
 #endif
@@ -3709,9 +3710,9 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 	bool do_shutdown = true;
 
 	CRecordManager::getInstance()->StopAutoRecord();
-	if(CRecordManager::getInstance()->RecordingStatus()) {
+	if(CRecordManager::getInstance()->RecordingStatus() || cYTCache::getInstance()->isActive()) {
 		do_shutdown =
-			(ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWN_RECODING_QUERY, CMessageBox::mbrNo,
+			(ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_SHUTDOWN_RECORDING_QUERY, CMessageBox::mbrNo,
 					CMessageBox::mbYes | CMessageBox::mbNo, NULL, 450, 30, true) == CMessageBox::mbrYes);
 	}
 

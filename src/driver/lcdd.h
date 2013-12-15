@@ -68,7 +68,8 @@ typedef enum
 	FP_ICON_CAM1       = 0x0B000001,
 	FP_ICON_COL2       = 0x0B000002,
 	FP_ICON_CAM2       = 0x0C000001,
-	FP_ICON_RECORD // dummy
+	FP_ICON_RECORD,
+	FP_ICON_DOWNLOAD,
 } fp_icon;
 #define CVFD CLCD
 

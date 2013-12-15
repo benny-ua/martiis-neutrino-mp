@@ -450,6 +450,9 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 				case FP_ICON_RECORD:
 					aotom_icon = AOTOM_REC1;
 					break;
+				case FP_ICON_DOWNLOAD:
+					aotom_icon = AOTOM_REC2;
+					break;
 				case FP_ICON_PAUSE:
 					aotom_icon = AOTOM_PLAY_PAUSE;
 					break;

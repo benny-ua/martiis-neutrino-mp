@@ -2070,7 +2070,7 @@ shairplay.head ShairPlay
 shairplay.password Passwort
 shairplay.port Port
 shairplay.reenable ShairPlay reaktivieren
-shutdown.recoding_query Aufnahme läuft. Trotzdem beenden?
+shutdown.recording_query Aufnahme läuft. Trotzdem beenden?
 shutdowntimer.announce Die Box wird in 1 Min. heruntergefahren.\nShutdown abbrechen?
 sleeptimerbox.announce Die Box wird in 1 Min. in Standby-Betrieb gehen.\nStandby-Betrieb abbrechen?
 sleeptimerbox.hint1 Ausschaltzeit in Minuten (000 = aus)

@@ -2100,7 +2100,7 @@ const char * locale_real_names[] =
 	"shairplay.password",
 	"shairplay.port",
 	"shairplay.reenable",
-	"shutdown.recoding_query",
+	"shutdown.recording_query",
 	"shutdowntimer.announce",
 	"sleeptimerbox.announce",
 	"sleeptimerbox.hint1",
