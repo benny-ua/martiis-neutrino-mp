@@ -959,6 +959,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
 			if(playback->GetPosition(position, duration)) {
+				FileTime.update(position, duration);
 				if(duration > 100)
 					file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
