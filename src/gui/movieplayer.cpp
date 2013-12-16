@@ -1186,13 +1186,11 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			int mm = ss/60;
 			ss -= mm * 60;
 			char val[10];
-			snprintf(val, sizeof(val), "%.2d:%.2d", hh, mm); // eplayer lacks precision, omit seconds
-			std::string Value(val);
-			ss = 0;
+			std::string Value = to_string(hh/10) + to_string(hh%10) + ":" + to_string(mm/10) + to_string(mm%10) + ":" + to_string(ss/10) + to_string(ss%10);
 			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, &Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
 			jumpTime.exec(NULL, "");
 			jumpTime.hide();
-			if (!cancel && ((3 == sscanf(Value.c_str(), "%d:%d:%d", &hh, &mm, &ss)) || (2 == sscanf(Value.c_str(), "%d:%d", &hh, &mm))))
+			if (!cancel && (3 == sscanf(Value.c_str(), "%d:%d:%d", &hh, &mm, &ss)))
 				playback->SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
 		} else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
 			callInfoViewer(/*duration, position*/);
