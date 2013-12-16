@@ -287,7 +287,6 @@ void* CComponentsFrmClock::initClockThread(void *arg)
 			//paint segements, but wihtout saved backgrounds
 			clock->paint(CC_SAVE_SCREEN_NO);
 			count = time(0);
-			clock->frameBuffer->blit();
 		}
 		if (time(0) >= count+30) {
 			clock->cl_thread = 0;
@@ -362,6 +361,8 @@ void CComponentsFrmClock::paint(bool do_save_bg)
 
 	//paint form contents
 	paintForm(do_save_bg);
+
+	frameBuffer->blit();
 }
 
 void CComponentsFrmClock::setClockFontSize(int size)
