@@ -77,7 +77,7 @@ void *cHddStat::Run(void *arg)
 		  || (g_settings.hdd_statfs_mode == SNeutrinoSettings::HDD_STATFS_RECORDING && (CRecordManager::getInstance()->RecordingStatus() || cYTCache::getInstance()->isActive()))) {
 			caller->once = false;
 			struct statfs st;
-			if (statfs(_dir.c_str(), &st) && st.f_blocks)
+			if (statfs(_dir.c_str(), &st) || !st.f_blocks)
 				perc = -1;
 			else
 				perc = 100 * (long long)(st.f_blocks - st.f_bfree) / (long long) st.f_blocks;
