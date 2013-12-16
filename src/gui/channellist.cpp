@@ -143,10 +143,6 @@ CChannelList::~CChannelList()
 			headerClock->hide();
 		if (headerClock->isClockRun())
 			headerClock->stopThread();
-		if(headerClock){
-			delete headerClock;
-			headerClock = NULL;
-		}		  
 	}
 }
 void CChannelList::ClearList(void)
