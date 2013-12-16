@@ -698,6 +698,7 @@ void CFrameBuffer::paintBoxRel(const int x, const int y, const int dx, const int
 
 	checkFbArea(x, y, dx, dy, true);
 
+#if HAVE_SPARK_HARDWARE
 	// hack: don't paint round corners unless these are actually visible --martii
 	fb_pixel_t *f = accel->lbb + y * stride/sizeof(fb_pixel_t) + x;
 	if ((col == *f)
@@ -705,6 +706,7 @@ void CFrameBuffer::paintBoxRel(const int x, const int y, const int dx, const int
 	 && (col == *(f + (dy - 1) * stride/sizeof(fb_pixel_t)))
 	 && (col == *(f + (dy - 1) * stride/sizeof(fb_pixel_t) + dx - 1)))
 		type = 0;
+#endif
 
 	if (!type || !radius)
 	{
