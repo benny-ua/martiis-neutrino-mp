@@ -429,7 +429,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 	if (fd < 0)
 		return;
 
-	int leds = 0;
+	int leds = -1;
 
 	switch (g_info.hw_caps->display_type) {
 		case HW_DISPLAY_LINE_TEXT: {
@@ -491,7 +491,7 @@ void CLCD::ShowIcon(fp_icon icon, bool show)
 		}
 	}
 
-	if (leds)
+	if (leds > -1)
 		led_mode[leds] = show ? g_settings.led_mode[leds] : 0;
 	setled();
 #endif
@@ -629,7 +629,7 @@ void CLCD::setled(void)
 	vData.u.led.on = on & 1;
 	ioctl(fd, VFDSETLED, &vData);
 	vData.u.led.led_nr = 1;
-	vData.u.led.on = on & 2;
+	vData.u.led.on = (on & 2) >> 1;
 	ioctl(fd, VFDSETLED, &vData);
 #endif
 }
