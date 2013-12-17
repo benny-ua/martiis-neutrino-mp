@@ -326,7 +326,7 @@ void CVolumeHelper::initInfoClock(Font** font)
 	}
 
 	time_dx = t1*7 + t2*2;
-	time_ax = h_spacer;
+	time_ax = frameBuffer->getScreenX() + h_spacer;
 }
 
 void CVolumeHelper::initMuteIcon()

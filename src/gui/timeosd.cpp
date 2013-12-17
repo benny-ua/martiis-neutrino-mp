@@ -112,38 +112,38 @@ void CTimeOSD::updatePos(int position, int duration)
 void CTimeOSD::update(int position, int duration)
 {
 	switch(m_mode) {
-	case MODE_ASC:
-		show(position, false);
-		break;
-	case MODE_DESC:
-		show(duration - position, false);
-		break;
-	case MODE_BAR:
-		updatePos(position, duration);
-		break;
-	default:
-		;
+		case MODE_ASC:
+			show(position, false);
+			break;
+		case MODE_DESC:
+			show(duration - position, false);
+			break;
+		case MODE_BAR:
+			updatePos(position, duration);
+			break;
+		default:
+			;
 	}
 }
 
 void CTimeOSD::switchMode(int position, int duration)
 {
 	switch (m_mode) {
-	case MODE_ASC:
-		m_mode = MODE_DESC;
-		break;
-	case MODE_DESC:
-		m_mode = MODE_BAR;
-		kill();
-		break;
-	case MODE_BAR:
-		m_mode = MODE_HIDE;
-		timescale.kill();
-		timescale.reset();
-		frameBuffer->blit();
-		return;
-	default:
-		m_mode = MODE_ASC;
+		case MODE_ASC:
+			m_mode = MODE_DESC;
+			break;
+		case MODE_DESC:
+			m_mode = MODE_BAR;
+			kill();
+			break;
+		case MODE_BAR:
+			m_mode = MODE_HIDE;
+			timescale.kill();
+			timescale.reset();
+			frameBuffer->blit();
+			return;
+		default:
+			m_mode = MODE_ASC;
 	}
 
 	update(position, duration);

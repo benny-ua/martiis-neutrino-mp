@@ -1185,7 +1185,6 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			ss -= hh * 3600;
 			int mm = ss/60;
 			ss -= mm * 60;
-			char val[10];
 			std::string Value = to_string(hh/10) + to_string(hh%10) + ":" + to_string(mm/10) + to_string(mm%10) + ":" + to_string(ss/10) + to_string(ss%10);
 			CTimeInput jumpTime (LOCALE_MPKEY_GOTO, &Value, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, NULL, &cancel);
 			jumpTime.exec(NULL, "");

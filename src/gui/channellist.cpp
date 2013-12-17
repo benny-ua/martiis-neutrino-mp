@@ -2155,6 +2155,7 @@ void CChannelList::paintHead()
 			headerClock->setClockIntervall(1);
 
 		}
+		headerClock->setClockFormat("%H:%M");
 		headerClock->setClockFont(SNeutrinoSettings::FONT_TYPE_MENU_TITLE);
 		headerClock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
 		headerClock->setYPos(y);
