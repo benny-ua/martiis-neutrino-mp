@@ -346,6 +346,7 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 
 	int mode = CNeutrinoApp::getInstance()->getMode();
 	if (mode == NeutrinoMessages::mode_standby && streams.empty()) {
+		CNeutrinoApp::getInstance()->timer_wakeup = true;
 		printf("CStreamManager::Parse: wakeup zapit..\n");
 		g_Zapit->setStandby(false);
 		g_Zapit->getMode();
