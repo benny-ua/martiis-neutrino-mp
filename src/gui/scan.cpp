@@ -72,20 +72,13 @@ CScanTs::CScanTs(int dtype)
 	radar = 0;
 	total = done = 0;
 	freqready = 0;
-
 	deltype = dtype;
-	sigscale = new CProgressBar();
-	sigscale->setBlink();
-	
-	snrscale = new CProgressBar();
-	snrscale->setBlink();
+	signalbox = NULL;
 	memset(&TP, 0, sizeof(TP)); // valgrind
 }
 
 CScanTs::~CScanTs()
 {
-	delete sigscale;
-	delete snrscale;
 }
 
 void CScanTs::prev_next_TP( bool up)
@@ -208,19 +201,12 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 	mheight     = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	fw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
 	width       = w_max(fw * 42, 0);
-	int tmp = (BAR_WIDTH + 4 + 7 * fw) * 2 + fw + 40; /* that's from the crazy calculation in showSNR() */
-	if (width < tmp)
-		width = w_max(tmp, 0);
 	height      = h_max(hheight + (10 * mheight), 0); //9 lines
 	x = frameBuffer->getScreenX() + (frameBuffer->getScreenWidth() - width) / 2;
 	y = frameBuffer->getScreenY() + (frameBuffer->getScreenHeight() - height) / 2;
 	xpos_radar = x + width - 20 - 64; /* TODO: don't assume radar is 64x64... */
 	ypos_radar = y + hheight + (mheight >> 1);
 	xpos1 = x + 10;
-
-	sigscale->reset();
-	snrscale->reset();
-	lastsig = lastsnr = -1;
 
 	if (!frameBuffer->getActive())
 		return menu_return::RETURN_EXIT_ALL;
@@ -383,6 +369,8 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 		} while (!(msg == CRCInput::RC_timeout));
 	}
 
+	delete signalbox;
+	signalbox = NULL;
 	hide();
 
 	CZapit::getInstance()->scanPids(scan_pids);
@@ -598,51 +586,14 @@ int CScanTs::greater_xpos(int xpos, const neutrino_locale_t txt)
 
 void CScanTs::showSNR ()
 {
-	char percent[10];
-	int barwidth = BAR_WIDTH;
-	uint16_t ssig, ssnr;
-	int sig, snr;
-	int posx, posy;
-	int sw;
-
-	CFrontend * frontend = CServiceScan::getInstance()->GetFrontend();
-	ssig = frontend->getSignalStrength();
-	ssnr = frontend->getSignalNoiseRatio();
-	snr = (ssnr & 0xFFFF) * 100 / 65535;
-	sig = (ssig & 0xFFFF) * 100 / 65535;
-
-	posy = y + height - mheight - 5;
-	//TODO: move sig/snr display into its own class, similar or same code also to find in motorcontrol
-	if (lastsig != sig) { 
-		lastsig = sig;
-		posx = x + 20;
-		sprintf(percent, "%d%%", sig);
-		sw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth ("100%");
-		sigscale->setProgress(posx - 1, posy+2, BAR_WIDTH, BAR_HEIGHT, sig, 100);
-		sigscale->paint();
-
-		posx = posx + barwidth + 3;
-		frameBuffer->paintBoxRel(posx, posy -1, sw, mheight-8, COL_MENUCONTENT_PLUS_0);
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString (posx+2, posy + mheight-(mheight-BAR_HEIGHT)/4, sw, percent, COL_MENUCONTENTDARK_TEXT);
-
-		frameBuffer->paintBoxRel(posx+(4*fw), posy - 2, 4*fw, mheight, COL_MENUCONTENT_PLUS_0);
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString (posx+2+(4*fw), posy + mheight-(mheight-BAR_HEIGHT)/4, 4*fw, "SIG", COL_MENUCONTENT_TEXT);
-
+	if (signalbox == NULL){
+		CFrontend * frontend = CServiceScan::getInstance()->GetFrontend();
+		signalbox = new CSignalBox(xpos1, y + height - mheight - 5, width - 2*(xpos1-x), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight(), frontend, false);
+		signalbox->setScaleWidth(60); /*%*/
+		signalbox->setColorBody(COL_MENUCONTENT_PLUS_0);
+		signalbox->setTextColor(COL_MENUCONTENT_TEXT);
+		signalbox->doPaintBg(true);
 	}
-	if (lastsnr != snr) {
-		lastsnr = snr;
-		posx = x + 20 + barwidth + 3 + 4 * fw + 4 * fw;
-		sprintf(percent, "%d%%", snr);
-		sw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth ("100%");
-		snrscale->setProgress(posx - 1, posy+2, BAR_WIDTH, BAR_HEIGHT, snr, 100);
-		snrscale->paint();
 
-		posx = posx + barwidth + 3;
-		frameBuffer->paintBoxRel(posx, posy - 1, sw, mheight-8, COL_MENUCONTENT_PLUS_0, 0, true);
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString (posx + 2, posy + mheight-(mheight-BAR_HEIGHT)/4, sw, percent, COL_MENUCONTENTDARK_TEXT, 0, true);
-
-		frameBuffer->paintBoxRel(posx+(4*fw), posy - 2, 4*fw, mheight, COL_MENUCONTENT_PLUS_0);
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString (posx+2+(4*fw), posy + mheight-(mheight-BAR_HEIGHT)/4, 4*fw, "SNR", COL_MENUCONTENT_TEXT);
-		
-	}
+	signalbox->paint(false);
 }
