@@ -305,7 +305,7 @@ bool CComponentsFrmClock::startThread()
 	if(!cl_thread) {
 		int res = pthread_create (&cl_thread, NULL, initClockThread, ptr) ;
 		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s]  pthread_create  %s\n", __FUNCTION__, strerror(errno));
+			printf("[CComponentsFrmClock]    [%s]  pthread_create  %s\n", __func__, strerror(errno));
 			return false;
 		}
 	}
@@ -318,13 +318,13 @@ bool CComponentsFrmClock::stopThread()
 	if(cl_thread) {
 		int res = pthread_cancel(cl_thread);
 		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s] pthread_cancel  %s\n", __FUNCTION__, strerror(errno));
+			printf("[CComponentsFrmClock]    [%s] pthread_cancel  %s\n", __func__, strerror(errno));
 			return false;
 		}
 
 		res = pthread_join(cl_thread, NULL);
 		if (res != 0){
-			printf("[CComponentsFrmClock]    [%s] pthread_join  %s\n", __FUNCTION__, strerror(errno));
+			printf("[CComponentsFrmClock]    [%s] pthread_join  %s\n", __func__, strerror(errno));
 			return false;
 		}
 	}
