@@ -40,7 +40,6 @@
 #include <gui/widget/icons.h>
 #include <gui/widget/menue.h>
 #include <driver/screen_max.h>
-#include <driver/volume.h>
 #include <driver/display.h>
 #include <zapit/zapit.h>
 #include <audio_td.h>
@@ -60,7 +59,10 @@ extern CAudioSetupNotifier	* audioSetupNotifier;
 
 CAudioSelectMenuHandler::CAudioSelectMenuHandler()
 {
+	AudioSelector = NULL;
 	width = w_max (40, 10);
+	mp = &CMoviePlayerGui::getInstance();
+	dvb_delay_offset = -1;
 }
 
 CAudioSelectMenuHandler::~CAudioSelectMenuHandler()
@@ -79,23 +81,66 @@ const CMenuOptionChooser::keyval AUDIOMENU_ANALOGOUT_OPTIONS[AUDIOMENU_ANALOGOUT
 
 int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 {
-	mp = &CMoviePlayerGui::getInstance();
+	int sel = -1;
+	if (AudioSelector) {
+		sel = AudioSelector->getSelected();
+		if (dvb_delay_offset > -1 && sel == dvb_delay_offset) {
+			if (actionkey == "-") {
+				if (g_settings.dvb_subtitle_delay > -99)
+					g_settings.dvb_subtitle_delay -= 1;
+				else
+					return menu_return::RETURN_NONE;
+			} else if (actionkey == "+") {
+				if (g_settings.dvb_subtitle_delay < 99)
+					g_settings.dvb_subtitle_delay += 1;
+				else
+					return menu_return::RETURN_NONE;
+			}
+			return menu_return::RETURN_REPAINT;
+		}
+		sel -= apid_offset;
+		if (sel < 0 || sel >= p_count)
+			return menu_return::RETURN_NONE;
+	}
 
-	if (mp->Playing())
-		playback = mp->getPlayback();
+	if (actionkey == "-" || actionkey == "+") {
+		if (actionkey == "-") {
+			if (perc_val[sel] == 0)
+				return menu_return::RETURN_NONE;
+			perc_val[sel]--;
+		} else {
+			if (perc_val[sel] == 999)
+				return menu_return::RETURN_NONE;
+			perc_val[sel]++;
+		}
+		perc_str[sel] = to_string(perc_val[sel]) + "%";
 
-	int sel= atoi(actionkey.c_str());
-	if(sel >= 0) {
+#if !HAVE_SPARK_HARDWARE
+		int vol =  CZapit::getInstance()->GetVolume();
+		/* keep resulting volume = (vol * percent)/100 not more than 115 */
+		if (vol * perc_val[sel] > 11500)
+			perc_val[sel] = 11500 / vol;
+#endif
+                CZapit::getInstance()->SetPidVolume(chan, apid[sel], perc_val[sel]);
+		if (sel == sel_apid)
+			CZapit::getInstance()->SetVolumePercent(perc_val[sel]);
+
+		return menu_return::RETURN_REPAINT;
+	}
+
+	if (actionkey == "s") {
 		if (mp->Playing()) {
 			mp->setAPID(sel);
 			CVFD::getInstance()->setAudioMode(mp->GetStreamType());
-		} else if (g_RemoteControl->current_PIDs.PIDs.selected_apid!= (unsigned int) sel ) {
+		} else if (g_RemoteControl->current_PIDs.PIDs.selected_apid != (unsigned int) sel ) {
 			g_RemoteControl->setAPID(sel);
 			CVFD::getInstance()->setAudioMode();
 		}
 		return menu_return::RETURN_EXIT;
 	}
 
+	if (mp->Playing())
+		playback = mp->getPlayback();
 	if (parent)
 		parent->hide();
 
@@ -104,35 +149,56 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 
 int CAudioSelectMenuHandler::doMenu ()
 {
-	CMenuWidget AudioSelector(LOCALE_AUDIOSELECTMENUE_HEAD, NEUTRINO_ICON_AUDIO, width);
+	AudioSelector = new CMenuWidget(LOCALE_AUDIOSELECTMENUE_HEAD, NEUTRINO_ICON_AUDIO, width);
 
 	CSubtitleChangeExec SubtitleChanger(playback);
 
 	//show cancel button if configured in usermenu settings
 	if (g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL])
-		AudioSelector.addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
+		AudioSelector->addIntroItems(NONEXISTANT_LOCALE, LOCALE_AUDIOSELECTMENUE_VOLUME, CMenuWidget::BTN_TYPE_CANCEL);
 	else
-		AudioSelector.addItem(GenericMenuSeparator);
+		AudioSelector->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOSELECTMENUE_VOLUME));
+	apid_offset = AudioSelector->getItemsCount();
+	AudioSelector->addKey(CRCInput::RC_right, this, "+");
+	AudioSelector->addKey(CRCInput::RC_left, this, "-");
 
 	bool is_mp = mp->Playing();
 
-	uint p_count = is_mp ? mp->getAPIDCount() : g_RemoteControl->current_PIDs.APIDs.size();
-	uint sel_apid = is_mp ? mp->getAPID() : g_RemoteControl->current_PIDs.PIDs.selected_apid;
+	p_count = is_mp ? mp->getAPIDCount() : g_RemoteControl->current_PIDs.APIDs.size();
+	sel_apid = is_mp ? mp->getAPID() : g_RemoteControl->current_PIDs.PIDs.selected_apid;
+
+	int _apid[p_count];
+	int _perc_val[p_count];
+	unsigned int _is_ac3[p_count];
+	std::string _perc_str[p_count];
+	perc_val = _perc_val;
+	perc_str = _perc_str;
+	is_ac3 = _is_ac3;
+	apid = _apid;
+	chan = is_mp ? mp->getChannelId() : 0;
 
 	// -- setup menue due to Audio PIDs
-	for(uint i=0; i < p_count; i++ )
-	{
-		char apid[5];
-		snprintf(apid, sizeof(apid), "%d", i);
+	for(int i = 0; i < p_count; i++) {
+		if (is_mp) {
+			mp->getAPID(i, apid[i], is_ac3[i]);
+		} else {
+			apid[i] = g_RemoteControl->current_PIDs.APIDs[i].pid;
+			is_ac3[i] = g_RemoteControl->current_PIDs.APIDs[i].is_ac3;
+		}
+		perc_val[i] = CZapit::getInstance()->GetPidVolume(chan, apid[i], is_ac3[i]);
+		perc_str[i] = to_string(perc_val[i]) + "%";
+
 		CMenuForwarder *fw = new CMenuForwarder(is_mp ? mp->getAPIDDesc(i).c_str() : g_RemoteControl->current_PIDs.APIDs[i].desc, 
-				true, NULL, this, apid, CRCInput::convertDigitToKey(i + 1));
+				true, perc_str[i], this, "s", CRCInput::convertDigitToKey(i + 1));
 		fw->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
-		AudioSelector.addItem(fw, sel_apid == i);
+		fw->setMarked(sel_apid == i);
+
+		AudioSelector->addItem(fw, sel_apid == i);
 	}
 	unsigned int shortcut_num = p_count;
 #if !HAVE_SPARK_HARDWARE
 	if (p_count)
-		AudioSelector.addItem(GenericMenuSeparatorLine);
+		AudioSelector->addItem(GenericMenuSeparatorLine);
 
 	// -- setup menue for to Dual Channel Stereo
 	CMenuOptionChooser* oj = new CMenuOptionChooser(LOCALE_AUDIOMENU_ANALOG_MODE,
@@ -140,13 +206,13 @@ int CAudioSelectMenuHandler::doMenu ()
 			AUDIOMENU_ANALOGOUT_OPTIONS, AUDIOMENU_ANALOGOUT_OPTION_COUNT,
 			true, audioSetupNotifier, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
 
-	AudioSelector.addItem( oj );
+	AudioSelector->addItem( oj );
 
 	oj = new CMenuOptionChooser(LOCALE_AUDIOMENU_ANALOG_OUT, &g_settings.analog_out,
 			OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT,
 			true, audioSetupNotifier, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
 
-	AudioSelector.addItem( oj );
+	AudioSelector->addItem( oj );
 #endif
 
 	CZapitChannel * cc = NULL;
@@ -175,7 +241,7 @@ int CAudioSelectMenuHandler::doMenu ()
 			if(!sep_added)
 			{
 				sep_added = true;
-				AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
+				AudioSelector->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
 			}
 
 			if (s->thisSubType == CZapitAbsSub::DVB) {
@@ -188,7 +254,7 @@ int CAudioSelectMenuHandler::doMenu ()
 				snprintf(spid,sizeof(spid), "DVB:%d", sd->pId);
 				char item[64];
 				snprintf(item,sizeof(item), "DVB: %s (pid %x)", sd->ISO639_language_code.c_str(), sd->pId);
-				AudioSelector.addItem(new CMenuForwarder(item,
+				AudioSelector->addItem(new CMenuForwarder(item,
 							sd->pId != (is_mp ? mp->getCurrentSubPid(CZapitAbsSub::DVB) : dvbsub_getpid()),
 							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			} else if (s->thisSubType == CZapitAbsSub::TTX) {
@@ -200,7 +266,7 @@ int CAudioSelectMenuHandler::doMenu ()
 				snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", sd->pId, page, sd->ISO639_language_code.c_str());
 				char item[64];
 				snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", sd->ISO639_language_code.c_str(), sd->pId, page);
-				AudioSelector.addItem(new CMenuForwarder(item,
+				AudioSelector->addItem(new CMenuForwarder(item,
 							!tuxtx_subtitle_running(&pid, &page, NULL),
 							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			} else if (is_mp && s->thisSubType == CZapitAbsSub::SUB) {
@@ -209,7 +275,7 @@ int CAudioSelectMenuHandler::doMenu ()
 				snprintf(spid,sizeof(spid), "SUB:%d", s->pId);
 				char item[64];
 				snprintf(item,sizeof(item), "SUB: %s (pid %x)", s->ISO639_language_code.c_str(), s->pId);
-				AudioSelector.addItem(new CMenuForwarder(item,
+				AudioSelector->addItem(new CMenuForwarder(item,
 							s->pId != mp->getCurrentSubPid(CZapitAbsSub::SUB),
 							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
 			}
@@ -217,45 +283,24 @@ int CAudioSelectMenuHandler::doMenu ()
 				delete s;
 		}
 #if HAVE_SPARK_HARDWARE
-		if (have_dvb_sub)
-			AudioSelector.addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
+		if (have_dvb_sub) {
+			dvb_delay_offset = AudioSelector->getItemsCount();
+			AudioSelector->addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
+		}
 #endif
 
 		if(sep_added) {
 			CMenuForwarder * item = new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, &SubtitleChanger, "off", CRCInput::RC_stop);
 			item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
-			AudioSelector.addItem(item);
+			AudioSelector->addItem(item);
 		}
 	}
 
-	AudioSelector.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUST));
-	/* setting volume percent to zapit with channel_id/apid = 0 means current channel and pid */
-	t_channel_id chan = 0;
-	int apid = -1;
-	unsigned int is_ac3;
-	if (is_mp) {
-		chan = mp->getChannelId();
-		mp->getAPID(apid, is_ac3);
-	}
-	CVolume::getInstance()->SetCurrentChannel(chan);
-	CVolume::getInstance()->SetCurrentPid(apid);
-	int percent[p_count];
-	for (uint i=0; i < p_count; i++) {
-		const char *desc;
-		if (is_mp) {
-			mp->getAPID(i, apid, is_ac3);
-			desc = mp->getAPIDDesc(i).c_str();
-		} else {
-			apid = g_RemoteControl->current_PIDs.APIDs[i].pid;
-			is_ac3 = g_RemoteControl->current_PIDs.APIDs[i].is_ac3;
-			desc = g_RemoteControl->current_PIDs.APIDs[i].desc;
-		}
+	int res = AudioSelector->exec(NULL, "");
 
-		percent[i] = CZapit::getInstance()->GetPidVolume(chan, apid, is_ac3);
-		AudioSelector.addItem(new CMenuOptionNumberChooser(desc, &percent[i], i == sel_apid, 0, 999, CVolume::getInstance()));
-	}
+	delete AudioSelector;
+	AudioSelector = NULL;
 
-	int res = AudioSelector.exec(NULL, "");
 #if HAVE_SPARK_HARDWARE
 	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
 #endif

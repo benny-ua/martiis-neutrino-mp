@@ -493,14 +493,11 @@ void CScanTs::paintRadar(void)
 
 	CFrontend * frontend = CServiceScan::getInstance()->GetFrontend();
 	bool status = frontend->getStatus();
-	if(tuned != status) {
-		tuned = status;
-		frameBuffer->loadPal(tuned ? "radar.pal" : "radar_red.pal", 18, 38);
-	}
+	tuned = status;
 
-	snprintf(filename,sizeof(filename), "radar%d.raw", radar);
-	radar = (radar + 1) % 10;
-	frameBuffer->paintIcon8(filename, xpos_radar, ypos_radar, 18);
+	snprintf(filename,sizeof(filename), "scan%d%d", tuned & 1, radar);
+	radar = (radar + 1) % 4;
+	frameBuffer->paintIcon(filename, xpos_radar, ypos_radar, 0, 18, true, true, COL_MENUCONTENT_PLUS_0);
 }
 
 void CScanTs::hide()
@@ -531,8 +528,6 @@ void CScanTs::paint(bool fortest)
 	header.paint(CC_SAVE_SCREEN_NO);
 
 	frameBuffer->paintBoxRel(x, y + hheight, width, height - hheight, COL_MENUCONTENT_PLUS_0, RADIUS_LARGE, CORNER_BOTTOM);
-
-	frameBuffer->loadPal(tuned ? "radar.pal" : "radar_red.pal", 18, 38);
 
 	int ypos = y + hheight + (mheight >> 1);
 

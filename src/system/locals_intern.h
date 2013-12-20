@@ -26,6 +26,7 @@ const char * locale_real_names[] =
 {
 	"INTERNAL ERROR - PLEASE REPORT",
 	"AUDIOSelectMenue.head",
+	"AUDIOSelectMenue.volume",
 	"EPGMenu.epgplus",
 	"EPGMenu.eventinfo",
 	"EPGMenu.eventlist",
@@ -167,7 +168,6 @@ const char * locale_real_names[] =
 	"audiomenu.pref_subs_head",
 	"audiomenu.spdif_dd",
 	"audiomenu.stereo",
-	"audiomenu.volume_adjust",
 	"audiomenu.volume_adjustment",
 	"audiomenu.volume_adjustment_ac3",
 	"audiomenu.volume_adjustment_clear",

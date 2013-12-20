@@ -41,7 +41,17 @@ class CAudioSelectMenuHandler : public CMenuTarget
 		CMoviePlayerGui *mp;
 		int width;
 		cPlayback *playback;
-		
+
+		int sel_apid;
+		int apid_offset;
+		int dvb_delay_offset;
+		int *apid;
+		int p_count;
+		int *perc_val;
+		unsigned int *is_ac3;
+		std::string *perc_str;
+		CMenuWidget *AudioSelector;
+		t_channel_id chan;
 	public:
 		CAudioSelectMenuHandler();
 		~CAudioSelectMenuHandler();
