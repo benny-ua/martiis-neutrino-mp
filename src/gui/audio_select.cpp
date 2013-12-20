@@ -62,7 +62,9 @@ CAudioSelectMenuHandler::CAudioSelectMenuHandler()
 	AudioSelector = NULL;
 	width = w_max (40, 10);
 	mp = &CMoviePlayerGui::getInstance();
+#if HAVE_SPARK_HARDWARE
 	dvb_delay_offset = -1;
+#endif
 }
 
 CAudioSelectMenuHandler::~CAudioSelectMenuHandler()
@@ -84,6 +86,7 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 	int sel = -1;
 	if (AudioSelector) {
 		sel = AudioSelector->getSelected();
+#if HAVE_SPARK_HARDWARE
 		if (dvb_delay_offset > -1 && sel == dvb_delay_offset) {
 			if (actionkey == "-") {
 				if (g_settings.dvb_subtitle_delay > -99)
@@ -98,6 +101,7 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 			}
 			return menu_return::RETURN_REPAINT;
 		}
+#endif
 		sel -= apid_offset;
 		if (sel < 0 || sel >= p_count)
 			return menu_return::RETURN_NONE;

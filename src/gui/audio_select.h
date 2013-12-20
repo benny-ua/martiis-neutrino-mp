@@ -44,7 +44,9 @@ class CAudioSelectMenuHandler : public CMenuTarget
 
 		int sel_apid;
 		int apid_offset;
+#if HAVE_SPARK_HARDWARE
 		int dvb_delay_offset;
+#endif
 		int *apid;
 		int p_count;
 		int *perc_val;
