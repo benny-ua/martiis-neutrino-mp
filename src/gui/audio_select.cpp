@@ -142,6 +142,8 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 		}
 		return menu_return::RETURN_EXIT;
 	}
+	if (actionkey == "x")
+		return menu_return::RETURN_EXIT;
 
 	if (mp->Playing())
 		playback = mp->getPlayback();
@@ -165,6 +167,10 @@ int CAudioSelectMenuHandler::doMenu ()
 	apid_offset = AudioSelector->getItemsCount();
 	AudioSelector->addKey(CRCInput::RC_right, this, "+");
 	AudioSelector->addKey(CRCInput::RC_left, this, "-");
+	AudioSelector->addKey(CRCInput::RC_red, this, "x");
+	AudioSelector->addKey(CRCInput::RC_green, this, "x");
+	AudioSelector->addKey(CRCInput::RC_yellow, this, "x");
+	AudioSelector->addKey(CRCInput::RC_blue, this, "x");
 
 	bool is_mp = mp->Playing();
 
