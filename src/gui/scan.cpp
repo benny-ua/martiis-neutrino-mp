@@ -493,11 +493,16 @@ void CScanTs::paintRadar(void)
 
 	CFrontend * frontend = CServiceScan::getInstance()->GetFrontend();
 	bool status = frontend->getStatus();
-	tuned = status;
+	if(tuned != (int)status) {
+		tuned = status;
+		frameBuffer->paintIcon((tuned) ? "radar_green" : "radar_red", xpos_radar, ypos_radar);
+	}
 
-	snprintf(filename,sizeof(filename), "scan%d%d", tuned & 1, radar);
-	radar = (radar + 1) % 4;
-	frameBuffer->paintIcon(filename, xpos_radar, ypos_radar, 0, 18, true, true, COL_MENUCONTENT_PLUS_0);
+	snprintf(filename,sizeof(filename), "radar%d", radar);
+	radar = (radar + 1) % 10;
+	frameBuffer->SetTransparent(CFrameBuffer::TM_NONE);
+	frameBuffer->paintIcon(filename, xpos_radar, ypos_radar);
+	frameBuffer->SetTransparentDefault();
 }
 
 void CScanTs::hide()
