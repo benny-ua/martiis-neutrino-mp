@@ -2551,16 +2551,24 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				if(!g_settings.minimode) {
 					StopSubtitles();
 					InfoClock->enableInfoClock(false);
-					if(g_settings.mode_clock)
-						InfoClock->StopClock();
+					int old_ttx = g_settings.cacheTXT;
+					int old_epg = g_settings.epg_scan;
 					mainMenu->exec(NULL, "");
-					if(g_settings.mode_clock)
-						InfoClock->StartClock();
 					InfoClock->enableInfoClock(true);
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
-					if (!g_settings.epg_scan)
-						CEpgScan::getInstance()->Clear();
+					if (old_epg != g_settings.epg_scan) {
+						if (g_settings.epg_scan)
+							CEpgScan::getInstance()->Start();
+						else
+							CEpgScan::getInstance()->Clear();
+					}
+					if (old_ttx != g_settings.cacheTXT) {
+						if(g_settings.cacheTXT) {
+							tuxtxt_init();
+						} else
+							tuxtxt_close();
+					}
 				}
 			}
 			else if (((msg == CRCInput::RC_tv) || (msg == CRCInput::RC_radio)) && (g_settings.key_tvradio_mode == (int)CRCInput::RC_nokey)) {
@@ -4112,7 +4120,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		frameBuffer->setActive(false);
 		// Active standby on
 		powerManager->SetStandby(false, false);
-		CEpgScan::getInstance()->StartStandby();
+		CEpgScan::getInstance()->Start(true);
 	} else {
 		// Active standby off
 		powerManager->SetStandby(false, false);
@@ -4124,9 +4132,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 #endif
 		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		videoDecoder->Standby(false);
-		CSectionsdClient::CurrentNextInfo dummy;
-		g_InfoViewer->getEPG(0, dummy);
-		CEpgScan::getInstance()->StopStandby();
+		CEpgScan::getInstance()->Stop();
 
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(false);
