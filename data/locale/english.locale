@@ -440,9 +440,9 @@ extra.longitude Longitude
 extra.menu_left_exit "Left" = menu back
 extra.neutrinosettings.title Neutrino Settings
 extra.north North
-extra.record_bufsize Write buffer in MB
-extra.record_bufsize_dmx DMX buffer in MB
-extra.record_time Max. recording time in hours
+extra.record_bufsize Write buffer size
+extra.record_bufsize_dmx DMX buffer size
+extra.record_time Max. recording time
 extra.rotor_swap Swap rotor east/west
 extra.rounded_corners Shape of corners
 extra.rounded_corners_off angular
@@ -1137,6 +1137,7 @@ menu.hint_opkg_upgrade Updates all installed packages to the most recent version
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
+menu.hint_osd_timing After this time the infobar will be faded out.
 menu.hint_parentallock_changepin Change PIN code
 menu.hint_parentallock_lockage Select age allowed to watch
 menu.hint_parentallock_menu Lock menus with pin code
@@ -2193,8 +2194,6 @@ timersettings.separator Timer
 timing.chanlist Channellist
 timing.epg Epg
 timing.filebrowser Filebrowser
-timing.hint_1 Time in sec. After this time the
-timing.hint_2 infobar will be faded out.
 timing.infobar Infobar
 timing.infobar_movieplayer Infobar (movie mode)
 timing.infobar_radio Infobar (radio mode)
@@ -2204,6 +2203,10 @@ timing.volumebar Volume bar
 unicable.lnb Unicable Input
 unicable.qrg Unicable Frequency
 unicable.scr Unicable SCR
+unit.short.hour h
+unit.short.millisecond ms
+unit.short.minute min
+unit.short.second s
 upnpbrowser.head UPnP Browser
 upnpbrowser.noservers No UPnP servers found
 upnpbrowser.rescan Scan again
