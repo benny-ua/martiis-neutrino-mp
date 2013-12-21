@@ -72,6 +72,7 @@ CAudioSelectMenuHandler::~CAudioSelectMenuHandler()
 
 }
 
+#if !HAVE_SPARK_HARDWARE
 // -- this is a copy from neutrino.cpp!!
 #define AUDIOMENU_ANALOGOUT_OPTION_COUNT 3
 const CMenuOptionChooser::keyval AUDIOMENU_ANALOGOUT_OPTIONS[AUDIOMENU_ANALOGOUT_OPTION_COUNT] =
@@ -80,6 +81,7 @@ const CMenuOptionChooser::keyval AUDIOMENU_ANALOGOUT_OPTIONS[AUDIOMENU_ANALOGOUT
 	{ 1, LOCALE_AUDIOMENU_MONOLEFT },
 	{ 2, LOCALE_AUDIOMENU_MONORIGHT }
 };
+#endif
 
 int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &actionkey)
 {
@@ -242,6 +244,8 @@ int CAudioSelectMenuHandler::doMenu ()
 #if HAVE_SPARK_HARDWARE
 		bool have_dvb_sub = false;
 #endif
+		bool sub_active = false;
+
 		for (int i = 0 ; i < subtitleCount ; ++i)
 		{
 			CZapitAbsSub* s = is_mp ? mp->getChannelSub(i, &s) : cc->getChannelSub(i);
@@ -254,56 +258,58 @@ int CAudioSelectMenuHandler::doMenu ()
 				AudioSelector->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SUBTITLES_HEAD));
 			}
 
+			bool ena = false;
+			bool add = true;
+			char spid[64];
+			char item[64];
+
 			if (s->thisSubType == CZapitAbsSub::DVB) {
 #if HAVE_SPARK_HARDWARE
 				have_dvb_sub = true;
 #endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
-				printf("[neutrino] adding DVB subtitle %s pid %x\n", sd->ISO639_language_code.c_str(), sd->pId);
-				char spid[10];
+				// printf("[neutrino] adding DVB subtitle %s pid %x\n", sd->ISO639_language_code.c_str(), sd->pId);
 				snprintf(spid,sizeof(spid), "DVB:%d", sd->pId);
-				char item[64];
 				snprintf(item,sizeof(item), "DVB: %s (pid %x)", sd->ISO639_language_code.c_str(), sd->pId);
-				AudioSelector->addItem(new CMenuForwarder(item,
-							sd->pId != (is_mp ? mp->getCurrentSubPid(CZapitAbsSub::DVB) : dvbsub_getpid()),
-							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+				ena = sd->pId != (is_mp ? mp->getCurrentSubPid(CZapitAbsSub::DVB) : dvbsub_getpid());
 			} else if (s->thisSubType == CZapitAbsSub::TTX) {
 				CZapitTTXSub* sd = reinterpret_cast<CZapitTTXSub*>(s);
-				printf("[neutrino] adding TTX subtitle %s pid %x mag %X page %x\n", sd->ISO639_language_code.c_str(), sd->pId, sd->teletext_magazine_number, sd->teletext_page_number);
-				char spid[64];
+				// printf("[neutrino] adding TTX subtitle %s pid %x mag %X page %x\n", sd->ISO639_language_code.c_str(), sd->pId, sd->teletext_magazine_number, sd->teletext_page_number);
 				int page = ((sd->teletext_magazine_number & 0xFF) << 8) | sd->teletext_page_number;
 				int pid = sd->pId;
 				snprintf(spid,sizeof(spid), "TTX:%d:%03X:%s", sd->pId, page, sd->ISO639_language_code.c_str());
-				char item[64];
 				snprintf(item,sizeof(item), "TTX: %s (pid %x page %03X)", sd->ISO639_language_code.c_str(), sd->pId, page);
-				AudioSelector->addItem(new CMenuForwarder(item,
-							!tuxtx_subtitle_running(&pid, &page, NULL),
-							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
+				ena = !tuxtx_subtitle_running(&pid, &page, NULL);
 			} else if (is_mp && s->thisSubType == CZapitAbsSub::SUB) {
-				printf("[neutrino] adding SUB subtitle %s pid %x\n", s->ISO639_language_code.c_str(), s->pId);
-				char spid[10];
+				// printf("[neutrino] adding SUB subtitle %s pid %x\n", s->ISO639_language_code.c_str(), s->pId);
 				snprintf(spid,sizeof(spid), "SUB:%d", s->pId);
-				char item[64];
 				snprintf(item,sizeof(item), "SUB: %s (pid %x)", s->ISO639_language_code.c_str(), s->pId);
-				AudioSelector->addItem(new CMenuForwarder(item,
-							s->pId != mp->getCurrentSubPid(CZapitAbsSub::SUB),
+				ena = s->pId != mp->getCurrentSubPid(CZapitAbsSub::SUB);
+			} else
+				add = false;
+
+			if (add)
+				AudioSelector->addItem(new CMenuForwarder(item, ena,
 							NULL, &SubtitleChanger, spid, CRCInput::convertDigitToKey(++shortcut_num)));
-			}
 			if (is_mp)
 				delete s;
-		}
-#if HAVE_SPARK_HARDWARE
-		if (have_dvb_sub) {
-			dvb_delay_offset = AudioSelector->getItemsCount();
-			AudioSelector->addItem(new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99));
-		}
-#endif
 
-		if(sep_added) {
+			sub_active |= !ena;
+		}
+
+		if(sub_active) {
 			CMenuForwarder * item = new CMenuForwarder(LOCALE_SUBTITLES_STOP, true, NULL, &SubtitleChanger, "off", CRCInput::RC_stop);
 			item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
 			AudioSelector->addItem(item);
 		}
+#if HAVE_SPARK_HARDWARE
+		if (have_dvb_sub) {
+			dvb_delay_offset = AudioSelector->getItemsCount();
+			CMenuOptionNumberChooser *ch = new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99);
+			ch->setNumberFormat(std::string("%d ") + g_Locale->getText(LOCALE_UNIT_SHORT_SECOND));
+			AudioSelector->addItem(ch);
+		}
+#endif
 	}
 
 	int res = AudioSelector->exec(NULL, "");
