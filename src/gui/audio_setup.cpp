@@ -231,21 +231,32 @@ int CAudioSetup::showAudioSetup()
 #if 0
 	audioSettings->addItem(mf);
 #endif
+	CMenuOptionNumberChooser *ch;
 #if HAVE_SPARK_HARDWARE
 	audioSetupNotifier->openMixers();
 	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_MIXER_VOLUME));
-	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG,
-		(int *)&g_settings.audio_mixer_volume_analog, true, 0, 100, audioSetupNotifier));
-	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI,
-		(int *)&g_settings.audio_mixer_volume_hdmi, true, 0, 100, audioSetupNotifier));
-	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF,
-		(int *)&g_settings.audio_mixer_volume_spdif, true, 0, 100, audioSetupNotifier));
+	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG,
+		(int *)&g_settings.audio_mixer_volume_analog, true, 0, 100, audioSetupNotifier);
+	ch->setNumberFormat("%d%%");
+	audioSettings->addItem(ch);
+	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_HDMI,
+		(int *)&g_settings.audio_mixer_volume_hdmi, true, 0, 100, audioSetupNotifier);
+	ch->setNumberFormat("%d%%");
+	audioSettings->addItem(ch);
+	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_SPDIF,
+		(int *)&g_settings.audio_mixer_volume_spdif, true, 0, 100, audioSetupNotifier);
+	ch->setNumberFormat("%d%%");
+	audioSettings->addItem(ch);
 #endif
 	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT));
-	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_AC3,
-		(int *)&g_settings.audio_volume_percent_ac3, true, 0, 100, audioSetupNotifier));
-	audioSettings->addItem(new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_PCM,
-		(int *)&g_settings.audio_volume_percent_pcm, true, 0, 100, audioSetupNotifier));
+	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_AC3,
+		(int *)&g_settings.audio_volume_percent_ac3, true, 0, 100, audioSetupNotifier);
+	ch->setNumberFormat("%d%%");
+	audioSettings->addItem(ch);
+	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_PCM,
+		(int *)&g_settings.audio_volume_percent_pcm, true, 0, 100, audioSetupNotifier);
+	ch->setNumberFormat("%d%%");
+	audioSettings->addItem(ch);
 	audioSettings->addItem(new CMenuForwarder(LOCALE_AUDIOMENU_VOLUME_ADJUSTMENT_CLEAR, true, NULL, this, "clear_vol_map"));
 
 	int res = audioSettings->exec(NULL, "");
