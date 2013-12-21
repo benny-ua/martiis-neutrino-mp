@@ -472,7 +472,7 @@ extra.volume_pos Volumebar
 extra.volume_size Height of display
 extra.west West
 extra.zap_cycle Zap cycle
-extra.zapit_fe_timeout Tune timeout (1 = 10 msec)
+extra.zapit_fe_timeout Tune timeout
 extra.zapit_hvoltage 18V for rotor moving 
 extra.zapit_motor_speed Motor moving speed (10 = 1deg/sec)
 extra.zapit_scanpids Scan/Use pids
