@@ -354,20 +354,6 @@ bool CAudioSetupNotifier::changeNotify(const neutrino_locale_t OptionName, void 
 }
 
 // used in ./gui/osd_setup.cpp:
-bool CTimingSettingsNotifier::changeNotify(const neutrino_locale_t OptionName, void *)
-{
-	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
-	{
-		if (ARE_LOCALES_EQUAL(OptionName, timing_setting[i].name))
-		{
-			g_settings.timing[i] = 	atoi(g_settings.timing_string[i]);
-			return true;
-		}
-	}
-	return false;
-}
-
-// used in ./gui/osd_setup.cpp:
 bool CFontSizeNotifier::changeNotify(const neutrino_locale_t, void *)
 {
 	CHintBox hintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_FONTSIZE_HINT)); // UTF-8
@@ -383,14 +369,14 @@ bool CFontSizeNotifier::changeNotify(const neutrino_locale_t, void *)
 
 int CSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 {
-printf("CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
+	fprintf(stderr, "CSubtitleChangeExec::exec: action %s\n", actionKey.c_str());
 
 	CMoviePlayerGui *mp = &CMoviePlayerGui::getInstance();
 	bool is_mp = mp->Playing();
 
 	if(actionKey == "off") {
 		tuxtx_stop_subtitle();
-		if (!mp && dvbsub_getpid() > 0)
+		if (!is_mp && dvbsub_getpid() > 0)
 			dvbsub_stop();
 		if (is_mp && playback) {
 			if (playback->GetDvbsubtitlePid() > 0)
@@ -665,7 +651,6 @@ int CDataResetNotifier::exec(CMenuTarget* /*parent*/, const std::string& actionK
 		CNeutrinoApp::getInstance()->saveSetup(NEUTRINO_SETTINGS_FILE);
 		//CNeutrinoApp::getInstance()->loadColors(NEUTRINO_SETTINGS_FILE);
 		CNeutrinoApp::getInstance()->SetupFonts();
-		CNeutrinoApp::getInstance()->SetupTiming();
 		CColorSetupNotifier::setPalette();
 		CVFD::getInstance()->setlcdparameter();
 		CFrameBuffer::getInstance()->Clear();

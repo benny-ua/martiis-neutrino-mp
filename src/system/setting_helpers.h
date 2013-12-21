@@ -113,12 +113,6 @@ class CAudioSetupNotifier : public CChangeObserver
 		bool changeNotify(const neutrino_locale_t OptionName, void *);
 };
 
-class CTimingSettingsNotifier : public CChangeObserver
-{
-	public:
-		bool changeNotify(const neutrino_locale_t OptionName, void *);
-};
-
 class CFontSizeNotifier : public CChangeObserver
 {
 	public:
