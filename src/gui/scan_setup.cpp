@@ -676,6 +676,13 @@ int CScanSetup::showScanMenuFrontendSetup()
 	return res;
 }
 
+static std::string rotationSpeed2str(int i)
+{
+	char s[40];
+	snprintf(s, sizeof(s), "%d.%d°/s", i / 10, i % 10);
+	return std::string(s);
+}
+
 int CScanSetup::showFrontendSetup(int number)
 {
 	int shortcut = 1;
@@ -802,6 +809,7 @@ int CScanSetup::showFrontendSetup(int number)
 
 		setupMenu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SATSETUP_EXTENDED_MOTOR));
 		CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_EXTRA_ZAPIT_MOTOR_SPEED, (int *)&fe_config.motorRotationSpeed, allow_moptions, 0, 64, NULL);
+		nc->setNumberFormat(rotationSpeed2str);
 		nc->setHint("", LOCALE_MENU_HINT_SCAN_MOTOR_SPEED);
 		setupMenu->addItem(nc);
 		msettings.Add(nc);

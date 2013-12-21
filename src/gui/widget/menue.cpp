@@ -1246,6 +1246,7 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name,
 	
 	nameString         = "";
 	numberFormat         = "%d";
+	numberFormatFunction = NULL;
 	observ = Observ;
 	slider_on = sliderOn;
 }
@@ -1267,6 +1268,7 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int 
 	
 	nameString         = Name;
 	numberFormat         = "%d";
+	numberFormatFunction = NULL;
 	observ = Observ;
 	slider_on = sliderOn;
 }
@@ -1302,11 +1304,15 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 int CMenuOptionNumberChooser::paint(bool selected)
 {
 	const char * l_option;
-	char option_value[11];
+	char option_value[40];
 
 	if ((localized_value_name == NONEXISTANT_LOCALE) || ((*optionValue) != localized_value))
 	{
-		sprintf(option_value, numberFormat.c_str(), ((*optionValue) + display_offset));
+		if (numberFormatFunction) {
+			std::string s = numberFormatFunction(*optionValue + display_offset);
+			strncpy(option_value, s.c_str(), s.length());
+		} else
+			sprintf(option_value, numberFormat.c_str(), *optionValue + display_offset);
 		l_option = option_value;
 	}
 	else
@@ -1350,7 +1356,10 @@ int CMenuOptionNumberChooser::getWidth(void)
 
 	width += (w1 > w2) ? w1 : w2;
 
-	if (numberFormat != "%d") {
+	if (numberFormatFunction) {
+		std::string s = numberFormatFunction(0);
+		width += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(s.c_str(), true) - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("0", true); // arbitrary
+	} else if (numberFormat != "%d") {
 		char format[numberFormat.length()];
 		snprintf(format, numberFormat.length(), numberFormat.c_str(), 0);
 		width += g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(format, true) - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("0", true);

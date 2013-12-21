@@ -305,6 +305,7 @@ private:
 	bool  		slider_on;
 	CChangeObserver *     observ;
 	std::string	numberFormat;
+	std::string	(*numberFormatFunction)(int num);
 
  public:
 	CMenuOptionNumberChooser(const neutrino_locale_t name, int * const OptionValue, const bool Active,
@@ -320,6 +321,7 @@ private:
 	int isMenueOptionChooser(void) const{return 1;}
 	int getWidth(void);
 	void setNumberFormat(std::string format) { numberFormat = format; }
+	void setNumberFormat(std::string (*fun)(int)) { numberFormatFunction = fun; }
 };
 
 class CMenuOptionChooser : public CAbstractMenuOptionChooser
