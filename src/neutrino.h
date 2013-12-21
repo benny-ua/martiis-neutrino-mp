@@ -159,7 +159,6 @@ public:
 	int loadSetup(const char * fname);
 	void loadKeys(const char * fname = NULL);
 	void saveKeys(const char * fname = NULL);
-	void SetupTiming();
 	void SetupFonts(int fmode = CNeutrinoFonts::FONTSETUP_ALL);
 	void setupRecordingDevice(void);
 

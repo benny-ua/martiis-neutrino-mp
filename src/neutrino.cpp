@@ -1883,12 +1883,6 @@ void CNeutrinoApp::SetupFonts(int fmode)
 /**************************************************************************************
 *          CNeutrinoApp -  setup the menu timouts                                     *
 **************************************************************************************/
-void CNeutrinoApp::SetupTiming()
-{
-	for (int i = 0; i < SNeutrinoSettings::TIMING_SETTING_COUNT; i++)
-		g_settings.timing_string[i] = to_string(g_settings.timing[i]);
-}
-
 
 #define LCD_UPDATE_TIME_RADIO_MODE (6 * 1000 * 1000)
 #define LCD_UPDATE_TIME_TV_MODE (60 * 1000 * 1000)
@@ -2142,8 +2136,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	/* setup GUI */
 	neutrinoFonts = CNeutrinoFonts::getInstance();
 	SetupFonts();
-fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
-	SetupTiming();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	g_PicViewer = new CPictureViewer();
 	CColorSetupNotifier::setPalette();
