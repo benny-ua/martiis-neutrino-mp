@@ -4074,8 +4074,8 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 
 		videoDecoder->Standby(true);
 
-		g_Sectionsd->setPauseScanning(!fromDeepStandby);
 		g_Sectionsd->setServiceChanged(0, false);
+		g_Sectionsd->setPauseScanning(!fromDeepStandby);
 
 		lastMode = mode;
 		mode = mode_standby;
