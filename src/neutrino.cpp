@@ -156,7 +156,7 @@ char zapit_lat[20]="#";
 char zapit_long[20]="#";
 bool autoshift = false;
 uint32_t scrambled_timer;
-t_channel_id standby_channel_id;
+t_channel_id standby_channel_id = 0;
 
 //NEW
 static pthread_t timer_thread;
@@ -3357,6 +3357,12 @@ _repeat:
 		if(!CRecordManager::getInstance()->RecordingStatus() && (!data))
 		{
 			if(mode == mode_standby) {
+				// zap back to pre-recording channel if necessary
+				t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+				if (standby_channel_id && (live_channel_id != standby_channel_id)) {
+					live_channel_id = standby_channel_id;
+					channelList->zapTo_ChannelID(live_channel_id);
+				}
 				/* do not put zapit to standby, if epg scan not finished */
 				if (!CEpgScan::getInstance()->Running())
 					g_Zapit->setStandby(true);
