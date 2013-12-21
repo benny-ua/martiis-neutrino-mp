@@ -419,8 +419,6 @@ printf("C: %d S: %d T: %d\n", CFEManager::getInstance()->haveCable(),CFEManager:
 	if (CFEManager::getInstance()->haveSat()) {
 		r_system = DVB_S;
 
-		//settings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_SCANTS_PREVERENCES_RECEIVING_SYSTEM ));
-
 		satOnOff = new CMenuWidget(LOCALE_SATSETUP_SATELLITE, NEUTRINO_ICON_SETTINGS, width);
 
 		//auto scan

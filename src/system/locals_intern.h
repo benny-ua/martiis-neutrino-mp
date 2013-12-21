@@ -2001,8 +2001,6 @@ const char * locale_real_names[] =
 	"scants.numberofradioservices",
 	"scants.numberoftotalservices",
 	"scants.numberoftvservices",
-	"scants.preverences_receiving_system",
-	"scants.preverences_scan",
 	"scants.provider",
 	"scants.select_tp",
 	"scants.startnow",
