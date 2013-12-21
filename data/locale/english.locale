@@ -106,7 +106,6 @@ adzap.minute minute
 adzap.minutes minutes
 adzap.monitor Stay active during current broadcast
 adzap.switchback Switch back after
-apidselector.head Select language
 audio.srs_algo Type
 audio.srs_algo_heavy Heavy
 audio.srs_algo_light Light
@@ -119,7 +118,6 @@ audiomenu.analog_mode Analog mode
 audiomenu.analog_out Analog output
 audiomenu.auto_lang Auto select audio
 audiomenu.auto_subs Auto select subtitles
-audiomenu.avs avs
 audiomenu.avsync A/V sync
 audiomenu.avsync_am Audio master
 audiomenu.clockrec 
@@ -260,7 +258,6 @@ channellist.history History
 channellist.keep_numbers Persistent channel numbers
 channellist.make_hdlist Create list of HD channels
 channellist.make_newlist Create list of new channels
-channellist.make_others Create list of other channels
 channellist.make_removedlist Create list of removed channels
 channellist.make_webtvlist Create list of WebTV channels
 channellist.new_zap_mode Quickzap in list
@@ -314,7 +311,6 @@ colormenusetup.menucontent_inactive Content inactive
 colormenusetup.menucontent_selected Content selected
 colormenusetup.menuhead Header
 colorstatusbar.text Infobar
-colorthememenu.head Select theme
 colorthememenu.head2 Load themes
 colorthememenu.name Theme name
 colorthememenu.neutrino_theme Neutrino Theme
@@ -435,7 +431,6 @@ extra.latitude Latitude
 extra.loadconfig Load from
 extra.loadkeys Load from
 extra.lodirection LoDirection
-extra.logo Logo number
 extra.longitude Longitude
 extra.menu_left_exit "Left" = menu back
 extra.neutrinosettings.title Neutrino Settings
@@ -479,7 +474,6 @@ extra.west West
 extra.zap_cycle Zap cycle
 extra.zapit_fe_timeout Tune timeout (1 = 10 msec)
 extra.zapit_hvoltage 18V for rotor moving 
-extra.zapit_make_bouquet Make Remaining Channels list
 extra.zapit_motor_speed Motor moving speed (10 = 1deg/sec)
 extra.zapit_scanpids Scan/Use pids
 extra.zapit_sdt_changed Channels changed, reload settings.
@@ -718,9 +712,6 @@ imageinfo.license License
 imageinfo.vcs Git:
 imageinfo.version Version:
 inetradio.name Internetradio
-infoclock OSD clock
-infoclock.no_background Transparent background
-infoclock.with_seconds Show seconds
 infoviewer.epgnotload EPG not loaded....
 infoviewer.epgwait waiting for EPG...
 infoviewer.eventlist Event-List
@@ -934,7 +925,6 @@ menu.hint_channels Open channel list
 menu.hint_ci Conditional access menu\nto setup your CI CAM or embeded Conax card
 menu.hint_clock_background Show clock with theme's background color
 menu.hint_clock_mode Switch clock on or off
-menu.hint_clock_no_background Change the clock background color to transparent.
 menu.hint_clock_seconds Change the time format to hide seconds.
 menu.hint_clock_size Set the size of the info clock.
 menu.hint_colors Configure GUI colors
@@ -1396,12 +1386,6 @@ miscsettings.infobar_disp_5 Logo+signal
 miscsettings.infobar_disp_6 Logo+channel number+signal
 miscsettings.infobar_disp_log Logo
 miscsettings.infobar_logo_hdd_dir Logo dir
-miscsettings.infobar_logo_hdd_dir_e2 Logo dir 2
-miscsettings.infobar_progressbar progressbar options
-miscsettings.infobar_progressbar_0 standard
-miscsettings.infobar_progressbar_1 below channel name
-miscsettings.infobar_progressbar_2 small below channel name
-miscsettings.infobar_progressbar_3 narrow between EPG-Events
 miscsettings.infobar_sat_display Satellite display on infobar
 miscsettings.infobar_show show Info on EPG change
 miscsettings.infobar_show_dd_available show DD availability
@@ -1411,15 +1395,12 @@ miscsettings.infobar_show_sysfs_hdd Fill level (sysFS & hdd)
 miscsettings.infobar_show_tuner Display active tuner
 miscsettings.infoclock Clock
 miscsettings.progressbar Progressbar
-miscsettings.progressbar_color Color
-miscsettings.progressbar_design Design
 miscsettings.progressbar_design_0 colored points
 miscsettings.progressbar_design_1 colored vertical lines
 miscsettings.progressbar_design_2 colored horizontal lines
 miscsettings.progressbar_design_3 colored bar
 miscsettings.progressbar_design_4 monochrome
 miscsettings.progressbar_design_long Progressbardesign
-miscsettings.progressbar_infobar_position Position
 miscsettings.progressbar_infobar_position_0 standard
 miscsettings.progressbar_infobar_position_1 below channel name
 miscsettings.progressbar_infobar_position_2 small below channel name
@@ -1614,7 +1595,6 @@ moviebrowser.yt_max_history Max search history size
 moviebrowser.yt_max_results Max results to fetch
 moviebrowser.yt_most_popular Most popular today
 moviebrowser.yt_most_popular_all_time Most popular
-moviebrowser.yt_next_results Next results
 moviebrowser.yt_orderby Order by
 moviebrowser.yt_orderby.published publishing date
 moviebrowser.yt_orderby.rating rating
@@ -1622,8 +1602,6 @@ moviebrowser.yt_orderby.relevance relevance
 moviebrowser.yt_orderby.viewcount view count
 moviebrowser.yt_pending Pending downloads
 moviebrowser.yt_pref_quality Prefered quality
-moviebrowser.yt_prev_results Previous results
-moviebrowser.yt_recently_featured Recently featured
 moviebrowser.yt_region Region
 moviebrowser.yt_related Related videos
 moviebrowser.yt_search Search keyword
@@ -1803,7 +1781,6 @@ personalize.pinhint Enter the Personalization PIN Code
 personalize.pinprotect Yes
 personalize.pinstatus Require PIN
 personalize.plugins Plugins
-personalize.setupmenuwithpin Settings Menu with PIN
 personalize.usermenu_preferred_buttons Assigning of preferred keys
 personalize.usermenu_show_cancel Show "Cancel"-Button
 personalize.visible Visible
@@ -1856,7 +1833,6 @@ plugintype.game Game
 plugintype.lua LUA Script
 plugintype.script Script
 plugintype.tool Tool
-progressbar.color Progressbar Design
 progressbar.color.full colored
 progressbar.color.horizontal colored horizontal lines
 progressbar.color.matrix colored dots
@@ -2185,11 +2161,7 @@ timerlist.weekdays Days of the week
 timerlist.weekdays.hint_1 Mo Tu We Th Fr Sa Su
 timerlist.weekdays.hint_2 'X'=timer '-' no timer
 timersettings.record_safety_time_after Record stop time correction
-timersettings.record_safety_time_after.hint_1 Correction time in min. (00=off). This time
-timersettings.record_safety_time_after.hint_2 will added to stop time of every record timer.
 timersettings.record_safety_time_before Record start time correction
-timersettings.record_safety_time_before.hint_1 Correction time in min. (00=off). This time
-timersettings.record_safety_time_before.hint_2 will be deducted of every record timer.
 timersettings.separator Timer
 timing.chanlist Channellist
 timing.epg Epg
@@ -2289,9 +2261,6 @@ videomenu.scart Scart
 videomenu.screensetup Screen Setup
 videomenu.sharpness Sharpness
 videomenu.tv-scart Video
-videomenu.vcrsignal VCR Output Signal Type
-videomenu.vcrsignal_composite CVBS
-videomenu.vcrsignal_svideo S-Video
 videomenu.videoformat Format
 videomenu.videoformat_149 14:9
 videomenu.videoformat_169 16:9
@@ -2301,7 +2270,6 @@ webtv.head WebTV
 webtv.xml WebTV XML files
 webtv.xml.add Add XML file
 webtv.xml.del Remove XML file
-webtv.xml.del.hint Please select the file to remove, then press RED.
 window_size Window size in %
 wizard.initial_settings Initial settings found
 wizard.install_settings Do you want to install channels for Astra 19.2°E?

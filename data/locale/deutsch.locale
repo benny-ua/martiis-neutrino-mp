@@ -106,7 +106,6 @@ adzap.minute Minute
 adzap.minutes Minuten
 adzap.monitor Daueraktiv bei aktueller Sendung
 adzap.switchback Zurückschalten nach
-apidselector.head Sprachauswahl
 audio.srs_algo Art
 audio.srs_algo_heavy stark
 audio.srs_algo_light einfach
@@ -119,7 +118,6 @@ audiomenu.analog_mode Analog Modus
 audiomenu.analog_out Analog-Ausgang
 audiomenu.auto_lang Tonwahl automatisch
 audiomenu.auto_subs Untertitel automatisch
-audiomenu.avs avs
 audiomenu.avsync A/V sync
 audiomenu.avsync_am Audio master
 audiomenu.clockrec 
@@ -313,7 +311,6 @@ colormenusetup.menucontent_inactive Fensterinhalt deaktiviert
 colormenusetup.menucontent_selected Fensterinhalt selektiert
 colormenusetup.menuhead Titelleiste
 colorstatusbar.text Infobar
-colorthememenu.head Theme auswählen
 colorthememenu.head2 Themes laden
 colorthememenu.name Themename
 colorthememenu.neutrino_theme Neutrino Theme
@@ -434,7 +431,6 @@ extra.latitude Breitengrad
 extra.loadconfig Laden von
 extra.loadkeys Laden von
 extra.lodirection Längengrad-Ausrichtung
-extra.logo Logo-Nummer
 extra.longitude Längengrad
 extra.menu_left_exit "links" = Menü zurück
 extra.neutrinosettings.title Neutrino-Einstellungen
@@ -478,7 +474,6 @@ extra.west Westen
 extra.zap_cycle Zap nur in Bouquet
 extra.zapit_fe_timeout Tuning Timeout (1=10ms)
 extra.zapit_hvoltage High (13.5/ 18.5) Voltage
-extra.zapit_make_bouquet Kanalliste auffüllen
 extra.zapit_motor_speed Rotor Drehzeit (10 = 1°/ sec)
 extra.zapit_scanpids PIDs scannen/nutzen
 extra.zapit_sdt_changed Kanalliste wird neu geladen.
@@ -717,9 +712,6 @@ imageinfo.license Lizenz
 imageinfo.vcs Git:
 imageinfo.version Version:
 inetradio.name Internetradio
-infoclock OSD-Uhr
-infoclock.no_background Hintergrund transparent
-infoclock.with_seconds Sekunden anzeigen
 infoviewer.epgnotload Informationen noch nicht geladen...
 infoviewer.epgwait Warte auf EPG-Informationen...
 infoviewer.eventlist EPG/Vorschau
@@ -1394,12 +1386,6 @@ miscsettings.infobar_disp_5 Logo/Signalbalken
 miscsettings.infobar_disp_6 Logo+Kanalnummer/Signalbalken
 miscsettings.infobar_disp_log Logo
 miscsettings.infobar_logo_hdd_dir Logo Verzeichnis
-miscsettings.infobar_logo_hdd_dir_e2 Logo Verz. 2
-miscsettings.infobar_progressbar Fortschrittsbalken Opt.
-miscsettings.infobar_progressbar_0 Standard
-miscsettings.infobar_progressbar_1 unterhalb Kanalname
-miscsettings.infobar_progressbar_2 unterhalb Kanalname schmal
-miscsettings.infobar_progressbar_3 zwischen EPG-Events schmal
 miscsettings.infobar_sat_display Kabel-/Satellitenanbieter
 miscsettings.infobar_show Info bei EPG Änderungen
 miscsettings.infobar_show_dd_available DD-Verfügbarkeit anzeigen
@@ -1409,15 +1395,12 @@ miscsettings.infobar_show_sysfs_hdd Füllstandanzeige (sysFS & hdd)
 miscsettings.infobar_show_tuner Aktiven Tuner anzeigen
 miscsettings.infoclock Uhr
 miscsettings.progressbar Fortschrittsbalken
-miscsettings.progressbar_color Farbe
-miscsettings.progressbar_design Design
 miscsettings.progressbar_design_0 farbige Punkte
 miscsettings.progressbar_design_1 farbige vertikale Linien
 miscsettings.progressbar_design_2 farbige horizontale Linien
 miscsettings.progressbar_design_3 Farbverlauf
 miscsettings.progressbar_design_4 monochrom
 miscsettings.progressbar_design_long Progressbardesign
-miscsettings.progressbar_infobar_position Position
 miscsettings.progressbar_infobar_position_0 Standard
 miscsettings.progressbar_infobar_position_1 unterhalb Kanalname
 miscsettings.progressbar_infobar_position_2 unterhalb Kanalname (schmal)
@@ -1612,7 +1595,6 @@ moviebrowser.yt_max_history Max. Anzahl früherer Suchen
 moviebrowser.yt_max_results Max. Anzahl der zu holenden Feeds
 moviebrowser.yt_most_popular Beliebteste Videos heute
 moviebrowser.yt_most_popular_all_time Beliebteste Videos
-moviebrowser.yt_next_results Nächste Ergebnisse
 moviebrowser.yt_orderby Sortierung nach
 moviebrowser.yt_orderby.published Veröffentlichungszeitpunkt
 moviebrowser.yt_orderby.rating Bewertung
@@ -1620,8 +1602,6 @@ moviebrowser.yt_orderby.relevance Relevanz
 moviebrowser.yt_orderby.viewcount Zahl der Views
 moviebrowser.yt_pending Anstehende Downloads
 moviebrowser.yt_pref_quality Bevorzugte Qualität
-moviebrowser.yt_prev_results Vorherige Ergebnisse
-moviebrowser.yt_recently_featured Vor kurzem empfohlen
 moviebrowser.yt_region Region
 moviebrowser.yt_related Passende Videos
 moviebrowser.yt_search Suche nach Stichwort
@@ -1853,7 +1833,6 @@ plugintype.game Spiel
 plugintype.lua LUA Skript
 plugintype.script Skript
 plugintype.tool Werkzeug
-progressbar.color Fortschrittsbalken-Design
 progressbar.color.full farbig
 progressbar.color.horizontal farbige horizontale Linien
 progressbar.color.matrix farbige Punkte
@@ -2182,11 +2161,7 @@ timerlist.weekdays Wochentage
 timerlist.weekdays.hint_1 Mo Di Mi Do Fr Sa So
 timerlist.weekdays.hint_2 'X'=Timer '-' kein Timer
 timersettings.record_safety_time_after Aufnahmeende-Korrektur
-timersettings.record_safety_time_after.hint_1 Korrekturzeit in Min. (00=aus), die auf die End-
-timersettings.record_safety_time_after.hint_2 zeit des jeweiligen Timers addiert wird
 timersettings.record_safety_time_before Aufnahmestart-Korrektur
-timersettings.record_safety_time_before.hint_1 Korrekturzeit in Min. (00=aus), die beim Start
-timersettings.record_safety_time_before.hint_2 des jeweiligen Timers abgezogen werden
 timersettings.separator Timer
 timing.chanlist Kanalliste
 timing.epg EPG
@@ -2286,9 +2261,6 @@ videomenu.scart Scart
 videomenu.screensetup Bildbereich
 videomenu.sharpness Schärfe
 videomenu.tv-scart TV Scart
-videomenu.vcrsignal VCR-Ausgang Signalart
-videomenu.vcrsignal_composite CVBS
-videomenu.vcrsignal_svideo S-Video
 videomenu.videoformat Bildschirmformat
 videomenu.videoformat_149 14:9
 videomenu.videoformat_169 16:9
@@ -2298,7 +2270,6 @@ webtv.head WebTV
 webtv.xml WebTV-XML-Dateien
 webtv.xml.add XML-Datei hinzufügen
 webtv.xml.del XML-Datei entfernen
-webtv.xml.del.hint Bitte die zu entfernende Datei auswählen, dann ROT drücken.
 window_size Fenstergröße in %
 wizard.initial_settings Grundeinstellungen gefunden
 wizard.install_settings Kanalliste für Astra 19.2°E installieren?
