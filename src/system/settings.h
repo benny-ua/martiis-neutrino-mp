@@ -86,8 +86,8 @@ struct SNeutrinoSettings
 	std::string shutdown_count; // FIXME
 	std::string shutdown_min; // FIXME
 	int sleeptimer_min;
-	std::string record_safety_time_before; // FIXME
-	std::string record_safety_time_after; // FIXME
+	int record_safety_time_before;
+	int record_safety_time_after;
 	int zapto_pre_time;
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
@@ -328,8 +328,7 @@ struct SNeutrinoSettings
 		TIMING_SETTING_COUNT
 	};
 
-	int  timing       [TIMING_SETTING_COUNT]   ;
-	std::string timing_string[TIMING_SETTING_COUNT];
+	int  timing [TIMING_SETTING_COUNT];
 
 	//widget settings
 	int widget_fade;
