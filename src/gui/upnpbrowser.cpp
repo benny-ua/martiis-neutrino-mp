@@ -610,9 +610,9 @@ void CUpnpBrowserGui::playnext(void)
 					m_folderplay = false; // FIXME else no way to stop in video folder
 				}
 				else if (mime.substr(0,6) == "image/") {
-					timeout = time(NULL) + atoi(g_settings.picviewer_slide_time);
+					timeout = time(NULL) + g_settings.picviewer_slide_time;
 					if (m_folderplay)
-						timeout = time(NULL) + atoi(g_settings.picviewer_slide_time);
+						timeout = time(NULL) + g_settings.picviewer_slide_time;
 					videoDecoder->setBlank(true);
 					showPicture((*entries)[0].resources[preferred].url);
 				}
