@@ -1911,8 +1911,6 @@ const char * locale_real_names[] =
 	"recordingmenu.vtxt_pid",
 	"recordingmenu.zap_on_announce",
 	"recordtimer.announce",
-	"repeatblocker.hint_1",
-	"repeatblocker.hint_2",
 	"reset_all",
 	"reset_channels",
 	"reset_confirm",
