@@ -125,7 +125,6 @@ struct SNeutrinoSettings
 	int dvb_subtitle_delay;
 	int auto_lang;
 	int auto_subs;
-	std::string audio_PCMOffset; //FIXME
 	int srs_enable;
 	int srs_algo;
 	int srs_ref_volume;
@@ -559,8 +558,8 @@ struct SNeutrinoSettings
 	int channellist_new_zap_mode;
 	int channellist_sort_mode;
 	int channellist_numeric_adjust;
-	std::string repeat_blocker; //FIXME
-	std::string repeat_genericblocker; //FIXME
+	int repeat_blocker;
+	int repeat_genericblocker;
 #if HAVE_SPARK_HARDWARE
 	int accept_other_remotes;
 #endif
