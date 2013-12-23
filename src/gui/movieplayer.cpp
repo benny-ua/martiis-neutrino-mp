@@ -47,6 +47,7 @@
 #include <driver/volume.h>
 #include <driver/display.h>
 #include <driver/abstime.h>
+#include <eitd/edvbstring.h>
 #include <system/helpers.h>
 
 #include <unistd.h>
@@ -1068,25 +1069,16 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				callInfoViewer(/*duration, position*/);
 
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
-#if 0
-			if (is_file_player)
-				selectChapter();
-			else
-#endif
-				handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_bookmark, position);
+			handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_bookmark, position);
 			update_lcd = true;
 #if 0
 			clearSubtitle();
 #endif
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_audio) {
-			StopSubtitles(true);
 			selectAudioPid();
-			StartSubtitles(true);
 			update_lcd = true;
 		} else if ( msg == (neutrino_msg_t) g_settings.mpkey_subtitle) {
-			StopSubtitles(true);
 			selectAudioPid();
-			StartSubtitles(true);
 #if 0
 			selectSubtitle();
 			clearSubtitle();
@@ -1500,7 +1492,9 @@ void CMoviePlayerGui::getCurrentAudioName(std::string &audioname)
 void CMoviePlayerGui::selectAudioPid()
 {
 	CAudioSelectMenuHandler APIDSelector;
+	StopSubtitles(true);
 	APIDSelector.exec(NULL, "-1");
+	StartSubtitles(true);
 }
 
 void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
@@ -1659,8 +1653,8 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 		}
 		return;
 	}
-	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark && !isWebTV && !isYT && !isNK) {
-		if (newComHintBox.isPainted() == true) {
+	else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
+		if (newComHintBox.isPainted()) {
 			// yes, let's get the end pos of the jump forward
 			new_bookmark.length = play_sec - new_bookmark.pos;
 			TRACE("[mp] commercial length: %d\r\n", new_bookmark.length);
@@ -1669,7 +1663,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			}
 			new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
 			newComHintBox.hide();
-		} else if (newLoopHintBox.isPainted() == true) {
+		} else if (newLoopHintBox.isPainted()) {
 			// yes, let's get the end pos of the jump backward
 			new_bookmark.length = new_bookmark.pos - play_sec;
 			new_bookmark.pos = play_sec;
@@ -1681,21 +1675,38 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
 			newLoopHintBox.hide();
 		} else {
-			// very dirty usage of the menue, but it works and I already spent to much time with it, feel free to make it better ;-)
-#define BOOKMARK_START_MENU_MAX_ITEMS 6
-			CSelectedMenu cSelectedMenuBookStart[BOOKMARK_START_MENU_MAX_ITEMS];
+			std::vector<int> positions; std::vector<std::string> titles;
+			playback->GetChapters(positions, titles);
+			if (positions.empty() && (isWebTV || isYT || isNK))
+				return;
 
-			CMenuWidget bookStartMenu(LOCALE_MOVIEBROWSER_BOOK_ADD, NEUTRINO_ICON_STREAMING);
+			// very dirty usage of the menue, but it works and I already spent to much time with it, feel free to make it better ;-)
+			CMenuWidget bookStartMenu(positions.empty() ? LOCALE_MOVIEBROWSER_BOOK_ADD : LOCALE_MOVIEBROWSER_MENU_MAIN_BOOKMARKS, NEUTRINO_ICON_AUDIO);
 			bookStartMenu.addIntroItems();
 #if 0 // not supported, TODO
 			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEPLAYER_HEAD, !isMovieBrowser, NULL, &cSelectedMenuBookStart[0]));
 			bookStartMenu.addItem(GenericMenuSeparatorLine);
 #endif
-			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_NEW, &isMovieBrowser, NULL, &cSelectedMenuBookStart[1]));
-			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_FORWARD, &isMovieBrowser, NULL, &cSelectedMenuBookStart[2]));
-			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_BACKWARD, &isMovieBrowser, NULL, &cSelectedMenuBookStart[3]));
-			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIESTART, &isMovieBrowser, NULL, &cSelectedMenuBookStart[4]));
-			bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIEEND, &isMovieBrowser, NULL, &cSelectedMenuBookStart[5]));
+			int chapter_item_offset = -1;
+			if (!positions.empty()) {
+				chapter_item_offset = bookStartMenu.getItemsCount();
+				for (unsigned i = 0; i < positions.size(); i++) {
+					titles[i] = isUTF8(titles[i]) ? titles[i]: convertLatin1UTF8(titles[i]);
+					bookStartMenu.addItem(new CMenuForwarder(titles[i].c_str(), true, NULL, NULL, NULL, CRCInput::convertDigitToKey(i + 1)));
+				}
+			}
+
+			int bookmark_item_offset = -1;
+			if (isMovieBrowser) {
+				if (!positions.empty())
+					bookStartMenu.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MOVIEBROWSER_BOOK_ADD));
+				bookmark_item_offset = bookStartMenu.getItemsCount();
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_NEW, &isMovieBrowser, NULL));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_FORWARD, &isMovieBrowser, NULL));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_BACKWARD, &isMovieBrowser, NULL));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIESTART, &isMovieBrowser, NULL));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIEEND, &isMovieBrowser, NULL));
+			}
 
 			// no, nothing else to do, we open a new bookmark menu
 			new_bookmark.name = "";	// use default name
@@ -1703,7 +1714,7 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			new_bookmark.length = 0;
 
 			// next seems return menu_return::RETURN_EXIT, if something selected
-			bookStartMenu.exec(NULL, "none");
+			int selected = (bookStartMenu.exec(NULL, "none") != menu_return::RETURN_EXIT) ? bookStartMenu.getSelected() : -1;
 #if 0 // not supported, TODO
 			if (cSelectedMenuBookStart[0].selected == true) {
 				/* Movieplayer bookmark */
@@ -1720,42 +1731,54 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				cSelectedMenuBookStart[0].selected = false;	// clear for next bookmark menu
 			} else
 #endif
-			if (cSelectedMenuBookStart[1].selected == true) {
-				/* Moviebrowser plain bookmark */
-				new_bookmark.pos = play_sec;
-				new_bookmark.length = 0;
-				if (!isWebTV && !isYT && !isNK && cMovieInfo.addNewBookmark(p_movie_info, new_bookmark) == true)
-					cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
-				new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
-				cSelectedMenuBookStart[1].selected = false;	// clear for next bookmark menu
-			} else if (cSelectedMenuBookStart[2].selected == true) {
-				/* Moviebrowser jump forward bookmark */
-				new_bookmark.pos = play_sec;
-				TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
-				newComHintBox.paint();
-				cSelectedMenuBookStart[2].selected = false;	// clear for next bookmark menu
-			} else if (cSelectedMenuBookStart[3].selected == true) {
-				/* Moviebrowser jump backward bookmark */
-				new_bookmark.pos = play_sec;
-				TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
-				newLoopHintBox.paint();
-				cSelectedMenuBookStart[3].selected = false;	// clear for next bookmark menu
-			} else if (!isWebTV && !isNK && !isYT && cSelectedMenuBookStart[4].selected == true) {
-				/* Moviebrowser movie start bookmark */
-				p_movie_info->bookmarks.start = play_sec;
-				TRACE("[mp] New movie start pos: %d\r\n", p_movie_info->bookmarks.start);
-				cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
-				cSelectedMenuBookStart[4].selected = false;	// clear for next bookmark menu
-			} else if (!isWebTV && !isNK && !isYT && cSelectedMenuBookStart[5].selected == true) {
-				/* Moviebrowser movie end bookmark */
-				p_movie_info->bookmarks.end = play_sec;
-				TRACE("[mp]  New movie end pos: %d\r\n", p_movie_info->bookmarks.start);
-				cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
-				cSelectedMenuBookStart[5].selected = false;	// clear for next bookmark menu
+			int chapter_item_selected = (selected > -1 && chapter_item_offset > -1) ? selected - chapter_item_offset : -1;
+			if (chapter_item_selected < 0 || chapter_item_selected >= (int)positions.size())
+				chapter_item_selected = -1;
+
+			int bookmark_item_selected = (selected > -1 && bookmark_item_offset > -1) ? selected - bookmark_item_offset : -1;
+			if (bookmark_item_selected < 0 || bookmark_item_selected > 4)
+				bookmark_item_selected = -1;
+
+			if (chapter_item_selected > -1) {
+				playback->SetPosition(positions[chapter_item_selected], true);
+			} else if (bookmark_item_selected > -1) {
+				switch (bookmark_item_selected) {
+					case 0:
+						/* Moviebrowser plain bookmark */
+						new_bookmark.pos = play_sec;
+						new_bookmark.length = 0;
+						if (cMovieInfo.addNewBookmark(p_movie_info, new_bookmark))
+							cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
+						new_bookmark.pos = 0;	// clear again, since this is used as flag for bookmark activity
+						break;
+					case 1:
+						/* Moviebrowser jump forward bookmark */
+						new_bookmark.pos = play_sec;
+						TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
+						newComHintBox.paint();
+						break;
+					case 2:
+						/* Moviebrowser jump backward bookmark */
+						new_bookmark.pos = play_sec;
+						TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
+						newLoopHintBox.paint();
+						break;
+					case 4:
+						/* Moviebrowser movie start bookmark */
+						p_movie_info->bookmarks.start = play_sec;
+						TRACE("[mp] New movie start pos: %d\r\n", p_movie_info->bookmarks.start);
+						cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
+						break;
+					case 5:
+						/* Moviebrowser movie end bookmark */
+						p_movie_info->bookmarks.end = play_sec;
+						TRACE("[mp]  New movie end pos: %d\r\n", p_movie_info->bookmarks.start);
+						cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
+						break;
+				}
 			}
 		}
 	}
-	return;
 }
 
 void CMoviePlayerGui::UpdatePosition()
@@ -1833,9 +1856,6 @@ void CMoviePlayerGui::StartSubtitles(bool show)
 #if 0
 void CMoviePlayerGui::selectChapter()
 {
-	if (!is_file_player)
-		return;
-
 	std::vector<int> positions; std::vector<std::string> titles;
 	playback->GetChapters(positions, titles);
 	if (positions.empty())
