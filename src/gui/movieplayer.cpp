@@ -1763,13 +1763,13 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 						TRACE("[mp] new bookmark 1. pos: %d\r\n", new_bookmark.pos);
 						newLoopHintBox.paint();
 						break;
-					case 4:
+					case 3:
 						/* Moviebrowser movie start bookmark */
 						p_movie_info->bookmarks.start = play_sec;
 						TRACE("[mp] New movie start pos: %d\r\n", p_movie_info->bookmarks.start);
 						cMovieInfo.saveMovieInfo(*p_movie_info);	/* save immediately in xml file */
 						break;
-					case 5:
+					case 4:
 						/* Moviebrowser movie end bookmark */
 						p_movie_info->bookmarks.end = play_sec;
 						TRACE("[mp]  New movie end pos: %d\r\n", p_movie_info->bookmarks.start);
