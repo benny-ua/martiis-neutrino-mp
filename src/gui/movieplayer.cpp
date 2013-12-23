@@ -1680,7 +1680,6 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			if (positions.empty() && (isWebTV || isYT || isNK))
 				return;
 
-			// very dirty usage of the menue, but it works and I already spent to much time with it, feel free to make it better ;-)
 			CMenuWidget bookStartMenu(positions.empty() ? LOCALE_MOVIEBROWSER_BOOK_ADD : LOCALE_MOVIEBROWSER_MENU_MAIN_BOOKMARKS, NEUTRINO_ICON_AUDIO);
 			bookStartMenu.addIntroItems();
 #if 0 // not supported, TODO
@@ -1701,11 +1700,11 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 				if (!positions.empty())
 					bookStartMenu.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MOVIEBROWSER_BOOK_ADD));
 				bookmark_item_offset = bookStartMenu.getItemsCount();
-				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_NEW, &isMovieBrowser, NULL));
-				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_FORWARD, &isMovieBrowser, NULL));
-				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_BACKWARD, &isMovieBrowser, NULL));
-				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIESTART, &isMovieBrowser, NULL));
-				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIEEND, &isMovieBrowser, NULL));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_NEW));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_FORWARD));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_TYPE_BACKWARD));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIESTART));
+				bookStartMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_BOOK_MOVIEEND));
 			}
 
 			// no, nothing else to do, we open a new bookmark menu
@@ -1742,6 +1741,8 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			if (chapter_item_selected > -1) {
 				playback->SetPosition(positions[chapter_item_selected], true);
 			} else if (bookmark_item_selected > -1) {
+				playback->GetPosition(position, duration);
+				play_sec = position / 1000;
 				switch (bookmark_item_selected) {
 					case 0:
 						/* Moviebrowser plain bookmark */
