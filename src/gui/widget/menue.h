@@ -109,15 +109,15 @@ class CMenuItem
 		neutrino_locale_t name;
 		std::string nameString;
 	public:
-		bool           	active;
-		bool           	marked;
-		bool           	inert;
+		bool		active;
+		bool		marked;
+		bool		inert;
 		bool		isStatic;
 		neutrino_msg_t 	directKey;
 		neutrino_msg_t 	msg;
-		std::string    	iconName;
-		std::string    	selected_iconName;
-		std::string    	iconName_Info_right;
+		std::string	iconName;
+		std::string	selected_iconName;
+		std::string	iconName_Info_right;
 		std::string	hintIcon;
 		std::string	hintText;
 		neutrino_locale_t hint;
@@ -176,19 +176,19 @@ class CMenuItem
 
 class CMenuSeparator : public CMenuItem
 {
-		int               type;
+		int type;
 
 	public:
 
 		enum
 		{
-			EMPTY =	0,
-			LINE =	1,
-			STRING =	2,
-			ALIGN_CENTER = 4,
-			ALIGN_LEFT =   8,
-			ALIGN_RIGHT = 16,
-			SUB_HEAD = 32
+			EMPTY		= 0,
+			LINE		= 1,
+			STRING		= 2,
+			ALIGN_CENTER	= 4,
+			ALIGN_LEFT	= 8,
+			ALIGN_RIGHT	= 16,
+			SUB_HEAD	= 32
 		};
 
 
@@ -206,12 +206,12 @@ class CMenuSeparator : public CMenuItem
 
 class CMenuForwarder : public CMenuItem
 {
-	std::string         actionKey;
+	std::string		actionKey;
 
  protected:
-	std::string	 option_string;
-	const std::string	*option_string_ptr;
-	CMenuTarget *       jumpTarget;
+	std::string	 	option_string;
+	const std::string *	option_string_ptr;
+	CMenuTarget *		jumpTarget;
 
 	virtual std::string getOption(void);
 
@@ -240,10 +240,7 @@ class CMenuForwarder : public CMenuItem
 	std::string getActionKey(){return actionKey;}
 
 	int exec(CMenuTarget* parent);
-	bool isSelectable(void) const
-		{
-			return active;
-		}
+	bool isSelectable(void) const { return active; }
 	void setOption(const std::string &Option);
 	void setName(const std::string& text);
 	void setName(const neutrino_locale_t text);
@@ -275,8 +272,8 @@ class CMenuDForwarder : public CMenuForwarder
 class CAbstractMenuOptionChooser : public CMenuItem
 {
 	protected:
-		int               height;
-		int *             optionValue;
+		int	height;
+		int *	optionValue;
 
 		int getHeight(void) const{return height;}
 
@@ -287,7 +284,7 @@ class CAbstractMenuOptionChooser : public CMenuItem
 			name = NONEXISTANT_LOCALE;
 			height = 0;
 			optionValue = NULL;
-		};
+		}
 		~CAbstractMenuOptionChooser(){}
 		
 };
@@ -295,17 +292,17 @@ class CAbstractMenuOptionChooser : public CMenuItem
 class CMenuOptionNumberChooser : public CAbstractMenuOptionChooser
 {
 private:
-	int                lower_bound;
-	int                upper_bound;
+	int			lower_bound;
+	int			upper_bound;
 
-	int                display_offset;
+	int			display_offset;
 
-	int                localized_value;
-	neutrino_locale_t  localized_value_name;
-	bool  		slider_on;
-	CChangeObserver *     observ;
-	std::string	numberFormat;
-	std::string	(*numberFormatFunction)(int num);
+	int			localized_value;
+	neutrino_locale_t	localized_value_name;
+	bool  			slider_on;
+	CChangeObserver *	observ;
+	std::string		numberFormat;
+	std::string		(*numberFormatFunction)(int num);
 
  public:
 	CMenuOptionNumberChooser(const neutrino_locale_t name, int * const OptionValue, const bool Active,
@@ -336,15 +333,15 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 
 	struct keyval
 	{
-		const int               key;
+		const int key;
 		const neutrino_locale_t value;
 	};
 
  private:
 	std::vector<keyval_ext> options;
-	unsigned              number_of_options;
-	CChangeObserver *     observ;
-	bool			 pulldown;
+	unsigned		number_of_options;
+	CChangeObserver *	observ;
+	bool			pulldown;
 
  public:
 	CMenuOptionChooser(const neutrino_locale_t Name, int * const OptionValue, const struct keyval * const Options,
@@ -378,11 +375,11 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 
 class CMenuOptionStringChooser : public CMenuItem
 {
-		int                      height;
-		std::string *		 optionValueString;
+		int			height;
+		std::string *		optionValueString;
 		std::vector<std::string> options;
-		CChangeObserver *        observ;
-		bool			 pulldown;
+		CChangeObserver *	observ;
+		bool			pulldown;
 
 	public:
 		CMenuOptionStringChooser(const neutrino_locale_t Name, std::string* OptionValue, bool Active = false,
@@ -406,9 +403,9 @@ class CMenuOptionStringChooser : public CMenuItem
 
 class CMenuOptionLanguageChooser : public CMenuItem
 {
-		int                      height;
-		std::string		 optionValue;
-		CChangeObserver *        observ;
+		int			height;
+		std::string		optionValue;
+		CChangeObserver *	observ;
 
 	public:
 		CMenuOptionLanguageChooser(char* OptionValue, CChangeObserver* Observ = NULL, const char * const IconName = NULL);
@@ -443,7 +440,7 @@ class CMenuWidget : public CMenuTarget
 
 	protected:
 		std::string		nameString;
-		neutrino_locale_t       name;
+		neutrino_locale_t	name;
 		CFrameBuffer		*frameBuffer;
 		std::vector<CMenuItem*>	items;
 		std::vector<int>	page_start;
@@ -472,13 +469,13 @@ class CMenuWidget : public CMenuTarget
 		int			fbutton_count;
 		const struct button_label	*fbutton_labels;
 
-		unsigned int         item_start_y;
-		unsigned int         current_page;
-		unsigned int         total_pages;
-		bool		     exit_pressed;
-		bool		     from_wizard;
-		bool		     fade;
-		bool		     washidden;
+		unsigned int		item_start_y;
+		unsigned int		current_page;
+		unsigned int		total_pages;
+		bool			exit_pressed;
+		bool			from_wizard;
+		bool			fade;
+		bool			washidden;
 
 		void Init(const std::string & Icon, const int mwidth, const mn_widget_id_t &w_index);
 		virtual void paintItems();
@@ -499,10 +496,10 @@ class CMenuWidget : public CMenuTarget
 		
 		enum 
 		{
-			BTN_TYPE_BACK =		0,
-			BTN_TYPE_CANCEL =	1,
-			BTN_TYPE_NEXT =		3,
-			BTN_TYPE_NO =		-1
+			BTN_TYPE_BACK	= 0,
+			BTN_TYPE_CANCEL = 1,
+			BTN_TYPE_NEXT	= 3,
+			BTN_TYPE_NO	= -1
 		};
 		virtual void addIntroItems(neutrino_locale_t subhead_text = NONEXISTANT_LOCALE, neutrino_locale_t section_text = NONEXISTANT_LOCALE, int buttontype = BTN_TYPE_BACK );
 		bool hasItem();
@@ -592,19 +589,19 @@ class CLockedMenuForwarder : public CMenuForwarder, public CPINProtection
 							iconName_Info_right = IconName_Info_right ? IconName_Info_right : NEUTRINO_ICON_LOCK; 
 						else
 							iconName_Info_right = "";
-				       };
+					};
 
 		virtual int exec(CMenuTarget* parent);
 };
 
 class CMenuSelectorTarget : public CMenuTarget
 {
-        public:
-                CMenuSelectorTarget(int *select) {m_select = select;};
-                int exec(CMenuTarget* parent, const std::string & actionKey);
+	public:
+		CMenuSelectorTarget(int *select) {m_select = select;};
+		int exec(CMenuTarget* parent, const std::string & actionKey);
 
-        private:
-                int *m_select;
+	private:
+		int *m_select;
 };
 
 extern CMenuSeparator * const GenericMenuSeparator;
