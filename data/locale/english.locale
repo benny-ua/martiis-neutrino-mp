@@ -437,7 +437,7 @@ extra.neutrinosettings.title Neutrino Settings
 extra.north North
 extra.record_bufsize Write buffer size
 extra.record_bufsize_dmx DMX buffer size
-extra.record_time Max. recording time
+extra.record_time Maximum recording time
 extra.rotor_swap Swap rotor east/west
 extra.rounded_corners Shape of corners
 extra.rounded_corners_off angular
@@ -1127,7 +1127,7 @@ menu.hint_opkg_upgrade Updates all installed packages to the most recent version
 menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
-menu.hint_osd_timing After this time the infobar will be faded out.
+menu.hint_osd_timing After this time the OSD will be faded out
 menu.hint_parentallock_changepin Change PIN code
 menu.hint_parentallock_lockage Select age allowed to watch
 menu.hint_parentallock_menu Lock menus with pin code
@@ -1157,7 +1157,7 @@ menu.hint_record_data_dvbsub Subtitle stream
 menu.hint_record_data_pmt PAT/PMT stream
 menu.hint_record_data_vtxt VideoText stream
 menu.hint_record_dir Select directory to store recordings
-menu.hint_record_end Stop direct record after max. time\nor after current event end time
+menu.hint_record_end Stop direct record after maximum time or after current event end time
 menu.hint_record_slow_warn Show warning, when record buffer is close to overflow
 menu.hint_record_tdir Select directory to save timeshift recordings\nin temporary timeshift mode
 menu.hint_record_time Record time before stop when\nusing direct record with record button
@@ -1415,7 +1415,7 @@ miscsettings.shutdown_real_rcdelay Delayed shutdown
 miscsettings.sleeptimer Inactivity shutdown timer
 miscsettings.sleeptimer_min Sleeptimer default
 miscsettings.volume Volume
-miscsettings.zapto_pre_time Zapto Start Time Correction (minutes)
+miscsettings.zapto_pre_time Zapto Start Time Correction
 motorcontrol.calc_positions (Re)-Calculate Positions
 motorcontrol.disable_limit Disable (soft) Limits
 motorcontrol.drive_mode Drive Mode

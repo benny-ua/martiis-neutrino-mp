@@ -52,6 +52,7 @@
 #include <driver/record.h>
 #include <system/helpers.h>
 #include <system/debug.h>
+#include <system/helpers.h>
 
 #include <zapit/femanager.h>
 #include <zapit/getservices.h>

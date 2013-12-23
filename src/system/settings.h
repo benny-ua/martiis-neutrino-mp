@@ -327,7 +327,7 @@ struct SNeutrinoSettings
 		TIMING_SETTING_COUNT
 	};
 
-	int  timing [TIMING_SETTING_COUNT];
+	int timing [TIMING_SETTING_COUNT];
 
 	//widget settings
 	int widget_fade;
