@@ -821,9 +821,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 	playback->SetTeletextPid(-1);
 
-
-	const char *ext = strrchr(file_name.c_str(), '.');
-	playback->Open((!ext || strcmp(ext, ".ts")) ? PLAYMODE_FILE : PLAYMODE_TS);
+	playback->Open(timeshift ? PLAYMODE_TS : PLAYMODE_FILE);
 
 	if(p_movie_info) {
 		// p_movie_info may be invalidated by CRecordManager while we're still using it. Create and use a copy.
