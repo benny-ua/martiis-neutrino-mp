@@ -356,7 +356,7 @@ int CHDDDestExec::exec(CMenuTarget* /*parent*/, const std::string&)
 		return 0;
 
 	if (!access("/sbin/hd-idle", X_OK)) {
-		my_system("kill $(pidof hd-idle)");
+		system("kill $(pidof hd-idle)");
 		int sleep_seconds = g_settings.hdd_sleep;
 		switch (sleep_seconds) {
 			case 241:
