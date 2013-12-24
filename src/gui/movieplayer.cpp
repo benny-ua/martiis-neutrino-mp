@@ -1685,11 +1685,16 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 			bookStartMenu.addItem(GenericMenuSeparatorLine);
 #endif
 			int chapter_item_offset = -1;
+			std::string positions_str[positions.size() + 1];
 			if (!positions.empty()) {
 				chapter_item_offset = bookStartMenu.getItemsCount();
 				for (unsigned i = 0; i < positions.size(); i++) {
 					titles[i] = isUTF8(titles[i]) ? titles[i]: convertLatin1UTF8(titles[i]);
-					bookStartMenu.addItem(new CMenuForwarder(titles[i].c_str(), true, NULL, NULL, NULL, CRCInput::convertDigitToKey(i + 1)));
+					time_t sec = positions[i]/1000;
+					char val[10];
+					strftime(val, sizeof(val), "%H:%M:%S", gmtime(&sec));
+					positions_str[i] = val;
+					bookStartMenu.addItem(new CMenuForwarder(titles[i].c_str(), true, positions_str[i], NULL, NULL, CRCInput::convertDigitToKey(i + 1)));
 				}
 			}
 
