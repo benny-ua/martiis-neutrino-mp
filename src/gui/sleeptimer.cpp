@@ -108,8 +108,8 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	int new_val = atoi(value);
 	if(permanent) {
-		g_settings.shutdown_min = to_string(new_val);
-		printf("permanent sleeptimer min: %s\n", g_settings.shutdown_min.c_str());
+		g_settings.shutdown_min = new_val;
+		printf("permanent sleeptimer min: %d\n", g_settings.shutdown_min);
 	}
 	else if(shutdown_min != new_val) {
 		shutdown_min = new_val;
