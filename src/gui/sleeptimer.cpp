@@ -68,7 +68,7 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 		shutdown_min = g_Timerd->getSleepTimerRemaining();  // remaining shutdown time?
 		value = to_string(shutdown_min);
 		if (value.length() < 3)
-			value.insert(0, 3 - value.length(), '0');
+			value.insert(0, 3 - value.length(), ' ');
 	}
 
 	if(permanent) {
