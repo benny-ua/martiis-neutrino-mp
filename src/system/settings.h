@@ -706,8 +706,6 @@ struct SNeutrinoSettings
 	// pictureviewer
 	int picviewer_slide_time;
 	int picviewer_scaling;
-	std::string picviewer_decode_server_ip;
-	std::string picviewer_decode_server_port; //FIXME
 
 	//audioplayer
 	int   audioplayer_display;
