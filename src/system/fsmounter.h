@@ -93,8 +93,8 @@ class CFSMounter
  public:
 	CFSMounter();
 	static bool isMounted(const std::string &local_dir);
-	static CFSMounter::MountRes mount(const std::string &ip, const std::string &dir, const std::string &local_dir, 
-				       const FSType fstype, const std::string &username, const std::string &password, 
+	static CFSMounter::MountRes mount(const std::string &ip, const std::string &dir, const std::string &local_dir,
+				       const FSType fstype, const std::string &username, const std::string &password,
 				       std::string options1, std::string options2);
 	static bool automount();
 	static void automount_async_start();

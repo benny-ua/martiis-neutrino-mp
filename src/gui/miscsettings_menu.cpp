@@ -34,6 +34,7 @@
 #include <mymenu.h>
 #include <neutrino_menue.h>
 #include <system/setting_helpers.h>
+#include <system/helpers.h>
 
 #include <gui/miscsettings_menu.h>
 #include <gui/cec_setup.h>

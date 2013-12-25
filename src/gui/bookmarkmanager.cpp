@@ -43,6 +43,7 @@
 #include <gui/widget/stringinput.h>
 #include <gui/widget/icons.h>
 #include <gui/widget/buttons.h>
+#include <system/helpers.h>
 
 #include <fcntl.h>
 #include <stdlib.h>

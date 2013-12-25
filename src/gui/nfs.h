@@ -47,11 +47,10 @@ class CNFSMountGui : public CMenuTarget
 
 	std::string       m_entry[NETWORK_NFS_NR_OF_ENTRIES];
 	std::string       ISO_8859_1_entry[NETWORK_NFS_NR_OF_ENTRIES];
+	std::string getEntryString(int i);
 
 	CMenuWidget *mountMenuWPtr;
 	int menu_offset;
-
-	std::string getEntryString(int i);
 
 	CMenuForwarder* mountMenuEntry[NETWORK_NFS_NR_OF_ENTRIES];
 

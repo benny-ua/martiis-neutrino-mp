@@ -11,7 +11,7 @@
 
 #include "libnet.h"
 
-#if 0 
+#if 0
 //never used
 static	void	scanip( char *str, unsigned char *to )
 {
@@ -122,7 +122,7 @@ void	netGetIP(std::string &dev, std::string &ip, std::string &mask, std::string 
 
 	close(fd);
 }
-#if 0 
+#if 0
 //never used
 void	netSetDefaultRoute( char *gw )
 {
@@ -189,7 +189,7 @@ void netGetDefaultRoute( std::string &ip )
 	fclose(fp);
 }
 
-#if 0 
+#if 0
 static	char	dombuf[256];
 static	char	domis=0;
 //never used
@@ -291,7 +291,7 @@ void netGetMacAddr(std::string &ifname, unsigned char *mac)
 		return;
 
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name, ifname.c_str(), sizeof(ifr.ifr_name) - 1);
+	strncpy(ifr.ifr_name, ifname.c_str(), sizeof(ifr.ifr_name));
 
 	if(ioctl(fd, SIOCGIFHWADDR, &ifr) < 0)
 		return;
