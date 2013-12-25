@@ -198,6 +198,10 @@ void CDBoxInfoWidget::paint()
 	int icon_w = 0, icon_h = 0;
 	frameBuffer->getIconSize(NEUTRINO_ICON_REC, &icon_w, &icon_h);
 
+	struct statfs rec_s;
+	if (statfs(g_settings.network_nfs_recordingdir.c_str(), &rec_s))
+		memset(&rec_s, 0, sizeof(rec_s));
+
 	struct statfs s;
 	FILE *          mountFile;
 	struct mntent * mnt;
@@ -234,7 +238,8 @@ void CDBoxInfoWidget::paint()
 				}
 				height += mheight;
 			}
-			nameOffset = std::max(nameOffset, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(mnt->mnt_dir, true) + icon_w + 20);
+			int icon_space = memcmp(&s.f_fsid, &rec_s.f_fsid, sizeof(s.f_fsid)) ? 0 : (10 + icon_w);
+			nameOffset = std::max(nameOffset, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(mnt->mnt_dir, true) + icon_space + 20);
 		}
 		endmntent(mountFile);
 	}
@@ -274,12 +279,11 @@ void CDBoxInfoWidget::paint()
 	offsetw += 20;
 	width = offsetw + 10 + 120;
 
-	int _width = w_max(width, 0);
-	if (_width < width) {
-		int diff = width - _width;
-		width = _width;
+	int diff = frameBuffer->getScreenWidth() - width;
+	if (diff < 0) {
+		width -= diff;
 		offsetw -= diff;
-		nameOffset -= width;
+		nameOffset -= diff;
 	}
 	height = h_max(height, 0);
 	x = getScreenStartX(width);
@@ -534,9 +538,6 @@ void CDBoxInfoWidget::paint()
 						}
 						bytes_used = bytes_total - bytes_free;
 						percent_used = (bytes_used * 200 + bytes_total) / 2 / bytes_total;
-						struct statfs rec_s;
-						if (statfs(g_settings.network_nfs_recordingdir.c_str(), &rec_s))
-							memset(&rec_s, 0, sizeof(rec_s));
 						//paint mountpoints
 						for (int j = 0; j < headSize; j++) {
 							int _w = width;
@@ -547,7 +548,7 @@ void CDBoxInfoWidget::paint()
 								strncpy(ubuf, mnt->mnt_dir, buf_size);
 								_w = nameOffset - mpOffset;
 								if (rec_mp)
-									_w -= icon_w;
+									_w -= icon_w + 10;
 								break;
 							case 1:
 								mpOffset = nameOffset + 10;
