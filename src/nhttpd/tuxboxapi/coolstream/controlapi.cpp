@@ -1148,7 +1148,9 @@ void CControlAPI::GetBouquetsCGI(CyhookHandler *hh) {
 		fav = true;
 
 	int mode = NeutrinoAPI->Zapit->getMode();
-	if (hh->ParamList["mode"].compare("TV") == 0)
+	if (hh->ParamList["mode"].compare("all") == 0)
+		mode = CZapitClient::MODE_ALL;
+	else if (hh->ParamList["mode"].compare("TV") == 0)
 		mode = CZapitClient::MODE_TV;
 	else if (hh->ParamList["mode"].compare("RADIO") == 0)
 		mode = CZapitClient::MODE_RADIO;
@@ -1156,8 +1158,18 @@ void CControlAPI::GetBouquetsCGI(CyhookHandler *hh) {
 	std::string bouquet;
 	for (int i = 0, size = (int) g_bouquetManager->Bouquets.size(); i < size; i++) {
 		std::string item = "";
-		ZapitChannelList * channels = mode == CZapitClient::MODE_RADIO ? &g_bouquetManager->Bouquets[i]->radioChannels : &g_bouquetManager->Bouquets[i]->tvChannels;
-		if (!channels->empty() && (!g_bouquetManager->Bouquets[i]->bHidden || show_hidden) && (!fav || g_bouquetManager->Bouquets[i]->bUser)) {
+		unsigned int channel_count = 0;
+		switch (mode) {
+			case CZapitClient::MODE_RADIO:
+				channel_count = g_bouquetManager->Bouquets[i]->radioChannels.size();
+				break;
+			case CZapitClient::MODE_TV:
+				channel_count = g_bouquetManager->Bouquets[i]->tvChannels.size();
+				break;
+			case CZapitClient::MODE_ALL:
+				channel_count = g_bouquetManager->Bouquets[i]->radioChannels.size() + g_bouquetManager->Bouquets[i]->tvChannels.size();
+		}
+		if (channel_count && (!g_bouquetManager->Bouquets[i]->bHidden || show_hidden) && (!fav || g_bouquetManager->Bouquets[i]->bUser)) {
 			bouquet = std::string(g_bouquetManager->Bouquets[i]->lName.c_str());
 			if (encode)
 				bouquet = encodeString(bouquet); // encode (URLencode) the bouquetname
