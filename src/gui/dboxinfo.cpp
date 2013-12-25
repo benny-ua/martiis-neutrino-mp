@@ -193,10 +193,10 @@ void CDBoxInfoWidget::paint()
 	int sizeOffset = fontWidth * 7;//9999.99M
 	int percOffset = fontWidth * 3 ;//100%
 	int nameOffset = fontWidth * 19;//WWWwwwwwww
-	int offsetw = nameOffset+ (sizeOffset+10)*3 +10+percOffset+10;
-	offsetw += 20;
-	width = offsetw + 10 + 120;
-	height = hheight + 9 * mheight;
+	height = hheight + 8 * mheight;
+
+	int icon_w = 0, icon_h = 0;
+	frameBuffer->getIconSize(NEUTRINO_ICON_REC, &icon_w, &icon_h);
 
 	struct statfs s;
 	FILE *          mountFile;
@@ -234,11 +234,53 @@ void CDBoxInfoWidget::paint()
 				}
 				height += mheight;
 			}
+			nameOffset = std::max(nameOffset, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(mnt->mnt_dir, true) + icon_w + 20);
 		}
 		endmntent(mountFile);
 	}
 
-	width = w_max(width, 0);
+	int m[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
+#define DBINFO_TOTAL 0
+#define DBINFO_USED 1
+#define DBINFO_FREE 2
+#define DBINFO_RAM 0
+#define DBINFO_SWAP 1
+	const char *n[2] = { "RAM", "Swap" };
+	FILE *procmeminfo = fopen("/proc/meminfo", "r");
+	if (procmeminfo) {
+		char buf[80], a[80];
+		int v;
+		while (fgets(buf, sizeof(buf), procmeminfo))
+			if (2 == sscanf(buf, "%[^:]: %d", a, &v)) {
+				if (!strcasecmp(a, "MemTotal"))
+					m[DBINFO_RAM][DBINFO_TOTAL] += v;
+				else if (!strcasecmp(a, "MemFree"))
+					m[DBINFO_RAM][DBINFO_FREE] += v;
+				else if (!strcasecmp(a, "Inactive"))
+					m[DBINFO_RAM][DBINFO_FREE] += v;
+				else if (!strcasecmp(a, "SwapTotal"))
+					m[DBINFO_SWAP][DBINFO_TOTAL] = v;
+				else if (!strcasecmp(a, "SwapFree"))
+					m[DBINFO_SWAP][DBINFO_FREE] += v;
+			}
+		fclose(procmeminfo);
+	}
+	bool have_swap = m[DBINFO_SWAP][DBINFO_TOTAL];
+
+	if (have_swap)
+		height += mheight;
+
+	int offsetw = nameOffset+ (sizeOffset+10)*3 +10+percOffset+10;
+	offsetw += 20;
+	width = offsetw + 10 + 120;
+
+	int _width = w_max(width, 0);
+	if (_width < width) {
+		int diff = width - _width;
+		width = _width;
+		offsetw -= diff;
+		nameOffset -= width;
+	}
 	height = h_max(height, 0);
 	x = getScreenStartX(width);
 	y = getScreenStartY(height);
@@ -355,11 +397,6 @@ void CDBoxInfoWidget::paint()
 		bool rec_mp=false, memory_flag = false;
 		const int headSize_mem = 5;
 		const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use%"};
-#define DBINFO_TOTAL 0
-#define DBINFO_USED 1
-#define DBINFO_FREE 2
-#define DBINFO_RAM 0
-#define DBINFO_SWAP 1
 		// paint mount head
 		for (int j = 0; j < headSize_mem; j++) {
 			switch (j)
@@ -383,28 +420,8 @@ void CDBoxInfoWidget::paint()
 			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
 		}
 		ypos+= mheight;
-		int m[2][3] = { { 0, 0, 0 }, { 0, 0, 0 } }; // size, used, available
-		const char *n[2] = { "RAM", "Swap" };
-		FILE *procmeminfo = fopen("/proc/meminfo", "r");
-		if (procmeminfo) {
-			char buf[80], a[80];
-			int v;
-			while (fgets(buf, sizeof(buf), procmeminfo))
-				if (2 == sscanf(buf, "%[^:]: %d", a, &v)) {
-					if (!strcasecmp(a, "MemTotal"))
-						m[DBINFO_RAM][DBINFO_TOTAL] += v;
-					else if (!strcasecmp(a, "MemFree"))
-						m[DBINFO_RAM][DBINFO_FREE] += v;
-					else if (!strcasecmp(a, "Inactive"))
-						m[DBINFO_RAM][DBINFO_FREE] += v;
-					else if (!strcasecmp(a, "SwapTotal"))
-						m[DBINFO_SWAP][DBINFO_TOTAL] = v;
-					else if (!strcasecmp(a, "SwapFree"))
-						m[DBINFO_SWAP][DBINFO_FREE] += v;
-				}
-			fclose(procmeminfo);
-		}
-		for (int k = 0; k < 2; k++) {
+
+		for (int k = 0; k < 1 + have_swap; k++) {
 			m[k][DBINFO_USED] = m[k][DBINFO_TOTAL] - m[k][DBINFO_FREE];
 			for (int j = 0; j < headSize_mem; j++) {
 				switch (j) {
@@ -516,30 +533,21 @@ void CDBoxInfoWidget::paint()
 						}
 						bytes_used = bytes_total - bytes_free;
 						percent_used = (bytes_used * 200 + bytes_total) / 2 / bytes_total;
+						struct statfs rec_s;
+						if (statfs(g_settings.network_nfs_recordingdir.c_str(), &rec_s))
+							memset(&rec_s, 0, sizeof(rec_s));
 						//paint mountpoints
 						for (int j = 0; j < headSize; j++) {
-							switch (j)
-							{
-							case 0: {
-								if ((s.f_type != 0x72b6) && (s.f_type != 0x5941ff53))
-								{
-									std::string mntDir = mnt->mnt_dir;
-									std::size_t found1 = g_settings.network_nfs_recordingdir.find_first_of("/",1);
-									std::size_t found2 = mntDir.find_first_of("/",1);
-									if (found2 !=std::string::npos){
-										std::size_t found3 = g_settings.network_nfs_recordingdir.find_first_of(mntDir.substr(found2),found1);
-										if (found3 !=std::string::npos)
-											rec_mp = true;
-									}else{
-										std::size_t found = mntDir.find_first_of(g_settings.network_nfs_recordingdir);
-										if (found !=std::string::npos)
-											rec_mp = true;
-									}
-								}
+							int _w = width;
+							switch (j) {
+							case 0:
+								rec_mp = !memcmp(&s.f_fsid, &rec_s.f_fsid, sizeof(s.f_fsid)) && (s.f_type != 0x72b6) && (s.f_type != 0x5941ff53);
 								mpOffset = 10;
-								snprintf(ubuf,buf_size,"%-20.20s", mnt->mnt_dir);
-							}
-							break;
+								strncpy(ubuf, mnt->mnt_dir, buf_size);
+								_w = nameOffset - mpOffset;
+								if (rec_mp)
+									_w -= icon_w;
+								break;
 							case 1:
 								mpOffset = nameOffset + 10;
 								bytes2string(bytes_total, ubuf, buf_size);
@@ -557,8 +565,12 @@ void CDBoxInfoWidget::paint()
 								snprintf(ubuf, buf_size, "%4d%%", percent_used);
 								break;
 							}
-							g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, rec_mp ? COL_MENUCONTENTINACTIVE_TEXT:COL_MENUCONTENT_TEXT);
-							rec_mp = false;
+							g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, _w - 10, ubuf, COL_MENUCONTENT_TEXT);
+							if (rec_mp) {
+								if (icon_w>0 && icon_h>0)
+									frameBuffer->paintIcon(NEUTRINO_ICON_REC, x + nameOffset - 10 - icon_w, ypos + (mheight/2 - icon_h/2));
+								rec_mp = false;
+							}
 						}
 						int pbw = width - offsetw - 10;
 						memory_flag = false;
