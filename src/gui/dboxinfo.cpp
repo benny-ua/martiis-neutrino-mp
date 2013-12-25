@@ -192,7 +192,7 @@ void CDBoxInfoWidget::paint()
 	int fontWidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
 	int sizeOffset = fontWidth * 7;//9999.99M
 	int percOffset = fontWidth * 3 ;//100%
-	int nameOffset = fontWidth * 19;//WWWwwwwwww
+	int nameOffset = fontWidth * 17;//WWWwwwwwww
 	height = hheight + 8 * mheight;
 
 	int icon_w = 0, icon_h = 0;
@@ -301,6 +301,8 @@ void CDBoxInfoWidget::paint()
 		HeadiconOffset = w+6;
 	}
 	int fw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getWidth();
+	int binfo_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(LOCALE_EXTRA_DBOXINFO));
+
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+(fw/3)+HeadiconOffset,y+hheight+1,
 		width-((fw/3)+HeadiconOffset), g_Locale->getText(LOCALE_EXTRA_DBOXINFO),
 		COL_MENUHEAD_TEXT, 0, true); // UTF-8
@@ -329,8 +331,7 @@ void CDBoxInfoWidget::paint()
 				char *p=rindex(buffer,':');
 				if (p)
 					hw=++p;
-				hw+=" Info";
-				g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+10, y + hheight+1, width - 10, hw.c_str(), COL_MENUHEAD_TEXT, 0, true); // UTF-8
+				g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+10+binfo_w+HeadiconOffset, y + hheight+1, width - 10, hw, COL_MENUHEAD_TEXT, 0, true); // UTF-8
 				break;
 			}
 			i++;
