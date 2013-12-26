@@ -129,6 +129,7 @@ int CKernelOptions::exec(CMenuTarget * parent, const std::string & actionKey)
 	    }
 	if (needs_save)
 	    save();
+	updateStatus();
 	return res;
     }
 
