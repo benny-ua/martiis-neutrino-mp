@@ -994,7 +994,7 @@ void CControlAPI::GetBouquetCGI(CyhookHandler *hh) {
 	std::string result = "";
 	if (!(hh->ParamList.empty())) {
 		int mode = NeutrinoAPI->Zapit->getMode();
- 
+
 		if (hh->ParamList["mode"].compare("TV") == 0)
 			mode = CZapitClient::MODE_TV;
 		else if (hh->ParamList["mode"].compare("RADIO") == 0)
