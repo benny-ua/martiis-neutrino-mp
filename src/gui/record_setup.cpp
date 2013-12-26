@@ -254,6 +254,7 @@ int CRecordSetup::showRecordSetup()
 	/* activate changes */
         CRecordManager::getInstance()->SetDirectory(g_settings.network_nfs_recordingdir);
         CRecordManager::getInstance()->Config(g_settings.recording_stopsectionsd, g_settings.recording_stream_vtxt_pid, g_settings.recording_stream_pmt_pid, g_settings.recording_stream_subtitle_pids);
+	g_Timerd->setRecordingSafety(g_settings.record_safety_time_before * 60, g_settings.record_safety_time_after * 60);
 
 	return res;
 }
