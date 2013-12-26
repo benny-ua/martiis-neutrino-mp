@@ -1040,10 +1040,10 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	if (zapProtection)
 		return messages_return::handled;
 
-	bool startvideo = true;
-
 	if (msg != NeutrinoMessages::EVT_PROGRAMLOCKSTATUS) // right now the only message handled here.
 		return messages_return::unhandled;
+
+	bool startvideo = false;
 
 	//printf("===> program-lock-status: %d zp: %d\n", data, zapProtection != NULL);
 
@@ -1110,13 +1110,13 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 				}
 			}
 		}
+		startvideo = true;
 	}
 	else
 	{
 		/* last_unlocked_time == 0 is the magic to tell zapTo() to not record the time.
 		   Without that, zapping to a locked channel twice would open it without the PIN */
 		chanlist[selected]->last_unlocked_time = 0;
-		startvideo = false;
 	}
 	delete zapProtection;
 	zapProtection = NULL;
