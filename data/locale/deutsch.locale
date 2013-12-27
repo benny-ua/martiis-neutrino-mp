@@ -286,7 +286,7 @@ ci.settings Zugangskontrolle
 ci.timeout CAM antwortet nicht
 ci.waiting Warte auf CAM-Antwort
 clock_background Hintergrund anzeigen
-clock_seconds Sekunden anzeigen
+clock_format Format
 clock_size_height Höhe der Anzeige
 clock_switch_off Uhr ausblenden
 clock_switch_on Uhr einblenden
@@ -925,8 +925,8 @@ menu.hint_channellist_setup Wählen Sie die Anzeigeoptionen für die Kanalliste
 menu.hint_channels Kanalliste öffnen
 menu.hint_ci Conditional-Access-Menü zum Einrichten Ihres CI-Moduls oder der eingebetteten Conax-Karte
 menu.hint_clock_background Lassen Sie die Uhr mit Hintergrund anzeigen
+menu.hint_clock_format Wählen Sie das Format der angezeigten Zeit
 menu.hint_clock_mode Schalten Sie die Uhr ein oder aus
-menu.hint_clock_seconds Legen Sie fest, ob die Sekunden angezeigt werden sollen
 menu.hint_clock_size Stellen Sie die Größe der Uhr ein
 menu.hint_clock_textcolor Konfigurieren Sie die Farbe der Ziffern
 menu.hint_colors Konfigurieren Sie die Menü-Farben

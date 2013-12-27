@@ -991,13 +991,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.pip_height = configfile.getInt32("pip_height", 200);
 #endif
 
+	g_settings.infoClockFormat0 = configfile.getString("infoClockFormat0", "%H:%M:%S");
+	g_settings.infoClockFormat1 = configfile.getString("infoClockFormat1", "%H:%M:%S");
 	g_settings.infoClockFontSize = configfile.getInt32("infoClockFontSize", 30);
 	g_settings.infoClockBackground = configfile.getInt32("infoClockBackground", 0);
-	g_settings.infoClockSeconds = configfile.getInt32("infoClockSeconds", 1);
-
-	// backwards compatibility with original implementation. FIXME, scheduled for removal in 02/2014
-	g_settings.infoClockSeconds = configfile.getInt32("infoclock_with_seconds", g_settings.infoClockSeconds);
-	g_settings.infoClockBackground = !configfile.getInt32("infoclock_no_background", g_settings.infoClockBackground);
 
 	if(erg)
 		configfile.setModifiedFlag(true);
@@ -1501,9 +1498,10 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("pip_width", g_settings.pip_width);
 	configfile.setInt32("pip_height", g_settings.pip_height);
 #endif
+	configfile.setString("infoClockFormat0", g_settings.infoClockFormat0);
+	configfile.setString("infoClockFormat1", g_settings.infoClockFormat1);
 	configfile.setInt32("infoClockFontSize", g_settings.infoClockFontSize);
 	configfile.setInt32("infoClockBackground", g_settings.infoClockBackground);
-	configfile.setInt32("infoClockSeconds", g_settings.infoClockSeconds);
 	if(strcmp(fname, NEUTRINO_SETTINGS_FILE))
 		configfile.saveConfig(fname);
 

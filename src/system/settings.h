@@ -654,8 +654,9 @@ struct SNeutrinoSettings
 		FONT_TYPE_COUNT
 	};
 
+	std::string infoClockFormat0;
+	std::string infoClockFormat1;
 	int infoClockFontSize;
-	int infoClockSeconds;
 	int infoClockBackground;
 
 	// lcdd

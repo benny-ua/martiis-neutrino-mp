@@ -303,7 +303,7 @@ void CVolumeHelper::initInfoClock(Font** font)
 	int t1       = (*clock_font)->getMaxDigitWidth();
 	int t2       = (*clock_font)->getRenderWidth(":");
 	clock_dy     = digit_h + (int)((float)digit_offset * 1.3);
-	if (g_settings.infoClockSeconds)
+	if (g_settings.infoClockFormat0.length() > 5)
 		clock_dx     = t1*7 + t2*2;
 	else
 		clock_dx     = t1*5 + t2*1;

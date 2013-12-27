@@ -286,7 +286,7 @@ ci.settings Conditional access
 ci.timeout Timeout waiting CI menu ready
 ci.waiting Waiting for CI answer
 clock_background Show background
-clock_seconds Show seconds
+clock_format Format
 clock_size_height Display height
 clock_switch_off Clock off
 clock_switch_on Clock on
@@ -925,8 +925,8 @@ menu.hint_channellist_setup Configure channel list GUI options
 menu.hint_channels Open channel list
 menu.hint_ci Conditional access menu\nto setup your CI CAM or embeded Conax card
 menu.hint_clock_background Show clock with theme's background color
+menu.hint_clock_format Select the time format
 menu.hint_clock_mode Switch clock on or off
-menu.hint_clock_seconds Show time format with seconds
 menu.hint_clock_size Set the size of the info clock
 menu.hint_clock_textcolor Configure digit colors
 menu.hint_colors Configure GUI colors
