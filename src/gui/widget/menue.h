@@ -360,6 +360,14 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 			   const unsigned Number_Of_Options, const bool Active = false, CChangeObserver * const Observ = NULL,
 			   const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const std::string & IconName= "",
 			   bool Pulldown = false);
+	CMenuOptionChooser(const neutrino_locale_t Name, int * const OptionValue, std::vector<keyval_ext> &Options,
+			   const bool Active = false, CChangeObserver * const Observ = NULL,
+			   const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const std::string & IconName= "",
+			   bool Pulldown = false);
+	CMenuOptionChooser(const std::string &Name, int * const OptionValue, std::vector<keyval_ext> &Options,
+			   const bool Active = false, CChangeObserver * const Observ = NULL,
+			   const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const std::string & IconName= "",
+			   bool Pulldown = false);
 	~CMenuOptionChooser();
 
 	void setOption(const int newvalue);

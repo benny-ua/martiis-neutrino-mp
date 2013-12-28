@@ -1455,6 +1455,37 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 		options.push_back(Options[i]);
 }
 
+CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int * const OptionValue, std::vector<keyval_ext> &Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const std::string & IconName, bool Pulldown)
+{
+	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
+	nameString	= "";
+	name		= OptionName;
+	active		= Active;
+	optionValue	= OptionValue;
+	options		= Options;
+	number_of_options = options.size();
+	observ		= Observ;
+	directKey	= DirectKey;
+	iconName	= IconName;
+	pulldown	= Pulldown;
+}
+
+CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * const OptionValue, std::vector<keyval_ext> &Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const std::string & IconName, bool Pulldown)
+{
+	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
+	nameString	= OptionName;
+	name		= NONEXISTANT_LOCALE;
+	active		= Active;
+	optionValue	= OptionValue;
+	options		= Options;
+	number_of_options = options.size();
+	observ		= Observ;
+	directKey	= DirectKey;
+	iconName	= IconName;
+	pulldown	= Pulldown;
+}
+
+
 CMenuOptionChooser::~CMenuOptionChooser()
 {
 	options.clear();
