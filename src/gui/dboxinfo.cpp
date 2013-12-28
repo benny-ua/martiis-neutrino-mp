@@ -54,6 +54,8 @@
 #include <sys/vfs.h>
 #include <system/helpers.h>
 #include <map>
+#include <iostream>
+#include <fstream>
 #include <ctype.h>
 
 static const int FSHIFT = 16;              /* nr of bits of precision */
@@ -193,7 +195,7 @@ void CDBoxInfoWidget::paint()
 	int sizeOffset = fontWidth * 7;//9999.99M
 	int percOffset = fontWidth * 3 ;//100%
 	int nameOffset = fontWidth * 17;//WWWwwwwwww
-	height = hheight + 7 * mheight;
+	height = hheight + 6 * mheight;
 
 	int icon_w = 0, icon_h = 0;
 	frameBuffer->getIconSize(NEUTRINO_ICON_REC, &icon_w, &icon_h);
@@ -305,56 +307,47 @@ void CDBoxInfoWidget::paint()
 		HeadiconOffset = w+6;
 	}
 	int fw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getWidth();
-	int binfo_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getRenderWidth(g_Locale->getText(LOCALE_EXTRA_DBOXINFO));
-
+	std::string title(g_Locale->getText(LOCALE_EXTRA_DBOXINFO));
+#if USE_STB_HAL
+	title += ": ";
+	title += g_info.hw_caps->boxname;
+#endif
+	std::map<std::string,std::string> cpuinfo;
+	std::ifstream in("/proc/cpuinfo");
+	if (in.is_open()) {
+		std::string line;
+		while (getline(in, line)) {
+			size_t colon = line.find_first_of(':');
+			if (colon != string::npos && colon > 1) {
+				std::string key = line.substr(0, colon - 1);
+				std::string val = line.substr(colon + 1);
+				cpuinfo[trim(key)] = trim(val);
+			}
+		}
+		in.close();
+	}
+#if !USE_STB_HAL
+	if (!cpuinfo["Hardware"].empty()) {
+		title += ": ";
+		title += cpuinfo["Hardware"];
+	} else if (!cpuinfo["machine"].empty()) {
+		title += ": ";
+		title + cpuinfo["machine"];
+	}
+#endif
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+(fw/3)+HeadiconOffset,y+hheight+1,
-		width-((fw/3)+HeadiconOffset), g_Locale->getText(LOCALE_EXTRA_DBOXINFO),
-		COL_MENUHEAD_TEXT, 0, true); // UTF-8
+		width-((fw/3)+HeadiconOffset), title, COL_MENUHEAD_TEXT, 0, true); // UTF-8
 	frameBuffer->paintIcon(iconfile, x + fw/4, y, hheight);
 
 	ypos+= hheight + (mheight/2);
-	FILE* fd = fopen("/proc/cpuinfo", "rt");
-	if (fd==NULL) {
-		printf("error while opening proc-cpuinfo\n" );
-	} else {
-		char *buffer=NULL;
-		size_t len = 0;
-		ssize_t read;
-		while ((read = getline(&buffer, &len, fd)) != -1) {
-#if HAVE_TRIPLEDRAGON
-			if (!(strncmp(const_cast<char *>("machine"),buffer,7)))
-#else
-			if (!(strncmp(const_cast<char *>("Hardware"),buffer,8)))
-#endif
-			{
-				char *t=rindex(buffer,'\n');
-				if (t)
-					*t='\0';
 
-				std::string hw;
-				char *p=rindex(buffer,':');
-				if (p)
-					hw=++p;
-				g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->RenderString(x+10+binfo_w+HeadiconOffset, y + hheight+1, width - 10, hw, COL_MENUHEAD_TEXT, 0, true); // UTF-8
-				break;
-			}
-			i++;
-#if HAVE_TRIPLEDRAGON
-			if (i == 1 || i > 3)
-#else
-			if (i > 2)
-#endif
-				continue;
-			if (read > 0 && buffer[read-1] == '\n')
-				buffer[read-1] = '\0';
-			buffer[0] = toupper(buffer[0]);
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, buffer, COL_MENUCONTENT_TEXT);
-			ypos+= mheight;
-		}
-		fclose(fd);
-		if (buffer)
-			free(buffer);
-	}
+	std::string bogomips;
+	if (!cpuinfo["bogomips"].empty())
+		bogomips = "BogoMips: " + cpuinfo["bogomips"];
+
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, bogomips, COL_MENUCONTENT_TEXT);
+	ypos += mheight;
+
 	char *ubuf=NULL, *sbuf=NULL;
 	int buf_size=256;
 	ubuf = new char[buf_size];
