@@ -64,40 +64,6 @@ CUserMenuSetup::~CUserMenuSetup()
 	delete ums;
 }
 
-const CMenuOptionChooser::keyval USERMENU_ITEM_OPTIONS[] =
-{
-	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE },
-	{ SNeutrinoSettings::ITEM_BAR,			LOCALE_USERMENU_ITEM_BAR },
-	{ SNeutrinoSettings::ITEM_EPG_LIST,		LOCALE_EPGMENU_EVENTLIST },
-	{ SNeutrinoSettings::ITEM_EPG_SUPER,		LOCALE_EPGMENU_EPGPLUS },
-	{ SNeutrinoSettings::ITEM_EPG_INFO,		LOCALE_EPGMENU_EVENTINFO },
-	{ SNeutrinoSettings::ITEM_EPG_MISC,		LOCALE_USERMENU_ITEM_EPG_MISC },
-	{ SNeutrinoSettings::ITEM_AUDIO_SELECT,		LOCALE_AUDIOSELECTMENUE_HEAD },
-	{ SNeutrinoSettings::ITEM_SUBCHANNEL,		LOCALE_INFOVIEWER_SUBSERVICE },
-	{ SNeutrinoSettings::ITEM_MOVIEPLAYER_MB,	LOCALE_MOVIEBROWSER_HEAD },
-	{ SNeutrinoSettings::ITEM_TIMERLIST,		LOCALE_TIMERLIST_NAME },
-	{ SNeutrinoSettings::ITEM_REMOTE,		LOCALE_RCLOCK_MENUEADD },
-	{ SNeutrinoSettings::ITEM_FAVORITS,		LOCALE_FAVORITES_MENUEADD },
-	{ SNeutrinoSettings::ITEM_TECHINFO,		LOCALE_EPGMENU_STREAMINFO },
-	{ SNeutrinoSettings::ITEM_PLUGIN,		LOCALE_TIMERLIST_PLUGIN },
-	{ SNeutrinoSettings::ITEM_VTXT,			LOCALE_USERMENU_ITEM_VTXT },
-	{ SNeutrinoSettings::ITEM_IMAGEINFO,		LOCALE_SERVICEMENU_IMAGEINFO },
-	{ SNeutrinoSettings::ITEM_BOXINFO,		LOCALE_EXTRA_DBOXINFO },
-	{ SNeutrinoSettings::ITEM_CAM,			LOCALE_CI_SETTINGS },
-	{ SNeutrinoSettings::ITEM_CLOCK,		LOCALE_CLOCK_SWITCH_ON },
-	{ SNeutrinoSettings::ITEM_GAMES,		LOCALE_MAINMENU_GAMES },
-	{ SNeutrinoSettings::ITEM_SCRIPTS,		LOCALE_MAINMENU_SCRIPTS },
-        { SNeutrinoSettings::ITEM_ADZAP,		LOCALE_USERMENU_ITEM_ADZAP },
-        { SNeutrinoSettings::ITEM_EMU_RESTART,		LOCALE_SERVICEMENU_RESTART_CAM },
-        { SNeutrinoSettings::ITEM_TUNER_RESTART,	LOCALE_SERVICEMENU_RESTART_TUNER },
-        { SNeutrinoSettings::ITEM_THREE_D_MODE,		LOCALE_THREE_D_SETTINGS },
-        { SNeutrinoSettings::ITEM_RASS,			LOCALE_RASS_HEAD },
-        { SNeutrinoSettings::ITEM_YOUTUBE,		LOCALE_MOVIEPLAYER_YTPLAYBACK },
-        { SNeutrinoSettings::ITEM_NETZKINO,		LOCALE_MOVIEPLAYER_NKPLAYBACK },
-	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD }
-};
-#define USERMENU_ITEM_OPTION_COUNT (sizeof(USERMENU_ITEM_OPTIONS)/sizeof(CMenuOptionChooser::keyval))
-
 int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &)
 {
 	if(parent != NULL)
@@ -109,8 +75,90 @@ int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &)
 	return res; 
 }
 
+static bool usermenu_show = true;
+#if HAVE_SPARK_HARDWARE
+static bool usermenu_show_three_d_mode = true;
+#else
+static bool usermenu_show_three_d_mode = false;
+#endif
+#if HAVE_SPARK_HARDWARE
+static bool usermenu_show_cam = false; // FIXME -- use hwcaps?
+#else
+static bool usermenu_show_cam = true; // FIXME -- use hwcaps?
+#endif
+struct keyvals
+{
+	const int key;
+	const neutrino_locale_t value;
+	bool &show;
+};
+
+static keyvals usermenu_items[] =
+{
+	{ SNeutrinoSettings::ITEM_BAR,			LOCALE_USERMENU_ITEM_BAR,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_EPG_LIST,		LOCALE_EPGMENU_EVENTLIST,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_EPG_SUPER,		LOCALE_EPGMENU_EPGPLUS,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_EPG_INFO,		LOCALE_EPGMENU_EVENTINFO,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_EPG_MISC,		LOCALE_USERMENU_ITEM_EPG_MISC,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_AUDIO_SELECT,		LOCALE_AUDIOSELECTMENUE_HEAD,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_SUBCHANNEL,		LOCALE_INFOVIEWER_SUBSERVICE,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_MOVIEPLAYER_MB,	LOCALE_MOVIEBROWSER_HEAD,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_TIMERLIST,		LOCALE_TIMERLIST_NAME,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_REMOTE,		LOCALE_RCLOCK_MENUEADD,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_FAVORITS,		LOCALE_FAVORITES_MENUEADD,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_TECHINFO,		LOCALE_EPGMENU_STREAMINFO,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_PLUGIN,		LOCALE_TIMERLIST_PLUGIN,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_VTXT,			LOCALE_USERMENU_ITEM_VTXT,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_IMAGEINFO,		LOCALE_SERVICEMENU_IMAGEINFO,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_BOXINFO,		LOCALE_EXTRA_DBOXINFO,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_CAM,			LOCALE_CI_SETTINGS,			usermenu_show_cam },
+	{ SNeutrinoSettings::ITEM_CLOCK,		LOCALE_CLOCK_SWITCH_ON,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_GAMES,		LOCALE_MAINMENU_GAMES,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_SCRIPTS,		LOCALE_MAINMENU_SCRIPTS,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_ADZAP,		LOCALE_USERMENU_ITEM_ADZAP,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_EMU_RESTART,		LOCALE_SERVICEMENU_RESTART_CAM,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_TUNER_RESTART,	LOCALE_SERVICEMENU_RESTART_TUNER,	usermenu_show },
+	{ SNeutrinoSettings::ITEM_THREE_D_MODE,		LOCALE_THREE_D_SETTINGS,		usermenu_show_three_d_mode },
+	{ SNeutrinoSettings::ITEM_RASS,			LOCALE_RASS_HEAD,			usermenu_show },
+	{ SNeutrinoSettings::ITEM_YOUTUBE,		LOCALE_MOVIEPLAYER_YTPLAYBACK,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_NETZKINO,		LOCALE_MOVIEPLAYER_NKPLAYBACK,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD,		usermenu_show },
+// order is not important, but ITEM_NONE needs to be last
+	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show }
+};
+
 int CUserMenuSetup::showSetup()
 {
+	std::map<std::string,int> locmap;
+	unsigned int i = 0;
+	unsigned USERMENU_ITEM_OPTION_COUNT = 0;
+	for (; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++)
+		if (usermenu_items[i].show) {
+			locmap[std::string(g_Locale->getText(usermenu_items[i].value))] = i;
+			USERMENU_ITEM_OPTION_COUNT++;
+		}
+
+	struct keyval
+	{
+		int key;
+		neutrino_locale_t value;
+	};
+
+	std::vector<CMenuOptionChooser::keyval_ext> vec;
+	CMenuOptionChooser::keyval_ext kext;
+	kext.valname = NULL;
+	kext.key = usermenu_items[i].key;
+	kext.value = usermenu_items[i].value;
+	vec.push_back(kext);
+
+	i = 1;
+	for(std::map<string,int>::iterator it = locmap.begin(); it != locmap.end(); ++it) {
+                kext.key = usermenu_items[(*it).second].key;
+                kext.value = usermenu_items[(*it).second].value;
+		vec.push_back(kext);
+		i++;
+	}
+
 	if (ums == NULL) {
 		mn_widget_id_t widget_id = MN_WIDGET_ID_USERMENU_RED + button; //add up ''button'' and becomes to MN_WIDGET_ID_USERMENU_ GREEN, MN_WIDGET_ID_USERMENU_ YELLOW, MN_WIDGET_ID_USERMENU_BLUE
 		ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
@@ -132,13 +180,12 @@ int CUserMenuSetup::showSetup()
 	ums->addItem(mf);
 	ums->addItem(GenericMenuSeparatorLine);
 	//-------------------------------------
-	char text[max_char];
 	for(int item = 0; item < SNeutrinoSettings::ITEM_MAX && item <13; item++) // Do not show more than 13 items
 	{
+		char text[max_char];
 		snprintf(text,max_char,"%d.",item+1);
 		text[max_char-1]=0;// terminate for sure
-		int count = (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF) ? USERMENU_ITEM_OPTION_COUNT : USERMENU_ITEM_OPTION_COUNT - 1;
-		ums->addItem(new CMenuOptionChooser(text, &g_settings.usermenu[button][item], USERMENU_ITEM_OPTIONS, count,true, NULL, CRCInput::RC_nokey, "", true ));	
+		ums->addItem(new CMenuOptionChooser(text, &g_settings.usermenu[button][item], vec, true, NULL, CRCInput::RC_nokey, "", true ));	
 	}
 	
 	int res = ums->exec(NULL, "");
@@ -171,8 +218,8 @@ void CUserMenuSetup::checkButtonItems()
 		{
 			CMenuOptionChooser * opt_c = NULL;
 			opt_c = static_cast <CMenuOptionChooser*>(ums->getItem(i));
-			neutrino_locale_t opt_locale = USERMENU_ITEM_OPTIONS[opt_c->getOption()].value;
-			int set_key = USERMENU_ITEM_OPTIONS[opt_c->getOption()].key;
+			neutrino_locale_t opt_locale = usermenu_items[opt_c->getOption()].value;
+			int set_key = usermenu_items[opt_c->getOption()].key;
 			opt_c = NULL;
 			
 			if (set_key != SNeutrinoSettings::ITEM_NONE)
