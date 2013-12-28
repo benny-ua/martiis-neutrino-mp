@@ -602,7 +602,7 @@ int CMenuInfoClockSetup::show(void)
 
 	// format of info clock
 	CMenuOptionStringChooser *sc = new CMenuOptionStringChooser(LOCALE_CLOCK_FORMAT, &formatValue, true, this, CRCInput::RC_nokey, "", true);
-	for(std::map<string,int>::iterator it = formatMap.begin(); it != formatMap.end(); ++it)
+	for(std::map<std::string,int>::iterator it = formatMap.begin(); it != formatMap.end(); ++it)
 		sc->addOption((*it).first);
 	sc->setHint("", LOCALE_MENU_HINT_CLOCK_FORMAT);
 	m.addItem(sc);
