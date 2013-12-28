@@ -180,7 +180,7 @@ static void bytes2string(uint64_t bytes, char *result, size_t len)
 		factor *= 1024;
 	}
 	if (b < 1024) /* no need for fractions for big numbers */
-		snprintf(result, len, "%3d.%02d%c", (int)b,
+		snprintf(result, len, "%d.%02d%c", (int)b,
 			(int)((bytes - b * factor) * 100 / factor), units[magnitude]);
 	else
 		snprintf(result, len, "%d%c", (int)bytes, units[magnitude]);
@@ -192,10 +192,10 @@ static void bytes2string(uint64_t bytes, char *result, size_t len)
 void CDBoxInfoWidget::paint()
 {
 	const int headSize = 5;
-	const char *head[headSize] = {"Filesystem", "Size", "Used", "Available", "Use%"};
+	const char *head[headSize] = {"Filesystem", "Size", "Used", "Available", "Use"};
 	int fontWidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
-	int sizeOffset = fontWidth * 7;//9999.99M
-	int percOffset = fontWidth * 3 ;//100%
+	int sizeOffset = fontWidth * 8;//9999.99M
+	int percOffset = fontWidth * 4 ;//100%
 	int nameOffset = fontWidth * 17;//WWWwwwwwww
 	height = hheight + 6 * mheight;
 
@@ -411,30 +411,25 @@ void CDBoxInfoWidget::paint()
 
 	int headOffset=0;
 	int mpOffset=0;
-	bool rec_mp=false, memory_flag = false;
+	bool rec_mp=false;
 	const int headSize_mem = 5;
-	const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use%"};
+	const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use"};
+	int offsets[] = {
+		10,
+		nameOffset + 20,
+		nameOffset + (sizeOffset+10)*1+20,
+		nameOffset + (sizeOffset+10)*2+15,
+		nameOffset + (sizeOffset+10)*3+15,
+	};
+	int widths[] = { 0, sizeOffset, sizeOffset, sizeOffset, percOffset };
+
 	// paint mount head
 	for (int j = 0; j < headSize_mem; j++) {
-		switch (j)
-		{
-			case 0:
-			headOffset = 10;
-			break;
-			case 1:
-			headOffset = nameOffset + 20;
-			break;
-			case 2:
-			headOffset = nameOffset + sizeOffset+10 +20;
-			break;
-			case 3:
-			headOffset = nameOffset + (sizeOffset+10)*2+15;
-			break;
-			case 4:
-			headOffset = nameOffset + (sizeOffset+10)*3+15;
-			break;
-		}
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
+		headOffset = offsets[j];
+		int center = 0;
+		if (j > 0)
+			center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(head_mem[j], true))/2;
+		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset + center, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
 	}
 	ypos+= mheight;
 
@@ -443,27 +438,26 @@ void CDBoxInfoWidget::paint()
 		for (int j = 0; j < headSize_mem; j++) {
 			switch (j) {
 				case 0:
-					mpOffset = 10;
 					snprintf(ubuf,buf_size,"%-20.20s", n[k]);
 					break;
 				case 1:
-					mpOffset = nameOffset + 10;
 					bytes2string(1024 * m[k][DBINFO_TOTAL], ubuf, buf_size);
 					break;
 				case 2:
-					mpOffset = nameOffset+ (sizeOffset+10)*1+10;
 					bytes2string(1024 * m[k][DBINFO_USED], ubuf, buf_size);
 					break;
 				case 3:
-					mpOffset = nameOffset+ (sizeOffset+10)*2+10;
 					bytes2string(1024 * m[k][DBINFO_FREE], ubuf, buf_size);
 					break;
 				case 4:
-					mpOffset = nameOffset+ (sizeOffset+10)*3+10;
-					snprintf(ubuf, buf_size, "%4d%%", m[k][DBINFO_TOTAL] ? (m[k][DBINFO_USED] * 100) / m[k][DBINFO_TOTAL] : 0);
+					snprintf(ubuf, buf_size, "%d%%", m[k][DBINFO_TOTAL] ? (m[k][DBINFO_USED] * 100) / m[k][DBINFO_TOTAL] : 0);
 					break;
 			}
-			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
+			mpOffset = offsets[j];
+			int center = 0;
+			if (j > 0)
+				center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(ubuf, true))/2;
+			g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset + center, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
 		}
 		int pbw = width - offsetw - 10;
 		if (pbw > 8) /* smaller progressbar is not useful ;) */
@@ -480,25 +474,11 @@ void CDBoxInfoWidget::paint()
 	
 	// paint mount head
 	for (int j = 0; j < headSize; j++) {
-		switch (j)
-		{
-			case 0:
-			headOffset = 10;
-			break;
-			case 1:
-			headOffset = nameOffset + 20;
-			break;
-			case 2:
-			headOffset = nameOffset + sizeOffset+10 +20;
-			break;
-			case 3:
-			headOffset = nameOffset + (sizeOffset+10)*2+15;
-			break;
-			case 4:
-			headOffset = nameOffset + (sizeOffset+10)*3+15;
-			break;
-		}
-		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset, ypos+ mheight, width - 10, head[j], COL_MENUCONTENTINACTIVE_TEXT);
+		headOffset = offsets[j];
+		int center = 0;
+		if (j > 0)
+			center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(head[j], true))/2;
+		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset + center, ypos+ mheight, width - 10, head[j], COL_MENUCONTENTINACTIVE_TEXT);
 	}
 	ypos+= mheight;
 
@@ -530,57 +510,44 @@ void CDBoxInfoWidget::paint()
 					default:
 						continue;
 				}
-				if ( s.f_blocks > 0 || memory_flag ) {
+				if ( s.f_blocks > 0 ) {
 					int percent_used;
 					uint64_t bytes_total;
 					uint64_t bytes_used;
 					uint64_t bytes_free;
-					if (memory_flag)
-					{
-						//bytes_total = info.totalram;
-						//bytes_free  = info.freeram;
-						unsigned long t, f;
-						get_mem_usage(t, f);
-						bytes_total = t*1024;
-						bytes_free = f*1024;
-					}
-					else
-					{
-						bytes_total = s.f_blocks * s.f_bsize;
-						bytes_free  = s.f_bfree  * s.f_bsize;
-					}
+					bytes_total = s.f_blocks * s.f_bsize;
+					bytes_free  = s.f_bfree  * s.f_bsize;
 					bytes_used = bytes_total - bytes_free;
 					percent_used = (bytes_used * 200 + bytes_total) / 2 / bytes_total;
 					//paint mountpoints
 					for (int j = 0; j < headSize; j++) {
+						mpOffset = offsets[j];
 						int _w = width;
 						switch (j) {
 						case 0:
 							rec_mp = !memcmp(&s.f_fsid, &rec_s.f_fsid, sizeof(s.f_fsid)) && (s.f_type != 0x72b6) && (s.f_type != 0x5941ff53);
-							mpOffset = 10;
 							strncpy(ubuf, mnt->mnt_dir, buf_size);
 							_w = nameOffset - mpOffset;
 							if (rec_mp)
 								_w -= icon_w + 10;
 							break;
 						case 1:
-							mpOffset = nameOffset + 10;
 							bytes2string(bytes_total, ubuf, buf_size);
 							break;
 						case 2:
-							mpOffset = nameOffset+ (sizeOffset+10)*1+10;
 							bytes2string(bytes_used, ubuf, buf_size);
 							break;
 						case 3:
-							mpOffset = nameOffset+ (sizeOffset+10)*2+10;
 							bytes2string(bytes_free, ubuf, buf_size);
 							break;
 						case 4:
-							mpOffset = nameOffset+ (sizeOffset+10)*3+10;
-							snprintf(ubuf, buf_size, "%4d%%", percent_used);
+							snprintf(ubuf, buf_size, "%d%%", percent_used);
 							break;
 						}
-						g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset, ypos+ mheight, _w - 10, ubuf, COL_MENUCONTENT_TEXT);
+						int center = 0;
+						if (j > 0)
+							center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(ubuf, true))/2;
+						g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset + center, ypos+ mheight, _w - 10, ubuf, COL_MENUCONTENT_TEXT);
 						if (rec_mp) {
 							if (icon_w>0 && icon_h>0)
 								frameBuffer->paintIcon(NEUTRINO_ICON_REC, x + nameOffset - 10 - icon_w, ypos + (mheight/2 - icon_h/2));
@@ -588,7 +555,6 @@ void CDBoxInfoWidget::paint()
 						}
 					}
 					int pbw = width - offsetw - 10;
-					memory_flag = false;
 //fprintf(stderr, "width: %d offsetw: %d pbw: %d\n", width, offsetw, pbw);
 					if (pbw > 8) /* smaller progressbar is not useful ;) */
 					{
