@@ -193,7 +193,7 @@ void CDBoxInfoWidget::paint()
 	int sizeOffset = fontWidth * 7;//9999.99M
 	int percOffset = fontWidth * 3 ;//100%
 	int nameOffset = fontWidth * 17;//WWWwwwwwww
-	height = hheight + 8 * mheight;
+	height = hheight + 7 * mheight;
 
 	int icon_w = 0, icon_h = 0;
 	frameBuffer->getIconSize(NEUTRINO_ICON_REC, &icon_w, &icon_h);
