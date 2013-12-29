@@ -204,9 +204,9 @@ void CDBoxInfoWidget::paint()
 	const int headSize = 5;
 	const char *head[headSize] = {"Filesystem", "Size", "Used", "Available", "Use"};
 	int fontWidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
-	int sizeOffset = fontWidth * 11;//9999.99 MiB
-	int percOffset = fontWidth * 4 ;//100%
-	int nameOffset = fontWidth * 17;//WWWwwwwwww
+	int sizeWidth = fontWidth * 11;//9999.99 MiB
+	int percWidth = fontWidth * 4 ;//100%
+	int nameWidth = fontWidth * 17;//WWWwwwwwww
 	height = hheight;
 	height += mheight/2;	// space
 	height += mheight;	// bogomips;
@@ -283,7 +283,7 @@ void CDBoxInfoWidget::paint()
 				bool is_rec = (st.st_dev == rec_st.st_dev);
 				mounts[mountpoint] = is_rec;
 				int icon_space = is_rec ? 10 + icon_w : 0;
-				nameOffset = std::max(nameOffset, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(mountpoint, true) + icon_space + 20);
+				nameWidth = std::max(nameWidth, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(mountpoint, true) + icon_space + 10);
 			}
 		}
 		in.close();
@@ -293,15 +293,14 @@ void CDBoxInfoWidget::paint()
 	height += mounts.size() * mheight;	// file systems
 	height += mheight/2;			// space
 
-	int offsetw = nameOffset+ (sizeOffset+10)*3 +10+percOffset+10;
-	offsetw += 20;
+	int offsetw = nameWidth+ (sizeWidth+10)*3 +10+percWidth+10;
 	width = offsetw + 10 + 120;
 
 	int diff = frameBuffer->getScreenWidth() - width;
 	if (diff < 0) {
 		width -= diff;
 		offsetw -= diff;
-		nameOffset -= diff;
+		nameWidth -= diff;
 	}
 	height = h_max(height, 0);
 	x = getScreenStartX(width);
@@ -424,12 +423,12 @@ void CDBoxInfoWidget::paint()
 	const char *head_mem[headSize_mem] = {"Memory", "Size", "Used", "Available", "Use"};
 	int offsets[] = {
 		10,
-		nameOffset + 20,
-		nameOffset + (sizeOffset+10)*1+20,
-		nameOffset + (sizeOffset+10)*2+15,
-		nameOffset + (sizeOffset+10)*3+15,
+		nameWidth + 10,
+		nameWidth + 10 + (sizeWidth+10)*1,
+		nameWidth + 10 + (sizeWidth+10)*2,
+		nameWidth + 10 + (sizeWidth+10)*3,
 	};
-	int widths[] = { 0, sizeOffset, sizeOffset, sizeOffset, percOffset };
+	int widths[] = { 0, sizeWidth, sizeWidth, sizeWidth, percWidth };
 
 	// paint mount head
 	for (int j = 0; j < headSize_mem; j++) {
@@ -511,7 +510,7 @@ void CDBoxInfoWidget::paint()
 					switch (j) {
 					case 0:
 						tmp = (*it).first;
-						_w = nameOffset - mpOffset;
+						_w = nameWidth - mpOffset;
 						if ((*it).second)
 							_w -= icon_w + 10;
 						break;
@@ -533,7 +532,7 @@ void CDBoxInfoWidget::paint()
 						center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(tmp, true))/2;
 					g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + mpOffset + center, ypos+ mheight, _w - 10, tmp, COL_MENUCONTENT_TEXT);
 					if ((*it).second && icon_w>0 && icon_h>0)
-						frameBuffer->paintIcon(NEUTRINO_ICON_REC, x + nameOffset - 10 - icon_w, ypos + (mheight/2 - icon_h/2));
+						frameBuffer->paintIcon(NEUTRINO_ICON_REC, x + nameWidth - icon_w, ypos + (mheight/2 - icon_h/2));
 				}
 				int pbw = width - offsetw - 10;
 //fprintf(stderr, "width: %d offsetw: %d pbw: %d\n", width, offsetw, pbw);
