@@ -124,6 +124,8 @@
 #include <system/setting_helpers.h>
 #include <system/settings.h>
 #include <system/helpers.h>
+#include <system/hddstat.h>
+#include <system/sysload.h>
 #ifdef ENABLE_GRAPHLCD
 #include <driver/nglcd.h>
 #endif
@@ -2400,6 +2402,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	SHTDCNT::getInstance()->init();
 
 	cHddStat::getInstance();
+	cSysLoad::getInstance();
 
 TIMER_STOP("################################## after all ##################################");
 	RealRun(personalize.getWidget(0)/**main**/);
