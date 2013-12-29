@@ -562,6 +562,7 @@ bool CMenuInfoClockSetup::changeNotify(const neutrino_locale_t OptionName, void 
 			InfoClock->setClockFontSize(g_settings.infoClockFontSize);
 			break;
 		case LOCALE_CLOCK_BACKGROUND:
+			InfoClock->enableInfoClock(false);
 			textColorForwarder->setActive(!*((int *) data));
 			break;
 		default:
