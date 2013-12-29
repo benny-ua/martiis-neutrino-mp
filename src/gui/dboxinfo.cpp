@@ -44,6 +44,7 @@
 #include <global.h>
 #include <neutrino.h>
 
+#include <driver/abstime.h>
 #include <driver/fontrenderer.h>
 #include <driver/screen_max.h>
 #include <driver/rcinput.h>
@@ -74,6 +75,7 @@ CDBoxInfoWidget::CDBoxInfoWidget()
 	height = 0;
 	x = 0;
 	y = 0;
+	stat_total = 0;
 }
 
 
@@ -209,8 +211,9 @@ void CDBoxInfoWidget::paint()
 	int nameWidth = fontWidth * 17;//WWWwwwwwww
 	height = hheight;
 	height += mheight/2;	// space
-	height += mheight;	// bogomips;
+	height += mheight;	// time
 	height += mheight;	// uptime
+	height += mheight;	// load
 	height += mheight/2;	// space
 
 	int frontend_count = CFEManager::getInstance()->getFrontendCount();
@@ -355,52 +358,45 @@ void CDBoxInfoWidget::paint()
 
 	ypos += hheight + mheight/2;
 
-	std::string bogomips;
-	if (!cpuinfo["bogomips"].empty())
-		bogomips = "BogoMips: " + cpuinfo["bogomips"];
-
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, bogomips, COL_MENUCONTENT_TEXT);
-	ypos += mheight;
-
-	int buf_size=256;
-	char ubuf[buf_size];
-	char sbuf[buf_size];
-
-	int updays, uphours, upminutes;
-	struct sysinfo info;
-	struct tm *current_time;
-	time_t current_secs;
-	*sbuf = 0;
-	time(&current_secs);
-	current_time = localtime(&current_secs);
-
-	sysinfo(&info);
-
-	snprintf( ubuf,buf_size, "Uptime: %2d:%02d%s  up ",
-		  current_time->tm_hour%12 ? current_time->tm_hour%12 : 12,
-		  current_time->tm_min, current_time->tm_hour > 11 ? "pm" : "am");
-	strcat(sbuf, ubuf);
-	updays = (int) info.uptime / (60*60*24);
-	if (updays) {
-		snprintf(ubuf,buf_size, "%d day%s, ", updays, (updays != 1) ? "s" : "");
-		strcat(sbuf, ubuf);
+	long current_load = -1;
+	in.open("/proc/stat");
+	if (in.is_open()) {
+		std::string line;
+		while (getline(in, line)) {
+			unsigned long _stat_user, _stat_nice, _stat_system, _stat_idle;
+			if (4 == sscanf(line.c_str(), "cpu %lu %lu %lu %lu", &_stat_user, &_stat_nice, &_stat_system, &_stat_idle)) {
+				if (stat_total) {
+					unsigned long div = _stat_user + _stat_nice + _stat_system + _stat_idle - stat_total;
+					if (div > 0)
+						current_load = (long)(1000 - 1000 * (_stat_idle - stat_idle) / div);
+				}
+				stat_idle = _stat_idle;
+				stat_total = _stat_user + _stat_nice + _stat_system + _stat_idle;
+				break;
+			}
+		}
+		in.close();
 	}
-	upminutes = (int) info.uptime / 60;
-	uphours = (upminutes / 60) % 24;
-	upminutes %= 60;
-	if (uphours)
-		snprintf(ubuf,buf_size,"%2d:%02d, ", uphours, upminutes);
-	else
-		snprintf(ubuf,buf_size,"%d min, ", upminutes);
-	strcat(sbuf, ubuf);
 
-	snprintf(ubuf,buf_size, "load: %ld.%02ld, %ld.%02ld, %ld.%02ld",
-		 LOAD_INT(info.loads[0]), LOAD_FRAC(info.loads[0]),
-		 LOAD_INT(info.loads[1]), LOAD_FRAC(info.loads[1]),
-		 LOAD_INT(info.loads[2]), LOAD_FRAC(info.loads[2]));
-	strcat(sbuf, ubuf);
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, sbuf, COL_MENUCONTENT_TEXT);
+	char ubuf[80];
+
+	time_t now = time(NULL);
+	strftime(ubuf, sizeof(ubuf), "Time: %FT%H:%M:%S%z", localtime(&now));
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
 	ypos+= mheight;
+
+	struct sysinfo info;
+	sysinfo(&info);
+	now -= info.uptime;
+	strftime(ubuf, sizeof(ubuf), "Boot: %FT%H:%M:%S%z", localtime(&now));
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
+	ypos+= mheight;
+
+	if (current_load > -1) {
+		snprintf(ubuf, sizeof(ubuf), "Load: %ld%s%ld%%", current_load/10, g_Locale->getText(LOCALE_UNIT_DECIMAL), current_load%10);
+		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
+	}
+	ypos += mheight;
 
 	ypos+= mheight/2;
 
