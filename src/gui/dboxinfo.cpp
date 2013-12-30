@@ -337,14 +337,14 @@ void CDBoxInfoWidget::paint()
 	time_t now = time(NULL);
 	strftime(ubuf, sizeof(ubuf), "Time: %FT%H:%M:%S%z", localtime(&now));
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
-	ypos+= mheight;
+	ypos += mheight;
 
 	struct sysinfo info;
 	sysinfo(&info);
 	now -= info.uptime;
 	strftime(ubuf, sizeof(ubuf), "Boot: %FT%H:%M:%S%z", localtime(&now));
 	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ 10, ypos+ mheight, width - 10, ubuf, COL_MENUCONTENT_TEXT);
-	ypos+= mheight;
+	ypos += mheight;
 
 	if (data_last > -1) {
 		snprintf(ubuf, sizeof(ubuf), "Load: %d%s%d%%", data_last/10, g_Locale->getText(LOCALE_UNIT_DECIMAL), data_last%10);
@@ -367,7 +367,7 @@ void CDBoxInfoWidget::paint()
 		}
 	}
 
-	ypos+= mheight/2;
+	ypos += mheight/2;
 
 	if (frontend_count) {
 		for (int i = 0; i < frontend_count; i++) {
@@ -403,7 +403,7 @@ void CDBoxInfoWidget::paint()
 			center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(head_mem[j], true))/2;
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset + center, ypos+ mheight, width - 10, head_mem[j], COL_MENUCONTENTINACTIVE_TEXT);
 	}
-	ypos+= mheight;
+	ypos += mheight;
 
 	for (int k = 0; k < 1 + have_swap; k++) {
 		std::string tmp;
@@ -440,9 +440,9 @@ void CDBoxInfoWidget::paint()
 			pb.setValues(memstat[k][0] ? (memstat[k][1] * 100) / memstat[k][0] : 0, 100);
 			pb.paint(false);
 		}
-		ypos+= mheight;
+		ypos += mheight;
 	}
-	ypos+= mheight/2;
+	ypos += mheight/2;
 	
 	// paint mount head
 	for (int j = 0; j < headSize; j++) {
@@ -452,7 +452,7 @@ void CDBoxInfoWidget::paint()
 			center = (widths[j] - g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(head[j], true))/2;
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+ headOffset + center, ypos+ mheight, width - 10, head[j], COL_MENUCONTENTINACTIVE_TEXT);
 	}
-	ypos+= mheight;
+	ypos += mheight;
 
 	for (std::map<std::string, bool>::iterator it = mounts.begin(); it != mounts.end(); ++it) {
 		struct statfs s;
@@ -506,7 +506,7 @@ void CDBoxInfoWidget::paint()
 					pb.setValues(percent_used, 100);
 					pb.paint(false);
 				}
-				ypos+= mheight;
+				ypos += mheight;
 			}
 		}
 		if (ypos > y + height - mheight)	/* the screen is not high enough */
