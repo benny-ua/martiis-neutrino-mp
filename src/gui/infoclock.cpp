@@ -36,7 +36,7 @@
 
 
 
-CInfoClock::CInfoClock():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", true, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
+CInfoClock::CInfoClock():CComponentsFrmClock( 0, 0, 0, 50, g_settings.infoClockFormat0.c_str(), true, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
 {
 	initVarInfoClock();
 }
