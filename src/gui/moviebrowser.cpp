@@ -3215,8 +3215,8 @@ int CMovieBrowser::showMovieInfoMenu(MI_MOVIE_INFO* movie_info)
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_CHANNEL,        true, NULL, &channelUserInput,NULL,   CRCInput::RC_0));//LOCALE_TIMERLIST_CHANNEL
     movieInfoMenu.addItem(GenericMenuSeparatorLine);
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_PATH,           false, dirItNr)); //LOCALE_TIMERLIST_RECORDING_DIR
-    movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_PREVPLAYDATE,   false, dateUserDateInput.getValueString().c_str()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
-    movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_RECORDDATE,     false, recUserDateInput.getValueString().c_str()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
+    movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_PREVPLAYDATE,   false, dateUserDateInput.getValue().c_str()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
+    movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_RECORDDATE,     false, recUserDateInput.getValue().c_str()));//LOCALE_FLASHUPDATE_CURRENTVERSIONDATE
     movieInfoMenu.addItem( new CMenuForwarder(LOCALE_MOVIEBROWSER_INFO_SIZE,           false, size));
     movieInfoMenu.addItem(GenericMenuSeparatorLine);
     movieInfoMenu.addItem(GenericMenuBack);

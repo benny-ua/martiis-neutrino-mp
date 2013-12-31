@@ -56,7 +56,7 @@ CMenuForwarder * const GenericMenuBack = &CGenericMenuBack;
 CMenuForwarder * const GenericMenuCancel = &CGenericMenuCancel;
 CMenuForwarder * const GenericMenuNext = &CGenericMenuNext;
 
-std::string &CMenuTarget::getValueString(void)
+std::string &CMenuTarget::getValue(void)
 {
 	return *valueString;
 }
@@ -1907,7 +1907,7 @@ std::string CMenuForwarder::getOption(void)
 	if (!option_string_ptr->empty())
 		return *option_string_ptr;
 	if (jumpTarget)
-		return jumpTarget->getValueString();
+		return jumpTarget->getValue();
 	return "";
 }
 

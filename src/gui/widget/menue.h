@@ -91,7 +91,7 @@ class CMenuTarget
 		virtual ~CMenuTarget(){}
 		virtual void hide(){}
 		virtual int exec(CMenuTarget* parent, const std::string & actionKey) = 0;
-		virtual std::string &getValueString(void);
+		virtual std::string &getValue(void);
 		virtual fb_pixel_t getColor(void) { return 0; }
 };
 

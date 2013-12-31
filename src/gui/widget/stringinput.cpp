@@ -374,7 +374,7 @@ void CStringInput::keyPlusPressed()
 	}
 }
 
-std::string &CStringInput::getValueString(void)
+std::string &CStringInput::getValue(void)
 {
 	return *valueString;
 }

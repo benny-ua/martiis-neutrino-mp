@@ -1238,7 +1238,7 @@ int CTimerList::newTimer()
 
 	CTimerListNewNotifier notifier2((int *)&timerNew.eventType,
 					&timerNew.stopTime,m2,m6,m8,m9,m10,m7,
-					&timerSettings_stopTime.getValueString());
+					&timerSettings_stopTime.getValue());
 	CMenuOptionChooser* m0;
 	if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 		m0 = new CMenuOptionChooser(LOCALE_TIMERLIST_TYPE, (int *)&timerNew.eventType, TIMERLIST_TYPE_OPTIONS, TIMERLIST_TYPE_OPTION_COUNT, true, &notifier2);

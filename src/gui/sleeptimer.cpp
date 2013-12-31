@@ -132,7 +132,7 @@ int CSleepTimerWidget::exec(CMenuTarget* parent, const std::string &actionKey)
 	return res;
 }
 
-std::string &CSleepTimerWidget::getValueString(void)
+std::string &CSleepTimerWidget::getValue(void)
 {
 	int remaining = g_Timerd->getSleepTimerRemaining();
 	valueStringTmp = (remaining > 0) ? to_string(remaining) + " " + g_Locale->getText(LOCALE_UNIT_SHORT_MINUTE) : "";

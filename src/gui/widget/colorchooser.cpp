@@ -97,7 +97,7 @@ CColorChooser::CColorChooser(const neutrino_locale_t Name, unsigned char *R, uns
 	value[VALUE_ALPHA] = Alpha;
 }
 
-std::string &CColorChooser::getValueString(void)
+std::string &CColorChooser::getValue(void)
 {
 	return *valueString;
 }
