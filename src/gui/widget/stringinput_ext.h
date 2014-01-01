@@ -76,8 +76,8 @@ class CExtendedInput : public CMenuTarget
 
 	public:
 
-		CExtendedInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel = NULL);
-		CExtendedInput(std::string &Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel = NULL);
+		CExtendedInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL, bool* cancel = NULL);
+		CExtendedInput(std::string &Name, std::string *Value, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL, bool* cancel = NULL);
 		~CExtendedInput();
 
 		void hide();
@@ -161,7 +161,7 @@ class CIPInput : public CExtendedInput
 		virtual void onAfterExec();
 
 	public:
-		CIPInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		CIPInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ class CDateInput : public CExtendedInput
 		virtual void onAfterExec();
 
 	public:
-		CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		CDateInput(const neutrino_locale_t Name, time_t* Time, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ class CMACInput : public CExtendedInput
 		virtual void onAfterExec();
 
 	public:
-		CMACInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		CMACInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ class CTimeInput : public CExtendedInput
 		virtual void onBeforeExec();
 		virtual void onAfterExec();
 	public:
-		CTimeInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL, bool* cancel=NULL);
+		CTimeInput(const neutrino_locale_t Name, std::string *Value, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL, bool* cancel=NULL);
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -218,7 +218,7 @@ class CIntInput : public CExtendedInput
 		/**
 		 *@param Size how many digits can be entered
 		 */
-		CIntInput(const neutrino_locale_t Name, int *Value, const unsigned int Size, const neutrino_locale_t Hint_1, const neutrino_locale_t Hint_2, CChangeObserver* Observ = NULL);
+		CIntInput(const neutrino_locale_t Name, int *Value, const unsigned int Size, const neutrino_locale_t Hint_1 = NONEXISTANT_LOCALE, const neutrino_locale_t Hint_2 = NONEXISTANT_LOCALE, CChangeObserver* Observ = NULL);
 		void updateValue() { onBeforeExec(); }
 };
 
