@@ -1303,7 +1303,7 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 		if (b < upper_bound)
 			b = upper_bound;
 		for (; b; b /= 10, size++);
-		CIntInput cii(name, optionValue, size);
+		CIntInput cii(name, optionValue, size, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
 		cii.exec(NULL, "");
 		if (*optionValue > upper_bound)
 			*optionValue = upper_bound;
