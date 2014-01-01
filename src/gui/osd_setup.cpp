@@ -905,9 +905,16 @@ public:
 
 	int exec(CMenuTarget * parent, const std::string & action_Key)
 	{
-		value = std::string(getOption());
+		value = getOption();
+		while (value.length() < 3)
+			value = " " + value;
 		CStringInput input(name, &value, 3, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2, "0123456789 ", this);
 		return input.exec(parent, action_Key);
+	}
+
+	std::string &getValue(void) {
+		value = getOption();
+		return value;
 	}
 };
 
