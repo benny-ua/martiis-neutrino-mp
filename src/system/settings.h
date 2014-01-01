@@ -69,6 +69,7 @@ struct SNeutrinoSettings
 	int psi_brightness;
 	int psi_tint;
 	int psi_step;
+	uint32_t video_mixer_color;
 #endif
 #ifdef BOXMODEL_APOLLO
 	int brightness;

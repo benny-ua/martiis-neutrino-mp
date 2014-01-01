@@ -230,6 +230,10 @@ class CFrameBuffer
 		void setBlendMode(uint8_t mode = 1);
 		void setBlendLevel(int level);
 
+#if HAVE_SPARK_HARDWARE
+		void setMixerColor(uint32_t mixer_background);
+#endif
+
 		//Palette stuff
 		void setAlphaFade(int in, int num, int tr);
 		void paletteGenFade(int in, __u32 rgb1, __u32 rgb2, int num, int tr=0);

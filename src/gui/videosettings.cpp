@@ -47,6 +47,9 @@
 #include <gui/widget/messagebox.h>
 #include <gui/osd_setup.h>
 #include <gui/psisetup.h>
+#if HAVE_SPARK_HARDWARE
+#include <gui/widget/colorchooser.h>
+#endif
 
 #include <driver/screen_max.h>
 #include <driver/display.h>
@@ -458,6 +461,18 @@ int CVideoSettings::showVideoSetup()
 		videosetup->addItem(vs_videomodes_fw);	  //video modes submenue
 
 #if HAVE_SPARK_HARDWARE
+
+	CColorSetupNotifier *colorSetupNotifier = new CColorSetupNotifier();
+//0xAARRGGBB
+	uint32_t video_mixer_color = g_settings.video_mixer_color;
+	unsigned char video_mixer_blue  = (unsigned char)(video_mixer_color & 0xff); video_mixer_color >>= 8;
+	unsigned char video_mixer_green = (unsigned char)(video_mixer_color & 0xff); video_mixer_color >>= 8;
+	unsigned char video_mixer_red   = (unsigned char)(video_mixer_color & 0xff);
+	CColorChooser* cc = new CColorChooser(LOCALE_VIDEOMENU_MIXER_COLOR, &video_mixer_red, &video_mixer_green, &video_mixer_blue, NULL, colorSetupNotifier);
+	CMenuForwarder *md = new CMenuDForwarder(LOCALE_VIDEOMENU_MIXER_COLOR, true, NULL, cc);
+	md->setHint("", LOCALE_MENU_HINT_VIDEO_MIXER_COLOR);
+	videosetup->addItem(md);
+
 	CMenuForwarder *mf;
 	CMenuOptionNumberChooser *mc;
 
@@ -520,6 +535,14 @@ int CVideoSettings::showVideoSetup()
 #endif
 	int res = videosetup->exec(NULL, "");
 	selected = videosetup->getSelected();
+#if HAVE_SPARK_HARDWARE
+	g_settings.video_mixer_color  = 0xff;              g_settings.video_mixer_color <<= 8;
+	g_settings.video_mixer_color |= video_mixer_red;   g_settings.video_mixer_color <<= 8;
+	g_settings.video_mixer_color |= video_mixer_green; g_settings.video_mixer_color <<= 8;
+	g_settings.video_mixer_color |= video_mixer_blue;
+        frameBuffer->setMixerColor(g_settings.video_mixer_color);
+	delete colorSetupNotifier;
+#endif
 	delete videosetup;
 	return res;
 }
@@ -564,6 +587,9 @@ void CVideoSettings::setVideoSettings()
 	changeNotify(LOCALE_VIDEOMENU_BRIGHTNESS, NULL);
 	changeNotify(LOCALE_VIDEOMENU_CONTRAST, NULL);
 	changeNotify(LOCALE_VIDEOMENU_SATURATION, NULL);
+#endif
+#if HAVE_SPARK_HARDWARE
+	frameBuffer->setMixerColor(g_settings.video_mixer_color);
 #endif
 #ifdef ENABLE_PIP
 	pipDecoder->Pig(g_settings.pip_x, g_settings.pip_y, g_settings.pip_width, g_settings.pip_height, frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));

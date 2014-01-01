@@ -1314,6 +1314,7 @@ menu.hint_video_contrast Ändert den Kontrast
 menu.hint_video_dbdr Verwendeter MPEG2 Filter
 menu.hint_video_format Wählen Sie das Bildschirmformat ihres Fernsehgerätes
 menu.hint_video_mask Definieren Sie einen kanalspezifischen Rahmen zum Ausblenden unerwünschter Inhalte am Bildschirmrand
+menu.hint_video_mixer_color Wenn kein Signal vorhanden ist, wird die gewählte Farbe als Hintergrundfarbe verwendet.
 menu.hint_video_mode Wählen Sie den Modus des Ausgangssignals für den HDMI-Anschluss
 menu.hint_video_modes Definiert, welche Videosysteme mit der VF-Taste der Fernbedienung ausgewählt werden können
 menu.hint_video_pip Bild in Bild Größe und Position
@@ -2246,6 +2247,7 @@ videomenu.hdmi_cec_view_on Aktiviere CEC View on
 videomenu.hue Farbton
 videomenu.letterbox Letterbox
 videomenu.masksetup Bildmaske
+videomenu.mixer_color Hintergrund-Farbe
 videomenu.panscan Pan & Scan
 videomenu.panscan2 14:9 Pan & Scan
 videomenu.pip PiP Setup

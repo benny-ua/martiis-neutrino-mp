@@ -375,6 +375,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.psi_brightness = configfile.getInt32("video_psi_brightness", 128);
 	g_settings.psi_tint = configfile.getInt32("video_psi_tint", 128);
 	g_settings.psi_step = configfile.getInt32("video_psi_step", 2);
+	g_settings.video_mixer_color = configfile.getInt32("video_mixer_color", 0xff000000);
 #endif
 
 	g_settings.video_Format = configfile.getInt32("video_Format", DISPLAY_AR_16_9);
@@ -1035,6 +1036,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32( "video_psi_brightness", g_settings.psi_brightness );
 	configfile.setInt32( "video_psi_tint", g_settings.psi_tint );
 	configfile.setInt32( "video_psi_step", g_settings.psi_step );
+	configfile.setInt32( "video_mixer_color", g_settings.video_mixer_color );
 #endif
 
 	configfile.setInt32( "current_volume", g_settings.current_volume );

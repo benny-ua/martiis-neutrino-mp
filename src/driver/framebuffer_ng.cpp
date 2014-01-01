@@ -182,6 +182,10 @@ CFrameBuffer::CFrameBuffer()
 	memset(green, 0, 256*sizeof(__u16));
 	memset(blue, 0, 256*sizeof(__u16));
 	memset(trans, 0, 256*sizeof(__u16));
+
+#if HAVE_SPARK_HARDWARE
+	setMixerColor(g_settings.video_mixer_color);
+#endif
 }
 
 CFrameBuffer* CFrameBuffer::getInstance()
@@ -1450,6 +1454,18 @@ fb_pixel_t CFrameBuffer::getBorderColor(void)
 void CFrameBuffer::ClearFB(void)
 {
 	accel->ClearFB();
+}
+
+void CFrameBuffer::setMixerColor(uint32_t mixer_background)
+{
+	struct stmfbio_output_configuration outputConfig;
+	memset(&outputConfig, 0, sizeof(outputConfig));
+	outputConfig.outputid = STMFBIO_OUTPUTID_MAIN;
+	outputConfig.activate = STMFBIO_ACTIVATE_IMMEDIATE;
+	outputConfig.caps = STMFBIO_OUTPUT_CAPS_MIXER_BACKGROUND;
+	outputConfig.mixer_background = mixer_background;
+	if(ioctl(fd, STMFBIO_SET_OUTPUT_CONFIG, &outputConfig) < 0)
+		perror("setting output configuration failed");
 }
 #endif
 

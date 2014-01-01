@@ -1314,6 +1314,7 @@ menu.hint_video_contrast Change picture contrast
 menu.hint_video_dbdr MPEG2 enhancement filters
 menu.hint_video_format TV aspect ratio
 menu.hint_video_mask Define a channel-specific border to hide unwanted screen content
+menu.hint_video_mixer_color This color will be used for the background if there is no signal available.
 menu.hint_video_mode HDMI output video mode
 menu.hint_video_modes VF key will cycle between enabled modes 
 menu.hint_video_pip Picture in picture size and position
@@ -2246,6 +2247,7 @@ videomenu.hdmi_cec_view_on Enable CEC View on
 videomenu.hue Hue
 videomenu.letterbox Letterbox
 videomenu.masksetup Mask Setup
+videomenu.mixer_color Background color
 videomenu.panscan Pan&Scan
 videomenu.panscan2 14:9 Pan&Scan
 videomenu.pip PiP setup
