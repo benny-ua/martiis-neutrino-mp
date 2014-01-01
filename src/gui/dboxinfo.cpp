@@ -305,9 +305,9 @@ void CDBoxInfoWidget::paint()
 
 	int diff = frameBuffer->getScreenWidth() - width;
 	if (diff < 0) {
-		width -= diff;
-		offsetw -= diff;
-		nameWidth -= diff;
+		width += diff;
+		offsetw += diff;
+		nameWidth += diff;
 	}
 	height = h_max(height, 0);
 	x = getScreenStartX(width);
