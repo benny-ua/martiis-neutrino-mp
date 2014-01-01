@@ -233,44 +233,28 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 	else if (actionKey == "font_scaling") {
 		int xre = g_settings.screen_xres;
 		int yre = g_settings.screen_yres;
-		std::string val_x = to_string(g_settings.screen_xres);
-		if (val_x.length() < 3)
-			val_x.insert(0, 3 - val_x.length(), '0');
-		std::string val_y = to_string(g_settings.screen_yres);
-		if (val_y.length() < 3)
-			val_y.insert(0, 3 - val_x.length(), '0');
 
 		CMenuWidget fontscale(LOCALE_FONTMENU_HEAD, NEUTRINO_ICON_COLORS, width, MN_WIDGET_ID_OSDSETUP_FONTSCALE);
 		fontscale.addIntroItems(LOCALE_FONTMENU_SCALING);
 
-		CStringInput xres_count(LOCALE_FONTMENU_SCALING_X, &val_x, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_X_HINT2, "0123456789 ");
-		xres_count.setMinMax(50, 200);
-		CMenuForwarder *m_x = new CMenuForwarder(LOCALE_FONTMENU_SCALING_X, true, NULL, &xres_count);
+		CMenuOptionNumberChooser* mc = new CMenuOptionNumberChooser(LOCALE_FONTMENU_SCALING_X, &g_settings.screen_xres, true, 50, 200, this);
+		mc->setNumericInput(true);
+		mc->setNumberFormat("%d%%");
+		mc->setHint("", LOCALE_MENU_HINT_FONT_SCALING_X);
+		fontscale.addItem(mc);
 
-		CStringInput yres_count(LOCALE_FONTMENU_SCALING_Y, &val_y, 3, LOCALE_FONTMENU_SCALING, LOCALE_FONTMENU_SCALING_Y_HINT2, "0123456789 ");
-		yres_count.setMinMax(50, 200);
-		CMenuForwarder *m_y = new CMenuForwarder(LOCALE_FONTMENU_SCALING_Y, true, NULL, &yres_count);
+		mc = new CMenuOptionNumberChooser(LOCALE_FONTMENU_SCALING_Y, &g_settings.screen_yres, true, 50, 200, this);
+		mc->setNumericInput(true);
+		mc->setNumberFormat("%d%%");
+		mc->setHint("", LOCALE_MENU_HINT_FONT_SCALING_Y);
+		fontscale.addItem(mc);
 
-		fontscale.addItem(m_x);
-		fontscale.addItem(m_y);
 		res = fontscale.exec(NULL, "");
-		xre = atoi(val_x);
-		yre = atoi(val_y);
-		//fallback for min/max bugs ;)
-		if( xre < 50 || xre > 200 ){
-			xre = g_settings.screen_xres;
-		}
-		if( yre < 50 || yre > 200 ){
-			yre = g_settings.screen_yres;
-		}
 
 		if (xre != g_settings.screen_xres || yre != g_settings.screen_yres) {
-			printf("[neutrino] new font scale settings x: %d%% y: %d%%\n", xre, yre);
-			g_settings.screen_xres = xre;
-			g_settings.screen_yres = yre;
+			printf("[neutrino] new font scale settings x: %d%% y: %d%%\n", g_settings.screen_xres, g_settings.screen_yres);
 			CNeutrinoApp::getInstance()->SetupFonts(CNeutrinoFonts::FONTSETUP_NEUTRINO_FONT | CNeutrinoFonts::FONTSETUP_NEUTRINO_FONT_INST);
 		}
-		//return menu_return::RETURN_REPAINT;
 		return res;
 	}
 	else if(actionKey=="window_size") {
@@ -598,6 +582,7 @@ int CMenuInfoClockSetup::show(void)
 
 	// size of info clock
 	CMenuOptionNumberChooser* mn = new CMenuOptionNumberChooser(LOCALE_CLOCK_SIZE_HEIGHT, &g_settings.infoClockFontSize, true, 30, 120, this);
+	mn->setNumericInput(true);
 	mn->setHint("", LOCALE_MENU_HINT_CLOCK_SIZE);
 	m.addItem(mn);
 
@@ -999,6 +984,7 @@ void COsdSetup::showOsdTimeoutSetup(CMenuWidget* menu_timeout)
 	{
 		CMenuOptionNumberChooser *ch = new CMenuOptionNumberChooser(timing_setting[i].name, &g_settings.timing[i], true, 0, 180);
 		ch->setNumberFormat(nf);
+		ch->setNumericInput(true);
 		ch->setHint("", LOCALE_MENU_HINT_OSD_TIMING);
 		menu_timeout->addItem(ch);
 	}
@@ -1194,6 +1180,7 @@ void COsdSetup::showOsdVolumeSetup(CMenuWidget *menu_volume)
 	int vMin = CVolumeHelper::getInstance()->getVolIconHeight();
 	g_settings.volume_size = max(g_settings.volume_size, vMin);
 	CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_EXTRA_VOLUME_SIZE, &g_settings.volume_size, true, vMin, 50);
+	nc->setNumericInput(true);
 	nc->setHint("", LOCALE_MENU_HINT_VOLUME_SIZE);
 	menu_volume->addItem(nc);
 
@@ -1376,6 +1363,7 @@ void COsdSetup::showOsdScreenShotSetup(CMenuWidget *menu_screenshot)
 	menu_screenshot->addItem(mf);
 
 	CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_SCREENSHOT_COUNT, &g_settings.screenshot_count, true, 1, 5, NULL);
+	nc->setNumericInput(true);
 	nc->setHint("", LOCALE_MENU_HINT_SCREENSHOT_COUNT);
 	menu_screenshot->addItem(nc);
 

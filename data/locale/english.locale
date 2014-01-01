@@ -610,10 +610,8 @@ fontmenu.head Font settings
 fontmenu.infobar Infobar
 fontmenu.menu Menu
 fontmenu.scaling Global Font Zoom Factor
-fontmenu.scaling_x Horizontal (in %)
-fontmenu.scaling_x_hint2 Horizontal (in %) min 50 / max 200
-fontmenu.scaling_y Vertical (in %)
-fontmenu.scaling_y_hint2 Vertical (in %) min 50 / max 200
+fontmenu.scaling_x Horizontal
+fontmenu.scaling_y Vertical
 fontmenu.sizes Font sizes
 fontsize.channel_num_zap direct selection
 fontsize.channellist Channellist
@@ -961,7 +959,9 @@ menu.hint_fileplay Play video files
 menu.hint_fileplay_setup Set file selection options.
 menu.hint_filesystem_is_utf8 Filebrowser filesystem encoding
 menu.hint_font_gui Select font file to use for GUI
-menu.hint_font_scaling Set global vertical and horizontal\nGUI font scaling
+menu.hint_font_scaling Set global vertical and horizontal GUI font scaling
+menu.hint_font_scaling_x Set global horizontal GUI font scaling factor (50% to 200%)
+menu.hint_font_scaling_y Set global vertical GUI font scaling factor (50% to 200%)
 menu.hint_font_ttx Select font file to use for teletext
 menu.hint_fonts Configure GUI fonts and font sizes
 menu.hint_gamelist_fonts Change games and scripts list font sizes
