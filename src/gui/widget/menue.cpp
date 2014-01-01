@@ -1256,6 +1256,8 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name,
 	numberFormatFunction = NULL;
 	observ		= Observ;
 	slider_on	= sliderOn;
+
+	numeric_input	= false;
 }
 
 CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
@@ -1278,15 +1280,36 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int 
 	numberFormatFunction = NULL;
 	observ = Observ;
 	slider_on = sliderOn;
+
+	numeric_input	= false;
 }
 
 int CMenuOptionNumberChooser::exec(CMenuTarget*)
 {
+	int res = menu_return::RETURN_NONE;
+
 	if(msg == CRCInput::RC_left) {
 		if (((*optionValue) > upper_bound) || ((*optionValue) <= lower_bound))
 			*optionValue = upper_bound;
 		else
 			(*optionValue)--;
+	} else if (numeric_input && msg == CRCInput::RC_ok) {
+		int size = 0;
+		int b = lower_bound;
+		if (b < 0) {
+			size++,
+			b = -b;
+		}
+		if (b < upper_bound)
+			b = upper_bound;
+		for (; b; b /= 10, size++);
+		CIntInput cii(name, optionValue, size);
+		cii.exec(NULL, "");
+		if (*optionValue > upper_bound)
+			*optionValue = upper_bound;
+		else if (*optionValue < lower_bound)
+			*optionValue = lower_bound;
+		res = menu_return::RETURN_REPAINT;
 	} else {
 		if (((*optionValue) >= upper_bound) || ((*optionValue) < lower_bound))
 			*optionValue = lower_bound;
@@ -1305,7 +1328,7 @@ int CMenuOptionNumberChooser::exec(CMenuTarget*)
 	// give the observer a chance to modify the value
 	paint(true);
 
-	return menu_return::RETURN_NONE;
+	return res;
 }
 
 int CMenuOptionNumberChooser::paint(bool selected)

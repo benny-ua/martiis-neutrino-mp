@@ -300,6 +300,7 @@ private:
 	int			localized_value;
 	neutrino_locale_t	localized_value_name;
 	bool  			slider_on;
+	bool  			numeric_input;
 	CChangeObserver *	observ;
 	std::string		numberFormat;
 	std::string		(*numberFormatFunction)(int num);
@@ -319,6 +320,7 @@ private:
 	int getWidth(void);
 	void setNumberFormat(std::string format) { numberFormat = format; }
 	void setNumberFormat(std::string (*fun)(int)) { numberFormatFunction = fun; }
+	void setNumericInput(bool _numeric_input) { numeric_input = _numeric_input; }
 };
 
 class CMenuOptionChooser : public CAbstractMenuOptionChooser
