@@ -61,6 +61,9 @@ void COSDFader::StartFadeIn()
 #endif
 
 	frameBuffer->setBlendLevel(fadeValue);
+#if HAVE_SPARK_HARDWARE
+	usleep(60000);
+#endif
 	fadeTimer = g_RCInput->addTimer( FADE_TIME, false );
 }
 
@@ -125,6 +128,9 @@ bool COSDFader::Fade()
 			frameBuffer->setBlendMode(CNXTFB_BLEND_MODE_PER_PIXEL); // Global alpha multiplied with pixel alpha
 #else
 			frameBuffer->setBlendMode(1); // Global alpha multiplied with pixel alpha
+#if HAVE_SPARK_HARDWARE
+		usleep(60000);
+#endif
 #endif
 		} else
 			frameBuffer->setBlendLevel(fadeValue);
