@@ -1055,8 +1055,10 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	// oder das bouquet des Kanals ist vorgesperrt
 
 	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
+	{
+		startvideo = true;
 		data = chanlist[selected]->last_fsk;
-	else
+	} else
 		chanlist[selected]->last_fsk = data;
 
 	// require password if either
