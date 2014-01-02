@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include <system/helpers.h>
+
 // yhttpd
 #include <yconfig.h>
 #include "ytypes_globals.h"
@@ -65,12 +67,8 @@ std::string itoa(unsigned int conv) {
 // convert timer_t to "<hour>:<minutes>" String
 //-------------------------------------------------------------------------
 std::string timeString(time_t time) {
-	char tmp[7] = { '\0' };
 	struct tm *tm = localtime(&time);
-	if (strftime(tmp, 6, "%H:%M", tm))
-		return std::string(tmp);
-	else
-		return std::string("??:??");
+	return strftime("%H:%M", tm);
 }
 //-------------------------------------------------------------------------
 // Printf and return formatet String. Buffer-save!

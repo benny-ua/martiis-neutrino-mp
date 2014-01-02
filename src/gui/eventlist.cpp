@@ -729,11 +729,9 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 
 			datetime1_str = g_Locale->getText(CLocaleManager::getWeekday(tmStartZeit));
 
-			strftime(tmpstr, sizeof(tmpstr), ". %H:%M, ", tmStartZeit );
-			datetime1_str += tmpstr;
+			datetime1_str += strftime(". %H:%M, ", tmStartZeit );
 
-			strftime(tmpstr, sizeof(tmpstr), " %d. ", tmStartZeit );
-			datetime2_str = tmpstr;
+			datetime2_str = strftime(" %d. ", tmStartZeit );
 
 			datetime2_str += g_Locale->getText(CLocaleManager::getMonth(tmStartZeit));
 

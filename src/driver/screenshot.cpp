@@ -408,9 +408,8 @@ void CScreenShot::MakeFileName(const t_channel_id channel_id)
 	}
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
+	filename += strftime("_%Y%m%d_%H%M%S", localtime(&tv.tv_sec));
 	char buf[40];
-	strftime(buf, sizeof(buf), "_%Y%m%d_%H%M%S", localtime(&tv.tv_sec));
-	filename += std::string(buf);
 	snprintf(buf, sizeof(buf), "_%03d", (int) tv.tv_usec/1000);
 	filename += std::string(buf);
 

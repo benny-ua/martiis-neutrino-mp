@@ -723,10 +723,8 @@ record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 		}
 	}
 
-	char buf[40];
 	time_t t = time(NULL);
-	strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", localtime(&t));
-	filename += std::string(buf);
+	filename += strftime("%Y%m%d_%H%M%S", localtime(&t));
 
 	if(autoshift)
 		filename += "_temp";
@@ -742,16 +740,14 @@ void CRecordInstance::GetRecordString(std::string &str, std::string &dur)
 		str = "Unknown channel : " + GetEpgTitle();
 		return;
 	}
-	char stime[15];
 	int err = GetStatus();
-	strftime(stime, sizeof(stime), "%H:%M:%S ", localtime(&start_time));
 	time_t duration = (time(0) - start_time) / 60;
 	char dtime[20];
 	int h = duration / 60;
 	int m = duration - (h * 60);
 	snprintf(dtime, sizeof(dtime), "(%d %s %02d %s)", h, h == 1 ? g_Locale->getText(LOCALE_RECORDING_TIME_HOUR) : g_Locale->getText(LOCALE_RECORDING_TIME_HOURS), 
 							  m, g_Locale->getText(LOCALE_RECORDING_TIME_MIN));
-	str = stime + channel->getName() + ": " + GetEpgTitle() + ((err & REC_STATUS_OVERFLOW) ? "  [!] " : " ");
+	str = strftime("%H:%M:%S ", localtime(&start_time)) + channel->getName() + ": " + GetEpgTitle() + ((err & REC_STATUS_OVERFLOW) ? "  [!] " : " ");
 	dur = dtime;
 }
 

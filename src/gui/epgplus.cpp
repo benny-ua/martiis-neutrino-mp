@@ -1208,11 +1208,8 @@ void EpgPlus::paintChannelEntry (int position)
 
 std::string EpgPlus::getTimeString (const time_t & time, const std::string & format)
 {
-	char tmpstr[256];
 	struct tm *tmStartTime = localtime (&time);
-
-	strftime (tmpstr, sizeof (tmpstr), format.c_str(), tmStartTime);
-	return tmpstr;
+	return strftime (format.c_str(), tmStartTime);
 }
 
 void EpgPlus::paint()

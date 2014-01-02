@@ -1026,18 +1026,14 @@ void CEpgData::GetEPGData(const t_channel_id channel_id, uint64_t id, time_t* st
 
 		struct tm *pStartZeit = localtime(&(epgData.epg_times).startzeit);
 		tmp_curent_zeit = (epgData.epg_times).startzeit;
-		char temp[20]={0};
-		strftime( temp, sizeof(temp),"%d.%m.%Y", pStartZeit);
 		epg_date = g_Locale->getText(CLocaleManager::getWeekday(pStartZeit));
 		epg_date += ".";
-		epg_date += temp;
-		strftime( temp, sizeof(temp), "%H:%M", pStartZeit);
-		epg_start= temp;
+		epg_date += strftime("%d.%m.%Y", pStartZeit);
+		epg_start = strftime("%H:%M", pStartZeit);
 
 		long int uiEndTime((epgData.epg_times).startzeit+ (epgData.epg_times).dauer);
 		struct tm *pEndeZeit = localtime((time_t*)&uiEndTime);
-		strftime( temp, sizeof(temp), "%H:%M", pEndeZeit);
-		epg_end= temp;
+		epg_end = strftime("%H:%M", pEndeZeit);
 
 		epg_done= -1;
 		if (( time(NULL)- (epgData.epg_times).startzeit )>= 0 )
@@ -1109,7 +1105,6 @@ int CEpgData::FollowScreenings (const t_channel_id /*channel_id*/, const std::st
 	std::string		screening_dates,screening_nodual;
 	int			count = 0;
 	int 			flag = 1;
-	char			tmpstr[256]={0};
 
 	screening_dates = screening_nodual = "";
 
@@ -1120,14 +1115,9 @@ int CEpgData::FollowScreenings (const t_channel_id /*channel_id*/, const std::st
 
 		screening_dates = g_Locale->getText(CLocaleManager::getWeekday(tmStartZeit));
 		screening_dates += '.';
-
-		strftime(tmpstr, sizeof(tmpstr), " %d.", tmStartZeit );
-		screening_dates += tmpstr;
-
+		screening_dates += strftime(" %d.", tmStartZeit );
 		screening_dates += g_Locale->getText(CLocaleManager::getMonth(tmStartZeit));
-
-		strftime(tmpstr, sizeof(tmpstr), ". %H:%M", tmStartZeit );
-		screening_dates += tmpstr;
+		screening_dates += strftime(". %H:%M", tmStartZeit );
 		if (e->startTime <= tmp_curent_zeit)
 			flag = 2;
 		else

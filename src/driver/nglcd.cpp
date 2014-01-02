@@ -151,10 +151,8 @@ void nGLCD::Exec() {
 
 	if (doStandbyTime) {
 		if (percent_time_standby) {
-			char timebuf[10];
-			strftime(timebuf, sizeof(timebuf), "%H:%M", tm);
 
-			std::string Time(timebuf);
+			std::string Time = strftime("%H:%M", tm);
 
 			bitmap->DrawText(max(2,(bitmap->Width() - 4 - font_time_standby.Width(Time))/2),
 				(bitmap->Height() - font_time_standby.Height(Time))/2, bitmap->Width() - 1, Time,
@@ -265,11 +263,7 @@ void nGLCD::Exec() {
 
 	if (percent_time) {
 		off += percent_space;
-		char timebuf[10];
-		strftime(timebuf, sizeof(timebuf), "%H:%M", tm);
-
-		std::string Time(timebuf);
-
+		std::string Time = strftime("%H:%M", tm);
 		bitmap->DrawText(max(2,(bitmap->Width() - 4 - font_time.Width(Time))/2),
 			off * bitmap->Height()/100, bitmap->Width() - 1, Time,
 			&font_time, g_settings.glcd_color_fg, GLCD::cColor::Transparent);

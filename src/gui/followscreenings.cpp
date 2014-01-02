@@ -146,7 +146,7 @@ void CFollowScreenings::updateRightIcon(int ix, time_t start, unsigned int durat
 
 void CFollowScreenings::show()
 {
-	char tmpstr[256], actionstr[32];
+	char actionstr[32];
 
 	getFollowScreenings();
 
@@ -166,11 +166,9 @@ void CFollowScreenings::show()
 			struct tm *tmStartZeit = localtime(&(e->startTime));
 			std::string screening_date = g_Locale->getText(CLocaleManager::getWeekday(tmStartZeit));
 			screening_date += '.';
-			strftime(tmpstr, sizeof(tmpstr), " %d.", tmStartZeit);
-			screening_date += tmpstr;
+			screening_date += strftime(" %d.", tmStartZeit);
 			screening_date += g_Locale->getText(CLocaleManager::getMonth(tmStartZeit));
-			strftime(tmpstr, sizeof(tmpstr), ". %H:%M", tmStartZeit );
-			screening_date += tmpstr;
+			screening_date += strftime(". %H:%M", tmStartZeit );
 			snprintf(actionstr, sizeof(actionstr), "%lu", e->startTime);
 			forwarders.push_back(new CMenuForwarder(screening_date, true, NULL, this, actionstr, directKey, icon));
 			updateRightIcon(i, e->startTime, e->duration);

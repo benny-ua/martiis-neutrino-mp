@@ -1297,10 +1297,9 @@ void CFileBrowser::paintItem(unsigned int pos)
 
 		if( S_ISDIR(actual_file->Mode) )
 		{
-			char timestring[18];
 			time_t rawtime;
 			rawtime = actual_file->Time;
-			strftime(timestring, 18, "%d-%m-%Y %H:%M", gmtime(&rawtime));
+			std::string timestring = strftime("%d-%m-%Y %H:%M", gmtime(&rawtime));
 			/* right align directory time */
 			int time_w = fnt_item->getRenderWidth(timestring);
 			fnt_item->RenderString(x + width - time_w - 25, ypos+ fheight, time_w, timestring, color);

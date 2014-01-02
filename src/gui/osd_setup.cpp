@@ -511,24 +511,16 @@ CMenuInfoClockSetup::CMenuInfoClockSetup(CColorSetupNotifier *_colorSetupNotifie
 
 	time_t now = time(NULL);
 
-	char ti[80];
 	for (unsigned i = 0; infoClockTimeFormats[i][0]; i++) {
-		std::string res;
-		strftime(ti, sizeof(ti), infoClockTimeFormats[i][0], localtime(&now));
-		res = std::string(ti);
+		std::string res = strftime(infoClockTimeFormats[i][0], localtime(&now));
 		if (strcmp(infoClockTimeFormats[i][0], infoClockTimeFormats[i][1])) {
-			res += " / ";
-			strftime(ti, sizeof(ti), infoClockTimeFormats[i][1], localtime(&now));
-			res += std::string(ti);
+			res += " / " + strftime(infoClockTimeFormats[i][1], localtime(&now));
 		}
 		formatMap[res] = i;
 	}
-	strftime(ti, sizeof(ti), g_settings.infoClockFormat0.c_str(), localtime(&now));
-	formatValue = std::string(ti);
+	formatValue = strftime(g_settings.infoClockFormat0.c_str(), localtime(&now));
 	if (g_settings.infoClockFormat0 != g_settings.infoClockFormat1) {
-		formatValue += " / ";
-		strftime(ti, sizeof(ti), g_settings.infoClockFormat1.c_str(), localtime(&now));
-		formatValue += std::string(ti);
+		formatValue += " / " + strftime(g_settings.infoClockFormat1.c_str(), localtime(&now));
 	}
 }
 

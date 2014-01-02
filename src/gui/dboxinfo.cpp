@@ -332,23 +332,22 @@ void CDBoxInfoWidget::paint()
 	cSysLoad *sysload = cSysLoad::getInstance();
 	int data_last = sysload->data_last;
 
-	char ubuf[80];
 	time_t now = time(NULL);
-	strftime(ubuf, sizeof(ubuf), "Time: %FT%H:%M:%S%z", localtime(&now));
+	std::string str_now = strftime("Time: %FT%H:%M:%S%z", localtime(&now));
 
-	char ubuf_boot[80];
 	struct sysinfo info;
 	sysinfo(&info);
 	now -= info.uptime;
-	strftime(ubuf_boot, sizeof(ubuf_boot), "Boot: %FT%H:%M:%S%z", localtime(&now));
+	std::string str_boot = strftime("Boot: %FT%H:%M:%S%z", localtime(&now));
 
-	int time_width = std::max(g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(ubuf), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(ubuf_boot));
+	int time_width = std::max(g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(str_now), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(str_boot));
 
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + offsetw - time_width - 10, ypos+ mheight, time_width, ubuf, COL_MENUCONTENT_TEXT);
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + offsetw - time_width - 10, ypos+ mheight, time_width, str_now, COL_MENUCONTENT_TEXT);
 	ypos += mheight;
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + offsetw - time_width - 10, ypos+ mheight, time_width, ubuf_boot, COL_MENUCONTENT_TEXT);
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + offsetw - time_width - 10, ypos+ mheight, time_width, str_boot, COL_MENUCONTENT_TEXT);
 	ypos += mheight;
 
+	char ubuf[80];
 	if (data_last > -1) {
 		snprintf(ubuf, sizeof(ubuf), "Load: %d%s%d%%", data_last/10, g_Locale->getText(LOCALE_UNIT_DECIMAL), data_last%10);
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x + offsetw - time_width - 10, ypos+ mheight, time_width, ubuf, COL_MENUCONTENT_TEXT);
