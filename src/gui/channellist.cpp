@@ -1043,7 +1043,7 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	if (msg != NeutrinoMessages::EVT_PROGRAMLOCKSTATUS) // right now the only message handled here.
 		return messages_return::unhandled;
 
-	bool startvideo = true;
+	bool startvideo = false;
 
 	//printf("===> program-lock-status: %d zp: %d\n", data, zapProtection != NULL);
 
@@ -1081,8 +1081,6 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	/* if a non-pre-locked channel was just unlocked, open it. */
 	if (data < 0x100 && chanlist[selected]->last_unlocked_time +  10 > time_monotonic())
 		goto out;
-
-	startvideo = false;
 
 	/* OK, let's ask for a PIN */
 	g_RemoteControl->stopvideo();
