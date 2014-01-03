@@ -161,10 +161,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	std::string txt = g_settings.usermenu_text[button];
 	neutrino_locale_t caption = user_menu[button].caption;
 	
-	//ensure correct caption for yellow menue
-	if ( button == SNeutrinoSettings::BUTTON_YELLOW) 
-		caption = g_RemoteControl->are_subchannels ? LOCALE_INFOVIEWER_SUBSERVICE : LOCALE_INFOVIEWER_SELECTTIME;
-	
 	//ensure no empty caption
 	if ( txt.empty() )
 		txt = g_Locale->getText(caption);
