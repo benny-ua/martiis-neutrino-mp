@@ -935,10 +935,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	//-------------------------------------------
 	// this is as the current neutrino usermen
 	const char* usermenu_default[SNeutrinoSettings::BUTTON_MAX]={
-		"2,3,4,13",		// RED
-		"6",			// GREEN
-		"7",			// YELLOW
-		"12,11,20,21,19,14,15"	// BLUE
+		"2,3,4,13",				// RED
+		"6",					// GREEN
+		"7",					// YELLOW
+		"22,23,24,12,11,20,21,19,15,27,28,29"	// BLUE
 	};
 
 	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++)
