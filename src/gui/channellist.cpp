@@ -1043,7 +1043,7 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	if (msg != NeutrinoMessages::EVT_PROGRAMLOCKSTATUS) // right now the only message handled here.
 		return messages_return::unhandled;
 
-	bool startvideo = false;
+	bool startvideo = (data == 0x200);
 
 	//printf("===> program-lock-status: %d zp: %d\n", data, zapProtection != NULL);
 
@@ -1055,10 +1055,8 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 	// oder das bouquet des Kanals ist vorgesperrt
 
 	if (data == 0x200) // use the previous fsk value (-> movieplayer, audioplayer et al.) --martii
-	{
-		startvideo = true;
 		data = chanlist[selected]->last_fsk;
-	} else
+	else
 		chanlist[selected]->last_fsk = data;
 
 	// require password if either
