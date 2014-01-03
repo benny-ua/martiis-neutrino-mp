@@ -194,16 +194,11 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_MPKEY_VTXT,			&g_settings.mpkey_vtxt,	 		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_TIMESHIFT,		&g_settings.key_timeshift,  		LOCALE_MENU_HINT_KEY_MPTIMESHIFT },
 	{LOCALE_MPKEY_PLUGIN,			&g_settings.mpkey_plugin,		LOCALE_MENU_HINT_KEY_MPPLUGIN },
-	/*{LOCALE_EXTRA_KEY_PLUGIN,		&g_settings.key_plugin,			},*/
 	{LOCALE_EXTRA_KEY_UNLOCK,		&g_settings.key_unlock,			LOCALE_MENU_HINT_KEY_UNLOCK},
 	{LOCALE_EXTRA_KEY_TIMERLIST,		&g_settings.key_timerlist,		NONEXISTANT_LOCALE},
-	{LOCALE_EXTRA_KEY_SHOWCLOCK,		&g_settings.key_showclock,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_NEXT43MODE,		&g_settings.key_next43mode,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SWITCHFORMAT,		&g_settings.key_switchformat,		NONEXISTANT_LOCALE},
-	{LOCALE_HDD_SETTINGS,			&g_settings.key_hddmenu,		NONEXISTANT_LOCALE},
-	{LOCALE_MOVIEBROWSER_HEAD,		&g_settings.key_tsplayback,		NONEXISTANT_LOCALE},
-	{LOCALE_MOVIEPLAYER_FILEPLAYBACK,	&g_settings.key_fileplayback,		NONEXISTANT_LOCALE},
 	{LOCALE_AUDIOPLAYER_NAME,		&g_settings.key_audioplayback,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT },
 	{LOCALE_EXTRA_KEY_PIP_CLOSE,		&g_settings.key_pip_close,		LOCALE_MENU_HINT_KEY_PIP_CLOSE },
@@ -342,13 +337,6 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", LOCALE_MENU_HINT_KEY_QUICKZAP);
  	bindSettings->addItem(mf);
 
-	//movieplayer
-	CMenuWidget* bindSettings_mplayer = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_MOVIEPLAYER);
-	showKeyBindMovieplayerSetup(bindSettings_mplayer);
-	mf = new CMenuDForwarder(LOCALE_MAINMENU_MOVIEPLAYER, true, NULL, bindSettings_mplayer, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
-	mf->setHint("", LOCALE_MENU_HINT_KEY_MOVIEPLAYER);
-	bindSettings->addItem(mf);
-
 	//video
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VIDEO));
 	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++) {
@@ -359,11 +347,9 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	//multimedia
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MULTIMEDIA));
-	for (int i = KEY_MOVIEPLAYER; i <= KEY_AUDIOPLAYER; i++) {
-		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
-		mf->setHint("", key_settings[i].hint);
-		bindSettings->addItem(mf);
-	}
+	mf = new CMenuForwarder(key_settings[KEY_AUDIOPLAYER].keydescription, true, keychooser[KEY_AUDIOPLAYER]->getKeyName(), keychooser[KEY_AUDIOPLAYER]);
+	mf->setHint("", key_settings[KEY_AUDIOPLAYER].hint);
+	bindSettings->addItem(mf);
 
 	//navigation
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_NAVIGATION));
@@ -414,9 +400,7 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 #endif
 
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_TIMERLIST].keydescription, true, keychooser[KEY_TIMERLIST]->getKeyName(), keychooser[KEY_TIMERLIST]));
-	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_SHOWCLOCK].keydescription, true, keychooser[KEY_SHOWCLOCK]->getKeyName(), keychooser[KEY_SHOWCLOCK]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
-	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_HDDMENU].keydescription, true, keychooser[KEY_HDDMENU]->getKeyName(), keychooser[KEY_HDDMENU]));
 
 	// audio for audio player
 	mc = new CMenuOptionChooser(LOCALE_EXTRA_AUDIO_RUN_PLAYER, &g_settings.audio_run_player, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);

@@ -54,7 +54,7 @@ typedef struct user_menu_data_t
 	int selected;
 } user_menu_data_struct;
 
-#define COL_BUTTONMAX SNeutrinoSettings::BUTTON_MAX
+#define COL_BUTTONMAX 4
 static user_menu_data_t user_menu[COL_BUTTONMAX]=
 {
 	{LOCALE_INFOVIEWER_EVENTLIST	, CRCInput::RC_red	, NEUTRINO_ICON_BUTTON_RED	, NEUTRINO_ICON_RED,	-1},

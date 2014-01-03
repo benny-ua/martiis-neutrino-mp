@@ -96,6 +96,16 @@ CUserMenu::~CUserMenu()
 bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 {
 	int button = -1;
+	for (int i = 0; i < SNeutrinoSettings::BUTTON_MAX; i++)
+		if (g_settings.usermenu_key[i] == (int) msg) {
+			button = i;
+			break;
+		}
+
+	if (button < 0)
+		return false;
+fprintf(stderr, "button = %d\n", button);
+
 	int pers = -1;
 	switch(msg) {
 		case CRCInput::RC_red:
@@ -115,18 +125,16 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			button = SNeutrinoSettings::BUTTON_BLUE;
 			break;
 	}
-	width = w_max (40, 10);
-
-	if (button < 0 || button >= COL_BUTTONMAX)
-		return false;
 
 	CNeutrinoApp::getInstance()->StopSubtitles();
 
-	if (g_settings.personalize[pers] != CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED) {
+	if (pers > -1 && (g_settings.personalize[pers] != CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)) {
 		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
 		CNeutrinoApp::getInstance()->StartSubtitles();
 		return true;
 	}
+
+	width = w_max (40, 10);
 
 	CMenuItem* menu_item = NULL;
 	CColorKeyHelper keyhelper;
@@ -159,17 +167,17 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	CPluginList * scripts					= NULL;
 	
 	std::string txt = g_settings.usermenu_text[button];
-	neutrino_locale_t caption = user_menu[button].caption;
-	
-	//ensure no empty caption
-	if ( txt.empty() )
-		txt = g_Locale->getText(caption);
-	
-	CMenuWidget *menu = new CMenuWidget(txt.c_str() , user_menu[button].menu_icon_def, width);
+	if (button < COL_BUTTONMAX && txt.empty())
+		txt = g_Locale->getText(user_menu[button].caption);
+	if (txt.empty())
+		txt = to_string(button - 4);
+
+	CMenuWidget *menu = new CMenuWidget(txt, (button < COL_BUTTONMAX) ? user_menu[button].menu_icon_def : "", width);
 	if (menu == NULL)
 		return true;
-	
-	menu->setSelected(user_menu[button].selected);
+
+	if (button < COL_BUTTONMAX)	
+		menu->setSelected(user_menu[button].selected);
 	
 	//show cancel button if configured
 	if (g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL])
@@ -213,7 +221,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_MOVIEPLAYER_MB;
 			keyhelper.get(&key,&icon,CRCInput::RC_green);
-			menu_item = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, &CMoviePlayerGui::getInstance(), "tsmoviebrowser", key, icon);
+			menu_item = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, CNeutrinoApp::getInstance(), "tsmoviebrowser", key, icon);
 			menu->addItem(menu_item, false);
 			break;
 		case SNeutrinoSettings::ITEM_TIMERLIST:
@@ -443,8 +451,16 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_FILEPLAY;
 			keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback", key, icon);
+			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "fileplayback", key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_FILEPLAY, LOCALE_MENU_HINT_FILEPLAY);
+			menu->addItem(menu_item, 0);
+			break;
+		case SNeutrinoSettings::ITEM_HDDMENU:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_HDDMENU;
+			keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_HDD_SETTINGS, true, NULL, CNeutrinoApp::getInstance(), "hddmenu", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_HDD, LOCALE_MENU_HINT_HDD);
 			menu->addItem(menu_item, 0);
 			break;
 		default:
@@ -479,7 +495,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	InfoClock->enableInfoClock(true);
 	CNeutrinoApp::getInstance()->StartSubtitles();
 
-	user_menu[button].selected = menu->getSelected();
+	if (button < COL_BUTTONMAX)
+		user_menu[button].selected = menu->getSelected();
 
 	// clear the heap
 	if (tmpFavorites)                delete tmpFavorites;
@@ -578,6 +595,8 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 				locCheck(LOCALE_MOVIEPLAYER_NKPLAYBACK);
                         case SNeutrinoSettings::ITEM_FILEPLAY:
 				locCheck(LOCALE_MOVIEPLAYER_FILEPLAYBACK);
+                        case SNeutrinoSettings::ITEM_HDDMENU:
+				locCheck(LOCALE_HDD_SETTINGS);
                 }
         }
 

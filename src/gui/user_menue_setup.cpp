@@ -122,6 +122,7 @@ static keyvals usermenu_items[] =
 	{ SNeutrinoSettings::ITEM_YOUTUBE,		LOCALE_MOVIEPLAYER_YTPLAYBACK,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_NETZKINO,		LOCALE_MOVIEPLAYER_NKPLAYBACK,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_HDDMENU,		LOCALE_HDD_SETTINGS,			usermenu_show },
 // order is not important, but ITEM_NONE needs to be last
 	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show }
 };
@@ -172,11 +173,19 @@ int CUserMenuSetup::showSetup()
 	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 11, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
 
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, g_settings.usermenu_text[button],&name);
+	CMenuDForwarder *kf = NULL;
+
+	if (button > 3 /* BLUE */) {
+		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu_key[button], LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
+		kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
+	}
 	
 	//-------------------------------------
 	ums->addIntroItems();
 	//-------------------------------------
 	ums->addItem(mf);
+	if (kf)
+		ums->addItem(kf);
 	ums->addItem(GenericMenuSeparatorLine);
 	//-------------------------------------
 	for(int item = 0; item < SNeutrinoSettings::ITEM_MAX && item <13; item++) // Do not show more than 13 items

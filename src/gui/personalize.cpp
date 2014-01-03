@@ -207,7 +207,7 @@ CPersonalizeGui::CPersonalizeGui() : CPINProtection(g_settings.personalize_pinco
 	show_pin_setup = false;
 	user_menu_notifier = NULL;
 	pin_setup_notifier = NULL;
-	fkeyMenu = NULL;
+	otherKeyMenu = NULL;
 	tmpW = NULL;
 	v_observ.clear();
 	options_count = 0;
@@ -266,7 +266,7 @@ int CPersonalizeGui::exec(CMenuTarget* parent, const string & actionKey)
 		res = ShowPersonalizationMenu();                                 // Show main Personalization Menu
 		SaveAndExit();
 	}
-	
+
 	return res;
 }
 
@@ -308,7 +308,7 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 
 	//usermenu
 	CMenuWidget* uMenu = NULL;
-	vector<CUserMenuSetup*> v_userMenuSetup;
+	std::vector<CUserMenuSetup*> v_userMenuSetup;
 	if (show_usermenu)
 	{
 		pMenu->addItem(GenericMenuSeparatorLine);
@@ -376,9 +376,9 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 	delete pMenu;
 	delete uMenu;
 	delete pinChangeWidget;
-	delete fkeyMenu;
+	delete otherKeyMenu;
 	delete plMenu;
-	for(vector<CUserMenuSetup*>::iterator it = v_userMenuSetup.begin(); it != v_userMenuSetup.end(); ++it)
+	for(std::vector<CUserMenuSetup*>::iterator it = v_userMenuSetup.begin(); it != v_userMenuSetup.end(); ++it)
 		delete *it;
 	v_userMenuSetup.clear();
 	delete user_menu_notifier;
@@ -402,34 +402,13 @@ void CPersonalizeGui::ShowPinSetup(CMenuWidget* p_widget, CPINChangeWidget *pin_
 	p_widget->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_PERSONALIZE_MENUCONFIGURATION));
 }
 
-
-
-//init preverred key setup 
-void CPersonalizeGui::ShowPreverredKeySetup(CMenuWidget* p_widget)
-{
-	p_widget->addIntroItems(LOCALE_PERSONALIZE_USERMENU_PREFERRED_BUTTONS);
-	
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_FAVORITES_MENUEADD, 	&g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_FAVORIT], OPTIONS_FEAT_KEY_OPTIONS, CPersonalizeGui::PERSONALIZE_FEAT_KEY_MAX, true));
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_TIMERLIST_NAME,		&g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_TIMERLIST], OPTIONS_FEAT_KEY_OPTIONS, CPersonalizeGui::PERSONALIZE_FEAT_KEY_MAX, true));
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_USERMENU_ITEM_VTXT, 	&g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_VTXT], OPTIONS_FEAT_KEY_OPTIONS, CPersonalizeGui::PERSONALIZE_FEAT_KEY_MAX, true));
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_RCLOCK_MENUEADD, 	&g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_RC_LOCK], OPTIONS_FEAT_KEY_OPTIONS, CPersonalizeGui::PERSONALIZE_FEAT_KEY_MAX, true));
-	
-// 	//plugins
-// 	plMenu = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width);
-// 	CMenuForwarder *fw_plugins = new CMenuForwarder(LOCALE_PERSONALIZE_PLUGINS, true, NULL, plMenu, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-// 	p_widget->addItem(GenericMenuSeparatorLine);
-// 	p_widget->addItem(fw_plugins);
-// 	ShowPluginMenu(plMenu);
-}
-
-
 //init usermenu items
-void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*> &v_umenu)
+void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuSetup*> &v_umenu)
 {
 	p_widget->addIntroItems(LOCALE_USERMENU_HEAD);
 	
 	//define usermenu items
-	vector<CMenuForwarder*> v_umenu_fw;
+	std::vector<CMenuForwarder*> v_umenu_fw;
 	for (uint i = 0; i<USERMENU_ITEMS_COUNT; i++)
 	{
 		v_umenu.push_back(new CUserMenuSetup(usermenu[i].menue_title, usermenu[i].menue_button));
@@ -440,38 +419,32 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, vector<CUserMenuSetup*
 		
 		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
 	}
-#if 0		
-	//feature keys
-	fkeyMenu = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width, MN_WIDGET_ID_PERSONALIZE_FEATUREKEYS);
-	CMenuForwarder *fw_fkeys = new CMenuForwarder(LOCALE_PERSONALIZE_USERMENU_PREFERRED_BUTTONS, true, NULL, fkeyMenu, NULL, CRCInput::RC_1);
-#endif	
-	//enable/disable epg/features
-
 	user_menu_notifier = new CUserMenuNotifier(v_umenu_fw[0], v_umenu_fw[1], v_umenu_fw[2], v_umenu_fw[3]);
-	//red 
-	p_widget->addItem(new CMenuOptionChooser(usermenu[0].menue_title, &g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON], PERSONALIZE_ACTIVE_MODE_OPTIONS, PERSONALIZE_ACTIVE_MODE_MAX, true, user_menu_notifier));/*LOCALE_INFOVIEWER_EVENTLIST*/
-	//green 
-	p_widget->addItem(new CMenuOptionChooser(usermenu[1].menue_title, &g_settings.personalize[SNeutrinoSettings::P_MAIN_GREEN_BUTTON], PERSONALIZE_ACTIVE_MODE_OPTIONS, PERSONALIZE_ACTIVE_MODE_MAX, true, user_menu_notifier));
-	//yellow 
-	p_widget->addItem(new CMenuOptionChooser(usermenu[2].menue_title, &g_settings.personalize[SNeutrinoSettings::P_MAIN_YELLOW_BUTTON], PERSONALIZE_ACTIVE_MODE_OPTIONS, PERSONALIZE_ACTIVE_MODE_MAX, true, user_menu_notifier));
-	//blue 
-	p_widget->addItem(new CMenuOptionChooser(usermenu[3].menue_title, &g_settings.personalize[SNeutrinoSettings::P_MAIN_BLUE_BUTTON], PERSONALIZE_ACTIVE_MODE_OPTIONS, PERSONALIZE_ACTIVE_MODE_MAX, true, user_menu_notifier));/*LOCALE_INFOVIEWER_STREAMINFO*/
-	
+	int  buttons[4] = { SNeutrinoSettings::P_MAIN_RED_BUTTON, SNeutrinoSettings::P_MAIN_GREEN_BUTTON, SNeutrinoSettings::P_MAIN_YELLOW_BUTTON, SNeutrinoSettings::P_MAIN_BLUE_BUTTON };
+	for (int i = 0; i < USERMENU_ITEMS_COUNT; i++)
+		p_widget->addItem(new CMenuOptionChooser(usermenu[i].menue_title, &g_settings.personalize[buttons[i]], PERSONALIZE_ACTIVE_MODE_OPTIONS, PERSONALIZE_ACTIVE_MODE_MAX, true, user_menu_notifier));
+
 	//add usermenu items
 	p_widget->addItem(new CMenuSeparator(CMenuSeparator::ALIGN_RIGHT | CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_USERMENU_NAME));
 	user_menu_notifier->changeNotify();
 	for (uint j = 0; j<USERMENU_ITEMS_COUNT; j++)
 		p_widget->addItem(v_umenu_fw[j]);
 	
-	p_widget->addItem(GenericMenuSeparator);
-#if 0	
-	//preverred keys
 	p_widget->addItem(GenericMenuSeparatorLine);
-	p_widget->addItem(fw_fkeys);
-	ShowPreverredKeySetup(fkeyMenu);
-#endif	
-	p_widget->addItem(GenericMenuSeparatorLine);
+
 	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+
+	//other keys
+	otherKeyMenu = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width, MN_WIDGET_ID_PERSONALIZE_FEATUREKEYS);
+
+	otherKeyMenu->addIntroItems(LOCALE_PERSONALIZE_USERMENU_OTHER_BUTTONS);
+	for (int i = USERMENU_ITEMS_COUNT; i < SNeutrinoSettings::BUTTON_MAX; i++) {
+		v_umenu.push_back(new CUserMenuSetup(LOCALE_USERMENU_HEAD, i));
+		otherKeyMenu->addItem(new CMenuForwarder(CRCInput::getKeyName(g_settings.usermenu_key[i]), true, g_settings.usermenu_text[i], v_umenu[i]));
+	}
+
+	CMenuForwarder *fw_fkeys = new CMenuForwarder(LOCALE_PERSONALIZE_USERMENU_OTHER_BUTTONS, true, NULL, otherKeyMenu);
+	p_widget->addItem(fw_fkeys);
 }
 
 #define PERSONALIZE_PLUGINTYPE_MAX 5

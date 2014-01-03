@@ -486,13 +486,9 @@ struct SNeutrinoSettings
 	int auto_delete;
 	int record_hours;
 	int key_timerlist;
-	int key_showclock;
 	int key_help;
 	int key_next43mode;
 	int key_switchformat;
-	int key_hddmenu;
-	int key_tsplayback;
-	int key_fileplayback;
 	int key_audioplayback;
 	int key_volumeup;
 	int key_volumedown;
@@ -764,7 +760,7 @@ struct SNeutrinoSettings
 		BUTTON_GREEN = 1,
 		BUTTON_YELLOW = 2,
 		BUTTON_BLUE = 3,
-		BUTTON_MAX   // MUST be always the last in the list
+		BUTTON_MAX = 20  // MUST be always the last in the list
 	} USER_BUTTON;
 	typedef enum
 	{
@@ -802,10 +798,12 @@ struct SNeutrinoSettings
                 ITEM_YOUTUBE = 28,
 		ITEM_NETZKINO = 29,
 		ITEM_FILEPLAY = 30,
+		ITEM_HDDMENU = 31,
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];
 	int usermenu[BUTTON_MAX][ITEM_MAX];  // (USER_ITEM)  [button][position in Menue] = feature item
+	int usermenu_key[BUTTON_MAX];
 
 	//progressbar arrangement for infobar
 	typedef enum

@@ -224,7 +224,16 @@ static bool can_deepstandby = false;
 extern const char * locale_real_names[]; /* #include <system/locals_intern.h> */
 
 // USERMENU
-const char* usermenu_button_def[SNeutrinoSettings::BUTTON_MAX]={"red","green","yellow","blue"};
+const char* usermenu_button_def[SNeutrinoSettings::BUTTON_MAX]={
+	"red","green","yellow","blue",
+	"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19" };
+const int usermenu_key_def[SNeutrinoSettings::BUTTON_MAX]={
+	CRCInput::RC_red, CRCInput::RC_green, CRCInput::RC_yellow, CRCInput::RC_blue,
+	CRCInput::RC_archive, CRCInput::RC_play, CRCInput::RC_usb, CRCInput::RC_timer,
+	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey,
+	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey,
+	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey
+};
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +          CNeutrinoApp - Constructor, initialize g_fontRenderer                      +
@@ -938,13 +947,33 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		"2,3,4,13",				// RED
 		"6",					// GREEN
 		"7",					// YELLOW
-		"22,23,24,12,11,20,21,19,15,27,28,29"	// BLUE
+		"22,23,24,12,11,20,21,19,15,27,28,29",	// BLUE
+		"30",					// 4 (fileplayer/RC_archive)
+		"9",					// 5 (movieplayer/RC_play)
+		"31",					// 6 (hdd menu/RC_usb)
+		"19",					// 7 (toggle clock/RC_time)
+		"",					// 8
+		"",					// 9
+		"",					// 10
+		"",					// 11
+		"",					// 12
+		"",					// 13
+		"",					// 14
+		"",					// 15
+		"",					// 16
+		"",					// 17
+		"",					// 18
+		"",					// 19
 	};
 
 	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++)
 	{
-		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
+		std::string usermenu_key("usermenu_key_");
+		usermenu_key += usermenu_button_def[button];
+		g_settings.usermenu_key[button] = configfile.getInt32(usermenu_key, usermenu_key_def[button]);
 
+		std::string txt1("usermenu_tv_");
+		txt1 += usermenu_button_def[button];
 		std::string txt2 = configfile.getString(txt1,usermenu_default[button]);	
 		const char* txt2ptr = txt2.c_str();
 		for( int pos = 0; pos < SNeutrinoSettings::ITEM_MAX; pos++)
@@ -1472,6 +1501,10 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	// USERMENU
 	//---------------------------------------
 	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++) {
+		std::string usermenu_key("usermenu_key_");
+		usermenu_key += usermenu_button_def[button];
+		configfile.setInt32(usermenu_key, g_settings.usermenu_key[button]);
+
 		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
 
 		std::string txt2;
@@ -2724,58 +2757,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
 				media->exec(NULL, "");
 			}
-			else if(msg == (uint32_t) g_settings.key_tsplayback) {
-				if (mode == mode_webtv) {
-					CMoviePlayerGui::getInstance().Pause(false);
-				} else {
-					//open moviebrowser via media player menu object
-#ifdef ENABLE_GRAPHLCD
-					nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
-#endif
-					if(g_settings.mode_clock)
-						InfoClock->StopClock();
-					StopSubtitles();
-					CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
-					StartSubtitles(0);
-					if(g_settings.mode_clock)
-						InfoClock->StartClock();
-#ifdef ENABLE_GRAPHLCD
-					nGLCD::unlockChannel();
-#endif
-				}
-			}
-			else if (msg == (uint32_t) g_settings.key_fileplayback) {
-#ifdef ENABLE_GRAPHLCD
-				nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
-#endif
-				if(g_settings.mode_clock)
-					InfoClock->StopClock();
-				StopSubtitles();
-				if(mode == NeutrinoMessages::mode_radio )
-					videoDecoder->StopPicture();
-				CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
-				if(mode == NeutrinoMessages::mode_radio )
-					videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
-				StartSubtitles(0);
-				if(g_settings.mode_clock)
-					InfoClock->StartClock();
-#ifdef ENABLE_GRAPHLCD
-				nGLCD::unlockChannel();
-#endif
-			}
 			else if (CRCInput::isNumeric(msg) && g_RemoteControl->director_mode ) {
 				g_RemoteControl->setSubChannel(CRCInput::getNumericValue(msg));
 				g_InfoViewer->showSubchan();
-			}
-			else if( ( msg == (uint32_t) g_settings.key_hddmenu )) {
-#ifdef ENABLE_GRAPHLCD
-				StopSubtitles(false);
-#else
-				StopSubtitles();
-#endif
-				CHDDMenuHandler m;
-				m.exec(NULL, "hotkey");
-				StartSubtitles();
 			}
 			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
 						(g_settings.infobar_cn && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
@@ -2795,10 +2779,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			} else if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) {
 				nGLCD::Update();
 #endif
-			}
-			else if (msg == (uint32_t) g_settings.key_showclock)
-			{
-				switchClockOnOff();
 			}
 			else if (msg == (uint32_t) g_settings.key_timerlist)
 			{
@@ -3664,6 +3644,8 @@ _repeat:
 		return messages_return::handled;
 //		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_EXTRA_ZAPIT_SDT_CHANGED),
 //				CMessageBox::mbrBack,CMessageBox::mbBack, NEUTRINO_ICON_INFO);
+	} else if (usermenu.showUserMenu(msg)) {
+		return messages_return::handled;
 	}
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
 		delete [] (unsigned char*) data;
@@ -4365,37 +4347,40 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		}
 	}
 # endif 
-	else if(actionKey=="webtv") {
-		StopSubtitles();
-		if(g_settings.mode_clock)
-			InfoClock->StopClock();
-		frameBuffer->Clear();
-		CMoviePlayerGui::getInstance().exec(NULL, "webtv");
-		if(g_settings.mode_clock)
-			InfoClock->StartClock();
-		StartSubtitles();
-		return menu_return::RETURN_EXIT_ALL;
-	}
 	else if(actionKey=="nkplayback") {
-		StopSubtitles();
-		if(g_settings.mode_clock)
-			InfoClock->StopClock();
 		frameBuffer->Clear();
 		CMoviePlayerGui::getInstance().exec(NULL, "nkplayback");
-		if(g_settings.mode_clock)
-			InfoClock->StartClock();
-		StartSubtitles();
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="ytplayback") {
-		StopSubtitles();
-		if(g_settings.mode_clock)
-			InfoClock->StopClock();
 		CMoviePlayerGui::getInstance().exec(NULL, "ytplayback");
-		if(g_settings.mode_clock)
-			InfoClock->StartClock();
-		StartSubtitles();
 		return menu_return::RETURN_EXIT_ALL;
+	}
+	else if(actionKey=="tsmoviebrowser") {
+		if (mode == mode_webtv) {
+			CMoviePlayerGui::getInstance().Pause(false);
+		} else {
+#ifdef ENABLE_GRAPHLCD
+			nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
+#endif
+			CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
+#ifdef ENABLE_GRAPHLCD
+			nGLCD::unlockChannel();
+#endif
+		}
+	}
+	else if(actionKey=="fileplayback") {
+#ifdef ENABLE_GRAPHLCD
+			nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
+#endif
+			if(mode == NeutrinoMessages::mode_radio )
+				videoDecoder->StopPicture();
+			CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
+			if(mode == NeutrinoMessages::mode_radio )
+				videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+#ifdef ENABLE_GRAPHLCD
+			nGLCD::unlockChannel();
+#endif
 	}
 	else if(actionKey=="rass") {
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
@@ -4434,6 +4419,16 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 			execvp(global_argv[0], global_argv); // no return if successful
 			exit(1);
 		}
+	}
+	else if(actionKey == "hddmenu") {
+#ifdef ENABLE_GRAPHLCD
+				StopSubtitles(false);
+#else
+				StopSubtitles();
+#endif
+				CHDDMenuHandler m;
+				m.exec(NULL, "hotkey");
+				StartSubtitles();
 	}
 	else if(actionKey == "moviedir") {
 		parent->hide();
@@ -4661,12 +4656,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_switchformat = tconfig.getInt32("key_switchformat", CRCInput::RC_prev);
 	g_settings.key_next43mode = tconfig.getInt32("key_next43mode", CRCInput::RC_next);
 	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", CRCInput::RC_tv );
-	g_settings.key_tsplayback = tconfig.getInt32( "key_tsplayback", CRCInput::RC_play );
-#if HAVE_SPARK_HARDWARE
-	g_settings.key_fileplayback = tconfig.getInt32( "key_fileplayback", CRCInput::RC_archive );
-#else
-	g_settings.key_fileplayback = tconfig.getInt32( "key_fileplayback", CRCInput::RC_nokey );
-#endif
 	g_settings.key_audioplayback = tconfig.getInt32( "key_audioplayback", CRCInput::RC_audio );
 	g_settings.key_volumeup = tconfig.getInt32( "key_volumeup",  CRCInput::RC_plus );
 	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
@@ -4703,13 +4692,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_bouquet_up = tconfig.getInt32( "key_bouquet_up",  CRCInput::RC_right);
 	g_settings.key_bouquet_down = tconfig.getInt32( "key_bouquet_down",  CRCInput::RC_left);
 	g_settings.key_timerlist = tconfig.getInt32( "key_timerlist", CRCInput::RC_timer);
-	g_settings.key_showclock = tconfig.getInt32( "key_showclock", CRCInput::RC_nokey );
 	g_settings.key_help = tconfig.getInt32( "key_help", CRCInput::RC_help );
-#if HAVE_SPARK_HARDWARE
-	g_settings.key_hddmenu = tconfig.getInt32("key_hddmenu", CRCInput::RC_usb);
-#else
-	g_settings.key_hddmenu = tconfig.getInt32("key_hddmenu", CRCInput::RC_nokey);
-#endif
 
 	g_settings.mpkey_rewind = tconfig.getInt32( "mpkey.rewind", CRCInput::RC_rewind );
 	g_settings.mpkey_forward = tconfig.getInt32( "mpkey.forward", CRCInput::RC_forward );
@@ -4768,8 +4751,6 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	//rc-key configuration
 	tconfig.setInt32( "key_switchformat", g_settings.key_switchformat );
 	tconfig.setInt32( "key_next43mode", g_settings.key_next43mode );
-	tconfig.setInt32( "key_tsplayback", g_settings.key_tsplayback );
-	tconfig.setInt32( "key_fileplayback", g_settings.key_fileplayback );
 	tconfig.setInt32( "key_audioplayback", g_settings.key_audioplayback );
 	tconfig.setInt32( "key_volumeup", g_settings.key_volumeup );
 	tconfig.setInt32( "key_volumedown", g_settings.key_volumedown );
@@ -4806,9 +4787,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_bouquet_up", g_settings.key_bouquet_up );
 	tconfig.setInt32( "key_bouquet_down", g_settings.key_bouquet_down );
 	tconfig.setInt32( "key_timerlist", g_settings.key_timerlist );
-	tconfig.setInt32( "key_showclock", g_settings.key_showclock );
 	tconfig.setInt32( "key_help", g_settings.key_help );
-	tconfig.setInt32( "key_hddmenu", g_settings.key_hddmenu );
 
 	tconfig.setInt32( "mpkey.rewind", g_settings.mpkey_rewind );
 	tconfig.setInt32( "mpkey.forward", g_settings.mpkey_forward );
