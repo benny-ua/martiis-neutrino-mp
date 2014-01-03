@@ -3579,7 +3579,7 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 			break;
 		case MB_INFO_PREVPLAYDATE: 			// 		= 12,
 			tm_tmp = localtime(&movie_info.dateOfLastPlay);
-			snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%02d",tm_tmp->tm_mday,(tm_tmp->tm_mon)+ 1, tm_tmp->tm_year >= 100 ? tm_tmp->tm_year-100 : tm_tmp->tm_year);
+			snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%04d",tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
 			*item_string = str_tmp;
 			break;
 
@@ -3589,13 +3589,13 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 			} else if (show_mode == MB_SHOW_NK) {
 				// YYYY-MM-DD hh:mm:ss
 				int day, month, year;
-				if (3 == sscanf(movie_info.ytdate.c_str(), "%d-%d-%d", &day, &month, &year)) {
-					snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%02d", day, month, year);
+				if (3 == sscanf(movie_info.ytdate.c_str(), "%d-%d-%d", &year, &month, &day)) {
+					snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%04d", day, month, year);
 					*item_string = str_tmp;
 				}
 			} else {
 				tm_tmp = localtime(&movie_info.file.Time);
-				snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%02d",tm_tmp->tm_mday,(tm_tmp->tm_mon) + 1,tm_tmp->tm_year >= 100 ? tm_tmp->tm_year-100 : tm_tmp->tm_year);
+				snprintf(str_tmp,MAX_STR_TMP, "%02d.%02d.%04d", tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
 				*item_string = str_tmp;
 			}
 			break;
@@ -3758,6 +3758,18 @@ void CMovieBrowser::autoFindSerie(void)
     }
 }
 
+static time_t toEpoch(std::string &date)
+{
+	struct tm t;
+	memset(&t, 0, sizeof(t));
+	if (3 == sscanf(date.c_str(), "%d-%d-%d", &t.tm_year, &t.tm_mon, &t.tm_mday)) {
+		t.tm_year -= 1900;
+		t.tm_mon += 1;
+		return mktime(&t);
+	}
+	return 0;
+}
+
 void CMovieBrowser::loadNKTitles(int mode, std::string search, int id)
 {
 	nkparser.SetMaxResults(m_settings.nkresults ? m_settings.nkresults : 100000);
@@ -3785,6 +3797,7 @@ void CMovieBrowser::loadNKTitles(int mode, std::string search, int id)
 		movieInfo.ytdate = ylist[i].published;
 		movieInfo.ytid = ylist[i].id;
 		movieInfo.file.Name = ylist[i].title;
+		movieInfo.file.Time = toEpoch(movieInfo.ytdate);
 		movieInfo.file.Url = nkparser.GetUrl(ylist[i].streaming, m_settings.nkrtmp);
 		movieInfo.nkstreaming = ylist[i].streaming;
 		m_vMovieInfo.push_back(movieInfo);
@@ -3832,10 +3845,10 @@ void CMovieBrowser::loadYTitles(int mode, std::string search, std::string id)
 		movieInfo.tfile = ylist[i].tfile;
 		movieInfo.ytdate = ylist[i].published;
 		movieInfo.ytid = ylist[i].id;
-
 		movieInfo.file.Name = ylist[i].title;
 		movieInfo.ytitag = m_settings.ytquality;
 		movieInfo.file.Url = ylist[i].GetUrl(&movieInfo.ytitag, false);
+		movieInfo.file.Time = toEpoch(movieInfo.ytdate);
 		m_vMovieInfo.push_back(movieInfo);
 	}
 	m_currentBrowserSelection = 0;
