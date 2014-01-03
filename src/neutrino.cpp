@@ -2815,8 +2815,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
 					StartSubtitles();
 				}
-					else
-						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
+				else
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
 			}
 			else if( msg == CRCInput::RC_green)
 			{
@@ -2846,8 +2846,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_BLUE);
 					StartSubtitles();
 				}
-					else
-						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
+				else
+					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
 			}
 			else if (msg == CRCInput::RC_aux)
 				scartMode(true);
