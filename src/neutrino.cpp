@@ -2811,11 +2811,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				// eventlist
 				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// EventList Menu - Personalization Check
 				{
-					InfoClock->enableInfoClock(false);
 					StopSubtitles();
 					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
 					StartSubtitles();
-					InfoClock->enableInfoClock(true);
 				}
 					else
 						ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
