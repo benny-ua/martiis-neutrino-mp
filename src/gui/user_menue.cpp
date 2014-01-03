@@ -93,13 +93,40 @@ CUserMenu::~CUserMenu()
 }
 
 // USERMENU
-bool CUserMenu::showUserMenu(int button)
+bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 {
-	// set width
+	int button = -1;
+	int pers = -1;
+	switch(msg) {
+		case CRCInput::RC_red:
+			pers = SNeutrinoSettings::P_MAIN_RED_BUTTON;
+			button = SNeutrinoSettings::BUTTON_RED;
+			break;
+		case CRCInput::RC_green:
+			pers = SNeutrinoSettings::P_MAIN_GREEN_BUTTON;
+			button = SNeutrinoSettings::BUTTON_GREEN;
+			break;
+		case CRCInput::RC_yellow:
+			pers = SNeutrinoSettings::P_MAIN_YELLOW_BUTTON;
+			button = SNeutrinoSettings::BUTTON_YELLOW;
+			break;
+		case CRCInput::RC_blue:
+			pers = SNeutrinoSettings::P_MAIN_BLUE_BUTTON;
+			button = SNeutrinoSettings::BUTTON_BLUE;
+			break;
+	}
 	width = w_max (40, 10);
-	
+
 	if (button < 0 || button >= COL_BUTTONMAX)
 		return false;
+
+	CNeutrinoApp::getInstance()->StopSubtitles();
+
+	if (g_settings.personalize[pers] != CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED) {
+		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);
+		CNeutrinoApp::getInstance()->StartSubtitles();
+		return true;
+	}
 
 	CMenuItem* menu_item = NULL;
 	CColorKeyHelper keyhelper;
@@ -144,7 +171,7 @@ bool CUserMenu::showUserMenu(int button)
 	
 	CMenuWidget *menu = new CMenuWidget(txt.c_str() , user_menu[button].menu_icon_def, width);
 	if (menu == NULL)
-		return 0;
+		return true;
 	
 	menu->setSelected(user_menu[button].selected);
 	
@@ -165,13 +192,10 @@ bool CUserMenu::showUserMenu(int button)
 		case SNeutrinoSettings::ITEM_BAR:
 			if (menu_prev == -1 || menu_prev == SNeutrinoSettings::ITEM_BAR )
 				break;
-
 			menu->addItem(GenericMenuSeparatorLine);
 			menu_prev = SNeutrinoSettings::ITEM_BAR;
 			break;
-
 		case SNeutrinoSettings::ITEM_FAVORITS:
-		{
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_FAVORITS;
 			tmpFavorites = new CFavorites;
@@ -179,9 +203,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_FAVORITES_MENUEADD, true, NULL, tmpFavorites, "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-		}
 		case SNeutrinoSettings::ITEM_RECORD:
-		{
 			if (g_settings.recording_type == RECORDING_OFF)
 				break;
 
@@ -191,7 +213,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_MAINMENU_RECORDING, true, NULL, CRecordManager::getInstance(), "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-		}
 		case SNeutrinoSettings::ITEM_MOVIEPLAYER_MB:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_MOVIEPLAYER_MB;
@@ -199,7 +220,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, &CMoviePlayerGui::getInstance(), "tsmoviebrowser", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_TIMERLIST:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_TIMERLIST;
@@ -208,7 +228,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_TIMERLIST_NAME, true, NULL, Timerlist, "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_REMOTE:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_REMOTE;
@@ -217,7 +236,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_RCLOCK_MENUEADD, true, NULL, rcLock, "-1" , key, icon );
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_EPG_SUPER:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_EPG_SUPER;
@@ -226,7 +244,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EPGPLUS   , true, NULL, tmpEPGplusHandler  ,  "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_EPG_LIST:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_EPG_LIST;
@@ -235,7 +252,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EVENTLIST , true, NULL, tmpEventListHandler,  "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_EPG_INFO:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_EPG_INFO;
@@ -244,7 +260,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EVENTINFO , true, NULL, tmpEPGDataHandler ,  "-1", key, icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_EPG_MISC:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_EPG_MISC;
@@ -258,19 +273,14 @@ bool CUserMenu::showUserMenu(int button)
 			menu_item = new CMenuForwarder(LOCALE_MAINMENU_CLEARSECTIONSD, true, NULL, CNeutrinoApp::getInstance(), "clearSectionsd", key,icon);
 			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_AUDIO_SELECT:
-			//g_settings.audio_left_right_selectable || g_RemoteControl->current_PIDs.APIDs.size() > 1)
-			if (1) {
-				menu_items++;
-				menu_prev = SNeutrinoSettings::ITEM_AUDIO_SELECT;
-				tmpAudioSelectMenuHandler = new CAudioSelectMenuHandler;
-				keyhelper.get(&key,&icon);
-				menu_item = new CMenuForwarder(LOCALE_AUDIOSELECTMENUE_HEAD, true, NULL, tmpAudioSelectMenuHandler, "-1", key,icon);
-				menu->addItem(menu_item, false);
-			}
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_AUDIO_SELECT;
+			tmpAudioSelectMenuHandler = new CAudioSelectMenuHandler;
+			keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_AUDIOSELECTMENUE_HEAD, true, NULL, tmpAudioSelectMenuHandler, "-1", key,icon);
+			menu->addItem(menu_item, false);
 			break;
-
 		case SNeutrinoSettings::ITEM_SUBCHANNEL:
 			if (!(g_RemoteControl->subChannels.empty())) {
 				// NVOD/SubService- Kanal!
@@ -284,7 +294,6 @@ bool CUserMenu::showUserMenu(int button)
 				}
 			}
 			break;
-
 		case SNeutrinoSettings::ITEM_TECHINFO:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_TECHINFO;
@@ -380,7 +389,6 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_ADZAP;
 			keyhelper.get(&key,&icon,CRCInput::RC_blue);
-			//keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_ADZAP, true, NULL, CNeutrinoApp::getInstance()->AdZapChanger, "adzap", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -405,7 +413,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_THREE_D_MODE;
 			keyhelper.get(&key,&icon);
-			//keyhelper.get(&key,&icon);
+			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, "3dmode", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -415,7 +423,6 @@ bool CUserMenu::showUserMenu(int button)
 				menu_items++;
 				menu_prev = SNeutrinoSettings::ITEM_RASS;
 				keyhelper.get(&key,&icon);
-				//keyhelper.get(&key,&icon);
 				menu_item = new CMenuForwarder(LOCALE_RASS_HEAD, true, NULL, CNeutrinoApp::getInstance(), "rass", key, icon);
 				menu->addItem(menu_item, 0);
 			}
@@ -424,7 +431,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_YOUTUBE;
 			keyhelper.get(&key,&icon);
-			//keyhelper.get(&key,&icon);
+			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -432,7 +439,7 @@ bool CUserMenu::showUserMenu(int button)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_NETZKINO;
 			keyhelper.get(&key,&icon);
-			//keyhelper.get(&key,&icon);
+			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -474,6 +481,7 @@ bool CUserMenu::showUserMenu(int button)
 		menu_item->exec( NULL );
 	
 	InfoClock->enableInfoClock(true);
+	CNeutrinoApp::getInstance()->StartSubtitles();
 
 	user_menu[button].selected = menu->getSelected();
 
@@ -493,7 +501,7 @@ bool CUserMenu::showUserMenu(int button)
 	if (games)                       delete games;
 	if (scripts)                     delete scripts;
 	if (menu)                        delete menu;
- 	return 0;
+ 	return true;
 }
 
 const char *CUserMenu::getUserMenuButtonName(int button, bool &active)

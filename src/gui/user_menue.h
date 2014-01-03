@@ -76,7 +76,7 @@ class CUserMenu : public CChangeObserver
 	public:
 		CUserMenu();
 		~CUserMenu();
-		bool showUserMenu(int button);
+		bool showUserMenu(neutrino_msg_t msg);
 		static const char *getUserMenuButtonName(int button, bool &active);
 };
 

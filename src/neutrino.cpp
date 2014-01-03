@@ -2807,51 +2807,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				Timerlist.exec(NULL, "");
 				StartSubtitles();
 			}
-			else if( msg == CRCInput::RC_red ) {
-				// eventlist
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_RED_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// EventList Menu - Personalization Check
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_RED);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if( msg == CRCInput::RC_green)
-			{
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_GREEN_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_GREEN);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if( msg == CRCInput::RC_yellow ) {
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_YELLOW_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_YELLOW);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT),450, 10);				
-			}
-			else if( msg == CRCInput::RC_blue ) {
-				if (g_settings.personalize[SNeutrinoSettings::P_MAIN_BLUE_BUTTON] == CPersonalizeGui::PERSONALIZE_ACTIVE_MODE_ENABLED)// Features Menu - Personalization Check
-				{
-					StopSubtitles();
-					usermenu.showUserMenu(SNeutrinoSettings::BUTTON_BLUE);
-					StartSubtitles();
-				}
-				else
-					ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_PERSONALIZE_MENUDISABLEDHINT), 450, 10);
-			}
 			else if (msg == CRCInput::RC_aux)
 				scartMode(true);
-			else {
+			else if (!usermenu.showUserMenu(msg)) {
 				if (msg == CRCInput::RC_home) {
 					CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 				}
