@@ -572,6 +572,8 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 				locCheck(LOCALE_MOVIEPLAYER_YTPLAYBACK);
                         case SNeutrinoSettings::ITEM_NETZKINO:
 				locCheck(LOCALE_MOVIEPLAYER_NKPLAYBACK);
+                        case SNeutrinoSettings::ITEM_FILEPLAY:
+				locCheck(LOCALE_MOVIEPLAYER_FILEPLAYBACK);
                 }
         }
 
