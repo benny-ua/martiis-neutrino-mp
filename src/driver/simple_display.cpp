@@ -545,7 +545,8 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 			// utf-8 -> ascii
 			s = "";
 			unsigned char *t = (unsigned char *) lastOutput.c_str();
-			while (*t) {
+			unsigned char *t_end = t + lastOutput.length();
+			while ((t < t_end) && *t) {
 				if ((*t & 0x80) == 0x0) {
 					s += (char)*t;
 					t += 1;
