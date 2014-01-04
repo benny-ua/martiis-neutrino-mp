@@ -456,8 +456,16 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_AUDIOPLAY;
 			keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, CNeutrinoApp::getInstance(), "audioplay", key, icon);
+			menu_item = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, CNeutrinoApp::getInstance(), "audioplayer", key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_APLAY, LOCALE_MENU_HINT_APLAY);
+			menu->addItem(menu_item, 0);
+			break;
+		case SNeutrinoSettings::ITEM_INETPLAY:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_INETPLAY;
+			keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_INETRADIO_NAME, true, NULL, CNeutrinoApp::getInstance(), "inetplayer", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_INET_RADIO, LOCALE_MENU_HINT_INET_RADIO);
 			menu->addItem(menu_item, 0);
 			break;
 		case SNeutrinoSettings::ITEM_HDDMENU:

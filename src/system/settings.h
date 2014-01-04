@@ -797,6 +797,7 @@ struct SNeutrinoSettings
 		ITEM_FILEPLAY = 30,
 		ITEM_HDDMENU = 31,
 		ITEM_AUDIOPLAY = 32,
+		ITEM_INETPLAY = 33,
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];

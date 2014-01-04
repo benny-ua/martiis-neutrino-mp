@@ -4373,13 +4373,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 #endif
 		return menu_return::RETURN_EXIT_ALL;
 	}
-	else if(actionKey=="audioplay") {
+	else if(actionKey=="audioplayer" || actionKey == "inetplayer") {
 		frameBuffer->Clear();
-		//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
 		CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
-		media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
-		media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
-		media->exec(NULL, "");
+		media->exec(NULL, actionKey);
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
