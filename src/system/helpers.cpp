@@ -361,6 +361,16 @@ std::string strftime(const char *format, const struct tm *tm)
 	return std::string(buf);
 }
 
+time_t toEpoch(std::string &date)
+{
+	struct tm t;
+	memset(&t, 0, sizeof(t));
+	char *p = strptime(date.c_str(), "%Y-%m-%d", &t);
+	if(p)
+		return mktime(&t);
+	return 0;
+}
+
 CFileHelpers::CFileHelpers()
 {
 	doCopyFlag	= true;
