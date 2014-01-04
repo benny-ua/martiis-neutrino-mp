@@ -4354,19 +4354,21 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 			nGLCD::unlockChannel();
 #endif
 		}
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="fileplayback") {
 #ifdef ENABLE_GRAPHLCD
-	nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
+		nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
-	if(mode == NeutrinoMessages::mode_radio )
-		videoDecoder->StopPicture();
-	CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
-	if(mode == NeutrinoMessages::mode_radio )
-		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+		if(mode == NeutrinoMessages::mode_radio )
+			videoDecoder->StopPicture();
+		CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
+		if(mode == NeutrinoMessages::mode_radio )
+			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 #ifdef ENABLE_GRAPHLCD
-	nGLCD::unlockChannel();
+		nGLCD::unlockChannel();
 #endif
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="audioplay") {
 		//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
@@ -4374,6 +4376,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
 		media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
 		media->exec(NULL, "");
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
@@ -4416,6 +4419,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey == "hddmenu") {
 		CHDDMenuHandler m;
 		m.exec(NULL, "hotkey");
+		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey == "moviedir") {
 		parent->hide();
