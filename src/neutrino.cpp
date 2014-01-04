@@ -4339,10 +4339,12 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="ytplayback") {
+		frameBuffer->Clear();
 		CMoviePlayerGui::getInstance().exec(NULL, "ytplayback");
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="tsmoviebrowser") {
+		frameBuffer->Clear();
 		if (mode == mode_webtv) {
 			CMoviePlayerGui::getInstance().Pause(false);
 		} else {
@@ -4357,6 +4359,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="fileplayback") {
+		frameBuffer->Clear();
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
@@ -4371,6 +4374,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="audioplay") {
+		frameBuffer->Clear();
 		//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
 		CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
 		media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
@@ -4379,6 +4383,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey=="rass") {
+		frameBuffer->Clear();
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		if (g_Radiotext)
 			g_Radiotext->RASS_interactive_mode();
