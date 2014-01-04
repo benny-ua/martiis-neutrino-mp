@@ -434,6 +434,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			keyhelper.get(&key,&icon);
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_YTPLAY, LOCALE_MENU_HINT_YTPLAY);
 			menu->addItem(menu_item, 0);
 			break;
 		case SNeutrinoSettings::ITEM_NETZKINO:
@@ -442,6 +443,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			keyhelper.get(&key,&icon);
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_NKPLAY, LOCALE_MENU_HINT_NKPLAY);
 			menu->addItem(menu_item, 0);
 			break;
 		case SNeutrinoSettings::ITEM_FILEPLAY:
