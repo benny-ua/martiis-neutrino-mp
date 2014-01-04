@@ -116,20 +116,6 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		int res = inetPlayer->exec(NULL, "init");
 		return res; //menu_return::RETURN_REPAINT;
 	}
-	else if (actionKey == "tsmoviebrowser")
-	{
-		audiomute->enableMuteIcon(false);
-		InfoClock->enableInfoClock(false);
-		int mode = CNeutrinoApp::getInstance()->getMode();
-		if( mode == NeutrinoMessages::mode_radio )
-			videoDecoder->StopPicture();
-		int res = CMoviePlayerGui::getInstance().exec(NULL, "tsmoviebrowser");
-		if( mode == NeutrinoMessages::mode_radio )
-			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
-		audiomute->enableMuteIcon(true);
-		InfoClock->enableInfoClock(true);
-		return res;
-	}
 	
 	int res = initMenuMedia();
 	
@@ -182,22 +168,22 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	personalize->addSeparator(*media, LOCALE_MAINMENU_MOVIEPLAYER, true);
 
 	//movie browser
-	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "tsmoviebrowser");
+	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, CNeutrinoApp::getInstance(), "tsmoviebrowser");
 	fw_mbrowser->setHint(NEUTRINO_ICON_HINT_MB, LOCALE_MENU_HINT_MB);
 	personalize->addItem(media, fw_mbrowser, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_MBROWSER]);
 	
 	//fileplayback
-	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "fileplayback");
+	CMenuForwarder *fw_file = new CMenuForwarder(LOCALE_MOVIEPLAYER_FILEPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "fileplayback");
 	fw_file->setHint(NEUTRINO_ICON_HINT_FILEPLAY, LOCALE_MENU_HINT_FILEPLAY);
 	personalize->addItem(media, fw_file, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_FILEPLAY]);
 
 	//yt
-	CMenuForwarder *fw_yt = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "ytplayback");
+	CMenuForwarder *fw_yt = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback");
 	fw_yt->setHint(NEUTRINO_ICON_HINT_YTPLAY, LOCALE_MENU_HINT_YTPLAY);
 	personalize->addItem(media, fw_yt, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_YTPLAY]);
 
 	//netzkino
-	CMenuForwarder *fw_nk = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, &CMoviePlayerGui::getInstance(), "nkplayback");
+	CMenuForwarder *fw_nk = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback");
 	fw_nk->setHint(NEUTRINO_ICON_HINT_NKPLAY, LOCALE_MENU_HINT_NKPLAY);
 	personalize->addItem(media, fw_nk, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_NKPLAY]);
 

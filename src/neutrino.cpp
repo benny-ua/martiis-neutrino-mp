@@ -4331,43 +4331,28 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		}
 	}
 # endif 
-	else if(actionKey=="nkplayback") {
-		frameBuffer->Clear();
-		CMoviePlayerGui::getInstance().exec(NULL, "nkplayback");
-		return menu_return::RETURN_EXIT_ALL;
-	}
-	else if(actionKey=="ytplayback") {
-		frameBuffer->Clear();
-		CMoviePlayerGui::getInstance().exec(NULL, "ytplayback");
-		return menu_return::RETURN_EXIT_ALL;
-	}
-	else if(actionKey=="tsmoviebrowser") {
-		frameBuffer->Clear();
-		if (mode == mode_webtv) {
-			CMoviePlayerGui::getInstance().Pause(false);
-		} else {
+	else if(actionKey=="nkplayback" || actionKey=="ytplayback" || actionKey=="tsmoviebrowser" || actionKey=="fileplayback") {
 #ifdef ENABLE_GRAPHLCD
-			nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
+		neutrino_locale_t loc = NONEXISTANT_LOCALE;
+		if (actionKey=="tsmoviebrowser")
+			loc = LOCALE_MOVIEPLAYER_HEAD;
+		else if (actionKey=="fileplayback")
+			loc = LOCALE_MOVIEPLAYER_FILEPLAYBACK;
+		if (loc != NONEXISTANT_LOCALE)
+			nGLCD::lockChannel(string(g_Locale->getText(loc)));
 #endif
-			CMediaPlayerMenu::getInstance()->exec(NULL,"tsmoviebrowser");
-#ifdef ENABLE_GRAPHLCD
-			nGLCD::unlockChannel();
-#endif
-		}
-		return menu_return::RETURN_EXIT_ALL;
-	}
-	else if(actionKey=="fileplayback") {
 		frameBuffer->Clear();
-#ifdef ENABLE_GRAPHLCD
-		nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
-#endif
 		if(mode == NeutrinoMessages::mode_radio )
 			videoDecoder->StopPicture();
-		CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
-		if(mode == NeutrinoMessages::mode_radio )
+		int _mode = mode;
+		CMoviePlayerGui::getInstance().exec(NULL, actionKey);
+		if(_mode == NeutrinoMessages::mode_radio )
 			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+		else if (_mode == mode_webtv)
+			tvMode(true);
 #ifdef ENABLE_GRAPHLCD
-		nGLCD::unlockChannel();
+		if (loc != NONEXISTANT_LOCALE)
+			nGLCD::unlockChannel();
 #endif
 		return menu_return::RETURN_EXIT_ALL;
 	}
