@@ -524,7 +524,7 @@ int CStringInput::exec( CMenuTarget* parent, const std::string & )
 	} else
 		hide();
 
-	trim (*valueString);
+	*valueString = trim (*valueString);
 
         if ( (observ) && (msg==CRCInput::RC_ok) )
         {
@@ -859,7 +859,7 @@ int CPINInput::exec( CMenuTarget* parent, const std::string & )
 
 	hide();
 
-	trim (*valueString);
+	*valueString = trim (*valueString);
 
 	if ( (observ) && (msg==CRCInput::RC_ok) )
 	{
