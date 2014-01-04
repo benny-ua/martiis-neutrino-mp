@@ -453,6 +453,14 @@ fprintf(stderr, "button = %d\n", button);
 			menu_item->setHint(NEUTRINO_ICON_HINT_FILEPLAY, LOCALE_MENU_HINT_FILEPLAY);
 			menu->addItem(menu_item, 0);
 			break;
+		case SNeutrinoSettings::ITEM_AUDIOPLAY:
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_AUDIOPLAY;
+			keyhelper.get(&key,&icon);
+			menu_item = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, CNeutrinoApp::getInstance(), "audioplay", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_AUDIO, LOCALE_MENU_HINT_AUDIO);
+			menu->addItem(menu_item, 0);
+			break;
 		case SNeutrinoSettings::ITEM_HDDMENU:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_HDDMENU;

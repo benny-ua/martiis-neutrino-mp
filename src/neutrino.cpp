@@ -2750,13 +2750,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				CRecordManager::getInstance()->exec(NULL, "Stop_record");
 				StartSubtitles();
 			}
-			else if((msg == (uint32_t) g_settings.key_audioplayback)) {
-				//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
-				CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
-				media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
-				media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
-				media->exec(NULL, "");
-			}
 			else if (CRCInput::isNumeric(msg) && g_RemoteControl->director_mode ) {
 				g_RemoteControl->setSubChannel(CRCInput::getNumericValue(msg));
 				g_InfoViewer->showSubchan();
@@ -4364,16 +4357,23 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	}
 	else if(actionKey=="fileplayback") {
 #ifdef ENABLE_GRAPHLCD
-			nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
+	nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK)));
 #endif
-			if(mode == NeutrinoMessages::mode_radio )
-				videoDecoder->StopPicture();
-			CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
-			if(mode == NeutrinoMessages::mode_radio )
-				videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
+	if(mode == NeutrinoMessages::mode_radio )
+		videoDecoder->StopPicture();
+	CMoviePlayerGui::getInstance().exec(NULL, "fileplayback");
+	if(mode == NeutrinoMessages::mode_radio )
+		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/radiomode.jpg");
 #ifdef ENABLE_GRAPHLCD
-			nGLCD::unlockChannel();
+	nGLCD::unlockChannel();
 #endif
+	}
+	else if(actionKey=="audioplay") {
+		//open mediaplayer menu in audio mode, user can select between audioplayer and internetradio
+		CMediaPlayerMenu * media = CMediaPlayerMenu::getInstance();
+		media->setMenuTitel(LOCALE_MAINMENU_AUDIOPLAYER);
+		media->setUsageMode(CMediaPlayerMenu::MODE_AUDIO);
+		media->exec(NULL, "");
 	}
 	else if(actionKey=="rass") {
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
@@ -4643,7 +4643,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_switchformat = tconfig.getInt32("key_switchformat", CRCInput::RC_prev);
 	g_settings.key_next43mode = tconfig.getInt32("key_next43mode", CRCInput::RC_next);
 	g_settings.key_tvradio_mode = tconfig.getInt32( "key_tvradio_mode", CRCInput::RC_tv );
-	g_settings.key_audioplayback = tconfig.getInt32( "key_audioplayback", CRCInput::RC_audio );
 	g_settings.key_volumeup = tconfig.getInt32( "key_volumeup",  CRCInput::RC_plus );
 	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
 
@@ -4736,7 +4735,6 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	//rc-key configuration
 	tconfig.setInt32( "key_switchformat", g_settings.key_switchformat );
 	tconfig.setInt32( "key_next43mode", g_settings.key_next43mode );
-	tconfig.setInt32( "key_audioplayback", g_settings.key_audioplayback );
 	tconfig.setInt32( "key_volumeup", g_settings.key_volumeup );
 	tconfig.setInt32( "key_volumedown", g_settings.key_volumedown );
 	tconfig.setInt32( "key_tvradio_mode", g_settings.key_tvradio_mode );

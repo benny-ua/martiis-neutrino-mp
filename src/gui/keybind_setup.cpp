@@ -198,7 +198,6 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_NEXT43MODE,		&g_settings.key_next43mode,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SWITCHFORMAT,		&g_settings.key_switchformat,		NONEXISTANT_LOCALE},
-	{LOCALE_AUDIOPLAYER_NAME,		&g_settings.key_audioplayback,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SCREENSHOT,		&g_settings.key_screenshot,		LOCALE_MENU_HINT_KEY_SCREENSHOT },
 	{LOCALE_EXTRA_KEY_PIP_CLOSE,		&g_settings.key_pip_close,		LOCALE_MENU_HINT_KEY_PIP_CLOSE },
 	{LOCALE_EXTRA_KEY_PIP_SETUP,		&g_settings.key_pip_setup,		LOCALE_MENU_HINT_KEY_PIP_SETUP },
@@ -343,12 +342,6 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 		mf->setHint("", key_settings[i].hint);
 		bindSettings->addItem(mf);
 	}
-
-	//multimedia
-	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MULTIMEDIA));
-	mf = new CMenuForwarder(key_settings[KEY_AUDIOPLAYER].keydescription, true, keychooser[KEY_AUDIOPLAYER]->getKeyName(), keychooser[KEY_AUDIOPLAYER]);
-	mf->setHint("", key_settings[KEY_AUDIOPLAYER].hint);
-	bindSettings->addItem(mf);
 
 	//navigation
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_NAVIGATION));

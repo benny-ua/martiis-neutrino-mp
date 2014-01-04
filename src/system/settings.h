@@ -487,7 +487,6 @@ struct SNeutrinoSettings
 	int key_help;
 	int key_next43mode;
 	int key_switchformat;
-	int key_audioplayback;
 	int key_volumeup;
 	int key_volumedown;
 
@@ -797,6 +796,7 @@ struct SNeutrinoSettings
 		ITEM_NETZKINO = 29,
 		ITEM_FILEPLAY = 30,
 		ITEM_HDDMENU = 31,
+		ITEM_AUDIOPLAY = 32,
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];

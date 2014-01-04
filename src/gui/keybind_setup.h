@@ -84,7 +84,6 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			KEY_NEXT43MODE,
 			KEY_NEXT_REPEAT_MODE,
 			KEY_SWITCHFORMAT,
-			KEY_AUDIOPLAYER,
 			KEY_SCREENSHOT,
 			KEY_PIP_CLOSE,
 			KEY_PIP_SETUP,
