@@ -56,6 +56,7 @@ CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
 	width = w_max (40, 10);
 	pref_name = g_settings.usermenu_text[button]; //set current button name as prefered name
 	ums = NULL;
+	forwarder = NULL;
 }
 
 CUserMenuSetup::~CUserMenuSetup()
@@ -101,6 +102,7 @@ static keyvals usermenu_items[] =
 	{ SNeutrinoSettings::ITEM_EPG_MISC,		LOCALE_USERMENU_ITEM_EPG_MISC,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_AUDIO_SELECT,		LOCALE_AUDIOSELECTMENUE_HEAD,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_SUBCHANNEL,		LOCALE_INFOVIEWER_SUBSERVICE,		usermenu_show },
+	{ SNeutrinoSettings::ITEM_FILEPLAY,		LOCALE_MOVIEPLAYER_FILEPLAYBACK,	usermenu_show },
 	{ SNeutrinoSettings::ITEM_MOVIEPLAYER_MB,	LOCALE_MOVIEBROWSER_HEAD,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_TIMERLIST,		LOCALE_TIMERLIST_NAME,			usermenu_show },
 	{ SNeutrinoSettings::ITEM_REMOTE,		LOCALE_RCLOCK_MENUEADD,			usermenu_show },
@@ -138,12 +140,6 @@ int CUserMenuSetup::showSetup()
 			USERMENU_ITEM_OPTION_COUNT++;
 		}
 
-	struct keyval
-	{
-		int key;
-		neutrino_locale_t value;
-	};
-
 	std::vector<CMenuOptionChooser::keyval_ext> vec;
 	CMenuOptionChooser::keyval_ext kext;
 	kext.valname = NULL;
@@ -162,7 +158,7 @@ int CUserMenuSetup::showSetup()
 	if (ums == NULL) {
 		mn_widget_id_t widget_id = MN_WIDGET_ID_USERMENU_RED + button; //add up ''button'' and becomes to MN_WIDGET_ID_USERMENU_ GREEN, MN_WIDGET_ID_USERMENU_ YELLOW, MN_WIDGET_ID_USERMENU_BLUE
 		ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
-	}else{ 
+	} else { 
 		//if widget not clean, ensure that we have an empty widget without any item and set the last selected item
 		int sel = ums->getSelected(); 
 		ums->resetWidget(true);
@@ -170,11 +166,11 @@ int CUserMenuSetup::showSetup()
 	}
 	
 	//CUserMenuNotifier *notify = new CUserMenuNotifier();
-	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 11, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
+	int old_key = g_settings.usermenu_key[button];
+	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 20, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, NULL, &name);
 
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, g_settings.usermenu_text[button],&name);
 	CMenuDForwarder *kf = NULL;
-
 	if (button > 3 /* BLUE */) {
 		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu_key[button], LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
 		kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
@@ -198,6 +194,9 @@ int CUserMenuSetup::showSetup()
 	
 	int res = ums->exec(NULL, "");
 
+	if (forwarder && (old_key != g_settings.usermenu_key[button]))
+		forwarder->setName(CRCInput::getKeyName(g_settings.usermenu_key[button]));
+
 	return res;
 }
 
@@ -213,7 +212,7 @@ void CUserMenuSetup::checkButtonItems()
 	//warn if no items defined and reset menu name, if empty
 	if (used_items == 0){
 		if (!g_settings.usermenu_text[button].empty()){
-			DisplayInfoMessage(g_Locale->getText(LOCALE_USERMENU_MSG_WARNING_NO_ITEMS));
+			// DisplayInfoMessage(g_Locale->getText(LOCALE_USERMENU_MSG_WARNING_NO_ITEMS));
 			g_settings.usermenu_text[button] = "";
 		}
 		return;
@@ -233,16 +232,19 @@ void CUserMenuSetup::checkButtonItems()
 			if (set_key != SNeutrinoSettings::ITEM_NONE)
 				pref_name = g_Locale->getText(opt_locale);
 			
-			//warn if we have more than 1 items and the name of usermenu ist the same like before, exit function and let user decide, what to do 
+			//warn if we have more than 1 items and the name of usermenu is the same like before, exit function and let user decide, what to do 
 			if (used_items > 1 && g_settings.usermenu_text[button]==pref_name){
 				DisplayInfoMessage(g_Locale->getText(LOCALE_USERMENU_MSG_WARNING_NAME));
 				return;
 			}
 		}
 	}
-		
-	if (used_items == 1)
-		g_settings.usermenu_text[button] = pref_name; //if found only 1 configured item, ensure that the caption of usermenu is the same like this	
+
+	//if found only 1 configured item, ensure that the caption of usermenu is the same like this	
+	if (used_items == 1) {
+		bool dummy;
+		g_settings.usermenu_text[button] =  CUserMenu::getUserMenuButtonName(button, dummy);
+	}
 }
 
 //check button name for details like empty string and show an user message on issue

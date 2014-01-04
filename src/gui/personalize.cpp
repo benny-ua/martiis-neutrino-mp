@@ -411,13 +411,16 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuS
 	std::vector<CMenuForwarder*> v_umenu_fw;
 	for (uint i = 0; i<USERMENU_ITEMS_COUNT; i++)
 	{
-		v_umenu.push_back(new CUserMenuSetup(usermenu[i].menue_title, usermenu[i].menue_button));
+		CUserMenuSetup *cms = new CUserMenuSetup(usermenu[i].menue_title, usermenu[i].menue_button);
+		v_umenu.push_back(cms);
 		
 		//ensure correct default string, e.g: required after settings reset
 		if (v_umenu[i]->getUsedItemsCount() > 0)
 			g_settings.usermenu_text[i] = g_settings.usermenu_text[i].empty() ? g_Locale->getText(usermenu[i].def_name) : g_settings.usermenu_text[i].c_str();
 		
-		v_umenu_fw.push_back(new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName));
+		CMenuForwarder *fw = new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu_text[i], v_umenu[i], NULL, usermenu[i].DirectKey, usermenu[i].IconName);
+		cms->setCaller(fw);
+		v_umenu_fw.push_back(fw);
 	}
 	user_menu_notifier = new CUserMenuNotifier(v_umenu_fw[0], v_umenu_fw[1], v_umenu_fw[2], v_umenu_fw[3]);
 	int  buttons[4] = { SNeutrinoSettings::P_MAIN_RED_BUTTON, SNeutrinoSettings::P_MAIN_GREEN_BUTTON, SNeutrinoSettings::P_MAIN_YELLOW_BUTTON, SNeutrinoSettings::P_MAIN_BLUE_BUTTON };
@@ -432,19 +435,27 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuS
 	
 	p_widget->addItem(GenericMenuSeparatorLine);
 
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
-
 	//other keys
 	otherKeyMenu = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width, MN_WIDGET_ID_PERSONALIZE_FEATUREKEYS);
+	otherKeyMenu->addItem(new CMenuSeparator(CMenuSeparator::ALIGN_LEFT | CMenuSeparator::SUB_HEAD | CMenuSeparator::STRING, LOCALE_PERSONALIZE_USERMENU_OTHER_BUTTONS));
+	otherKeyMenu->addItem(GenericMenuSeparator);
+	otherKeyMenu->addItem(GenericMenuBack);
+	otherKeyMenu->addItem(new CMenuSeparator(CMenuSeparator::ALIGN_RIGHT | CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_USERMENU_NAME));
 
-	otherKeyMenu->addIntroItems(LOCALE_PERSONALIZE_USERMENU_OTHER_BUTTONS);
 	for (int i = USERMENU_ITEMS_COUNT; i < SNeutrinoSettings::BUTTON_MAX; i++) {
-		v_umenu.push_back(new CUserMenuSetup(LOCALE_USERMENU_HEAD, i));
-		otherKeyMenu->addItem(new CMenuForwarder(CRCInput::getKeyName(g_settings.usermenu_key[i]), true, g_settings.usermenu_text[i], v_umenu[i]));
+		CUserMenuSetup *cms = new CUserMenuSetup(LOCALE_USERMENU_HEAD, i);
+		v_umenu.push_back(cms);
+		CMenuForwarder *fw = new CMenuForwarder(CRCInput::getKeyName(g_settings.usermenu_key[i]), true, g_settings.usermenu_text[i], v_umenu[i]);
+		cms->setCaller(fw);
+		otherKeyMenu->addItem(fw);
 	}
 
 	CMenuForwarder *fw_fkeys = new CMenuForwarder(LOCALE_PERSONALIZE_USERMENU_OTHER_BUTTONS, true, NULL, otherKeyMenu);
 	p_widget->addItem(fw_fkeys);
+
+	p_widget->addItem(GenericMenuSeparatorLine);
+
+	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 }
 
 #define PERSONALIZE_PLUGINTYPE_MAX 5
@@ -461,7 +472,7 @@ const CMenuOptionChooser::keyval PERSONALIZE_PLUGINTYPE_OPTIONS[PERSONALIZE_PLUG
 void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget, std::string da[], int ia[])
 {
 	p_widget->addIntroItems(LOCALE_PERSONALIZE_PLUGINS);
-	
+
 	uint  d_key = 1;	
 	int pcount = g_PluginList->getNumberOfPlugins();
 	for (int i = 0; i < pcount; i++)
@@ -474,7 +485,7 @@ void CPersonalizeGui::ShowPluginMenu(CMenuWidget* p_widget, std::string da[], in
 		if (!pluginDesc.empty())
 			da[i] += " (" + pluginDesc + ")";
 		p_widget->addItem(new CMenuOptionChooser(da[i].c_str(), &ia[i], PERSONALIZE_PLUGINTYPE_OPTIONS, PERSONALIZE_PLUGINTYPE_MAX,
-			!g_PluginList->isHidden(i), NULL, getShortcut(d_key++)));
+					!g_PluginList->isHidden(i), NULL, getShortcut(d_key++)));
 	}
 }
 
@@ -484,20 +495,20 @@ int CPersonalizeGui::ShowMenuOptions(const int& widget)
 {
 	string mn_name = v_widget[widget]->getName();
 	printf("[neutrino-personalize] exec %s for [%s]...\n", __FUNCTION__, mn_name.c_str());
-	
+
 	mn_widget_id_t w_index = widget+MN_WIDGET_ID_PERSONALIZE_MAIN;
 	CMenuWidget* pm = new CMenuWidget(LOCALE_PERSONALIZE_HEAD, NEUTRINO_ICON_PERSONALIZE, width, w_index);
 	//reuqired in changeNotify()
 	options_count = 0; 
 	tmpW = pm;
 	//*************************
-	
+
 	//subhead
 	CMenuSeparator * pm_subhead = new CMenuSeparator(CMenuSeparator::ALIGN_LEFT | CMenuSeparator::SUB_HEAD | CMenuSeparator::STRING);
 	string 	s_sh = g_Locale->getText(LOCALE_PERSONALIZE_ACCESS);
-			s_sh += ": " + mn_name;
+	s_sh += ": " + mn_name;
 	pm_subhead->setName(s_sh);
-	
+
 	pm->addItem(pm_subhead);
 	pm->addIntroItems();
 
@@ -507,7 +518,7 @@ int CPersonalizeGui::ShowMenuOptions(const int& widget)
 		if (mn_name == v_item[i].widget->getName())
 		{
 			int i_mode = v_item[i].item_mode;
-			
+
 			if (i_mode != PERSONALIZE_SHOW_NO)
 			{
 				//add items to the options menu
@@ -518,42 +529,42 @@ int CPersonalizeGui::ShowMenuOptions(const int& widget)
 						//get locale name and personalize mode
 						neutrino_locale_t name = v_item[i].locale_name;
 						int* p_mode = v_item[i].personalize_mode;
-						
+
 						//found observer item and if found, then define 'this' as observer for current option chooser and run changeNotify
 						bool is_observer = isObserver(v_item[i].widget, v_item[i].menuItem) ? true : false;
 						CChangeObserver* observer = is_observer ? this : NULL;					
 						CMenuOptionChooser * opt = new CMenuOptionChooser(name, p_mode, PERSONALIZE_MODE_OPTIONS, PERSONALIZE_MODE_MAX, v_item[i].menuItem->active, observer);
 						if (is_observer)
 							changeNotify(name, (void*)p_mode);
-										
+
 						//required for first view: check active mode of option chooser and disable if it's an observed item and item mode is set to 'not visible'
 						for (uint j = 0; j < v_observ.size(); j++)		
 							if (opt->getOptionName()== g_Locale->getText(v_observ[j].to_observ_locale) && *p_mode == PERSONALIZE_MODE_NOTVISIBLE)
 								opt->setActive(false);	
-												
+
 						pm->addItem(opt); //add option chooser
 					}
 					else 
 						pm->addItem(v_item[i].menuItem); //separator
 				}
-				
+
 				//pin protected items only
 				if (i_mode == PERSONALIZE_SHOW_AS_ACCESS_OPTION)
 				{
 					string 	itm_name = g_Locale->getText(v_item[i].locale_name);
-							itm_name += " ";
-							itm_name += g_Locale->getText(LOCALE_PERSONALIZE_PINSTATUS);
-							
+					itm_name += " ";
+					itm_name += g_Locale->getText(LOCALE_PERSONALIZE_PINSTATUS);
+
 					if (v_item[i].personalize_mode != NULL)
 						pm->addItem(new CMenuOptionChooser(itm_name.c_str(), v_item[i].personalize_mode, PERSONALIZE_PROTECT_MODE_OPTIONS, PERSONALIZE_PROTECT_MODE_MAX, v_item[i].menuItem->active));
 				}
-				
+
 				//only show in personalize menu, usefull to hide separators in menu, but visible only in personalizing menu
 				if (i_mode == PERSONALIZE_SHOW_ONLY_IN_PERSONALIZE_MENU)
 					pm->addItem(v_item[i].menuItem); 
 			}	
 		}
-		
+
 	}
 	options_count = pm->getItemsCount();
 	int res = pm->exec (NULL, "");
@@ -580,15 +591,15 @@ bool CPersonalizeGui::isObserver(CMenuWidget* widget, CMenuItem *item)
 bool CPersonalizeGui::changeNotify(const neutrino_locale_t locale, void *data)
 {	
 	int opt_val = *(int*) data;
-	
+
 	//exit if no options found
 	int opt_count = options_count;
 	if (opt_count == 0 && locale == NONEXISTANT_LOCALE)
 		return true;
-	
+
 	//if found an option and handle
 	for (int i = 0; i < opt_count; i++){
-		
+
 		//get current item
 		CMenuItem* item = tmpW->getItem(i);
 		if (item->isMenueOptionChooser())
@@ -626,7 +637,7 @@ bool CPersonalizeGui::changeNotify(const neutrino_locale_t locale, void *data)
 void CPersonalizeGui::ShowHelpPersonalize()
 {
 	Helpbox helpbox;
-	
+
 	for (int i = (int)LOCALE_PERSONALIZE_HELP_LINE1; i<= (int)LOCALE_PERSONALIZE_HELP_LINE8; i++)
 		helpbox.addLine(g_Locale->getText((neutrino_locale_t)i));
 
@@ -700,7 +711,7 @@ int CPersonalizeGui::getWidgetId(CMenuWidget *widget)
 void CPersonalizeGui::addObservedItem(CMenuWidget *widget, CMenuItem* observer_Item, CMenuItem* to_observ_Item)
 {
 	CMenuForwarder *fw[2] = {	static_cast <CMenuForwarder*> (observer_Item),
-					static_cast <CMenuForwarder*> (to_observ_Item)};
+		static_cast <CMenuForwarder*> (to_observ_Item)};
 	observ_menu_item_t item = {widget, fw[0]->getTextLocale(), fw[1]->getTextLocale()};
 	v_observ.push_back(item);
 }
@@ -731,9 +742,9 @@ void CPersonalizeGui::addItem(CMenuWidget *widget, CMenuItem *menu_Item, const i
 {
 	if (observer_Item != NULL)
 		addObservedItem(widget, observer_Item, menu_Item);
-	
- 	CMenuForwarder *fw = static_cast <CMenuForwarder*> (menu_Item);
-	
+
+	CMenuForwarder *fw = static_cast <CMenuForwarder*> (menu_Item);
+
 	menu_item_t item = {widget, menu_Item, defaultselected, fw->getTextLocale(), (int*)personalize_mode, item_mode, observer_Item};
 
 	if (item_mode == PERSONALIZE_SHOW_AS_ACCESS_OPTION)
@@ -774,11 +785,11 @@ void CPersonalizeGui::addSeparator(CMenuWidget &widget, const neutrino_locale_t 
 int CPersonalizeGui::getItemsCount(CMenuWidget *widget)
 {
 	int ret = 0; 
-	
+
 	for (uint i = 0; i < v_item.size(); i++)
 		if (v_item[i].widget == widget)
 			ret++;
-		
+
 	return ret;
 }
 
@@ -796,52 +807,52 @@ void CPersonalizeGui::addPersonalizedItems()
 	int widget_id = 0;
 	int short_cut = shortcut;
 	int old_p_mode = PERSONALIZE_MODE_NOTVISIBLE;
-	
+
 	//get current mode of personlize itself
 	int in_pinmode = hasPinItems() ? PERSONALIZE_PROTECT_MODE_PIN_PROTECTED : PERSONALIZE_PROTECT_MODE_NOT_PROTECTED;
-	
- 	for (uint i = 0; i < v_item.size(); i++)
+
+	for (uint i = 0; i < v_item.size(); i++)
 	{
 		int i_mode = v_item[i].item_mode;
-			
+
 		if (i_mode != PERSONALIZE_SHOW_ONLY_IN_PERSONALIZE_MENU) //skip if item only used in personalize settings
 		{
 			widget_id = getWidgetId(v_item[i].widget);
-					
+
 			if (old_w_id != widget_id)
 			{
 				//reset shortcut if widget has changed
 				short_cut = shortcut; 
-				
+
 				//normalize previous widget: remove last item, if it is a separator line
 				uint items_count = v_item[old_w_id].widget->getItemsCount(); 
 				if (v_item[old_w_id].widget->getItem(items_count-1) == GenericMenuSeparatorLine)
 					v_item[old_w_id].widget->removeItem(items_count-1);
-				
+
 				allow_sep = true;
 			}
-										
+
 			if (v_item[i].personalize_mode != NULL) //handle personalized item and non separator
 			{
 				CMenuForwarder *fw = static_cast <CMenuForwarder*> (v_item[i].menuItem);
-				
+
 				bool use_pin 		= false;
 				int p_mode 		= *v_item[i].personalize_mode;
 				neutrino_msg_t d_key 	= fw->directKey;
 				bool add_shortcut 	= false;
-								
+
 				//get shortcut
 				if (fw->iconName.empty() && fw->active ) //if no icon is defined and item is active, allow to generate a shortcut, 
 				{
 					add_shortcut = true;
 					d_key = getShortcut(short_cut);
 				}					
-				
+
 				//set pin mode if required
 				const char* lock_icon = NULL;
 				if (p_mode == PERSONALIZE_MODE_PIN || (p_mode == PERSONALIZE_PROTECT_MODE_PIN_PROTECTED && i_mode == PERSONALIZE_SHOW_AS_ACCESS_OPTION))
 					use_pin = true;
-				
+
 				//set pinmode for personalize menu or for settings manager menu and if any item is pin protected 
 				if (in_pinmode && !use_pin)
 					if (v_item[i].personalize_mode == &g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS] || v_item[i].personalize_mode == &g_settings.personalize[SNeutrinoSettings::P_MSET_SETTINGS_MANAGER])
@@ -849,7 +860,7 @@ void CPersonalizeGui::addPersonalizedItems()
 						use_pin = true;
 						lock_icon = NEUTRINO_ICON_LOCK_PASSIVE;
 					}
-											
+
 				//convert item to locked forwarder and use generated pin mode for usage as ask parameter 
 				v_item[i].menuItem = new CLockedMenuForwarder(fw->getTextLocale(), g_settings.personalize_pincode, use_pin, fw->active, NULL, fw->getTarget(), fw->getActionKey().c_str(), d_key, fw->iconName.c_str(), lock_icon);
 				v_item[i].menuItem->hintIcon = fw->hintIcon;
@@ -860,7 +871,7 @@ void CPersonalizeGui::addPersonalizedItems()
 					//add item
 					v_item[i].widget->addItem(v_item[i].menuItem, v_item[i].default_selected); //forwarders...
 					allow_sep = true;
-									
+
 					//generate shortcut for next item
 					if (add_shortcut)
 						short_cut++;
@@ -873,8 +884,8 @@ void CPersonalizeGui::addPersonalizedItems()
 						old_p_mode = p_mode;
 						allow_sep = true;
 					}
- 				}
-									
+				}
+
 				delete fw;
 			}
 			else //handle and add separator as non personalized item and don't allow to add a separator as next but allow back button as next
@@ -917,7 +928,7 @@ bool  CPersonalizeGui::haveChangedSettings()
 	for (uint i = 0; i < v_int_settings.size(); i++)
 		if (v_int_settings[i].old_val != *v_int_settings[i].p_val)
 			return true;
-	
+
 	return false;
 }
 
@@ -930,7 +941,7 @@ bool  CPersonalizeGui::hasPinItems()
 			printf("[neutrino personalize] %s found pin protected item...[item %d]\n", __FUNCTION__, i);
 			return true;
 		}
-	
+
 	return false;
 }
 
@@ -940,7 +951,7 @@ void CPersonalizeGui::restoreSettings()
 	//restore settings with current settings
 	for (uint i = 0; i < v_int_settings.size(); i++)
 		*v_int_settings[i].p_val = v_int_settings[i].old_val;
-	
+
 	exec(NULL, "restore");
 }
 
@@ -960,20 +971,20 @@ bool CUserMenuNotifier::changeNotify(const neutrino_locale_t, void *)
 	toDisable[1]->setActive(g_settings.personalize[SNeutrinoSettings::P_MAIN_GREEN_BUTTON]);
 	toDisable[2]->setActive(g_settings.personalize[SNeutrinoSettings::P_MAIN_YELLOW_BUTTON]);
 	toDisable[3]->setActive(g_settings.personalize[SNeutrinoSettings::P_MAIN_BLUE_BUTTON]);
-	
+
 	return false;
 }
 
 //helper class to enable/disable pin setup
 CPinSetupNotifier::CPinSetupNotifier( CMenuItem* item)
 {
-   toDisable=item;
+	toDisable=item;
 }
 
 bool CPinSetupNotifier::changeNotify(const neutrino_locale_t, void *)
 {
 	toDisable->setActive(g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS]);
-   
-//   return g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS];
+
+	//   return g_settings.personalize[SNeutrinoSettings::P_MAIN_PINSTATUS];
 	return false;
 }

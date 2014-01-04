@@ -169,8 +169,6 @@ fprintf(stderr, "button = %d\n", button);
 	std::string txt = g_settings.usermenu_text[button];
 	if (button < COL_BUTTONMAX && txt.empty())
 		txt = g_Locale->getText(user_menu[button].caption);
-	if (txt.empty())
-		txt = to_string(button - 4);
 
 	CMenuWidget *menu = new CMenuWidget(txt, (button < COL_BUTTONMAX) ? user_menu[button].menu_icon_def : "", width);
 	if (menu == NULL)

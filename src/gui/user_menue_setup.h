@@ -66,6 +66,7 @@ class CUserMenuSetup : public CMenuTarget
 		int button;
 		std::string pref_name;
 		neutrino_locale_t local;
+		CMenuForwarder *forwarder;
 
 		int showSetup();
 		void checkButtonItems();
@@ -76,6 +77,7 @@ class CUserMenuSetup : public CMenuTarget
 	public:
 		CUserMenuSetup(neutrino_locale_t menue_title, int menue_button);
 		~CUserMenuSetup();
+		void setCaller(CMenuForwarder *fw) { forwarder = fw ; }
 		int getUsedItemsCount();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 };
