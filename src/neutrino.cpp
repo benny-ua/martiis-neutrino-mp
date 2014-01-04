@@ -4349,7 +4349,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 #ifdef ENABLE_GRAPHLCD
 			nGLCD::lockChannel(string(g_Locale->getText(LOCALE_MOVIEPLAYER_HEAD)));
 #endif
-			CMediaPlayerMenu::getInstance()->exec(NULL,"movieplayer");
+			CMediaPlayerMenu::getInstance()->exec(NULL,"tsmoviebrowser");
 #ifdef ENABLE_GRAPHLCD
 			nGLCD::unlockChannel();
 #endif

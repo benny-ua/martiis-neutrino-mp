@@ -116,7 +116,7 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		int res = inetPlayer->exec(NULL, "init");
 		return res; //menu_return::RETURN_REPAINT;
 	}
-	else if (actionKey == "movieplayer")
+	else if (actionKey == "tsmoviebrowser")
 	{
 		audiomute->enableMuteIcon(false);
 		InfoClock->enableInfoClock(false);
@@ -182,7 +182,7 @@ int CMediaPlayerMenu::initMenuMedia(CMenuWidget *m, CPersonalizeGui *p)
 	personalize->addSeparator(*media, LOCALE_MAINMENU_MOVIEPLAYER, true);
 
 	//movie browser
-	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "movieplayer");
+	CMenuForwarder *fw_mbrowser = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, this, "tsmoviebrowser");
 	fw_mbrowser->setHint(NEUTRINO_ICON_HINT_MB, LOCALE_MENU_HINT_MB);
 	personalize->addItem(media, fw_mbrowser, &g_settings.personalize[SNeutrinoSettings::P_MPLAYER_MBROWSER]);
 	
