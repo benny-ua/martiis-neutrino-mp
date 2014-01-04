@@ -104,7 +104,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 
 	if (button < 0)
 		return false;
-fprintf(stderr, "button = %d\n", button);
 
 	int pers = -1;
 	switch(msg) {
@@ -458,7 +457,7 @@ fprintf(stderr, "button = %d\n", button);
 			menu_prev = SNeutrinoSettings::ITEM_AUDIOPLAY;
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, CNeutrinoApp::getInstance(), "audioplay", key, icon);
-			menu_item->setHint(NEUTRINO_ICON_HINT_AUDIO, LOCALE_MENU_HINT_AUDIO);
+			menu_item->setHint(NEUTRINO_ICON_HINT_APLAY, LOCALE_MENU_HINT_APLAY);
 			menu->addItem(menu_item, 0);
 			break;
 		case SNeutrinoSettings::ITEM_HDDMENU:
