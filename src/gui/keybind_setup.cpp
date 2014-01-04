@@ -195,7 +195,6 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_EXTRA_KEY_TIMESHIFT,		&g_settings.key_timeshift,  		LOCALE_MENU_HINT_KEY_MPTIMESHIFT },
 	{LOCALE_MPKEY_PLUGIN,			&g_settings.mpkey_plugin,		LOCALE_MENU_HINT_KEY_MPPLUGIN },
 	{LOCALE_EXTRA_KEY_UNLOCK,		&g_settings.key_unlock,			LOCALE_MENU_HINT_KEY_UNLOCK},
-	{LOCALE_EXTRA_KEY_TIMERLIST,		&g_settings.key_timerlist,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_NEXT43MODE,		&g_settings.key_next43mode,		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_SWITCHFORMAT,		&g_settings.key_switchformat,		NONEXISTANT_LOCALE},
@@ -399,7 +398,6 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	bindSettings->addItem(mf);
 #endif
 
-	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_TIMERLIST].keydescription, true, keychooser[KEY_TIMERLIST]->getKeyName(), keychooser[KEY_TIMERLIST]));
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
 
 	// audio for audio player

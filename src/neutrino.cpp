@@ -2780,13 +2780,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				nGLCD::Update();
 #endif
 			}
-			else if (msg == (uint32_t) g_settings.key_timerlist)
-			{
-				CTimerList Timerlist;
-				StopSubtitles();
-				Timerlist.exec(NULL, "");
-				StartSubtitles();
-			}
 			else if (msg == CRCInput::RC_aux)
 				scartMode(true);
 			else if (!usermenu.showUserMenu(msg)) {
@@ -4421,14 +4414,8 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		}
 	}
 	else if(actionKey == "hddmenu") {
-#ifdef ENABLE_GRAPHLCD
-				StopSubtitles(false);
-#else
-				StopSubtitles();
-#endif
-				CHDDMenuHandler m;
-				m.exec(NULL, "hotkey");
-				StartSubtitles();
+		CHDDMenuHandler m;
+		m.exec(NULL, "hotkey");
 	}
 	else if(actionKey == "moviedir") {
 		parent->hide();
@@ -4691,7 +4678,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 
 	g_settings.key_bouquet_up = tconfig.getInt32( "key_bouquet_up",  CRCInput::RC_right);
 	g_settings.key_bouquet_down = tconfig.getInt32( "key_bouquet_down",  CRCInput::RC_left);
-	g_settings.key_timerlist = tconfig.getInt32( "key_timerlist", CRCInput::RC_timer);
 	g_settings.key_help = tconfig.getInt32( "key_help", CRCInput::RC_help );
 
 	g_settings.mpkey_rewind = tconfig.getInt32( "mpkey.rewind", CRCInput::RC_rewind );
@@ -4786,7 +4772,6 @@ void CNeutrinoApp::saveKeys(const char * fname)
 
 	tconfig.setInt32( "key_bouquet_up", g_settings.key_bouquet_up );
 	tconfig.setInt32( "key_bouquet_down", g_settings.key_bouquet_down );
-	tconfig.setInt32( "key_timerlist", g_settings.key_timerlist );
 	tconfig.setInt32( "key_help", g_settings.key_help );
 
 	tconfig.setInt32( "mpkey.rewind", g_settings.mpkey_rewind );

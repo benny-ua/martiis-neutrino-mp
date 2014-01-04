@@ -79,9 +79,7 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			MPKEY_VTXT,
 			KEY_TIMESHIFT,
 			MPKEY_PLUGIN,
-			/*KEY_PLUGIN,*/
 			KEY_UNLOCK,
-			KEY_TIMERLIST,
 			KEY_Help,
 			KEY_NEXT43MODE,
 			KEY_NEXT_REPEAT_MODE,
