@@ -38,13 +38,11 @@
 class CMediaPlayerMenu : public CMenuTarget
 {
 	private:
-		int width, usage_mode;
+		int width;
 		neutrino_locale_t menu_title;
 		
 		CAudioPlayerGui *audioPlayer;
 		CAudioPlayerGui *inetPlayer;
-				
-		void showMoviePlayer(CMenuWidget *menu_movieplayer, CPersonalizeGui *p);
 
 	public:	
 		enum MM_MENU_MODES
@@ -62,7 +60,6 @@ class CMediaPlayerMenu : public CMenuTarget
 		
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 		void setMenuTitel(const neutrino_locale_t title = LOCALE_MAINMENU_MEDIA){menu_title = title;};
-		void setUsageMode(const int& mm_mode = MODE_DEFAULT){usage_mode = mm_mode;};
 		CAudioPlayerGui *getPlayerInstance() { if (audioPlayer != NULL) return audioPlayer; else if (inetPlayer != NULL) return inetPlayer; else return NULL; }
 };
 
