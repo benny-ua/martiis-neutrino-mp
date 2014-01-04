@@ -400,11 +400,6 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
 
-	// audio for audio player
-	mc = new CMenuOptionChooser(LOCALE_EXTRA_AUDIO_RUN_PLAYER, &g_settings.audio_run_player, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	mc->setHint("", LOCALE_MENU_HINT_KEY_AUDIO);
-	bindSettings->addItem(mc);
-
 	// right key
 	mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV, &g_settings.mode_left_right_key_tv, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_OPTIONS, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_KEY_RIGHT);
