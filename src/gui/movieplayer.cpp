@@ -1301,6 +1301,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			g_RCInput->postMsg(msg, data);
 		} else if (msg == CRCInput::RC_timeout) {
 			// nothing
+		} else if (CNeutrinoApp::getInstance()->usermenu.showUserMenu(msg)) {
 		} else if (msg == CRCInput::RC_sat || msg == CRCInput::RC_favorites) {
 			//FIXME do nothing ?
 #if 0
