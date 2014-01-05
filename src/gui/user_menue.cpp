@@ -186,36 +186,44 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		case SNeutrinoSettings::ITEM_FAVORITS:
 			keyhelper.get(&key,&icon,feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_FAVORIT]].key); //CRCInput::RC_green
 			menu_item = new CMenuDForwarder(LOCALE_FAVORITES_MENUEADD, true, NULL, new CFavorites, "-1", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_RECORD:
 			if (g_settings.recording_type == RECORDING_OFF)
 				break;
 			keyhelper.get(&key,&icon,CRCInput::RC_red);
 			menu_item = new CMenuForwarder(LOCALE_MAINMENU_RECORDING, true, NULL, CRecordManager::getInstance(), "-1", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_MOVIEPLAYER_MB:
 			keyhelper.get(&key,&icon,CRCInput::RC_green);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEBROWSER_HEAD, true, NULL, neutrino, "tsmoviebrowser", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_MB, LOCALE_MENU_HINT_MB);
 			break;
 		case SNeutrinoSettings::ITEM_TIMERLIST:
 			keyhelper.get(&key,&icon,feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_TIMERLIST]].key); //CRCInput::RC_yellow
 			menu_item = new CMenuDForwarder(LOCALE_TIMERLIST_NAME, true, NULL, new CTimerList, "-1", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_TIMERS, LOCALE_MENU_HINT_TIMERS);
 			break;
 		case SNeutrinoSettings::ITEM_REMOTE:
 			keyhelper.get(&key,&icon,feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_RC_LOCK]].key); //CRCInput::RC_nokey);
 			menu_item = new CMenuDForwarder(LOCALE_RCLOCK_MENUEADD, true, NULL, new CRCLock, "-1" , key, icon );
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_EPG_SUPER:
 			keyhelper.get(&key,&icon,CRCInput::RC_green);
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EPGPLUS   , true, NULL, new CEPGplusHandler,  "-1", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_EPG_LIST:
 			keyhelper.get(&key,&icon,CRCInput::RC_red);
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EVENTLIST , true, NULL, new CEventListHandler,  "-1", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_EPG_INFO:
 			keyhelper.get(&key,&icon,CRCInput::RC_yellow);
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EVENTINFO , true, NULL, new CEPGDataHandler,  "-1", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_EPG_MISC:
 			dummy = g_Sectionsd->getIsScanningActive();
@@ -226,10 +234,12 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu->addItem(menu_item, false);
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MAINMENU_CLEARSECTIONSD, true, NULL, neutrino, "clearSectionsd", key,icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_AUDIO_SELECT:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_AUDIOSELECTMENUE_HEAD, true, NULL, new CAudioSelectMenuHandler, "-1", key,icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_SUBCHANNEL:
 		{
@@ -243,19 +253,23 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			}
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(g_RemoteControl->are_subchannels ? LOCALE_NVODSELECTOR_SUBSERVICE : LOCALE_NVODSELECTOR_HEAD, true, NULL, tmpNVODSelector, "-1", key,icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		}
 		case SNeutrinoSettings::ITEM_TECHINFO:
 			keyhelper.get(&key,&icon,CRCInput::RC_blue);
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_STREAMINFO, !neutrino->channelList->isEmpty(), NULL, new CStreamInfo2, "-1", key, icon );
+			menu_item->setHint(NEUTRINO_ICON_HINT_STREAMINFO, LOCALE_MENU_HINT_STREAMINFO);
 			break;
 		case SNeutrinoSettings::ITEM_GAMES:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_MAINMENU_GAMES, g_PluginList->hasPlugin(CPlugins::P_TYPE_GAME), NULL, new CPluginList(LOCALE_MAINMENU_GAMES,CPlugins::P_TYPE_GAME), "-1", key, icon );
+			menu_item->setHint(NEUTRINO_ICON_HINT_GAMES, LOCALE_MENU_HINT_GAMES);
 			break;
 		case SNeutrinoSettings::ITEM_SCRIPTS:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_MAINMENU_SCRIPTS, g_PluginList->hasPlugin(CPlugins::P_TYPE_SCRIPT), NULL, new CPluginList(LOCALE_MAINMENU_SCRIPTS,CPlugins::P_TYPE_SCRIPT), "-1", key, icon );
+			menu_item->setHint(NEUTRINO_ICON_HINT_SCRIPTS, LOCALE_MENU_HINT_SCRIPTS);
 			break;
 		case SNeutrinoSettings::ITEM_PLUGIN:
 		{
@@ -276,6 +290,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 					//printf("[neutrino usermenu] plugin %d, set key %d...\n", count, g_PluginList->getKey(count));
 					keyhelper.get(&key,&icon, d_key);
 					menu_item = new CMenuForwarder(g_PluginList->getName(count), true, NULL, &StreamFeaturesChanger, id, key, icon);
+					menu_item->setHint("", g_PluginList->getDescription(count));
 
 					menu->addItem(menu_item, false);
 					cnt++;
@@ -287,14 +302,17 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		case SNeutrinoSettings::ITEM_VTXT:
 			keyhelper.get(&key,&icon, feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_VTXT]].key); //CRCInput::RC_blue
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_VTXT, true, NULL, &StreamFeaturesChanger, "teletext", key, icon);
+			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_IMAGEINFO:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_SERVICEMENU_IMAGEINFO,  true, NULL, new CImageInfo, NULL, key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_IMAGEINFO, LOCALE_MENU_HINT_IMAGEINFO);
 			break;
 		case SNeutrinoSettings::ITEM_BOXINFO:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_EXTRA_DBOXINFO, true, NULL, new CDBoxInfoWidget, NULL, key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_DBOXINFO, LOCALE_MENU_HINT_DBOXINFO);
 			break;
 #if !HAVE_SPARK_HARDWARE
 		case SNeutrinoSettings::ITEM_CAM:
@@ -306,25 +324,30 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		case SNeutrinoSettings::ITEM_CLOCK:
 			keyhelper.get(&key,&icon); 
 			menu_item = new CMenuForwarder(!g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_ON:LOCALE_CLOCK_SWITCH_OFF, true, NULL, neutrino, "clock_switch", key, icon);
+			menu_item->setHint("", LOCALE_MENU_HINT_CLOCK_MODE);
 			break;
 		case SNeutrinoSettings::ITEM_ADZAP:
 			keyhelper.get(&key,&icon,CRCInput::RC_blue);
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_ADZAP, true, NULL, neutrino, "adzap", key, icon);
+			menu_item->setHint("", LOCALE_MENU_HINT_ADZAP);
 			break;
 		case SNeutrinoSettings::ITEM_EMU_RESTART:
 			if (access("/etc/init.d/cam", X_OK))
 				continue;
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_CAM, true, NULL, neutrino, "restartcam", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RESTART_CAM);
 			break;
 		case SNeutrinoSettings::ITEM_TUNER_RESTART:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_SERVICEMENU_RESTART_TUNER, true, NULL, neutrino, "restarttuner", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_RELOAD_CHANNELS, LOCALE_MENU_HINT_RESTART_TUNER);
 			break;
 #if HAVE_SPARK_HARDWARE
 		case SNeutrinoSettings::ITEM_THREE_D_MODE:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, neutrino->threeDSetup, "3dmode", key, icon);
+			menu_item->setHint("", LOCALE_MENU_HINT_VIDEO_THREE_D);
 			break;
 #endif
 		case SNeutrinoSettings::ITEM_RASS:
@@ -332,6 +355,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 				continue;
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_RASS_HEAD, true, NULL, neutrino, "rass", key, icon);
+			menu_item->setHint(NEUTRINO_ICON_HINT_RASS, LOCALE_MENU_HINT_RASS);
 			break;
 		case SNeutrinoSettings::ITEM_YOUTUBE:
 			keyhelper.get(&key,&icon);

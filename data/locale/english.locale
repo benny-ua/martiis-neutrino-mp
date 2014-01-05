@@ -879,6 +879,7 @@ menu.back Back
 menu.cancel Cancel
 menu.hint_a_pic Configure audio player, picture viewer, movie player and more
 menu.hint_accept_other_remotes Disable to ignore other remote controls
+menu.hint_adzap AdZap will switch back to the current channel when the selected time is up
 menu.hint_aplay Audio player
 menu.hint_aplay_setup Change title display, start directory, screen saver and more
 menu.hint_audio Audio output, DD\nSRS True volume options
@@ -1149,6 +1150,7 @@ menu.hint_pref_subs Select preferred subtitle language\nselect 'none' to disable
 menu.hint_progressbar_color Change appearance of progress bars
 menu.hint_protection Protect content by PIN code\nDefault PIN 0000
 menu.hint_radiomode Switch box to radio mode
+menu.hint_rass Switch to interactive Rass (radio screen show) mode.
 menu.hint_reboot Reboot box\nNo confirmation
 menu.hint_record_apid_ac3 Record AC-3 audio pids
 menu.hint_record_apid_alt Record alternative non-AC-3 audio pids

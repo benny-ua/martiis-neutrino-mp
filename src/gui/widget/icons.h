@@ -226,6 +226,7 @@
 #define NEUTRINO_ICON_HINT_HDD		"hint_hdd"
 #define NEUTRINO_ICON_HINT_KEYS		"hint_keys"
 #define NEUTRINO_ICON_HINT_A_PIC	"hint_a_pic"
+#define NEUTRINO_ICON_HINT_RASS		"hint_rass"
 
 #define NEUTRINO_ICON_HINT_COLORS	"hint_colors"
 #define NEUTRINO_ICON_HINT_FONTS	"hint_fonts"
