@@ -38,7 +38,6 @@
 #include <neutrino_menue.h>
 #include <neutrinoMessages.h>
 
-#include <gui/audiomute.h>
 #include <gui/infoclock.h>
 #include <gui/movieplayer.h>
 #include <gui/pictureviewer.h>
@@ -89,7 +88,6 @@ int CMediaPlayerMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	if (parent)
 		parent->hide();
 	
-	CAudioMute *audiomute = CAudioMute::getInstance();
 	if (actionKey == "audioplayer")
 	{
 		if (audioPlayer == NULL)
