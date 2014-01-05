@@ -143,7 +143,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	neutrino_msg_t key = feat_key[CPersonalizeGui::PERSONALIZE_FEAT_KEY_AUTO].key; //CRCInput::RC_nokey
 	
 	const char * icon = NULL;
-	int dummy;
 
 	int menu_items = 0;
 
@@ -227,8 +226,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
 		case SNeutrinoSettings::ITEM_EPG_MISC:
-			dummy = g_Sectionsd->getIsScanningActive();
-			//dummy = sectionsd_scanning;
+		{
+			int dummy = g_Sectionsd->getIsScanningActive();
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuOptionChooser(LOCALE_MAINMENU_PAUSESECTIONSD, &dummy, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this , key, icon );
 			menu_items++;
@@ -237,6 +236,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_item = new CMenuForwarder(LOCALE_MAINMENU_CLEARSECTIONSD, true, NULL, neutrino, "clearSectionsd", key,icon);
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
 			break;
+		}
 		case SNeutrinoSettings::ITEM_AUDIO_SELECT:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_AUDIOSELECTMENUE_HEAD, true, NULL, new CAudioSelectMenuHandler, "-1", key,icon);
