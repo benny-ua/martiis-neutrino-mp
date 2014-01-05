@@ -132,6 +132,7 @@ install_DATA += \
 	hint_picview.png \
 	hint_protection.png \
 	hint_radiomode.png \
+	hint_rass.png \
 	hint_reboot.png \
 	hint_recording.png \
 	hint_reload.png \
