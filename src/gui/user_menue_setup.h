@@ -80,6 +80,7 @@ class CUserMenuSetup : public CMenuTarget
 		void setCaller(CMenuForwarder *fw) { forwarder = fw ; }
 		int getUsedItemsCount();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
+		static neutrino_locale_t getLocale(unsigned int i);
 };
 
 

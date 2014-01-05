@@ -131,6 +131,20 @@ static keyvals usermenu_items[] =
 	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show }
 };
 
+static neutrino_locale_t locals[SNeutrinoSettings::ITEM_MAX];
+neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
+{
+	static bool initialized = false;
+	if (!initialized) {
+		initialized = true;
+		for (int i = 0; i < SNeutrinoSettings::ITEM_MAX; i++)
+			locals[i] = NONEXISTANT_LOCALE;
+		for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++) 
+			locals[usermenu_items[i].key] = usermenu_items[i].value;
+	}
+	return locals[key];
+}
+
 int CUserMenuSetup::showSetup()
 {
 	std::map<std::string,int> locmap;
