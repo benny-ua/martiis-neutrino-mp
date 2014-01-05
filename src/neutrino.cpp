@@ -2365,7 +2365,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_PluginList->loadPlugins();
 
 	MoviePluginChanger        = new CMoviePluginChangeExec;
-	AdZapChanger              = new CAdZapMenu;
+	AdZapChanger              = NULL;
 	batchEPGSettings	  = new CBatchEPG_Menu;
 #if HAVE_SPARK_HARDWARE
 	threeDSetup		  = new C3DSetup;
@@ -4404,6 +4404,12 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	else if(actionKey == "hddmenu") {
 		CHDDMenuHandler m;
 		m.exec(NULL, "hotkey");
+		return menu_return::RETURN_EXIT_ALL;
+	}
+	else if(actionKey == "adzap") {
+		if (!AdZapChanger)
+			AdZapChanger = new CAdZapMenu;
+		AdZapChanger->exec(parent, "adzap");
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey == "moviedir") {
