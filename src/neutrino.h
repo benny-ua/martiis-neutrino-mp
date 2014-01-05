@@ -88,6 +88,7 @@ private:
 	int                             network_dhcp;
 	int                             network_automatic_start;
 	CMenuWidget			*mainMenu;
+	CAdZapMenu			*AdZapChanger;
 
 	int				mode;
 	int				lastMode;
@@ -171,7 +172,6 @@ public:
 	CChannelList			*TVchannelList;
 	CChannelList			*RADIOchannelList;
 	CChannelList			*channelList;
-	CAdZapMenu			*AdZapChanger;
 #if HAVE_SPARK_HARDWARE
 	CPSISetup			*chPSISetup;
 	C3DSetup			*threeDSetup;
