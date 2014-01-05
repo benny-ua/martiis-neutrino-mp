@@ -375,14 +375,12 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			break;
 #endif
 		case SNeutrinoSettings::ITEM_CLOCK:
-			{
-				menu_items++;
-				menu_prev = SNeutrinoSettings::ITEM_CLOCK;
-				keyhelper.get(&key,&icon); 
-				neutrino = CNeutrinoApp::getInstance();
-				menu_item = new CMenuForwarder(!g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_ON:LOCALE_CLOCK_SWITCH_OFF, true, NULL, neutrino, "clock_switch", key, icon);
-				menu->addItem(menu_item, false);
-			}
+			menu_items++;
+			menu_prev = SNeutrinoSettings::ITEM_CLOCK;
+			keyhelper.get(&key,&icon); 
+			neutrino = CNeutrinoApp::getInstance();
+			menu_item = new CMenuForwarder(!g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_ON:LOCALE_CLOCK_SWITCH_OFF, true, NULL, neutrino, "clock_switch", key, icon);
+			menu->addItem(menu_item, false);
 			break;
 		case SNeutrinoSettings::ITEM_ADZAP:
 			menu_items++;
@@ -412,7 +410,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_THREE_D_MODE;
 			keyhelper.get(&key,&icon);
-			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, "3dmode", key, icon);
 			menu->addItem(menu_item, 0);
 			break;
@@ -430,7 +427,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_YOUTUBE;
 			keyhelper.get(&key,&icon);
-			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_YTPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "ytplayback", key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_YTPLAY, LOCALE_MENU_HINT_YTPLAY);
 			menu->addItem(menu_item, 0);
@@ -438,7 +434,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		case SNeutrinoSettings::ITEM_NETZKINO:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_NETZKINO;
-			keyhelper.get(&key,&icon);
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuForwarder(LOCALE_MOVIEPLAYER_NKPLAYBACK, true, NULL, CNeutrinoApp::getInstance(), "nkplayback", key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_NKPLAY, LOCALE_MENU_HINT_NKPLAY);
