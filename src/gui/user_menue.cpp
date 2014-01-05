@@ -207,7 +207,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		case SNeutrinoSettings::ITEM_RECORD:
 			if (g_settings.recording_type == RECORDING_OFF)
 				break;
-
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_RECORD;
 			keyhelper.get(&key,&icon,CRCInput::RC_red);
@@ -341,9 +340,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 					cnt++;
 				}
 			}
+			break;
 		}
-		break;
-
 		case SNeutrinoSettings::ITEM_VTXT:
 			menu_items++;
 			menu_prev = SNeutrinoSettings::ITEM_VTXT;
@@ -529,14 +527,14 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	if (games)                       delete games;
 	if (scripts)                     delete scripts;
 	if (menu)                        delete menu;
- 	return true;
+	return true;
 }
 
 const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 {
 	active = false;
-        if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
-                return false;
+	if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
+		return false;
 
 	bool return_title = false;
 	neutrino_locale_t loc = NONEXISTANT_LOCALE;
@@ -544,22 +542,22 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 
 	#define locCheck(L) if(loc != NONEXISTANT_LOCALE) return_title = true; else loc=L;active=true;continue
 
-        for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX && !return_title; pos++) {
-                switch(g_settings.usermenu[button][pos]) {
-                        case SNeutrinoSettings::ITEM_NONE:
-                        case SNeutrinoSettings::ITEM_BAR:
+	for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX && !return_title; pos++) {
+		switch(g_settings.usermenu[button][pos]) {
+			case SNeutrinoSettings::ITEM_NONE:
+			case SNeutrinoSettings::ITEM_BAR:
 				continue;
-                        case SNeutrinoSettings::ITEM_EPG_LIST:
+			case SNeutrinoSettings::ITEM_EPG_LIST:
 				locCheck(LOCALE_EPGMENU_EVENTLIST);
-                        case SNeutrinoSettings::ITEM_EPG_SUPER:
+			case SNeutrinoSettings::ITEM_EPG_SUPER:
 				locCheck(LOCALE_EPGMENU_EPGPLUS);
-                        case SNeutrinoSettings::ITEM_EPG_INFO:
-                                locCheck(LOCALE_EPGMENU_EVENTINFO);
-                        case SNeutrinoSettings::ITEM_EPG_MISC:
+			case SNeutrinoSettings::ITEM_EPG_INFO:
+				locCheck(LOCALE_EPGMENU_EVENTINFO);
+			case SNeutrinoSettings::ITEM_EPG_MISC:
 				return_title = true; active = true; continue;
-                        case SNeutrinoSettings::ITEM_AUDIO_SELECT:
+			case SNeutrinoSettings::ITEM_AUDIO_SELECT:
 				if (g_RemoteControl->current_PIDs.APIDs.size() > 0)
-                        		text = g_RemoteControl->current_PIDs.APIDs[
+					text = g_RemoteControl->current_PIDs.APIDs[
 						g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
 				locCheck(LOCALE_AUDIOSELECTMENUE_HEAD);
 			case SNeutrinoSettings::ITEM_SUBCHANNEL:
@@ -567,53 +565,53 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 					locCheck(g_RemoteControl->are_subchannels ? LOCALE_NVODSELECTOR_SUBSERVICE : LOCALE_NVODSELECTOR_HEAD);
 				}
 				continue;
-                        case SNeutrinoSettings::ITEM_RECORD:
+			case SNeutrinoSettings::ITEM_RECORD:
 				locCheck(LOCALE_FAVORITES_MENUEADD);
-                        case SNeutrinoSettings::ITEM_MOVIEPLAYER_MB:
-                                locCheck(LOCALE_MOVIEBROWSER_HEAD);
-                        case SNeutrinoSettings::ITEM_TIMERLIST:
-                                locCheck(LOCALE_TIMERLIST_NAME);
-                        case SNeutrinoSettings::ITEM_FAVORITS:
+			case SNeutrinoSettings::ITEM_MOVIEPLAYER_MB:
+				locCheck(LOCALE_MOVIEBROWSER_HEAD);
+			case SNeutrinoSettings::ITEM_TIMERLIST:
+				locCheck(LOCALE_TIMERLIST_NAME);
+			case SNeutrinoSettings::ITEM_FAVORITS:
 				locCheck(LOCALE_FAVORITES_MENUEADD);
 			case SNeutrinoSettings::ITEM_VTXT:
 				locCheck(LOCALE_USERMENU_ITEM_VTXT);
-                        case SNeutrinoSettings::ITEM_TECHINFO:
-                                locCheck(LOCALE_EPGMENU_STREAMINFO);
-                        case SNeutrinoSettings::ITEM_REMOTE:
-                                locCheck(LOCALE_RCLOCK_MENUEADD);
-                        case SNeutrinoSettings::ITEM_PLUGIN:
+			case SNeutrinoSettings::ITEM_TECHINFO:
+				locCheck(LOCALE_EPGMENU_STREAMINFO);
+			case SNeutrinoSettings::ITEM_REMOTE:
+				locCheck(LOCALE_RCLOCK_MENUEADD);
+			case SNeutrinoSettings::ITEM_PLUGIN:
 				return_title = true;
 				continue;
-                        case SNeutrinoSettings::ITEM_IMAGEINFO:
-                                locCheck(LOCALE_SERVICEMENU_IMAGEINFO);
-                        case SNeutrinoSettings::ITEM_BOXINFO:
+			case SNeutrinoSettings::ITEM_IMAGEINFO:
+				locCheck(LOCALE_SERVICEMENU_IMAGEINFO);
+			case SNeutrinoSettings::ITEM_BOXINFO:
 				locCheck(LOCALE_EXTRA_DBOXINFO);
-                        case SNeutrinoSettings::ITEM_CAM:
+			case SNeutrinoSettings::ITEM_CAM:
 				locCheck(LOCALE_CI_SETTINGS);
-                        case SNeutrinoSettings::ITEM_CLOCK:
+			case SNeutrinoSettings::ITEM_CLOCK:
 				locCheck(!g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_ON:LOCALE_CLOCK_SWITCH_OFF);
-                        case SNeutrinoSettings::ITEM_GAMES:
+			case SNeutrinoSettings::ITEM_GAMES:
 				locCheck(LOCALE_MAINMENU_GAMES);
-                        case SNeutrinoSettings::ITEM_SCRIPTS:
+			case SNeutrinoSettings::ITEM_SCRIPTS:
 				locCheck(LOCALE_MAINMENU_SCRIPTS);
 			case SNeutrinoSettings::ITEM_ADZAP:
 				locCheck(LOCALE_USERMENU_ITEM_ADZAP);
-                        case SNeutrinoSettings::ITEM_EMU_RESTART:
+			case SNeutrinoSettings::ITEM_EMU_RESTART:
 				locCheck(LOCALE_SERVICEMENU_RESTART_CAM);
-                        case SNeutrinoSettings::ITEM_TUNER_RESTART:
+			case SNeutrinoSettings::ITEM_TUNER_RESTART:
 				locCheck(LOCALE_SERVICEMENU_RESTART_TUNER);
-                        case SNeutrinoSettings::ITEM_THREE_D_MODE:
+			case SNeutrinoSettings::ITEM_THREE_D_MODE:
 				locCheck(LOCALE_THREE_D_SETTINGS);
-                        case SNeutrinoSettings::ITEM_YOUTUBE:
+			case SNeutrinoSettings::ITEM_YOUTUBE:
 				locCheck(LOCALE_MOVIEPLAYER_YTPLAYBACK);
-                        case SNeutrinoSettings::ITEM_NETZKINO:
+			case SNeutrinoSettings::ITEM_NETZKINO:
 				locCheck(LOCALE_MOVIEPLAYER_NKPLAYBACK);
-                        case SNeutrinoSettings::ITEM_FILEPLAY:
+			case SNeutrinoSettings::ITEM_FILEPLAY:
 				locCheck(LOCALE_MOVIEPLAYER_FILEPLAYBACK);
-                        case SNeutrinoSettings::ITEM_HDDMENU:
+			case SNeutrinoSettings::ITEM_HDDMENU:
 				locCheck(LOCALE_HDD_SETTINGS);
-                }
-        }
+		}
+	}
 
 	if (!return_title && (loc != NONEXISTANT_LOCALE)) {
 		if(text)
