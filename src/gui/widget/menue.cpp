@@ -423,6 +423,7 @@ void CMenuWidget::Init(const std::string &Icon, const int mwidth, const mn_widge
 	hint_height	= 0;
 	fbutton_count	= 0;
 	fbutton_labels	= NULL;
+	fbutton_width	= 0;
 	fbutton_height	= 0;
 }
 
@@ -932,9 +933,7 @@ void CMenuWidget::calcSize()
 				maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
 			itemHeightTotal = items.size() * maxItemHeight;
 		}
-		int _footerwidth;
-		paintButtons(fbutton_labels, fbutton_count, 0, 0, 0, 0, 0, false, &_footerwidth, &fbutton_height);
-		width = std::max(width, _footerwidth);
+		width = std::max(width, fbutton_width);
 	}
 
 	if (width > (int)frameBuffer->getScreenWidth())
@@ -1230,6 +1229,11 @@ void CMenuWidget::setFooter(const struct button_label *_fbutton_labels, const in
 {
 	fbutton_count = _fbutton_count;
 	fbutton_labels = _fbutton_labels;
+
+	fbutton_width = 0;
+	fbutton_height = 0;
+	if (fbutton_count)
+		paintButtons(fbutton_labels, fbutton_count, 0, 0, 0, 0, 0, false, &fbutton_width, &fbutton_height);
 	if (repaint)
 		paint();
 }

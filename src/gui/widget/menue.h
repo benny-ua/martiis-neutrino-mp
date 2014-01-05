@@ -475,6 +475,7 @@ class CMenuWidget : public CMenuTarget
 		bool			has_hints; // is any items has hints
 		bool			hint_painted; // is hint painted
 
+		int			fbutton_width;
 		int			fbutton_height;
 		int			fbutton_count;
 		const struct button_label	*fbutton_labels;
