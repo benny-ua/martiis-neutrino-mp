@@ -136,6 +136,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	width = w_max (40, 10);
 
 	CMenuItem* menu_item = NULL;
+	CMenuItem* last_menu_item = NULL;
 	CColorKeyHelper keyhelper;
 	
 	//set default feature key
@@ -395,6 +396,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		if (menu_item) {
 			menu_items++;
 			menu->addItem(menu_item, false);
+			last_menu_item = menu_item;
 		}
 	}
 
@@ -418,8 +420,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	if (menu_items > 1 ) {
 		menu->exec(NULL,"");
 	}
-	else if (menu_item != NULL)
-		menu_item->exec( NULL );
+	else if (last_menu_item != NULL)
+		last_menu_item->exec( NULL );
 	
 	InfoClock->enableInfoClock(true);
 	CNeutrinoApp::getInstance()->StartSubtitles();
