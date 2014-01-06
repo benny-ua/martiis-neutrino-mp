@@ -191,103 +191,9 @@ int CThemes::Show()
 void CThemes::rememberOldTheme(bool remember)
 {
 	if ( remember ) {
-		oldThemeValues[0]  = g_settings.menu_Head_alpha;
-		oldThemeValues[1]  = g_settings.menu_Head_red;
-		oldThemeValues[2]  = g_settings.menu_Head_green;
-		oldThemeValues[3]  = g_settings.menu_Head_blue;
-		oldThemeValues[4]  = g_settings.menu_Head_Text_alpha;
-		oldThemeValues[5]  = g_settings.menu_Head_Text_red;
-		oldThemeValues[6]  = g_settings.menu_Head_Text_green;
-		oldThemeValues[7]  = g_settings.menu_Head_Text_blue;
-		oldThemeValues[8]  = g_settings.menu_Content_alpha;
-		oldThemeValues[9]  = g_settings.menu_Content_red;
-		oldThemeValues[10] = g_settings.menu_Content_green;
-		oldThemeValues[11] = g_settings.menu_Content_blue;
-		oldThemeValues[12] = g_settings.menu_Content_Text_alpha;
-		oldThemeValues[13] = g_settings.menu_Content_Text_red;
-		oldThemeValues[14] = g_settings.menu_Content_Text_green;
-		oldThemeValues[15] = g_settings.menu_Content_Text_blue;
-		oldThemeValues[16] = g_settings.menu_Content_Selected_alpha;
-		oldThemeValues[17] = g_settings.menu_Content_Selected_red;
-		oldThemeValues[18] = g_settings.menu_Content_Selected_green;
-		oldThemeValues[19] = g_settings.menu_Content_Selected_blue;
-		oldThemeValues[20] = g_settings.menu_Content_Selected_Text_alpha;
-		oldThemeValues[21] = g_settings.menu_Content_Selected_Text_red;
-		oldThemeValues[22] = g_settings.menu_Content_Selected_Text_green;
-		oldThemeValues[23] = g_settings.menu_Content_Selected_Text_blue;
-		oldThemeValues[24] = g_settings.menu_Content_inactive_alpha;
-		oldThemeValues[25] = g_settings.menu_Content_inactive_red;
-		oldThemeValues[26] = g_settings.menu_Content_inactive_green;
-		oldThemeValues[27] = g_settings.menu_Content_inactive_blue;
-		oldThemeValues[28] = g_settings.menu_Content_inactive_Text_alpha;
-		oldThemeValues[29] = g_settings.menu_Content_inactive_Text_red;
-		oldThemeValues[30] = g_settings.menu_Content_inactive_Text_green;
-		oldThemeValues[31] = g_settings.menu_Content_inactive_Text_blue;
-		oldThemeValues[32] = g_settings.infobar_alpha;
-		oldThemeValues[33] = g_settings.infobar_red;
-		oldThemeValues[34] = g_settings.infobar_green;
-		oldThemeValues[35] = g_settings.infobar_blue;
-		oldThemeValues[36] = g_settings.infobar_Text_alpha;
-		oldThemeValues[37] = g_settings.infobar_Text_red;
-		oldThemeValues[38] = g_settings.infobar_Text_green;
-		oldThemeValues[39] = g_settings.infobar_Text_blue;
-		oldThemeValues[40] = g_settings.colored_events_alpha;
-		oldThemeValues[41] = g_settings.colored_events_red;
-		oldThemeValues[42] = g_settings.colored_events_green;
-		oldThemeValues[43] = g_settings.colored_events_blue;
-		oldThemeValues[44] = g_settings.clock_Digit_alpha;
-		oldThemeValues[45] = g_settings.clock_Digit_red;
-		oldThemeValues[46] = g_settings.clock_Digit_green;
-		oldThemeValues[47] = g_settings.clock_Digit_blue;
+		memcpy(&oldTheme, &g_settings.theme, sizeof(SNeutrinoTheme));
 	} else {
-		g_settings.menu_Head_alpha 			= oldThemeValues[0];
-		g_settings.menu_Head_red 			= oldThemeValues[1];
-		g_settings.menu_Head_green 			= oldThemeValues[2];
-		g_settings.menu_Head_blue 			= oldThemeValues[3];
-		g_settings.menu_Head_Text_alpha 		= oldThemeValues[4];
-		g_settings.menu_Head_Text_red 			= oldThemeValues[5];
-		g_settings.menu_Head_Text_green 		= oldThemeValues[6];
-		g_settings.menu_Head_Text_blue 			= oldThemeValues[7];
-		g_settings.menu_Content_alpha 			= oldThemeValues[8];
-		g_settings.menu_Content_red 			= oldThemeValues[9];
-		g_settings.menu_Content_green 			= oldThemeValues[10];
-		g_settings.menu_Content_blue 			= oldThemeValues[11];
-		g_settings.menu_Content_Text_alpha 		= oldThemeValues[12];
-		g_settings.menu_Content_Text_red 		= oldThemeValues[13];
-		g_settings.menu_Content_Text_green 		= oldThemeValues[14];
-		g_settings.menu_Content_Text_blue 		= oldThemeValues[15];
-		g_settings.menu_Content_Selected_alpha 		= oldThemeValues[16];
-		g_settings.menu_Content_Selected_red 		= oldThemeValues[17];
-		g_settings.menu_Content_Selected_green 		= oldThemeValues[18];
-		g_settings.menu_Content_Selected_blue 		= oldThemeValues[19];
-		g_settings.menu_Content_Selected_Text_alpha 	= oldThemeValues[20];
-		g_settings.menu_Content_Selected_Text_red 	= oldThemeValues[21];
-		g_settings.menu_Content_Selected_Text_green 	= oldThemeValues[22];
-		g_settings.menu_Content_Selected_Text_blue 	= oldThemeValues[23];
-		g_settings.menu_Content_inactive_alpha 		= oldThemeValues[24];
-		g_settings.menu_Content_inactive_red 		= oldThemeValues[25];
-		g_settings.menu_Content_inactive_green 		= oldThemeValues[26];
-		g_settings.menu_Content_inactive_blue		= oldThemeValues[27];
-		g_settings.menu_Content_inactive_Text_alpha 	= oldThemeValues[28];
-		g_settings.menu_Content_inactive_Text_red 	= oldThemeValues[29];
-		g_settings.menu_Content_inactive_Text_green 	= oldThemeValues[30];
-		g_settings.menu_Content_inactive_Text_blue 	= oldThemeValues[31];
-		g_settings.infobar_alpha 			= oldThemeValues[32];
-		g_settings.infobar_red 				= oldThemeValues[33];
-		g_settings.infobar_green 			= oldThemeValues[34];
-		g_settings.infobar_blue 			= oldThemeValues[35];
-		g_settings.infobar_Text_alpha 			= oldThemeValues[36];
-		g_settings.infobar_Text_red 			= oldThemeValues[37];
-		g_settings.infobar_Text_green 			= oldThemeValues[38];
-		g_settings.infobar_Text_blue 			= oldThemeValues[39];
-		g_settings.colored_events_alpha			= oldThemeValues[40];
-		g_settings.colored_events_red 			= oldThemeValues[41];
-		g_settings.colored_events_green 		= oldThemeValues[42];
-		g_settings.colored_events_blue 			= oldThemeValues[43];
-		g_settings.clock_Digit_alpha 			= oldThemeValues[44];
-		g_settings.clock_Digit_red 			= oldThemeValues[45];
-		g_settings.clock_Digit_green 			= oldThemeValues[46];
-		g_settings.clock_Digit_blue 			= oldThemeValues[47];
+		memcpy(&g_settings.theme, &oldTheme, sizeof(SNeutrinoTheme));
 
 		notifier = new CColorSetupNotifier;
 		notifier->changeNotify(NONEXISTANT_LOCALE, NULL);
@@ -324,63 +230,65 @@ void CThemes::saveFile(char * themename)
 // setup default Colors
 void CThemes::setupDefaultColors()
 {
-	g_settings.menu_Head_alpha = 0x00;
-	g_settings.menu_Head_red   = 0x00;
-	g_settings.menu_Head_green = 0x0A;
-	g_settings.menu_Head_blue  = 0x19;
+	SNeutrinoTheme &t = g_settings.theme;
 
-	g_settings.menu_Head_Text_alpha = 0x00;
-	g_settings.menu_Head_Text_red   = 0x5f;
-	g_settings.menu_Head_Text_green = 0x46;
-	g_settings.menu_Head_Text_blue  = 0x00;
+	t.menu_Head_alpha = 0x00;
+	t.menu_Head_red   = 0x00;
+	t.menu_Head_green = 0x0A;
+	t.menu_Head_blue  = 0x19;
 
-	g_settings.menu_Content_alpha = 0x14;
-	g_settings.menu_Content_red   = 0x00;
-	g_settings.menu_Content_green = 0x0f;
-	g_settings.menu_Content_blue  = 0x23;
+	t.menu_Head_Text_alpha = 0x00;
+	t.menu_Head_Text_red   = 0x5f;
+	t.menu_Head_Text_green = 0x46;
+	t.menu_Head_Text_blue  = 0x00;
 
-	g_settings.menu_Content_Text_alpha = 0x00;
-	g_settings.menu_Content_Text_red   = 0x64;
-	g_settings.menu_Content_Text_green = 0x64;
-	g_settings.menu_Content_Text_blue  = 0x64;
+	t.menu_Content_alpha = 0x14;
+	t.menu_Content_red   = 0x00;
+	t.menu_Content_green = 0x0f;
+	t.menu_Content_blue  = 0x23;
 
-	g_settings.menu_Content_Selected_alpha = 0x14;
-	g_settings.menu_Content_Selected_red   = 0x19;
-	g_settings.menu_Content_Selected_green = 0x37;
-	g_settings.menu_Content_Selected_blue  = 0x64;
+	t.menu_Content_Text_alpha = 0x00;
+	t.menu_Content_Text_red   = 0x64;
+	t.menu_Content_Text_green = 0x64;
+	t.menu_Content_Text_blue  = 0x64;
 
-	g_settings.menu_Content_Selected_Text_alpha  = 0x00;
-	g_settings.menu_Content_Selected_Text_red    = 0x00;
-	g_settings.menu_Content_Selected_Text_green  = 0x00;
-	g_settings.menu_Content_Selected_Text_blue   = 0x00;
+	t.menu_Content_Selected_alpha = 0x14;
+	t.menu_Content_Selected_red   = 0x19;
+	t.menu_Content_Selected_green = 0x37;
+	t.menu_Content_Selected_blue  = 0x64;
 
-	g_settings.menu_Content_inactive_alpha = 0x14;
-	g_settings.menu_Content_inactive_red   = 0x00;
-	g_settings.menu_Content_inactive_green = 0x0f;
-	g_settings.menu_Content_inactive_blue  = 0x23;
+	t.menu_Content_Selected_Text_alpha  = 0x00;
+	t.menu_Content_Selected_Text_red    = 0x00;
+	t.menu_Content_Selected_Text_green  = 0x00;
+	t.menu_Content_Selected_Text_blue   = 0x00;
 
-	g_settings.menu_Content_inactive_Text_alpha  = 0x00;
-	g_settings.menu_Content_inactive_Text_red    = 55;
-	g_settings.menu_Content_inactive_Text_green  = 70;
-	g_settings.menu_Content_inactive_Text_blue   = 85;
+	t.menu_Content_inactive_alpha = 0x14;
+	t.menu_Content_inactive_red   = 0x00;
+	t.menu_Content_inactive_green = 0x0f;
+	t.menu_Content_inactive_blue  = 0x23;
 
-	g_settings.infobar_alpha = 0x14;
-	g_settings.infobar_red   = 0x00;
-	g_settings.infobar_green = 0x0e;
-	g_settings.infobar_blue  = 0x23;
+	t.menu_Content_inactive_Text_alpha  = 0x00;
+	t.menu_Content_inactive_Text_red    = 55;
+	t.menu_Content_inactive_Text_green  = 70;
+	t.menu_Content_inactive_Text_blue   = 85;
 
-	g_settings.infobar_Text_alpha = 0x00;
-	g_settings.infobar_Text_red   = 0x64;
-	g_settings.infobar_Text_green = 0x64;
-	g_settings.infobar_Text_blue  = 0x64;
+	t.infobar_alpha = 0x14;
+	t.infobar_red   = 0x00;
+	t.infobar_green = 0x0e;
+	t.infobar_blue  = 0x23;
 
-	g_settings.colored_events_alpha = 0x00;
-	g_settings.colored_events_red = 95;
-	g_settings.colored_events_green = 70;
-	g_settings.colored_events_blue = 0;
+	t.infobar_Text_alpha = 0x00;
+	t.infobar_Text_red   = 0x64;
+	t.infobar_Text_green = 0x64;
+	t.infobar_Text_blue  = 0x64;
 
-	g_settings.clock_Digit_alpha = 0x00;
-	g_settings.clock_Digit_red   = 0x64;
-	g_settings.clock_Digit_green = 0x64;
-	g_settings.clock_Digit_blue  = 0x64;
+	t.colored_events_alpha = 0x00;
+	t.colored_events_red = 95;
+	t.colored_events_green = 70;
+	t.colored_events_blue = 0;
+
+	t.clock_Digit_alpha = 0x00;
+	t.clock_Digit_red   = 0x64;
+	t.clock_Digit_green = 0x64;
+	t.clock_Digit_blue  = 0x64;
 }

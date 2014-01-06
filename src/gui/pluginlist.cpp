@@ -138,7 +138,7 @@ int CPluginList::exec(CMenuTarget* parent, const std::string & /*actionKey*/)
 		}
 	}
 
-	COSDFader fader(g_settings.menu_Content_alpha);
+	COSDFader fader(g_settings.theme.menu_Content_alpha);
 	fader.StartFadeIn();
 
 	paint();
