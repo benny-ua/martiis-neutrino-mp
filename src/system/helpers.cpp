@@ -359,14 +359,9 @@ std::string getFileExt(std::string &file)
 	return _getBaseName(file, ".");
 }
 
-
 std::string getNowTimeStr(const char* format)
 {
-	char tmpStr[256];
-	struct timeval tv;
-	gettimeofday(&tv, NULL);        
-	strftime(tmpStr, sizeof(tmpStr), format, localtime(&tv.tv_sec));
-	return (std::string)tmpStr;
+	return strftime(format, time(NULL));
 }
 
 std::string trim(std::string &str, const std::string &trimChars /*= " \n\r\t"*/)
@@ -381,6 +376,12 @@ std::string strftime(const char *format, const struct tm *tm)
 	*buf = 0;
 	strftime(buf, sizeof(buf), format, tm);
 	return std::string(buf);
+}
+
+std::string strftime(const char *format, time_t when, bool gm)
+{
+	struct tm *t = gm ? gmtime(&when) : localtime(&when);
+	return strftime(format, t);
 }
 
 time_t toEpoch(std::string &date)

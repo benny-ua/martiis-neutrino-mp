@@ -334,12 +334,12 @@ void CDBoxInfoWidget::paint()
 	int data_last = sysload->data_last;
 
 	time_t now = time(NULL);
-	std::string str_now = strftime("Time: %FT%H:%M:%S%z", localtime(&now));
+	std::string str_now = strftime("Time: %FT%H:%M:%S%z", now);
 
 	struct sysinfo info;
 	sysinfo(&info);
 	now -= info.uptime;
-	std::string str_boot = strftime("Boot: %FT%H:%M:%S%z", localtime(&now));
+	std::string str_boot = strftime("Boot: %FT%H:%M:%S%z", now);
 
 	int time_width = std::max(g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(str_now), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(str_boot));
 

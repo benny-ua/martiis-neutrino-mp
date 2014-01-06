@@ -732,12 +732,10 @@ void CTimerList::paintItem(int pos)
 	if (liststart+pos<timerlist.size())
 	{
 		CTimerd::responseGetTimer & timer = timerlist[liststart+pos];
-		char zAlarmTime[25] = {0};
 		struct tm *alarmTime = localtime(&(timer.alarmTime));
-		strftime(zAlarmTime,20,"%d.%m. %H:%M",alarmTime);
-		char zStopTime[25] = {0};
+		std::string zAlarmTime = strftime("%d.%m. %H:%M",alarmTime);
 		struct tm *stopTime = localtime(&(timer.stopTime));
-		strftime(zStopTime,20,"%d.%m. %H:%M",stopTime);
+		std::string zStopTime = strftime("%d.%m. %H:%M",stopTime);
 		int fw = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getWidth();
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(x+10,ypos+fheight, fw*12, zAlarmTime, color, fheight, true); // UTF-8
 		if (timer.stopTime != 0)
@@ -1314,20 +1312,13 @@ bool askUserOnTimerConflict(time_t announceTime, time_t stopTime, t_channel_id c
 					timerbuf += it->epgTitle;
 				}
 			}
-			timerbuf += ")";
+			timerbuf += "):\n";
 
-			timerbuf += ":\n";
-			char at[25] = {0};
 			struct tm *annTime = localtime(&(it->announceTime));
-			strftime(at,20,"%d.%m. %H:%M",annTime);
-			timerbuf += at;
-			timerbuf += " - ";
+			timerbuf += strftime("%d.%m. %H:%M\n",annTime);
 
-			char st[25] = {0};
 			struct tm *sTime = localtime(&(it->stopTime));
-			strftime(st,20,"%d.%m. %H:%M",sTime);
-			timerbuf += st;
-			timerbuf += "\n";
+			timerbuf += strftime("%d.%m. %H:%M\n",sTime);
 			//printf("%d\t%d\t%d\n",it->announceTime,it->alarmTime,it->stopTime);
 		}
 		//printf("message:\n%s\n",timerbuf.c_str());
