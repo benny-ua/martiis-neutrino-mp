@@ -233,6 +233,10 @@ public:
 	void stopDaemonsForFlash();
 	int showChannelList(const neutrino_msg_t msg, bool from_menu = false);
 	CPersonalizeGui & getPersonalizeGui() { return personalize; }
+
+	void setTheme(CConfigFile &themefile);
+	void getTheme(CConfigFile &themefile);
+
 };
 #endif
 
