@@ -72,7 +72,7 @@ class CBuildInfo :  public CMenuTarget, public CComponentsWindow
 		};
 
 		CBuildInfo();
-		~CBuildInfo();
+
 		///assigns text Font type
 		void setFontType(Font* font_text);
 		build_info_t getInfo(const info_type_id_t& type_id);
