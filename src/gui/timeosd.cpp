@@ -83,7 +83,7 @@ CTimeOSD::~CTimeOSD()
 void CTimeOSD::initTimeString()
 {
 	struct tm t;
-	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format_str.c_str(), gmtime_r(&m_time_show, &t));
+	strftime((char*) &cl_timestr, sizeof(cl_timestr), cl_format_str, gmtime_r(&m_time_show, &t));
 }
 
 void CTimeOSD::show(time_t time_show, bool force)
