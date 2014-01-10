@@ -31,7 +31,7 @@
 #include <stdio.h>    /* printf       */
 #include <sys/time.h> /* gettimeofday */
 #include <driver/framebuffer.h>
-#include <pthread.h>
+#include <OpenThreads/Mutex>
 #include <map>
 
 class CPictureViewer
@@ -134,14 +134,13 @@ class CPictureViewer
 	int m_endy;
 
 	std::string logo_hdd_dir;
-	std::string logo_hdd_dir_2;
 	struct logo_data {
 		std::string name;
 		int width;
 		int height;
 	};
 	std::map<uint64_t, logo_data> logo_map;
-	pthread_mutex_t logo_map_mutex;
+	OpenThreads::Mutex logo_map_mutex;
 #if HAVE_SPARK_HARDWARE
 	unsigned char *bpamem;
 	size_t bpasize;
