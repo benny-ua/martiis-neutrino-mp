@@ -1180,6 +1180,7 @@ menu.hint_record_zap_pre_time Stellen Sie eine Vorlaufzeit in Minuten für den U
 menu.hint_recording Aufnahme-, Timeshift- und Timer-Optionen, Einstellung von aufzunehmenden Tonspuren
 menu.hint_reload_channels Kanallisten neu laden, um Änderungen wirksam zu machen
 menu.hint_reload_plugins Plugins neu laden, um Änderungen wirksam zu machen
+menu.hint_rename_picons Gibt Sender-Logos bei Verwendung den Namen des Kanals, so dass keine Abhängigkeit von den Empfangsparametern mehr besteht.
 menu.hint_reset Zurücksetzen von Neutrino-Einstellungen auf Standardwerte. Tuner-Einstellungen und Kanäle bleiben erhalten
 menu.hint_restart_cam Starten Sie Ihr Conditional Access Module neu
 menu.hint_restart_tuner Führen Sie einen Neustart des internen Tuners durch. Das kann Empfangsprobleme beheben.
@@ -1413,6 +1414,7 @@ miscsettings.progressbar_infobar_position_1 unterhalb Kanalname
 miscsettings.progressbar_infobar_position_2 unterhalb Kanalname (schmal)
 miscsettings.progressbar_infobar_position_3 zwischen EPG-Events (schmal)
 miscsettings.radiotext Radiotext
+miscsettings.rename_picons Logos in Kanalnamen umbenennen
 miscsettings.restart Die Änderung wird bei Neustart aktiv.
 miscsettings.shutdown_count Komplett ausschalten nach
 miscsettings.shutdown_count_hint1 Zeit (in Minuten), nach der vom Standby in

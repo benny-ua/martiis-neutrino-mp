@@ -13,6 +13,8 @@
 
 #include <cs_api.h>
 
+#include <algorithm>
+
 #ifdef FBV_SUPPORT_GIF
 extern int fh_gif_getsize (const char *, int *, int *, int, int);
 extern int fh_gif_load (const char *, unsigned char **, int *, int *);
@@ -541,12 +543,6 @@ CPictureViewer::CPictureViewer ()
 	pic_cache_maxsize = 0x100000; // 1 MB default
 
 	logo_hdd_dir = string(g_settings.logo_hdd_dir);
-	logo_hdd_dir_2 = string(g_settings.logo_hdd_dir_2);
-
-	pthread_mutexattr_t attr;
-	pthread_mutexattr_init(&attr);
-	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
-	pthread_mutex_init(&logo_map_mutex, &attr);
 
 	init_handlers ();
 }
@@ -662,39 +658,39 @@ void CPictureViewer::getSize(const char* name, int* width, int *height)
 
 #define LOGO_FLASH_DIR DATADIR "/neutrino/icons/logo"
 
-bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& ChannelName, std::string & name, int *width, int *height)
+bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& _ChannelName, std::string & name, int *width, int *height)
 {
-	char strChanId[16];
+	if (g_settings.logo_hdd_dir.empty())
+		return false;
 
-	name = "";
+	std::string ChannelName = _ChannelName;
+	std::replace(ChannelName.begin(), ChannelName.end(), '/', '-');
 
-	pthread_mutex_lock(&logo_map_mutex);
+	if(width)
+		*width = 0;
+	if(height)
+		*height = 0;
 
-	if ((logo_hdd_dir != g_settings.logo_hdd_dir) ||
-	    (logo_hdd_dir_2 != g_settings.logo_hdd_dir_2)) {
+ 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(logo_map_mutex);
+
+	if (logo_hdd_dir != g_settings.logo_hdd_dir) {
 		logo_map.clear();
 		logo_hdd_dir = g_settings.logo_hdd_dir;
-		logo_hdd_dir_2 = g_settings.logo_hdd_dir_2;
 	}
 
 	std::map<uint64_t, logo_data>::iterator it;
 	it = logo_map.find(channel_id);
 	if (it != logo_map.end()) {
-		if (it->second.name == "") {
-			pthread_mutex_unlock(&logo_map_mutex);
-			return false;
-		} else {
-			name = it->second.name;
-			if (width)
-				*width = it->second.width;
-			if (height)
-				*height = it->second.height;
-			pthread_mutex_unlock(&logo_map_mutex);
-			return true;
-		}
+		name = it->second.name;
+		if (width)
+			*width = it->second.width;
+		if (height)
+			*height = it->second.height;
+		return !name.empty();
 	}
 
-	sprintf(strChanId, "%llx", channel_id & 0xFFFFFFFFFFFFULL);
+	char strChanId[17];
+	snprintf(strChanId, sizeof(strChanId), "%llx", channel_id & 0xFFFFFFFFFFFFULL);
 
 	std::string strLogoE2[2] = { "", "" };
 	CZapitChannel * cc = NULL;
@@ -717,45 +713,48 @@ bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& 
 			(u_int) cc->getSatellitePosition());
 		strLogoE2[1] = std::string(fname);
 	}
-	/* first the channel-id, then the channelname */
-	std::string strLogoName[2] = { (std::string)strChanId, ChannelName };
+	/* first the channelname, then the channel-id */
+	std::string strLogoName[2] = { ChannelName, (std::string)strChanId };
 	/* first png, then jpg, then gif */
 	std::string strLogoExt[3] = { ".png", ".jpg" , ".gif" };
-	std::string dirs[2] = { g_settings.logo_hdd_dir, g_settings.logo_hdd_dir_2 };
 
-	std::string tmp;
+	bool do_rename = false;
 
-	for (int k = 0; k < 2; k++) {
-		if (dirs[k].length() < 1)
-			continue;
-		for (int i = 0; i < 2; i++)
-			for (int j = 0; j < 3; j++) {
-				tmp = dirs[k] + "/" + strLogoName[i] + strLogoExt[j];
-				if (!access(tmp, R_OK))
-					goto found;
-			}
-		if (!cc)
-			continue;
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 3; j++) {
+			name = g_settings.logo_hdd_dir + "/" + strLogoName[i] + strLogoExt[j];
+			if (!access(name, R_OK))
+				goto found;
+			do_rename = true;
+		}
+	if (cc)
 		for (int i = 0; i < 2; i++) {
-			tmp = dirs[k] + "/" + strLogoE2[i];
-			if (!access(tmp, R_OK))
+			name = g_settings.logo_hdd_dir + "/" + strLogoE2[i];
+			if (!access(name, R_OK))
 				goto found;
 		}
-	}
+
 	logo_map[channel_id].name = "";
-	pthread_mutex_unlock(&logo_map_mutex);
+	logo_map[channel_id].width = 0;
+	logo_map[channel_id].height = 0;
 	return false;
 
 found:
+	if (do_rename && g_settings.logo_rename_to_channelname && !ChannelName.empty()) {
+		int dot = name.find_last_of(".");
+		std::string new_name = g_settings.logo_hdd_dir + "/" + ChannelName + name.substr(dot);
+		if (!rename(name.c_str(), new_name.c_str()))
+			name = new_name;
+	}
 	int w, h;
-	getSize(tmp.c_str(), &w, &h);
-	if(width && height)
-		*width = w, *height = h;
-	name = tmp;
+	getSize(name.c_str(), &w, &h);
+	if(width)
+		*width = w;
+	if(height)
+		*height = h;
 	logo_map[channel_id].name = name;
 	logo_map[channel_id].width = w;
 	logo_map[channel_id].height = h;
-	pthread_mutex_unlock(&logo_map_mutex);
 	return true;
 }
 #if 0

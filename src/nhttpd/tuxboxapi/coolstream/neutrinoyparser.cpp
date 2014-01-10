@@ -362,8 +362,6 @@ std::string CNeutrinoYParser::func_get_bouquets_with_epg(CyhookHandler *hh, std:
 	if (hh->WebserverConfigList["Tuxbox.DisplayLogos"] == "true") {
 		DIR *d;
 		d = opendir(g_settings.logo_hdd_dir.c_str());
-		if (!d)
-			d = opendir(g_settings.logo_hdd_dir_2.c_str());
 		if (d) {
 			closedir(d);
 			have_logos = true;

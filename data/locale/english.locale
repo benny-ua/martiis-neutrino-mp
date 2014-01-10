@@ -1180,6 +1180,7 @@ menu.hint_record_zap_pre_time For ZapTo timers, switch channel\nbefore event sta
 menu.hint_recording Recording and timeshift options\nTimers safety, audio pids options
 menu.hint_reload_channels Reload channels from flash
 menu.hint_reload_plugins Reload plugins from flash
+menu.hint_rename_picons Auto-rename channel logos to the portable channel name format.
 menu.hint_reset Reset Neutrino GUI settings to defaults\nTuner config and channels not affected
 menu.hint_restart_cam Restart the Conditional Access Module
 menu.hint_restart_tuner Restart the internal tuner. This may help if you're experiencing reception problems
@@ -1413,6 +1414,7 @@ miscsettings.progressbar_infobar_position_1 below channel name
 miscsettings.progressbar_infobar_position_2 small below channel name
 miscsettings.progressbar_infobar_position_3 narrow between EPG-Events
 miscsettings.radiotext Radiotext
+miscsettings.rename_picons Rename Picons to channel names
 miscsettings.restart The change will be active after restart.
 miscsettings.shutdown_count In standby, switch off after
 miscsettings.shutdown_count_hint1 time (in minutes) to switch from standby

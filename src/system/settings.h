@@ -452,7 +452,7 @@ struct SNeutrinoSettings
 	std::string plugin_hdd_dir;
 	
 	std::string logo_hdd_dir;
-	std::string logo_hdd_dir_2;
+	int logo_rename_to_channelname;
 
 	std::string plugins_disabled;
 	std::string plugins_game;

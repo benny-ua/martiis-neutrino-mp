@@ -325,11 +325,6 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		chooserDir(g_settings.logo_hdd_dir, false, action_str);
 		return res;
 	}
-	else if(actionKey=="logo_dir_2") {
-		const char *action_str = "logo_2";
-		chooserDir(g_settings.logo_hdd_dir_2, false, action_str);
-		return menu_return::RETURN_REPAINT;
-	}
 	else if(actionKey=="screenshot_dir") {
 		const char *action_str = "screenshot";
 		chooserDir(g_settings.screenshot_dir, true, action_str);
@@ -1055,6 +1050,11 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_MISCSETTINGS_INFOBAR_LOGO_HDD_DIR, true, g_settings.logo_hdd_dir, this, "logo_dir");
 	mf->setHint("", LOCALE_MENU_HINT_INFOBAR_LOGO_DIR);
 	menu_infobar->addItem(mf);
+
+	// rename logos to channelname
+	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_RENAME_PICONS, &g_settings.logo_rename_to_channelname, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_RENAME_PICONS);
+	menu_infobar->addItem(mc);
 
 	// satellite
 	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_INFOBAR_SAT_DISPLAY, &g_settings.infobar_sat_display, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
