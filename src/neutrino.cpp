@@ -394,9 +394,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.audio_mixer_volume_analog = configfile.getInt32("audio_mixer_volume_analog", 50);
 	g_settings.audio_mixer_volume_hdmi = configfile.getInt32("audio_mixer_volume_hdmi", 75);
 	g_settings.audio_mixer_volume_spdif = configfile.getInt32("audio_mixer_volume_spdif", 75);
+#endif
 	g_settings.audio_volume_percent_ac3 = configfile.getInt32("audio_volume_percent_ac3", 100);
 	g_settings.audio_volume_percent_pcm = configfile.getInt32("audio_volume_percent_pcm", 100);
-#endif
 #if ENABLE_SHAIRPLAY
 	g_settings.shairplay_enabled = configfile.getInt32("shairplay_enabled", 0);
 	shairplay_enabled_cur = g_settings.shairplay_enabled;
@@ -1018,9 +1018,9 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("audio_mixer_volume_analog", g_settings.audio_mixer_volume_analog);
 	configfile.setInt32("audio_mixer_volume_hdmi", g_settings.audio_mixer_volume_hdmi);
 	configfile.setInt32("audio_mixer_volume_spdif", g_settings.audio_mixer_volume_spdif);
+#endif
 	configfile.setInt32("audio_volume_percent_ac3", g_settings.audio_volume_percent_ac3);
 	configfile.setInt32("audio_volume_percent_pcm", g_settings.audio_volume_percent_pcm);
-#endif
 #if ENABLE_SHAIRPLAY
 	configfile.setInt32("shairplay_enabled", g_settings.shairplay_enabled);
 	configfile.setInt32("shairplay_port", g_settings.shairplay_port);
