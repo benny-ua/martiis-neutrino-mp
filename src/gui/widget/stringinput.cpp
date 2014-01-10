@@ -228,11 +228,9 @@ void CStringInput::keyYellowPressed()
 {
 	if(lower_bound == -1 || upper_bound == -1){
 		selected=0;
+		valueString->assign(valueString->length(), ' ');
 		for(int i=0 ; i < size ; i++)
-		{
-			valueString->at(i)=' ';
 			paintChar(i);
-		}
 	}
 }
 
