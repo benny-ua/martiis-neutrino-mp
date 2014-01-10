@@ -176,12 +176,6 @@ int CVfdSetup::showSetup()
 	mc = new CMenuOptionChooser(LOCALE_LEDCONTROLLER_MODE_PLAYBACK, &g_settings.led_mode[SNeutrinoSettings::LED_MODE_PLAYBACK], LEDMENU_OPTIONS, LEDMENU_OPTION_COUNT, true, this);
 	//mc->setHint("", LOCALE_MENU_HINT_LEDS_PLAYBACK);
 	vfds->addItem(mc);
-#ifdef ENABLE_GRAPHLCD
-	vfds->addItem(GenericMenuSeparatorLine);
-	GLCD_Menu glcdMenu;
-	vfds->addItem(new CMenuForwarder(LOCALE_GLCD_HEAD, true, NULL,
-		&glcdMenu, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
-#endif
 #else
 	//vfd brightness menu
 	CMenuWidget lcd_sliders(LOCALE_LCDMENU_HEAD, NEUTRINO_ICON_LCD,width, MN_WIDGET_ID_VFDSETUP_LCD_SLIDERS);
@@ -217,6 +211,12 @@ int CVfdSetup::showSetup()
 	lcd_clock_channelname_menu->setHint("", LOCALE_MENU_HINT_VFD_INFOLINE);
 	vfds->addItem(oj);
 	vfds->addItem(lcd_clock_channelname_menu);
+#endif
+#ifdef ENABLE_GRAPHLCD
+	vfds->addItem(GenericMenuSeparatorLine);
+	GLCD_Menu glcdMenu;
+	vfds->addItem(new CMenuForwarder(LOCALE_GLCD_HEAD, true, NULL,
+		&glcdMenu, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE));
 #endif
 
 	int res = vfds->exec(NULL, "");
