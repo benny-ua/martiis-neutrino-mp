@@ -99,10 +99,8 @@ bool insert_modules(const CFSMounter::FSType fstype)
 		return ((system("insmod sunrpc") == 0) && (system("insmod lockd") == 0) && (system("insmod nfs") == 0));
 #endif
 	}
-	else if (fstype == CFSMounter::CIFS)
+	if (fstype == CFSMounter::CIFS)
 		return (system("insmod cifs") == 0);
-	else if (fstype == CFSMounter::LUFS)
-		return (system("insmod lufs") == 0);
 	return false;
 }
 
@@ -114,9 +112,9 @@ bool remove_modules(const CFSMounter::FSType fstype)
 	{
 		return ((system("rmmod nfs") == 0) && (system("rmmod lockd") == 0) && (system("rmmod sunrpc") == 0));
 	}
-	else if (fstype == CFSMounter::CIFS)
+	if (fstype == CFSMounter::CIFS)
 		return (system("rmmod cifs") == 0);
-	else if (fstype == CFSMounter::LUFS)
+	if (fstype == CFSMounter::LUFS)
 		return (system("rmmod lufs") == 0);
 	return false;
 }
@@ -231,11 +229,13 @@ CFSMounter::MountRes CFSMounter::mount(const std::string &ip, const std::string 
 			options1 = "ro";
 			options2 = "";
 		}
+#if 0
 		else if(fstype == LUFS)
 		{
 			options1 = "";
 			options2 = "";
 		}
+#endif
 	}
 	
 	if(fstype == NFS)
@@ -269,23 +269,8 @@ CFSMounter::MountRes CFSMounter::mount(const std::string &ip, const std::string 
 		//cmd += ',';
 		//cmd += options1;
 	}
-	else
-	{
-		cmd = "lufsd none ";
-		cmd += local_dir;
-		cmd += " -o fs=ftpfs,username=";
-		cmd += username;
-		cmd += ",password=";
-		cmd += password;
-		cmd += ",host=";
-		cmd += ip;
-		cmd += ",root=/";
-		cmd += dir;
-		cmd += ',';
-		cmd += options1;
-	}
-	
-	if (options2[0] !='\0')
+
+	if (!options2.empty())
 	{
 		cmd += ',';
 		cmd += options2;
@@ -396,9 +381,7 @@ void CFSMounter::getMountedFS(MountInfos& info)
 		MountInfo mi;
 		in >> mi.device >> mi.mountPoint >> mi.type;
 		in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		if (mi.type == "nfs" ||
-		    mi.type == "cifs" ||
-		    mi.type == "lufs")
+		if (mi.type == "nfs" || mi.type == "cifs")
 		{
 			info.push_back(mi);
 			printf("[CFSMounter] mounted fs: dev: %s, mp: %s, type: %s\n",
