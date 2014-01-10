@@ -217,11 +217,7 @@ public:
 	void MarkChannelListChanged(void) { g_channel_list_changed = true; };
 	void quickZap(int msg);
 	void numericZap(int msg);
-#ifdef ENABLE_GRAPHLCD
-	void StopSubtitles(bool b = true);
-#else
-	void StopSubtitles();
-#endif
+	void StopSubtitles(bool enable_glcd_mirroring = true);
 	void StartSubtitles(bool show = true);
 	bool StartPip(const t_channel_id channel_id);
 	void SelectSubtitles();

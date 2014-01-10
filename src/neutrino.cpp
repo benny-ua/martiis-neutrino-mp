@@ -681,8 +681,8 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.plugins_lua = configfile.getString( "plugins_lua", "" );
 
 	g_settings.logo_hdd_dir = configfile.getString( "logo_hdd_dir", "/var/share/icons/logo" );
+	g_settings.logo_rename_to_channelname = configfile.getInt32("logo_rename_to_channelname", false);
 
-	g_settings.logo_hdd_dir_2 = configfile.getString( "logo_hdd_dir_2", "/share/tuxbox/neutrino/icons/logo");
 	g_settings.streaming_server_url = configfile.getString("streaming_server_url", "");
 
 	int webtv_count = configfile.getInt32("webtv_xml_count", 0);
@@ -1243,7 +1243,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setString ( "plugins_lua", g_settings.plugins_lua );
 
 	configfile.setString ( "logo_hdd_dir", g_settings.logo_hdd_dir );
-	configfile.setString ( "logo_hdd_dir_2", g_settings.logo_hdd_dir_2 );
+	configfile.setInt32 ( "logo_rename_to_channelname", g_settings.logo_rename_to_channelname);
 
 	configfile.setString ( "streaming_server_url", g_settings.streaming_server_url);
 	int webtv_count = 0;
@@ -2338,11 +2338,7 @@ void CNeutrinoApp::quickZap(int msg)
 {
 	int res;
 
-#ifdef ENABLE_GRAPHLCD
 	StopSubtitles(false);
-#else
-	StopSubtitles();
-#endif
 	printf("CNeutrinoApp::quickZap haveFreeFrontend %d\n", CFEManager::getInstance()->haveFreeFrontend());
 #if 0
 	if(!CFEManager::getInstance()->haveFreeFrontend())
@@ -2372,11 +2368,7 @@ void CNeutrinoApp::numericZap(int msg)
 
 void CNeutrinoApp::showInfo()
 {
-#ifdef ENABLE_GRAPHLCD
 	StopSubtitles(false);
-#else
-	StopSubtitles();
-#endif
 
 	char *pname = NULL;
 	if(g_settings.infobar_show_channeldesc){
@@ -2502,11 +2494,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			}
 			else if( msg == (neutrino_msg_t) g_settings.key_subchannel_up || msg == (neutrino_msg_t) g_settings.key_subchannel_down) {
 				if( !g_RemoteControl->subChannels.empty() ) {
-#ifdef ENABLE_GRAPHLCD
 					StopSubtitles(false);
-#else
-					StopSubtitles();
-#endif
 					if( msg == (neutrino_msg_t) g_settings.key_subchannel_up )
 						g_RemoteControl->subChannelUp();
 					else if( msg == (neutrino_msg_t) g_settings.key_subchannel_down )
@@ -4794,19 +4782,11 @@ void CNeutrinoApp::getTheme(CConfigFile &themefile)
 	t.clock_Digit_blue = themefile.getInt32( "clock_Digit_blue", t.menu_Content_Text_blue );
 }
 
-#ifdef ENABLE_GRAPHLCD
-void CNeutrinoApp::StopSubtitles(bool b)
-#else
-void CNeutrinoApp::StopSubtitles()
-#endif
+void CNeutrinoApp::StopSubtitles(bool enable_glcd_mirroring)
 {
 	printf("[neutrino] %s\n", __FUNCTION__);
 	if (CMoviePlayerGui::getInstance().Playing()) {
-#if HAVE_SPARK_HARDWARE
-		CMoviePlayerGui::getInstance().StopSubtitles(b);
-#else
-		CMoviePlayerGui::getInstance().StopSubtitles(true /* whatever */);
-#endif
+		CMoviePlayerGui::getInstance().StopSubtitles(enable_glcd_mirroring);
 		return;
 	}
 
@@ -4822,7 +4802,7 @@ void CNeutrinoApp::StopSubtitles()
 		frameBuffer->paintBackground();
 	}
 #ifdef ENABLE_GRAPHLCD
-	if (b)
+	if (enable_glcd_mirroring)
 		nGLCD::MirrorOSD(g_settings.glcd_mirror_osd);
 #endif
 }

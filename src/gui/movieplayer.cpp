@@ -1814,11 +1814,7 @@ void CMoviePlayerGui::showHelpTS()
 	helpbox.show(LOCALE_MESSAGEBOX_INFO);
 }
 
-#ifdef ENABLE_GRAPHLCD
-void CMoviePlayerGui::StopSubtitles(bool b)
-#else
-void CMoviePlayerGui::StopSubtitles(bool)
-#endif
+void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring)
 {
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s\n", __FUNCTION__);
@@ -1835,8 +1831,8 @@ void CMoviePlayerGui::StopSubtitles(bool)
 		frameBuffer->paintBackground();
 	}
 #ifdef ENABLE_GRAPHLCD
-	if (b)
-		nGLCD::MirrorOSD();
+	if (enable_glcd_mirroring)
+		nGLCD::MirrorOSD(g_settings.glcd_mirror_osd);
 #endif
 #endif
 }
