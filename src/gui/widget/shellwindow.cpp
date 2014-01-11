@@ -34,12 +34,12 @@
 #include <poll.h>
 #include <fcntl.h>
 
-CShellWindow::CShellWindow(const std::string command, const int _mode, int *res) {
+CShellWindow::CShellWindow(const std::string &command, const int _mode, int *res) {
 	textBox = NULL;
-	std::string cmd = command;
+	std::string cmd;
 	mode = _mode;
 	if (!(mode & VERBOSE)){
-		cmd += " 2>/dev/null >&2";
+		cmd = "PATH=/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin ; export PATH ; " + command + " 2>/dev/null >&2";
 		int r = system(cmd.c_str());
 		if (res) {
 			if (r == -1)
@@ -50,7 +50,7 @@ CShellWindow::CShellWindow(const std::string command, const int _mode, int *res)
 		return;
 	}
 
-	cmd += " 2>&1";
+	cmd = command + " 2>&1";
 	FILE *f = popen(cmd.c_str(), "r");
 	if (!f) {
 		if (res)
