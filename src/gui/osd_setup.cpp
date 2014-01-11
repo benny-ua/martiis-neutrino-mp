@@ -495,7 +495,7 @@ static const char *infoClockTimeFormats[8][2] = {
 	{ "%H:%M",		"%H:%M"		},
 	{ "%H:%M",		"%H.%M"		},
 	{ "%H:%M",		"%H %M"		},
-	{ NULL,			NULL,		}
+	{ NULL,			NULL		}
 };
 
 CMenuInfoClockSetup::CMenuInfoClockSetup(CColorSetupNotifier *_colorSetupNotifier)
