@@ -692,33 +692,13 @@ bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& 
 	char strChanId[17];
 	snprintf(strChanId, sizeof(strChanId), "%llx", channel_id & 0xFFFFFFFFFFFFULL);
 
-	std::string strLogoE2[2] = { "", "" };
-	CZapitChannel * cc = NULL;
-	if (CNeutrinoApp::getInstance()->channelList)
-		cc = CNeutrinoApp::getInstance()->channelList->getChannel(channel_id);
-	if (cc) {
-		char fname[255];
-		snprintf(fname, sizeof(fname), "1_0_%X_%X_%X_%X_%X0000_0_0_0.png",
-			(u_int) cc->getServiceType(true),
-			(u_int) channel_id & 0xFFFF,
-			(u_int) (channel_id >> 32) & 0xFFFF,
-			(u_int) (channel_id >> 16) & 0xFFFF,
-			(u_int) cc->getSatellitePosition());
-		strLogoE2[0] = std::string(fname);
-		snprintf(fname, sizeof(fname), "1_0_%X_%X_%X_%X_%X0000_0_0_0.png",
-			(u_int) 1,
-			(u_int) channel_id & 0xFFFF,
-			(u_int) (channel_id >> 32) & 0xFFFF,
-			(u_int) (channel_id >> 16) & 0xFFFF,
-			(u_int) cc->getSatellitePosition());
-		strLogoE2[1] = std::string(fname);
-	}
 	/* first the channelname, then the channel-id */
 	std::string strLogoName[2] = { ChannelName, (std::string)strChanId };
 	/* first png, then jpg, then gif */
 	std::string strLogoExt[3] = { ".png", ".jpg" , ".gif" };
 
 	bool do_rename = false;
+	CZapitChannel * cc = NULL;
 
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 3; j++) {
@@ -727,13 +707,37 @@ bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& 
 				goto found;
 			do_rename = true;
 		}
-	if (cc)
-		for (int i = 0; i < 2; i++) {
-			name = g_settings.logo_hdd_dir + "/" + strLogoE2[i];
+
+	if (CNeutrinoApp::getInstance()->channelList)
+		cc = CNeutrinoApp::getInstance()->channelList->getChannel(channel_id);
+	if (cc) {
+		char fname[255];
+		u_int service_type = (u_int) cc->getServiceType(true);
+
+		snprintf(fname, sizeof(fname), "1_0_%X_%X_%X_%X_%X0000_0_0_0.png",
+			service_type,
+			(u_int) channel_id & 0xFFFF,
+			(u_int) (channel_id >> 32) & 0xFFFF,
+			(u_int) (channel_id >> 16) & 0xFFFF,
+			(u_int) cc->getSatellitePosition());
+		name = g_settings.logo_hdd_dir + "/" + std::string(fname);
+		if (!access(name, R_OK))
+			goto found;
+
+		if (service_type != 1) {
+			snprintf(fname, sizeof(fname), "1_0_%X_%X_%X_%X_%X0000_0_0_0.png",
+				1,
+				(u_int) channel_id & 0xFFFF,
+				(u_int) (channel_id >> 32) & 0xFFFF,
+				(u_int) (channel_id >> 16) & 0xFFFF,
+				(u_int) cc->getSatellitePosition());
+			name = g_settings.logo_hdd_dir + "/" + std::string(fname);
 			if (!access(name, R_OK))
 				goto found;
 		}
+	}
 
+	name = "";
 	logo_map[channel_id].name = "";
 	logo_map[channel_id].width = 0;
 	logo_map[channel_id].height = 0;
