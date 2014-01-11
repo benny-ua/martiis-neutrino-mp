@@ -841,14 +841,14 @@ fb_pixel_t * CPictureViewer::int_getImage(const std::string & name, int *width, 
 	else
 		mode_str = "getIcon";
 
-  	fh = fh_getsize(name.c_str(), &x, &y, INT_MAX, INT_MAX);
-  	if (fh)
-  	{
+	fh = fh_getsize(name.c_str(), &x, &y, INT_MAX, INT_MAX);
+	if (fh)
+	{
 		buffer = (unsigned char *) malloc(x * y * 4);
 		if (buffer == NULL)
 		{
-		  	printf("%s: Error: malloc\n", mode_str.c_str());
-		  	return 0;
+			printf("%s: Error: malloc\n", mode_str.c_str());
+			return 0;
 		}
 #ifdef FBV_SUPPORT_PNG
 		if ((name.find(".png") == (name.length() - 4)) && (fh_png_id(name.c_str())))
@@ -876,10 +876,10 @@ fb_pixel_t * CPictureViewer::int_getImage(const std::string & name, int *width, 
 				ret = (fb_pixel_t *) frameBuffer->convertRGB2FB(buffer, x, y, convertSetupAlpha2Alpha(g_settings.theme.infobar_alpha));
 			*width = x;
 			*height = y;
-		}else
-	  		printf("%s: Error decoding file %s\n", mode_str.c_str(), name.c_str());
+		} else
+			printf("%s: Error decoding file %s\n", mode_str.c_str(), name.c_str());
 		free(buffer);
-  	}else
+	} else
 		printf("%s: Error open file %s\n", mode_str.c_str(), name.c_str());
 	return ret;
 }
@@ -906,7 +906,7 @@ unsigned char * CPictureViewer::int_Resize(unsigned char *orgin, int ox, int oy,
 			printf("Resize Error: malloc\n");
 			return(orgin);
 		}
-	}else
+	} else
 		cr = dst;
 
 	if(type == SIMPLE)
@@ -924,8 +924,7 @@ unsigned char * CPictureViewer::int_Resize(unsigned char *orgin, int ox, int oy,
 				memmove(l+k, p+ip, 3);
 			}
 		}
-	}else
-	{
+	} else {
 		unsigned char *p,*q;
 		int i,j,k,l,ya,yb;
 		int sq,r,g,b,a;
@@ -962,7 +961,7 @@ unsigned char * CPictureViewer::int_Resize(unsigned char *orgin, int ox, int oy,
 					p[0]=r/sq; p[1]=g/sq; p[2]=b/sq; p[3]=a/sq;
 				}
 			}
-		}else
+		} else
 		{
 			for(j=0;j<dy;j++)
 			{
@@ -1046,7 +1045,7 @@ void CPictureViewer::cacheClearLRU(void)
 	std::map<cached_pic_key,cached_pic_data>::iterator it_lru = it;
 	for (it = it_lru = pic_cache.begin(); it != pic_cache.end(); ++it) {
 		if ((*it).second.last_used < (*it_lru).second.last_used)
-			it_lru = it;
+		it_lru = it;
 	}
 	if (it_lru != pic_cache.end()) {
 		pic_cache_size -= (*it_lru).first.width * (*it_lru).first.height * 4;
