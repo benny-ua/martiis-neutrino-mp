@@ -87,10 +87,8 @@ sortByDateTime(const CChannelEvent & a, const CChannelEvent & b)
 void
  CAdZapMenu::Update()
 {
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
+    clock_gettime(CLOCK_REALTIME, &zapBackTime);
 
-    memcpy(&zapBackTime, &ts, sizeof(ts));
     zapBackTime.tv_sec +=
 	g_settings.adzap_zapBackPeriod - ZAPBACK_ALERT_PERIOD;
 
