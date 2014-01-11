@@ -59,6 +59,10 @@
 #include <driver/record.h>
 #include <driver/genpsi.h>
 #include <system/set_threadname.h>
+#include <pwrmngr.h>
+
+/* defined in neutrino.cpp */
+extern cCpuFreqManager * cpuFreq;
 
 #if 0
 /* experimental mode:
@@ -350,6 +354,7 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid)
 	if (mode == NeutrinoMessages::mode_standby && streams.empty()) {
 		CNeutrinoApp::getInstance()->timer_wakeup = true;
 		printf("CStreamManager::Parse: wakeup zapit..\n");
+		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		g_Zapit->setStandby(false);
 		g_Zapit->getMode();
 	}
@@ -531,6 +536,7 @@ void CStreamManager::run()
 					if (g_Zapit->getMode() != 0) {
 						printf("CStreamManager::run: put zapit into standby...\n");
 						g_Zapit->setStandby(true);
+						cpuFreq->SetCpuFreq(g_settings.standby_cpufreq * 1000 * 1000);
 					}
 				}
 			}
