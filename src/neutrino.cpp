@@ -4,7 +4,7 @@
 	Copyright (C) 2001 Steffen Hehn 'McClean'
 							 and some other guys
 
-	Copyright (C) 2006-2012 Stefan Seyfried
+	Copyright (C) 2006-2014 Stefan Seyfried
 
 	Copyright (C) 2011 CoolStream International Ltd
 
@@ -130,7 +130,7 @@
 #include <system/localize_bouquetnames.h>
 #define CONF_VERSION 1
 
-#include <timerdclient/timerdmsg.h>
+#include <timerdclient/timerdclient.h>
 
 #include <zapit/debug.h>
 #include <zapit/zapit.h>

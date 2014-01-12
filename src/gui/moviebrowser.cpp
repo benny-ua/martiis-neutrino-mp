@@ -30,7 +30,7 @@
 	Author: Günther@tuxbox.berlios.org
 		based on code of Steffen Hehn 'McClean'
 
-	(C) 2009-2012 Stefan Seyfried
+	(C) 2009-2014 Stefan Seyfried
 
 ****************************************************************************/
 
@@ -67,6 +67,8 @@
 #include <system/helpers.h>
 #include <system/hddstat.h>
 #include <system/ytcache.h>
+
+#include <timerdclient/timerdclient.h>
 
 extern CPictureViewer * g_PicViewer;
 static CProgressBar *timescale;
