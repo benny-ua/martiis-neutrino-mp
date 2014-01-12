@@ -333,7 +333,7 @@ int CTimerManager::modifyEvent(int peventID, time_t announceTime, time_t alarmTi
 		switch (event->eventType)
 		{
 			case CTimerd::TIMER_SHUTDOWN:
-			case CTimerd::TIMER_NEXTPROGRAM:
+			//case CTimerd::TIMER_NEXTPROGRAM:
 			case CTimerd::TIMER_STANDBY:
 			case CTimerd::TIMER_REMIND:
 			case CTimerd::TIMER_SLEEPTIMER:
@@ -459,6 +459,7 @@ void CTimerManager::loadEventsFromConfig()
 						}
 						break;
 					}
+#if 0
 				case CTimerd::TIMER_NEXTPROGRAM :
 					{
 						CTimerEvent_NextProgram *event=
@@ -481,6 +482,7 @@ void CTimerManager::loadEventsFromConfig()
 						}
 						break;
 					}
+#endif
 				case CTimerd::TIMER_ZAPTO :
 					{
 						CTimerEvent_Zapto *event=
@@ -1365,6 +1367,8 @@ void CTimerEvent_Zapto::getEpgId()
 			epgTitle=epgdata.title;
 	}
 }
+
+#if 0
 //=============================================================
 // NextProgram Event
 //=============================================================
@@ -1444,6 +1448,8 @@ void CTimerEvent_NextProgram::Reschedule()
 	eventInfo.epg_starttime = 0;
 	CTimerEvent::Reschedule();
 }
+#endif
+
 //=============================================================
 // Remind Event
 //=============================================================
