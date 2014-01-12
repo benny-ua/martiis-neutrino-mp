@@ -70,6 +70,14 @@ public:
 	bool SelectSubtitles(int pid);
 	void GetChapters(std::vector<int> &positions, std::vector<std::string> &titles);
 	void RequestAbort();
+	bool SetTeletextPid(int ){return false;}//FIXME
+	void FindAllSubtitlePids(int */*pids*/, unsigned int */*numpids*/, std::string */*language*/){}
+	void FindAllDvbsubtitlePids(int */*pids*/, unsigned int */*numpidd*/, std::string */*language*/){}
+	void FindAllTeletextsubtitlePids(int */*pids*/, unsigned int */*numpidt*/, std::string */*tlanguage*/){}
+	int  GetDvbsubtitlePid(void) { return /*mDvbsubtitleStream*/0; }
+	int  GetSubtitlePid(void) { return /*mSubtitleStream*/0; }
+	bool SetSubtitlePid(int /*pid*/){return false;}
+	bool SetDvbsubtitlePid(int /*pid*/){return false;}
 };
 
 #endif // __PLAYBACK_CS_H_

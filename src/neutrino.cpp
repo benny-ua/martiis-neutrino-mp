@@ -109,9 +109,6 @@
 #endif
 #include <system/set_threadname.h>
 #include <system/ytcache.h>
-#if HAVE_COOL_HARDWARE
-#include "gui/widget/progressbar.h"
-#endif
 
 #include <audio.h>
 #include <ca_cs.h>

@@ -73,8 +73,11 @@ extern CPictureViewer * g_PicViewer;
 #include <system/helpers.h>
 #include <driver/screen_max.h>
 #include <zapit/zapit.h>
+#if HAVE_COOL_HARDWARE
+#include <audio_cs.h>
+#else
 #include <audio_td.h>
-
+#endif
 #include <algorithm>
 #include <sys/time.h>
 #include <fstream>

@@ -368,7 +368,13 @@ void *CShairPlay::showPicThread (void *_this)
 	unlink(COVERART_M2V);
 	T->lock(&T->videoMutex);
 	if (*T->active)
+#if HAVE_COOL_HARDWARE
+		// FIXME. The second argument on non-CST hardware is just to avoid caching the m2v.
+		// No idea whether this would be advisable on CST hardware. --martii
+		videoDecoder->ShowPicture(COVERART);
+#else
 		videoDecoder->ShowPicture(COVERART, COVERART_M2V);
+#endif
 	T->unlock(&T->videoMutex);
 	pthread_exit(NULL);
 }

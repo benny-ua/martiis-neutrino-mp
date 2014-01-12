@@ -109,6 +109,7 @@ CMoviePlayerGui::~CMoviePlayerGui()
 	instance_mp = NULL;
 }
 
+#if !HAVE_COOL_HARDWARE
 // for libeplayer3/libass subtitles
 static void framebuffer_blit(void)
 {
@@ -140,6 +141,7 @@ static void framebuffer_callback(
 #endif
 	*framebufferBlit = framebuffer_blit;
 }
+#endif
 
 void getPlayerPts(int64_t *pts)
 {
@@ -152,7 +154,9 @@ uint64_t CMoviePlayerGui::GetPts(void)
 #define INVALID_PTS_VALUE 0x200000000ull
 #endif
 	uint64_t pts = INVALID_PTS_VALUE;
+#if !HAVE_COOL_HARDWARE
 	playback->GetPts(pts);
+#endif
 	return pts;
 }
 
@@ -217,8 +221,11 @@ void CMoviePlayerGui::Init(void)
 
 	StreamType = AUDIO_FMT_AUTO;
 	hintBox = NULL;
-
+#if HAVE_COOL_HARDWARE
+	playback = new cPlayback(3/*, &framebuffer_callback*/);
+#else
 	playback = new cPlayback(3, &framebuffer_callback);
+#endif
 	stopped = true;
 }
 
@@ -689,7 +696,7 @@ void* CMoviePlayerGui::bgPlayThread(void *arg)
 	set_threadname(__func__);
 	CMoviePlayerGui *mp = (CMoviePlayerGui *) arg;
 
-	while (mp->playback->isPlaying())
+	while (mp->playback->IsPlaying())
 		usleep(100000);
 	mp->PlayFileEnd();
 	pthread_exit(NULL);
@@ -762,6 +769,9 @@ void CMoviePlayerGui::RequestAbort(void)
 {
 	ShowAbortHintBox();
 	playback->RequestAbort();
+#if HAVE_COOL_HARDWARE
+	playback->Close();
+#endif
 	while (!stopped)
 		usleep(100000);
 	HideHintBox();
@@ -792,6 +802,9 @@ void CMoviePlayerGui::HideHintBox(void)
 void CMoviePlayerGui::stopPlayBack(void)
 {
 	playback->RequestAbort();
+#if HAVE_COOL_HARDWARE
+	playback->Close();
+#endif
 	filelist.clear();
 	repeat_mode = REPEAT_OFF;
 	while (!stopped)
@@ -916,7 +929,11 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			}
 			printf("******************* Timeshift %d, position %d, seek to %d seconds\n", timeshift, position, startposition/1000);
 		}
+#if HAVE_COOL_HARDWARE
+		if(!(timeshift == PLAYMODE_TS) && startposition >= 0)//FIXME no jump for file at start yet
+#else
 		if(!isWebTV && startposition > -1)
+#endif
 			playback->SetPosition(startposition, true);
 
 		/* playback->Start() starts paused */
@@ -1462,7 +1479,11 @@ void CMoviePlayerGui::getCurrentAudioName(std::string &audioname)
 	if(numpida)
 		currentapid = apids[0];
 	bool ena = true;
+#if HAVE_COOL_HARDWARE
+	for (unsigned short count = 0; count < numpida; count++) {
+#else
 	for (unsigned int count = 0; count < numpida; count++) {
+#endif
 		if(currentapid == apids[count]){
 			if (getAudioName(apids[count], audioname))
 				return;
@@ -1814,7 +1835,7 @@ void CMoviePlayerGui::showHelpTS()
 	helpbox.show(LOCALE_MESSAGEBOX_INFO);
 }
 
-void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring)
+void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring __attribute__((unused)))
 {
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s\n", __FUNCTION__);
@@ -1837,13 +1858,14 @@ void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring)
 #endif
 }
 
-void CMoviePlayerGui::StartSubtitles(bool show)
+void CMoviePlayerGui::StartSubtitles(bool show __attribute__((unused)))
 {
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s: %s\n", __FUNCTION__, show ? "Show" : "Not show");
 #ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
 #endif
+
 	if(!show)
 		return;
 	playback->SuspendSubtitle(false);

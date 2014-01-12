@@ -45,7 +45,12 @@
 #include <driver/record.h>
 #include <zapit/channel.h>
 #include <playback.h>
+#if HAVE_COOL_HARDWARE
+#include <playback.h>
+#include <audio_cs.h>
+#else
 #include <audio_td.h>
+#endif
 
 #include <stdio.h>
 
@@ -89,12 +94,21 @@ class CMoviePlayerGui : public CMenuTarget
 	int duration;
 	CTimeOSD FileTime;
 
+#if HAVE_COOL_HARDWARE
+	uint16_t numpida;
+#else
 	unsigned int numpida;
+#endif
 	int vpid;
 	int vtype;
 	std::string    language[REC_MAX_APIDS];
+#if HAVE_COOL_HARDWARE
+	uint16_t apids[REC_MAX_APIDS];
+	unsigned short ac3flags[REC_MAX_APIDS];
+#else
 	int apids[REC_MAX_APIDS];
 	unsigned int ac3flags[REC_MAX_APIDS];
+#endif
 	int currentapid, currentac3;
 	// subtitle data
 	unsigned int numpids;

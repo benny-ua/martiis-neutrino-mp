@@ -383,7 +383,9 @@ void CLuaInstance::registerFunctions()
 	luaopen_string(lua);
 	luaopen_math(lua);
 #ifndef DYNAMIC_LUAPOSIX
-	luaopen_posix_c(lua);
+#if !HAVE_COOL_HARDWARE
+ 	luaopen_posix_c(lua);
+#endif
 #else
 	dolibrary(lua,"posix");
 #endif
@@ -685,7 +687,7 @@ bool CLuaMenuChangeObserver::changeNotify(lua_State *L, const std::string &luaAc
 	lua_pcall(L, 2 /* two args */, 1 /* one result */, 0);
 	double res = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
 	lua_pop(L, 2);
-	return res == menu_return::RETURN_REPAINT || res == menu_return::RETURN_EXIT_REPAINT;
+	return ((res == menu_return::RETURN_REPAINT) || (res == menu_return::RETURN_EXIT_REPAINT));
 }
 
 void CLuaInstance::MenuRegister(lua_State *L)

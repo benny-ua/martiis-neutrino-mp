@@ -1049,7 +1049,7 @@ void CPictureViewer::cacheClearLRU(void)
 	}
 	if (it_lru != pic_cache.end()) {
 		pic_cache_size -= (*it_lru).first.width * (*it_lru).first.height * 4;
-		free ((*it_lru).second.data);
+		cs_free_uncached ((*it_lru).second.data);
 		pic_cache.erase(it_lru);
 	}
 }

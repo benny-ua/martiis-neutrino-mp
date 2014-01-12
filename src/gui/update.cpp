@@ -577,7 +577,7 @@ bool CFlashExpert::checkSize(int mtd, std::string &backupFile)
 	if (mtd == -1) { // check disk space for image creation
 		if (!get_fs_usage("/", btotal, bused, &bsize)) {
 			snprintf(errMsg, sizeof(errMsg)-1, g_Locale->getText(LOCALE_FLASHUPDATE_READ_VOLUME_ERROR), "root0");
-			ShowHintUTF(LOCALE_MESSAGEBOX_ERROR, errMsg);
+			ShowHint(LOCALE_MESSAGEBOX_ERROR, errMsg);
 			return false;
 		}
 		backupRequiredSize = ((bused * bsize) / 1024ULL) * 2ULL; // twice disk space for summarized image
@@ -673,7 +673,7 @@ void CFlashExpert::readmtdJFFS2(std::string &filename)
 
 	char message[500];
 	sprintf(message, g_Locale->getText(LOCALE_FLASHUPDATE_SAVESUCCESS), filename.c_str());
-	ShowHintUTF(LOCALE_MESSAGEBOX_INFO, message);
+	ShowHint(LOCALE_MESSAGEBOX_INFO, message);
 }
 #endif
 
@@ -748,7 +748,7 @@ void CFlashExpert::readmtd(int preadmtd)
 		hide();
 #ifdef BOXMODEL_APOLLO
 		if (!forceOtherFilename)
-			ShowHintUTF(LOCALE_MESSAGEBOX_INFO, message);
+			ShowHint(LOCALE_MESSAGEBOX_INFO, message);
 #else
 		ShowHint(LOCALE_MESSAGEBOX_INFO, message);
 #endif
@@ -956,7 +956,7 @@ int CFlashExpertSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			// create image warning
 			const char *box = (mtdInfo->getMTDEraseSize(mtdInfo->findMTDsystem()) == 0x40000) ? "Trinity" : "Tank";
 			snprintf(message, sizeof(message)-1, g_Locale->getText(LOCALE_FLASHUPDATE_CREATEIMAGE_WARNING), box, box);
-			if (ShowMsgUTF(LOCALE_MESSAGEBOX_INFO, message, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) != CMessageBox::mbrYes)
+			if (ShowMsg(LOCALE_MESSAGEBOX_INFO, message, CMessageBox::mbrNo, CMessageBox::mbYes | CMessageBox::mbNo, NEUTRINO_ICON_UPDATE) != CMessageBox::mbrYes)
 				skipImage = true;
 		}
 		if (!skipImage) {

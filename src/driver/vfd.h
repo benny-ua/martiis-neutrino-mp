@@ -149,7 +149,15 @@ class CVFD
 		void ShowIcon(fp_icon icon, bool show);
 		void ShowText(const char *str);
 		void wake_up();
-		MODES getMode(void) { return mode; };
+		MODES getMode(void) { return mode; }
+		void setAudioMode(void){}
+		void setAudioMode(int){}
+		void setHddUsage(int /*perc*/){};
+
+		std::string getServicename(void) { return servicename; }
+		void setLiveFE(char /*fe*/){}
+		void setCA(bool /*onoff*/){}
+
 #ifdef LCD_UPDATE
         private:
                 CFileList* m_fileList;

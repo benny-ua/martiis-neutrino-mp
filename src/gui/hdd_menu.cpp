@@ -475,7 +475,6 @@ static int umount_all(const char *dev)
 /* triggers a uevent for all partitions of a given blockdev, dev can be /dev/sda, sda or sda4 */
 static int mount_all(const char *dev)
 {
-	char buffer[255];
 	int i, ret = -1;
 	char *d = strdupa(dev);
 	char *p = d + strlen(d) - 1;
@@ -488,6 +487,7 @@ static int mount_all(const char *dev)
 	for (i = 1; i < 16; i++)
 	{
 #ifdef ASSUME_MDEV
+		char buffer[255];
 		sprintf(buffer, "/sys/block/%s/%s%d/uevent", d, d, i);
 		if (!access(buffer, W_OK)) {
 			FILE *f = fopen(buffer, "w");
