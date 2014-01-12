@@ -437,7 +437,7 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 {
 	active = false;
 	if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
-		return false;
+		return "";
 
 	bool return_title = false;
 	neutrino_locale_t loc = NONEXISTANT_LOCALE;
