@@ -54,7 +54,7 @@ class CTimeOSD : public CComponentsFrmClock
 		CTimeOSD();
 // 		~CTimeOSD(); is inherited
 		void show(time_t time_show, bool force = true);
-		void kill();
+		void kill(bool force = false);
 		bool IsVisible() {return m_mode != MODE_HIDE;}
 		void update(int position, int duration);
 		void switchMode(int position, int duration);

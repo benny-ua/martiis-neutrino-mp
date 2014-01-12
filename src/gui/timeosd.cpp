@@ -148,9 +148,9 @@ void CTimeOSD::switchMode(int position, int duration)
 	update(position, duration);
 }
 
-void CTimeOSD::kill()
+void CTimeOSD::kill(bool force)
 {
-	if (m_mode != MODE_HIDE) {
+	if (force || (m_mode != MODE_HIDE)) {
 		KillAndResetTimescale();
 		CComponents::kill();
 		frameBuffer->blit();

@@ -816,7 +816,6 @@ bool CMoviePlayerGui::PlayFileStart(void)
 	menu_ret = menu_return::RETURN_REPAINT;
 
 	first_start_timeshift = false;
-	time_forced = false;
 	update_lcd = true;
 
 	//CTimeOSD FileTime;
@@ -968,6 +967,10 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			callInfoViewer(/*duration, position*/);
 			first_start_timeshift = false;
 		}
+		if (time_forced && (playstate != CMoviePlayerGui::FF) && (time_forced != CMoviePlayerGui::REW)) {
+			FileTime.kill(time_forced);
+			time_forced = false;
+		}
 
 		neutrino_msg_t msg;
 		neutrino_msg_data_t data;
@@ -975,7 +978,10 @@ void CMoviePlayerGui::PlayFileLoop(void)
 
 		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
 			if(playback->GetPosition(position, duration)) {
-				FileTime.update(position, duration);
+				if (time_forced)
+					FileTime.show(position, true);
+				else
+					FileTime.update(position, duration);
 				if(duration > 100)
 					file_prozent = (unsigned char) (position / (duration / 100));
 #if HAVE_TRIPLEDRAGON
@@ -1057,14 +1063,14 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				playstate = CMoviePlayerGui::PLAY;
 				speed = 1;
 				playback->SetSpeed(speed);
+				if (time_forced) {
+					FileTime.kill(time_forced);
+					time_forced = false;
+				}
 				//update_lcd = true;
 				updateLcd();
 				if (!timeshift)
 					callInfoViewer(/*duration, position*/);
-			}
-			if (time_forced) {
-				time_forced = false;
-				FileTime.hide();
 			}
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_pause) {
 			if (playstate == CMoviePlayerGui::PAUSE) {
@@ -1120,13 +1126,16 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			}
 			//update_lcd = true;
 
-			if (!timeshift)
-				callInfoViewer(/*duration, position*/);
-
 			if (!FileTime.IsVisible()) {
-				FileTime.show(position);
+				FileTime.show(position, true);
 				time_forced = true;
 			}
+
+			if (!timeshift)
+				callInfoViewer(/*duration, position*/);
+			else if (time_forced)
+				FileTime.show(position, true);
+
 		} else if (msg == CRCInput::RC_1) {	// Jump Backwards 1 minute
 #if 0
 			clearSubtitle();
@@ -1242,7 +1251,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 #endif
 		} else if(timeshift && (msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 			bool restore = FileTime.IsVisible();
-			FileTime.hide();
+			FileTime.kill(time_forced);
 
 			StopSubtitles(true);
 			if( msg == CRCInput::RC_epg )
@@ -1373,7 +1382,7 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 		nGLCD::unlockChannel();
 #endif
 
-	FileTime.hide();
+	FileTime.kill(time_forced);
 	CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, false);
 	CVFD::getInstance()->ShowIcon(FP_ICON_PAUSE, false);
 
