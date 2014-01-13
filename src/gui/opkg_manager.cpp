@@ -53,6 +53,7 @@
 #include <driver/screen_max.h>
 
 #include <system/debug.h>
+#include <system/helpers.h>
 
 #include <stdio.h>
 #include <poll.h>
@@ -276,12 +277,21 @@ int COPKGManager::showMenu()
 //returns true if opkg support is available
 bool COPKGManager::hasOpkgSupport()
 {
-	const char *deps[] = {"/bin/opkg-cl","/bin/opkg-key", "/etc/opkg/opkg.conf", "/var/lib/opkg", NULL};
-	for (const char **d = deps; *d; d++)
-		if(access(*d, R_OK) !=0) {
-			printf("[neutrino opkg] %s not found\n", *d);
-			return false;
-		}
+	const char *deps[] = {"opkg-cl", "opkg-key", "/etc/opkg/opkg.conf", "/var/lib/opkg", NULL};
+	for (const char **d = deps; *d; d++) {
+		if (*d[0] != '/') {
+			bool found = false;
+			const char *path[] = {"/bin", "/usr/bin", "/sbin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin", NULL};
+			for (const char **p = path; *p && !found; p++)
+				found = access(std::string(*p) + "/" + *d, R_OK);
+			if (!found)
+				return false;
+			continue;
+		} else if(!access(*d, R_OK))
+			continue;
+		printf("[neutrino opkg] %s not found\n", *d);
+		return false;
+	}
 	
 	return true;
 }
