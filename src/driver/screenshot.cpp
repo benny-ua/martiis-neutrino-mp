@@ -41,6 +41,7 @@
 #include <zapit/debug.h>
 #include <zapit/getservices.h>
 #include <eitd/sectionsd.h>
+#include <system/helpers.h>
 
 #include <video.h>
 #include <cs_api.h>

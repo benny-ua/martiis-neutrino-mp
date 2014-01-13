@@ -42,11 +42,7 @@
 #include <driver/screen_max.h>
 #include <driver/display.h>
 #include <zapit/zapit.h>
-#if HAVE_COOL_HARDWARE
-//#include <audio_cs.h>
-#else
-//#include <audio_td.h>
-#endif
+#include <system/helpers.h>
 
 extern CRemoteControl		* g_RemoteControl; /* neutrino.cpp */
 extern CAudioSetupNotifier	* audioSetupNotifier;

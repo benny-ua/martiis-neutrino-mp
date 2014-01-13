@@ -37,7 +37,7 @@
 #include "widget/menue.h"
 #include <sys/time.h>
 #include <string.h>
-#include <gui/timerlist.h>
+#include <timerdclient/timerdclient.h>
 #include <sectionsdclient/sectionsdclient.h>
 
 class CFollowScreenings : public CMenuTarget

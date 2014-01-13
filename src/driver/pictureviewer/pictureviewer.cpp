@@ -1,6 +1,7 @@
 #include "config.h"
 #include <global.h>
 #include <neutrino.h>
+#include <system/helpers.h>
 #include "pictureviewer.h"
 #include "pv_config.h"
 

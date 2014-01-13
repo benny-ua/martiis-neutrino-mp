@@ -47,6 +47,7 @@
 #include <driver/screen_max.h>
 
 #include <xmlinterface.h>
+#include <system/helpers.h>
 #include <system/debug.h>
 
 #include <algorithm>

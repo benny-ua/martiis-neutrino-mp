@@ -28,6 +28,7 @@
 #include <neutrino.h>
 #include <algorithm>
 #include <system/debug.h>
+#include <system/helpers.h>
 #include <system/set_threadname.h>
 #include <driver/pictureviewer/pictureviewer.h>
 #include <hardware_caps.h>

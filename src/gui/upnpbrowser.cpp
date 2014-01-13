@@ -60,6 +60,7 @@
 #include <gui/widget/messagebox.h>
 #include <gui/widget/hintbox.h>
 #include <system/settings.h>
+#include <system/helpers.h>
 
 #include <gui/upnpbrowser.h>
 #include <zapit/zapit.h>

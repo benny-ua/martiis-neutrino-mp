@@ -32,6 +32,7 @@
 #include <neutrino.h>
 #include "cc_item_picture.h"
 #include <unistd.h>
+#include <system/helpers.h>
 
 extern CPictureViewer * g_PicViewer;
 

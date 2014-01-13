@@ -40,6 +40,7 @@
 #include <driver/fontrenderer.h>
 #include <driver/neutrinofonts.h>
 #include <system/settings.h>
+#include <system/helpers.h>
 
 #include <configfile.h>
 
