@@ -542,7 +542,8 @@ CPictureViewer::CPictureViewer ()
 	pic_cache_size = 0;
 	pic_cache_maxsize = 0x100000; // 1 MB default
 
-	logo_hdd_dir = string(g_settings.logo_hdd_dir);
+	logo_hdd_dir = std::string(g_settings.logo_hdd_dir);
+	logo_rename_to_channelname = g_settings.logo_rename_to_channelname;
 
 	init_handlers ();
 }
@@ -673,9 +674,10 @@ bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& 
 
  	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(logo_map_mutex);
 
-	if (logo_hdd_dir != g_settings.logo_hdd_dir) {
+	if (logo_hdd_dir != g_settings.logo_hdd_dir || (g_settings.logo_rename_to_channelname && !logo_rename_to_channelname)) {
 		logo_map.clear();
 		logo_hdd_dir = g_settings.logo_hdd_dir;
+		logo_rename_to_channelname = g_settings.logo_rename_to_channelname;
 	}
 
 	std::map<uint64_t, logo_data>::iterator it;

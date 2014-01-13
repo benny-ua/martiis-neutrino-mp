@@ -134,6 +134,7 @@ class CPictureViewer
 	int m_endy;
 
 	std::string logo_hdd_dir;
+	bool logo_rename_to_channelname;
 	struct logo_data {
 		std::string name;
 		int width;
