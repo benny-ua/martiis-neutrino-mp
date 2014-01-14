@@ -33,6 +33,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <unistd.h>
 
 #include "global.h"
 #include "neutrino.h"

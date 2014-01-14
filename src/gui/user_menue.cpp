@@ -40,6 +40,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <unistd.h>
 
 #include "user_menue.h"
 #include "user_menue_setup.h"

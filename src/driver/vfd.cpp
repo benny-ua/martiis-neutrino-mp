@@ -31,6 +31,7 @@
 #include <global.h>
 #include <neutrino.h>
 #include <system/settings.h>
+#include <system/helpers.h>
 #include <driver/record.h>
 
 #include <fcntl.h>

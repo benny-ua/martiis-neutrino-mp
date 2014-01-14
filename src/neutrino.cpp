@@ -224,7 +224,7 @@ extern const char * locale_real_names[]; /* #include <system/locals_intern.h> */
 const char* usermenu_button_def[SNeutrinoSettings::BUTTON_MAX]={
 	"red","green","yellow","blue",
 	"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19" };
-const int usermenu_key_def[SNeutrinoSettings::BUTTON_MAX]={
+const unsigned int usermenu_key_def[SNeutrinoSettings::BUTTON_MAX]={
 	CRCInput::RC_red, CRCInput::RC_green, CRCInput::RC_yellow, CRCInput::RC_blue,
 	CRCInput::RC_archive, CRCInput::RC_play, CRCInput::RC_usb, CRCInput::RC_timer,
 	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey,
