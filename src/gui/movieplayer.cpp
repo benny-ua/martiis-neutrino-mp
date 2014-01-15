@@ -952,7 +952,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 {
 	time_forced = false;
 	update_lcd = true;
-
+#if HAVE_COOL_HARDWARE
+	int eof = 0;
+#endif
 	while (playstate >= CMoviePlayerGui::PLAY)
 	{
 #ifdef ENABLE_GRAPHLCD
@@ -997,7 +999,22 @@ void CMoviePlayerGui::PlayFileLoop(void)
 					update_lcd = true;
 				}
 			} else
+#if HAVE_COOL_HARDWARE
+			{
+				/* in case ffmpeg report incorrect values */
+				int posdiff = duration - position;
+				if ((posdiff > 0) && (posdiff < 1000) && !timeshift)
+				{
+					/* 10 seconds after end-of-file, stop */
+					if (++eof > 10)
+						g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
+				}
+				else
+					eof = 0;
+			}
+#else
 				g_RCInput->postMsg((neutrino_msg_t) g_settings.mpkey_stop, 0);
+#endif
 		}
 
 		if (msg == (neutrino_msg_t) g_settings.mpkey_plugin) {
