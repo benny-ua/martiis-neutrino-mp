@@ -37,8 +37,6 @@
 #include <system/debug.h>
 #include <global.h>
 
-#include <fribidi/fribidi.h>
-
 FT_Error FBFontRenderClass::myFTC_Face_Requester(FTC_FaceID  face_id,
         FT_Library  /*library*/,
         FT_Pointer  request_data,
@@ -169,6 +167,7 @@ FT_Error FBFontRenderClass::getGlyphBitmap(FTC_ScalerRec *sc, FT_ULong glyph_ind
 
 const char *FBFontRenderClass::AddFont(const char * const filename, const bool make_italics)
 {
+	fflush(stdout);
 	int error;
 	fontListEntry *n=new fontListEntry;
 
@@ -396,32 +395,6 @@ void Font::paintFontPixel(fb_pixel_t *td, uint8_t fg_trans, uint8_t fg_red, uint
 		 ((fg_blue  + ((korr_b*faktor)/F_MUL))        & 0x000000FF);
 }
 
-static std::string fribidiShapeChar(const char * text, bool utf8_encoded)
-{
-	if (utf8_encoded && text && *text) {
-		int len = strlen(text);
-		fribidi_set_mirroring(true);
-		fribidi_set_reorder_nsm(false);
-		
-		// init to utf-8
-		FriBidiCharSet fribidiCharset = FRIBIDI_CHAR_SET_UTF8;	
-		// tell bidi that we need bidirectional
-		FriBidiCharType Base = FRIBIDI_TYPE_LTR;
-		// our buffer
-		FriBidiChar *Logical = (FriBidiChar *)alloca(sizeof(FriBidiChar)*(len + 1));
-		FriBidiChar *Visual = (FriBidiChar *)alloca(sizeof(FriBidiChar)*(len + 1));
-		// convert from the selected charset to Unicode
-		int RtlLen = fribidi_charset_to_unicode(fribidiCharset, const_cast<char *>(text), len, Logical);
-		
-		if (fribidi_log2vis(Logical, len, &Base, Visual, NULL, NULL, NULL)) {
-			char *Rtl = (char *)alloca(sizeof(char)*(RtlLen * 4 + 1));
-			fribidi_unicode_to_charset(fribidiCharset, Visual, RtlLen, Rtl);
-			return std::string(Rtl);
-		}
-	}
-	return std::string(text);
-}
-
 void Font::RenderString(int x, int y, const int width, const char *text, const fb_pixel_t color, const int boxheight, const unsigned int flags)
 {
 	const bool utf8_encoded = flags & IS_UTF8;
@@ -563,9 +536,6 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 			spread_by = 1;
 	}
 
-	std::string txt = fribidiShapeChar(text, utf8_encoded).c_str();
-	text = txt.c_str();
-
 	for (; *text; text++)
 	{
 		FTC_SBit glyph;
@@ -696,9 +666,6 @@ void Font::RenderString(int x, int y, const int width, const std::string & text,
 int Font::getRenderWidth(const char *text, const bool utf8_encoded)
 {
 	pthread_mutex_lock( &renderer->render_mutex );
-
-	std::string txt = fribidiShapeChar(text, utf8_encoded).c_str();
-	text = txt.c_str();
 
 	FT_Error err = FTC_Manager_LookupSize(renderer->cacheManager, &scaler, &size);
 	if (err != 0)
