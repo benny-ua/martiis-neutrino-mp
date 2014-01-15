@@ -83,6 +83,7 @@ neutrino_LDADD = \
 	@PNG_LIBS@ \
 	@LIBCS_LIBS@ \
 	-ldvbsi++ \
+	-lfribidi \
 	-ljpeg \
 	-lOpenThreads \
 	-lrt -lpthread \
