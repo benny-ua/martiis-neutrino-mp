@@ -219,7 +219,7 @@ bool CFrontend::Open(bool init)
 
 	if (fd < 0) {
 		if ((fd = open(filename, O_RDWR | O_NONBLOCK | O_CLOEXEC)) < 0) {
-			ERROR(filename);
+//			ERROR(filename);
 			return false;
 		}
 		fop(ioctl, FE_GET_INFO, &info);
