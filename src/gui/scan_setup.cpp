@@ -279,9 +279,7 @@ int CScanSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		if (reloadhintBox)
 			reloadhintBox->hide();
 		CNeutrinoApp::getInstance ()->SDTreloadChannels = false;
-		if(file_exists(CURRENTSERVICES_XML)){
-			unlink(CURRENTSERVICES_XML);
-		}
+		unlink(CURRENTSERVICES_XML);
 		return res;
 	}
 	else if(actionKey == "satsetup")
