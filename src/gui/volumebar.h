@@ -48,7 +48,7 @@ class CVolumeBar : public CComponentsForm
 		int clock_y, clock_width, clock_height;
 
 		//volume value
-		char *vb_vol;
+		int *vb_vol;
 
 		//scale dimensions
 		int vb_pbx, vb_pby, vb_pbw, vb_pbh;

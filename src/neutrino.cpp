@@ -387,6 +387,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_Format = configfile.getInt32("video_Format", DISPLAY_AR_16_9);
 	g_settings.video_43mode = configfile.getInt32("video_43mode", DISPLAY_AR_MODE_LETTERBOX);
 	g_settings.current_volume = configfile.getInt32("current_volume", 50);
+	g_settings.audio_initial_volume = configfile.getInt32("audio_initial_volume", -1);
+	if (g_settings.audio_initial_volume > -1)
+		g_settings.current_volume = g_settings.audio_initial_volume;
 #if HAVE_SPARK_HARDWARE
 	g_settings.audio_mixer_volume_analog = configfile.getInt32("audio_mixer_volume_analog", 50);
 	g_settings.audio_mixer_volume_hdmi = configfile.getInt32("audio_mixer_volume_hdmi", 75);
@@ -1011,6 +1014,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 #endif
 
 	configfile.setInt32( "current_volume", g_settings.current_volume );
+	configfile.setInt32( "audio_initial_volume", g_settings.audio_initial_volume );
 	configfile.setInt32( "current_volume_step", g_settings.current_volume_step );
 #if HAVE_SPARK_HARDWARE
 	configfile.setInt32("audio_mixer_volume_analog", g_settings.audio_mixer_volume_analog);

@@ -139,7 +139,8 @@ struct SNeutrinoSettings
 	int contrast;
 	int saturation;
 #endif
-	char current_volume;
+	int current_volume;
+	int audio_initial_volume;
 	int current_volume_step;
 	int channel_mode;
 	int channel_mode_radio;

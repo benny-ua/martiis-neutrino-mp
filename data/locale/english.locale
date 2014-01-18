@@ -126,6 +126,8 @@ audiomenu.dolbydigital.auto Prefer Dolby Digital
 audiomenu.hdmi_dd Encoded DD on HDMI
 audiomenu.hdmi_dd_auto auto
 audiomenu.hdmi_dd_force force
+audiomenu.initial_volume Initial volume after boot
+audiomenu.initial_volume_restore Previous
 audiomenu.mixer_volume Mixer volume
 audiomenu.mixer_volume_analog Analog
 audiomenu.mixer_volume_hdmi HDMI
@@ -887,6 +889,7 @@ menu.hint_audio_analog_mode Select audio channel to use\nstereo, mono-left, mono
 menu.hint_audio_avsync A/V sync
 menu.hint_audio_dd Auto-switch to DolbyDigital audio pid,\nif available
 menu.hint_audio_hdmi_dd DolbyDigital over HDMI: off - decoded\nauto  if supported by device, force
+menu.hint_audio_initial_volume Set the initial volume after boot or use the pre-shutdown value.
 menu.hint_audio_spdif_dd DolbyDigital over optical output
 menu.hint_audio_srs SRS TruVolume control volume jumps\nat content changes
 menu.hint_audio_srs_algo Amount of control, light or normal
