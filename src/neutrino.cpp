@@ -427,6 +427,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		extern CMenuOptionChooser::keyval_ext VIDEOMENU_VIDEOMODE_OPTIONS[VIDEOMENU_VIDEOMODE_OPTION_COUNT];
 		g_settings.enabled_video_modes[i] = configfile.getInt32("enabled_video_mode_" + to_string(i), VIDEOMENU_VIDEOMODE_OPTIONS[i].key > -1);
 	}
+#if HAVE_SPARK_HARDWARE
+	if (getenv("NEUTRINO_DEFAULT_SCART"))
+		g_settings.enabled_video_modes[1] = 1; // PAL
+#endif
 
 	g_settings.cpufreq = configfile.getInt32("cpufreq", 0);
 #if HAVE_SPARK_HARDWARE
