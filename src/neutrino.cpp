@@ -424,14 +424,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.video_dbdr = configfile.getInt32("video_dbdr", 0);
 
 	for(int i = 0; i < VIDEOMENU_VIDEOMODE_OPTION_COUNT; i++) {
-		g_settings.enabled_video_modes[i] = configfile.getInt32("enabled_video_mode_" + to_string(i), 0);
+		extern CMenuOptionChooser::keyval_ext VIDEOMENU_VIDEOMODE_OPTIONS[VIDEOMENU_VIDEOMODE_OPTION_COUNT];
+		g_settings.enabled_video_modes[i] = configfile.getInt32("enabled_video_mode_" + to_string(i), VIDEOMENU_VIDEOMODE_OPTIONS[i].key > -1);
 	}
-#if !HAVE_SPARK_HARDWARE
-#if VIDEOMENU_VIDEOMODE_OPTION_COUNT > 3
-	g_settings.enabled_video_modes[3] = 1; // 720p 50Hz
-	g_settings.enabled_video_modes[4] = 1; // 1080i 50Hz
-#endif
-#endif
 
 	g_settings.cpufreq = configfile.getInt32("cpufreq", 0);
 #if HAVE_SPARK_HARDWARE
