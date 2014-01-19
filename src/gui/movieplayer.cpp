@@ -54,6 +54,7 @@
 #include <stdlib.h>
 #include <sys/timeb.h>
 
+#include <eitd/edvbstring.h>
 #include <video.h>
 #include <libtuxtxt/teletext.h>
 #include <zapit/zapit.h>
@@ -884,16 +885,19 @@ bool CMoviePlayerGui::PlayFileStart(void)
 				CMovieInfo cmi;
 				cmi.clearMovieInfo(&mi);
 				for (size_t i = 0; i < count; i++) {
-					if (!strcasecmp("title", keys[i].c_str())) {
-						mi.epgTitle = values[i];
+					std::string key = trim(keys[i]);
+					if (mi.epgTitle.empty() && !strcasecmp("title", key.c_str())) {
+ 						mi.epgTitle = isUTF8(values[i]) ? values[i] : convertLatin1UTF8(values[i]);
+						pretty_name = mi.epgTitle;
+						CVFD::getInstance()->showServicename(pretty_name.c_str());
 						continue;
 					}
-					if (!strcasecmp("artist", keys[i].c_str())) {
-						mi.epgChannel = values[i];
+					if (mi.epgChannel.empty() && !strcasecmp("artist", key.c_str())) {
+ 						mi.epgChannel = isUTF8(values[i]) ? values[i] : convertLatin1UTF8(values[i]);
 						continue;
 					}
-					if (!strcasecmp("comment", keys[i].c_str())) {
-						mi.epgInfo1 = values[i];
+					if (mi.epgInfo1.empty() && !strcasecmp("comment", key.c_str())) {
+ 						mi.epgInfo1 = isUTF8(values[i]) ? values[i] : convertLatin1UTF8(values[i]);
 						continue;
 					}
 				}
@@ -1426,7 +1430,7 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 	cSS.showBorder(CZapit::getInstance()->GetCurrentChannelID());
 #endif
 #ifdef ENABLE_GRAPHLCD
-	if (p_movie_info && !isWebTV)
+	if (p_movie_info)
 		nGLCD::unlockChannel();
 #endif
 
