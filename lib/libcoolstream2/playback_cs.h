@@ -78,7 +78,7 @@ public:
 	int  GetSubtitlePid(void) { return /*mSubtitleStream*/0; }
 	bool SetSubtitlePid(int /*pid*/){return false;}
 	bool SetDvbsubtitlePid(int /*pid*/){return false;}
-	void cPlayback::GetMetadata(std::vector<std::string> &keys, std::vector<std::string> &values) { keys.clear(); values.clear(); }
+	void GetMetadata(std::vector<std::string> &keys, std::vector<std::string> &values) { keys.clear(); values.clear(); }
 };
 
 #endif // __PLAYBACK_CS_H_
