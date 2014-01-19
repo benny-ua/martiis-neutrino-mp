@@ -844,7 +844,9 @@ bool CMoviePlayerGui::PlayFileStart(void)
 #if HAVE_SPARK_HARDWARE
 		CScreenSetup cSS;
 		cSS.showBorder(p_movie_info->epgId);
+#endif
 	} else {
+#if HAVE_SPARK_HARDWARE
 		CScreenSetup cSS;
 		cSS.showBorder(0);
 #endif
@@ -856,7 +858,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 #endif
 #ifdef ENABLE_GRAPHLCD
 	nGLCD::MirrorOSD(false);
-	if (p_movie_info && !isWebTV)
+	if (p_movie_info)
 		nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
 #endif
 	pthread_t thrStartHint = 0;
@@ -874,6 +876,35 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		stopped = false;
 		PlayFileEnd(true);
 	} else {
+		if (!p_movie_info) {
+			std::vector<std::string> keys, values;
+			playback->GetMetadata(keys, values);
+			size_t count = keys.size();
+			if (count > 0) {
+				CMovieInfo cmi;
+				cmi.clearMovieInfo(&mi);
+				for (size_t i = 0; i < count; i++) {
+					if (!strcasecmp("title", keys[i].c_str())) {
+						mi.epgTitle = values[i];
+						continue;
+					}
+					if (!strcasecmp("artist", keys[i].c_str())) {
+						mi.epgChannel = values[i];
+						continue;
+					}
+					if (!strcasecmp("comment", keys[i].c_str())) {
+						mi.epgInfo1 = values[i];
+						continue;
+					}
+				}
+				if (!mi.epgChannel.empty() || !mi.epgTitle.empty())
+					p_movie_info = &mi;
+#ifdef ENABLE_GRAPHLCD
+				if (p_movie_info)
+					nGLCD::lockChannel(p_movie_info->epgChannel, p_movie_info->epgTitle);
+#endif
+			}
+		}
 		stopped = false;
 		numpida = REC_MAX_APIDS;
 		playback->FindAllPids(apids, ac3flags, &numpida, language);
@@ -1425,7 +1456,7 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 	currentaudioname = "Unk";
 	getCurrentAudioName(currentaudioname);
 
-	if (isMovieBrowser && p_movie_info) {
+	if (p_movie_info) {
 		std::string channelName = p_movie_info->epgChannel;
 		if (channelName.empty()) {
 			if (isYT)
@@ -1434,6 +1465,8 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 				channelName = g_Locale->getText(LOCALE_MOVIEPLAYER_NKPLAYBACK);
 			else if (isWebTV)
 				channelName = g_Locale->getText(LOCALE_WEBTV_HEAD);
+			else
+				channelName = g_Locale->getText(LOCALE_MOVIEPLAYER_FILEPLAYBACK);
 		}
 		g_InfoViewer->showMovieTitle(playstate, GET_CHANNEL_ID_FROM_EVENT_ID(p_movie_info->epgEpgId),
 					     channelName, p_movie_info->epgTitle, p_movie_info->epgInfo1,
@@ -1441,7 +1474,7 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 		return;
 	}
 
-	/* not moviebrowser => use the filename as title */
+	/* fallthrough: use the filename as title */
 	g_InfoViewer->showMovieTitle(playstate, 0, pretty_name, "", "", duration, position, repeat_mode);
 }
 
