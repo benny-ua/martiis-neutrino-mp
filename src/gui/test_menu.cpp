@@ -309,7 +309,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		int fnum = atoi(actionKey.substr(5, 1));
 		printf("22kon: fe %d sat pos %d\n", fnum, test_pos[fnum]);
-		scansettings.sat_TP_freq = to_string(12000*1000);
+		scansettings.sat_TP_freq = "12000000";
 		scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
 		CScanTs scanTs(FE_QPSK);
 		scanTs.exec(NULL, "test");
@@ -319,7 +319,7 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 	{
 		int fnum = atoi(actionKey.substr(6, 1));
 		printf("22koff: fe %d sat pos %d\n", fnum, test_pos[fnum]);
-		scansettings.sat_TP_freq = to_string(11000*1000);
+		scansettings.sat_TP_freq = "11000000";
 		scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
 		CScanTs scanTs(FE_QPSK);
 		scanTs.exec(NULL, "test");
@@ -334,10 +334,10 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 		switch (frontend->getInfo()->type) {
 			case FE_QPSK:
 				scansettings.satName = CServiceManager::getInstance()->GetSatelliteName(test_pos[fnum]);
-				scansettings.sat_TP_freq = to_string((fnum & 1) ? 12439000: 12538000);
-				scansettings.sat_TP_rate = to_string((fnum & 1) ? 2500*1000 : 41250*1000);
-				scansettings.sat_TP_fec = (fnum & 1) ? FEC_3_4 : FEC_1_2;
-				scansettings.sat_TP_pol = (fnum & 1) ? 0 : 1;
+				scansettings.sat_TP_freq = (fnum & 1) ? "12439000": "12538000";
+				scansettings.sat_TP_rate = (fnum & 1) ? "2500000" : "41250000";
+				scansettings.sat_TP_fec  = (fnum & 1) ? FEC_3_4 : FEC_1_2;
+				scansettings.sat_TP_pol  = (fnum & 1) ? 0 : 1;
 				break;
 			case FE_QAM:
 				{
@@ -348,11 +348,11 @@ int CTestMenu::exec(CMenuTarget* parent, const std::string &actionKey)
 							fe->setMode(CFrontend::FE_MODE_UNUSED);
 					}
 					frontend->setMode(CFrontend::FE_MODE_INDEPENDENT);
-					scansettings.cableName = "CST Berlin";
-					scansettings.cable_TP_freq = to_string(474*1000);
-					scansettings.cable_TP_rate = to_string(6875*1000);
-					scansettings.cable_TP_fec = 1;
-					scansettings.cable_TP_mod = 5;
+					scansettings.cableName     = "CST Berlin";
+					scansettings.cable_TP_freq = "474000";
+					scansettings.cable_TP_rate = "6875000";
+					scansettings.cable_TP_fec  = 1;
+					scansettings.cable_TP_mod  = 5;
 				}
 				break;
 			case FE_OFDM:

@@ -2077,7 +2077,7 @@ void CControlAPI::SendTimersXML(CyhookHandler *hh)
 		hh->printf("\t\t\t\t<text>%s</text>\n",zRep.c_str());
 		std::string weekdays;
 		NeutrinoAPI->Timerd->setWeekdaysToStr(timer->eventRepeat, weekdays);
-		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n",weekdays.c_str());
+		hh->printf("\t\t\t\t<weekdays>%s</weekdays>\n", weekdays.c_str());
 		hh->WriteLn("\t\t\t</repeat>\n");
 
 		// channel infos

@@ -146,15 +146,15 @@ bool CScanSettings::loadSettings(const char * const fileName, const delivery_sys
 	scan_logical_numbers = configfile.getInt32("scan_logical_numbers", 0);
 	scan_logical_hd = configfile.getInt32("scan_logical_hd", 1);
 
-	satName = configfile.getString("satName", satName);
-	sat_TP_fec = configfile.getInt32("sat_TP_fec", 1);
-	sat_TP_pol = configfile.getInt32("sat_TP_pol", 0);
+	satName     = configfile.getString("satName", satName);
+	sat_TP_fec  = configfile.getInt32("sat_TP_fec", 1);
+	sat_TP_pol  = configfile.getInt32("sat_TP_pol", 0);
 	sat_TP_freq = configfile.getString("sat_TP_freq", "10100000");
 	sat_TP_rate = configfile.getString("sat_TP_rate", "27500000");
 
-	cableName = configfile.getString("cableName", cableName);
-	cable_TP_mod = configfile.getInt32("cable_TP_mod", 3);
-	cable_TP_fec = configfile.getInt32("cable_TP_fec", 1);
+	cableName     = configfile.getString("cableName", cableName);
+	cable_TP_mod  = configfile.getInt32("cable_TP_mod", 3);
+	cable_TP_fec  = configfile.getInt32("cable_TP_fec", 1);
 	cable_TP_freq = configfile.getString("cable_TP_freq", "369000");
 	cable_TP_rate = configfile.getString("cable_TP_rate", "6875000");
 #if 1

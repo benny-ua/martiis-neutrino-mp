@@ -241,7 +241,7 @@ void CNeutrinoApp::InitMenuMain()
 #endif
 
 #ifdef ENABLE_TEST_MENU
-	personalize.addItem(MENU_MAIN, new CMenuForwarderNonLocalized("Test menu", true, NULL, new CTestMenu()), NULL, false, CPersonalizeGui::PERSONALIZE_SHOW_NO);
+	personalize.addItem(MENU_MAIN, new CMenuForwarder("Test menu", true, NULL, new CTestMenu()), NULL, false, CPersonalizeGui::PERSONALIZE_SHOW_NO);
 #endif
 }
 
