@@ -284,7 +284,7 @@ bool CRecordInstance::Stop(bool remove_event)
 	struct stat test;
 	snprintf(buf,sizeof(buf), "%s.xml", filename.c_str());
 	if(stat(buf, &test) == 0){
-		cMovieInfo->clearMovieInfo(recMovieInfo);
+		recMovieInfo->clear();
 		snprintf(buf,sizeof(buf), "%s.ts", filename.c_str());
 		recMovieInfo->file.Name = buf;
 		cMovieInfo->loadMovieInfo(recMovieInfo);//restore user bookmark
@@ -596,7 +596,7 @@ void CRecordInstance::FillMovieInfo(CZapitChannel * channel, APIDList & apid_lis
 {
 	std::string info1, info2;
 
-	cMovieInfo->clearMovieInfo(recMovieInfo);
+	recMovieInfo->clear();
 
 	std::string tmpstring = channel->getName();
 

@@ -882,8 +882,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			playback->GetMetadata(keys, values);
 			size_t count = keys.size();
 			if (count > 0) {
-				CMovieInfo cmi;
-				cmi.clearMovieInfo(&mi);
+				mi.clear();
 				for (size_t i = 0; i < count; i++) {
 					std::string key = trim(keys[i]);
 					if (mi.epgTitle.empty() && !strcasecmp("title", key.c_str())) {
