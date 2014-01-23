@@ -4328,6 +4328,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	{
 		g_Sectionsd->freeMemory();
 	}
+	else if(actionKey == "channels")
+		return showChannelList(CRCInput::RC_ok, true);
+	else if(actionKey == "standby")
+		g_RCInput->postMsg(NeutrinoMessages::STANDBY_ON, 0);
 
 	return returnval;
 }

@@ -39,7 +39,7 @@
 
 struct table_key {
 	const char *name;
-	uint32_t code;
+	lua_Integer code;
 };
 
 struct lua_envexport {
@@ -122,6 +122,7 @@ static void set_lua_variables(lua_State *L)
 		{ "mute_off",		CRCInput::RC_mute_off },
 		{ "analog_on",		CRCInput::RC_analog_on },
 		{ "analog_off",		CRCInput::RC_analog_off },
+#if 0
 		{ "find",		CRCInput::RC_find },
 		{ "pip",		CRCInput::RC_pip },
 		{ "folder",		CRCInput::RC_archive },
@@ -137,6 +138,7 @@ static void set_lua_variables(lua_State *L)
 		{ "prog2",		CRCInput::RC_prog2 },
 		{ "prog3",		CRCInput::RC_prog3 },
 		{ "prog4",		CRCInput::RC_prog4 },
+#endif
 		/* to check if it is in our range */
 		{ "MaxRC",		CRCInput::RC_MaxRC },
 		{ NULL, 0 }
@@ -222,20 +224,20 @@ static void set_lua_variables(lua_State *L)
 		{ "TOP_RIGHT",		CORNER_TOP_RIGHT },
 		{ "BOTTOM_LEFT",	CORNER_BOTTOM_LEFT },
 		{ "BOTTOM_RIGHT",	CORNER_BOTTOM_RIGHT },
-		{ "RADIUS_LARGE",	(uint32_t) RADIUS_LARGE }, /* those depend on g_settings.rounded_corners */
-		{ "RADIUS_MID",		(uint32_t) RADIUS_MID },
-		{ "RADIUS_SMALL",	(uint32_t) RADIUS_SMALL },
-		{ "RADIUS_MIN",		(uint32_t) RADIUS_MIN },
+		{ "RADIUS_LARGE",	RADIUS_LARGE },	/* those depend on g_settings.rounded_corners */
+		{ "RADIUS_MID",		RADIUS_MID },
+		{ "RADIUS_SMALL",	RADIUS_SMALL },
+		{ "RADIUS_MIN",		RADIUS_MIN },
 		{ NULL, 0 }
 	};
 
 	/* screen offsets, exported as e.g. SCREEN['END_Y'] */
 	table_key screenopts[] =
 	{
-		{ "OFF_X", (uint32_t) g_settings.screen_StartX },
-		{ "OFF_Y", (uint32_t) g_settings.screen_StartY },
-		{ "END_X", (uint32_t) g_settings.screen_EndX },
-		{ "END_Y", (uint32_t) g_settings.screen_EndY },
+		{ "OFF_X", g_settings.screen_StartX },
+		{ "OFF_Y", g_settings.screen_StartY },
+		{ "END_X", g_settings.screen_EndX },
+		{ "END_Y", g_settings.screen_EndY },
 		{ NULL, 0 }
 	};
 	table_key menureturn[] =
@@ -634,7 +636,7 @@ int CLuaInstance::GCWindow(lua_State *L)
 	return 0;
 }
 
-#if HAVE_COOL_HARDWARE
+#if 1
 int CLuaInstance::Blit(lua_State *)
 {
 	return 0;
@@ -694,7 +696,7 @@ bool CLuaMenuChangeObserver::changeNotify(lua_State *L, const std::string &luaAc
 	lua_pushstring(L, luaId.c_str());
 	lua_pushstring(L, optionValue);
 	lua_pcall(L, 2 /* two args */, 1 /* one result */, 0);
-	int res = lua_isnumber(L, -1) ? (int)lua_tonumber(L, -1) : 0;
+	double res = lua_isnumber(L, -1) ? lua_tonumber(L, -1) : 0;
 	lua_pop(L, 2);
 	return ((res == menu_return::RETURN_REPAINT) || (res == menu_return::RETURN_EXIT_REPAINT));
 }
@@ -1273,7 +1275,7 @@ int CLuaInstance::MessageboxExec(lua_State *L)
 
 	tmp = "cancel";
 	for (int i = 0; mbr[i].name; i++)
-		if ((uint32_t)res == mbr[i].code) {
+		if (res == mbr[i].code) {
 			tmp = mbr[i].name;
 			break;
 		}
@@ -1333,28 +1335,30 @@ CLuaCWindow *CLuaInstance::CWindowCheck(lua_State *L, int n)
 int CLuaInstance::CWindowPaint(lua_State *L)
 {
 	lua_assert(lua_istable(L,1));
-	int do_save_bg = 1;
-	tableLookup(L, "do_save_bg", do_save_bg);
+	std::string tmp = "true";
+	tableLookup(L, "do_save_bg", tmp);
+	bool do_save_bg = (tmp == "true" || tmp == "1" || tmp == "yes");
 
 	CLuaCWindow *m = CWindowCheck(L, 1);
 	if (!m)
 		return 0;
 
-	m->w->paint((do_save_bg!=0)?true:false);
+	m->w->paint(do_save_bg);
 	return 0;
 }
 
 int CLuaInstance::CWindowHide(lua_State *L)
 {
 	lua_assert(lua_istable(L,1));
-	int no_restore = 0;
-	tableLookup(L, "no_restore", no_restore);
+	std::string tmp = "false";
+	tableLookup(L, "no_restore", tmp);
+	bool no_restore = (tmp == "true" || tmp == "1" || tmp == "yes");
 
 	CLuaCWindow *m = CWindowCheck(L, 1);
 	if (!m)
 		return 0;
 
-	m->w->hide((no_restore!=0)?true:false);
+	m->w->hide(no_restore);
 	return 0;
 }
 
@@ -1416,14 +1420,15 @@ int CLuaInstance::SignalBoxNew(lua_State *L)
 int CLuaInstance::SignalBoxPaint(lua_State *L)
 {
 	lua_assert(lua_istable(L,1));
-	int do_save_bg = 1;
-	tableLookup(L, "do_save_bg", do_save_bg);
+	std::string tmp = "true";
+	tableLookup(L, "do_save_bg", tmp);
+	bool do_save_bg = (tmp == "true" || tmp == "1" || tmp == "yes");
 
 	CLuaSignalBox *m = SignalBoxCheck(L, 1);
 	if (!m)
 		return 0;
 
-	m->s->paint((do_save_bg!=0)?true:false);
+	m->s->paint(do_save_bg);
 	return 0;
 }
 

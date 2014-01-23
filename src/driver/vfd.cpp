@@ -73,6 +73,7 @@ CVFD::CVFD()
 	clearClock = 0;
 	mode = MODE_TVRADIO;
 	switch_name_time_cnt = 0;
+	timeout_cnt = 0;
 }
 
 CVFD::~CVFD()
