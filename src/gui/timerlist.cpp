@@ -289,8 +289,8 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 			if (timer_apids_dflt)
 				timerlist[selected].apids = TIMERD_APIDS_CONF;
 			else
-				timerlist[selected].apids = (timer_apids_std * TIMERD_APIDS_STD) | (timer_apids_ac3 * TIMERD_APIDS_AC3) |
-							    (timer_apids_alt * TIMERD_APIDS_ALT);
+				timerlist[selected].apids = (unsigned char)((timer_apids_std * TIMERD_APIDS_STD) | (timer_apids_ac3 * TIMERD_APIDS_AC3) |
+							    (timer_apids_alt * TIMERD_APIDS_ALT));
 			Timer->modifyTimerAPid(timerlist[selected].eventID,timerlist[selected].apids);
 			Timer->modifyRecordTimerEvent(timerlist[selected].eventID, timerlist[selected].announceTime,
 						      timerlist[selected].alarmTime,
