@@ -323,31 +323,22 @@ bool get_mem_usage(unsigned long &kbtotal, unsigned long &kbfree)
 
 std::string find_executable(const char *name)
 {
-	struct stat s;
-	char *tmpPath = getenv("PATH");
-	char *p, *n, *path;
-	if (tmpPath)
-		path = strdupa(tmpPath);
-	else
-		path = strdupa("/bin:/usr/bin:/sbin:/usr/sbin");
+	struct stat st;
+
 	if (name[0] == '/') { /* full path given */
-		if (!access(name, X_OK) && !stat(name, &s) && S_ISREG(s.st_mode))
+		if (!access(name, X_OK) && !stat(name, &st) && S_ISREG(st.st_mode))
 			return std::string(name);
 		return "";
 	}
 
-	p = path;
-	while (p) {
-		n = strchr(p, ':');
-		if (n)
-			*n++ = '\0';
-		if (*p != '\0') {
-			std::string tmp = std::string(p) + "/" + std::string(name);
-			const char *f = tmp.c_str();
-			if (!access(f, X_OK) && !stat(f, &s) && S_ISREG(s.st_mode))
-				return tmp;
-		}
-		p = n;
+	const char *path[] = { "/bin", "/sbin/", "/usr/bin", "/usr/sbin", NULL };
+	const char *p = *path;
+	while (*p) {
+		std::string tmp = std::string(p) + "/" + std::string(name);
+		const char *f = tmp.c_str();
+		if (!access(f, X_OK) && !stat(f, &st) && S_ISREG(st.st_mode))
+			return tmp;
+		p++;
 	}
 	return "";
 }
