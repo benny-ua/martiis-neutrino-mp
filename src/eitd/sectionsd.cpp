@@ -47,6 +47,7 @@
 #include <eventserver.h>
 #include <driver/abstime.h>
 #include <system/set_threadname.h>
+#include <system/helpers.h>
 
 #include "eitd.h"
 #include "sectionsd.h"
@@ -2155,8 +2156,8 @@ bool CEitManager::Start()
 	oldEventsAre = config.epg_old_events*60L*60L; //hours
 	max_events = config.epg_max_events;
 
-	if (access("/sbin/ntpdate", F_OK))
-		ntp_system_cmd_prefix = "/sbin/ntpd -n -q -p ";
+	if (find_executable("ntpdate").empty())
+		ntp_system_cmd_prefix = "ntpd -n -q -p ";
 
 	printf("[sectionsd] Caching: %d days, %d hours Extended Text, max %d events, Events are old %d hours after end time\n",
 		config.epg_cache, config.epg_extendedcache, config.epg_max_events, config.epg_old_events);

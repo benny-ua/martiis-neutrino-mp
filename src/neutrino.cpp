@@ -3512,6 +3512,14 @@ _repeat:
 //		ShowHint(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_EXTRA_ZAPIT_SDT_CHANGED),
 //				CMessageBox::mbrBack,CMessageBox::mbBack, NEUTRINO_ICON_INFO);
 	}
+#if !HAVE_SPARK_HARDWARE
+	else if (msg == NeutrinoMessages::EVT_HDMI_CEC_ON) {
+		if(g_settings.hdmi_cec_view_on)
+			videoDecoder->SetCECAutoView(g_settings.hdmi_cec_view_on);
+
+		return messages_return::handled;
+	}
+#endif
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
 		delete [] (unsigned char*) data;
 	
