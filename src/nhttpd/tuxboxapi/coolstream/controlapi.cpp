@@ -438,6 +438,10 @@ void CControlAPI::StandbyCGI(CyhookHandler *hh)
 				CEC_HDMI_off = true;
 			}
 		}
+		//dont use CEC with standbyoff --- use: control/standby?off&cec=off
+		if(g_settings.hdmi_cec_view_on && CEC_HDMI_off){
+			videoDecoder->SetCECAutoView(0);
+		}
 #endif
 
 		if (hh->ParamList["1"] == "on")	// standby mode on
@@ -448,26 +452,19 @@ void CControlAPI::StandbyCGI(CyhookHandler *hh)
 		}
 		else if (hh->ParamList["1"] == "off")// standby mode off
 		{
-#if !HAVE_SPARK_HARDWARE
-			//dont use CEC with standbyoff --- use: control/standby?off&cec=off
-			if(g_settings.hdmi_cec_view_on && CEC_HDMI_off){
-				videoDecoder->SetCECAutoView(0);
-			}
-#endif
-
 			NeutrinoAPI->Zapit->setStandby(false);
 			if(CNeutrinoApp::getInstance()->getMode() == 4)
 				NeutrinoAPI->EventServer->sendEvent(NeutrinoMessages::STANDBY_OFF, CEventServer::INITID_HTTPD);
 			hh->SendOk();
-
-#if !HAVE_SPARK_HARDWARE
-			if(g_settings.hdmi_cec_view_on && CEC_HDMI_off){//dont use CEC with standbyoff
-				NeutrinoAPI->EventServer->sendEvent(NeutrinoMessages::EVT_HDMI_CEC_ON, CEventServer::INITID_HTTPD);
-			}
-#endif
 		}
 		else
 			hh->SendError();
+
+#if !HAVE_SPARK_HARDWARE
+		if(g_settings.hdmi_cec_view_on && CEC_HDMI_off){//dont use CEC with standbyoff
+			NeutrinoAPI->EventServer->sendEvent(NeutrinoMessages::EVT_HDMI_CEC_ON, CEventServer::INITID_HTTPD);
+		}
+#endif
 	}
 	else
 		if(CNeutrinoApp::getInstance()->getMode() == 4)//mode_standby = 4
