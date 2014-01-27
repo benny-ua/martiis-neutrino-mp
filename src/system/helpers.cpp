@@ -331,7 +331,7 @@ std::string find_executable(const char *name)
 		return "";
 	}
 
-	const char *path[] = { "/bin", "/sbin/", "/usr/bin", "/usr/sbin", NULL };
+	const char *path[] = { "/bin", "/sbin/", "/usr/bin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin", NULL };
 	const char **p = path;
 	while (p) {
 		std::string tmp = std::string(*p) + "/" + std::string(name);

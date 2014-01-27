@@ -4515,6 +4515,8 @@ int main(int argc, char **argv)
 
 	tzset();
 
+	setenv("PATH", "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin", 1);
+
 	return CNeutrinoApp::getInstance()->run(argc, argv);
 }
 
