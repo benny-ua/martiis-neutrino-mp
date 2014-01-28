@@ -109,6 +109,7 @@ private:
 	int radiosort[LIST_MODE_LAST];
 
 	CMoviePluginChangeExec 		*MoviePluginChanger;
+	bool				channellist_visible;
 
 	void SDT_ReloadChannels();
 	void setupNetwork( bool force= false );
@@ -233,6 +234,8 @@ public:
 	void setTheme(CConfigFile &themefile);
 	void getTheme(CConfigFile &themefile);
 
+	bool getChannellistIsVisible() { return channellist_visible; }
+	void zapTo(t_channel_id channel_id);
 };
 #endif
 

@@ -155,6 +155,8 @@ struct NeutrinoMessages {
 		EVT_BATCHEPG				 = CRCInput::RC_WithData + 26,
 		EVT_WEBTV				 = CRCInput::RC_WithData + 27, /* data: (MI_MOVIE_INFO *) */
 		EVT_HDMI_CEC_ON	    			 = CRCInput::RC_WithData + 28,
+		EVT_HDMI_CEC_VIEW_ON	    		 = CRCInput::RC_WithData + 29,
+		EVT_HDMI_CEC_STANDBY	    		 = CRCInput::RC_WithData + 30, 
 	};
 	enum
 	{
