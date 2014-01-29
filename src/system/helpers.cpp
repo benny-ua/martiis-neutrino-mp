@@ -333,7 +333,7 @@ std::string find_executable(const char *name)
 
 	const char *path[] = { "/bin", "/sbin/", "/usr/bin", "/usr/sbin", "/usr/local/bin", "/usr/local/sbin", NULL };
 	const char **p = path;
-	while (p) {
+	while (*p) {
 		std::string tmp = std::string(*p) + "/" + std::string(name);
 		const char *f = tmp.c_str();
 		if (!access(f, X_OK) && !stat(f, &st) && S_ISREG(st.st_mode))
