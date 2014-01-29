@@ -323,7 +323,7 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 		else if (timerNew.eventType == CTimerd::TIMER_ZAPTO ||
 			 timerNew.eventType == CTimerd::TIMER_RECORD)
 		{
-			if (strcmp(timerNew_channel_name, "---")==0)
+			if (timerNew_channel_name == "---")
 				return menu_return::RETURN_REPAINT;
 			if (timerNew.eventType==CTimerd::TIMER_RECORD)
 			{
@@ -371,7 +371,7 @@ int CTimerList::exec(CMenuTarget* parent, const std::string & actionKey)
 		       "%n",
 		       &timerNew.channel_id,
 		       &delta);
-		cstrncpy(timerNew_channel_name, &(key[3 + delta + 1]), sizeof(timerNew_channel_name));
+		timerNew_channel_name = std::string(key + 3 + delta + 1);
 		g_RCInput->postMsg(CRCInput::RC_timeout, 0); // leave underlying menu also
 		g_RCInput->postMsg(CRCInput::RC_timeout, 0); // leave underlying menu also
 		return menu_return::RETURN_EXIT;
@@ -1217,9 +1217,8 @@ int CTimerList::newTimer()
 	CMenuWidget mm(LOCALE_TIMERLIST_MODESELECT, NEUTRINO_ICON_SETTINGS);
 	mm.addItem(new CMenuForwarder(LOCALE_TIMERLIST_MODETV, true, NULL, &mctv));
 	mm.addItem(new CMenuForwarder(LOCALE_TIMERLIST_MODERADIO, true, NULL, &mcradio));
-	strcpy(timerNew_channel_name,"---");
-	std::string TimerNew_channel_name(timerNew_channel_name);
-	CMenuForwarder* m6 = new CMenuForwarder(LOCALE_TIMERLIST_CHANNEL, true, TimerNew_channel_name, &mm);
+	timerNew_channel_name = "---";
+	CMenuForwarder* m6 = new CMenuForwarder(LOCALE_TIMERLIST_CHANNEL, true, timerNew_channel_name, &mm);
 
 	std::string timerNew_recordingDir(timerNew.recordingDir);
 	CMenuForwarder* m7 = new CMenuForwarder(LOCALE_TIMERLIST_RECORDING_DIR, true, timerNew_recordingDir, this, "rec_dir2", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
