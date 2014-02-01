@@ -30,6 +30,11 @@
 #include <gui/filebrowser.h>
 #include <driver/pictureviewer/pictureviewer.h>
 #include <neutrino.h>
+#include <system/helpers.h>
+#include <system/set_threadname.h>
+#include <luaclient/luaclient.h>
+#include <connection/basicserver.h>
+#include <list>
 
 #include "luainstance.h"
 
@@ -314,7 +319,7 @@ CLuaInstance::~CLuaInstance()
 	lua_setglobal(lua, #NAME);
 
 /* Run the given script. */
-void CLuaInstance::runScript(const char *fileName)
+void CLuaInstance::runScript(const char *fileName, std::vector<std::string> *argv, std::string *result_code, std::string *result_string, std::string *error_string)
 {
 	// luaL_dofile(lua, fileName);
 	/* run the script */
@@ -322,14 +327,31 @@ void CLuaInstance::runScript(const char *fileName)
 	if (status) {
 		fprintf(stderr, "[CLuaInstance::%s] Can't load file: %s\n", __func__, lua_tostring(lua, -1));
 		ShowMsg2UTF("Lua script error:", lua_tostring(lua, -1), CMsgBox::mbrBack, CMsgBox::mbBack);
+		if (error_string)
+			*error_string = std::string(lua_tostring(lua, -1));
 		return;
 	}
 	set_lua_variables(lua);
+	if (argv) {
+		lua_createtable(lua, argv->size(), 0);
+		int n = 0;
+		for(std::vector<std::string>::iterator it = argv->begin(); it != argv->end(); ++it) {
+			lua_pushstring(lua, it->c_str());
+			lua_rawseti(lua, -2, n++);
+		}
+		lua_setglobal(lua, "arg");
+	}
 	status = lua_pcall(lua, 0, LUA_MULTRET, 0);
+	if (result_code)
+		*result_code = to_string(status);
+	if (result_string && lua_isstring(lua, -1))
+		*result_string = std::string(lua_tostring(lua, -1));
 	if (status)
 	{
 		fprintf(stderr, "[CLuaInstance::%s] error in script: %s\n", __func__, lua_tostring(lua, -1));
 		ShowMsg2UTF("Lua script error:", lua_tostring(lua, -1), CMsgBox::mbrBack, CMsgBox::mbBack);
+		if (error_string)
+			*error_string = std::string(lua_tostring(lua, -1));
 	}
 }
 
@@ -1443,6 +1465,173 @@ int CLuaInstance::SignalBoxDelete(lua_State *L)
 	m->s->kill();
 	delete m;
 	return 0;
+}
+
+// --------------------------------------------------------------------------------
+
+#if 0
+For testing try:
+
+cat <<EOT > /lib/tuxbox/luaplugins/test.lua
+for i,v in ipairs(arg) do
+	print(tostring(i) .. "\t" .. tostring(v))
+end
+return "ok"
+EOT
+
+followed by luaclient test a b c d
+#endif
+class luaserver_data
+{
+	public:
+		int fd;
+		std::vector<std::string> argv;
+		std::string script;
+
+		luaserver_data(int _fd, std::string &_script) {
+			fd = dup(_fd);
+			fcntl(fd, F_SETFD, FD_CLOEXEC);
+			script = _script;
+		}
+		~luaserver_data(void) {
+			close(fd);
+		}
+		
+};
+
+static int luaserver_count = 0;
+static pthread_mutex_t luaserver_mutex;
+
+static void luaserver_lock(void)
+{
+	pthread_mutex_lock(&luaserver_mutex);
+}
+
+static void luaserver_unlock(void)
+{
+	pthread_mutex_unlock(&luaserver_mutex);
+}
+
+static void *luaserver_thread(void *arg) {
+	set_threadname(__func__);
+	luaserver_lock();
+	luaserver_count++;
+	luaserver_unlock();
+	sem_post(&CNeutrinoApp::getInstance()->lua_did_run);
+
+	luaserver_data *lsd = (class luaserver_data *)arg;
+
+	CLuaInstance lua;
+	std::string result_code;
+	std::string result_string;
+	std::string error_string;
+	lua.runScript(lsd->script.c_str(), &lsd->argv, &result_code, &result_string, &error_string);
+	size_t result_code_len = result_code.length() + 1;
+	size_t result_string_len = result_string.length() + 1;
+	size_t error_string_len = error_string.length() + 1;
+	size_t size = result_code_len + result_string_len + error_string_len;
+	char result[size + sizeof(size)];
+	char *rp = result;
+	memcpy(rp, &size, sizeof(size));
+	rp += sizeof(size);
+	size += sizeof(size);
+	memcpy(rp, result_code.c_str(), result_code_len);
+	rp += result_code_len;
+	memcpy(rp, result_string.c_str(), result_string_len);
+	rp += result_string_len;
+	memcpy(rp, error_string.c_str(), error_string_len);
+	rp += error_string_len;
+	CBasicServer::send_data(lsd->fd, result, size);
+
+	delete lsd;
+	luaserver_lock();
+	luaserver_count--;
+	if (!luaserver_count)
+		sem_post(&CNeutrinoApp::getInstance()->lua_may_run);
+	luaserver_unlock();
+	pthread_exit(NULL);
+}
+
+static bool luaserver_parse_command(CBasicMessage::Header &rmsg __attribute__((unused)), int connfd)
+{
+	size_t size;
+
+	if (!CBasicServer::receive_data(connfd, &size, sizeof(size))) {
+		fprintf(stderr, "%s %s %d: receive_data failed\n", __FILE__, __func__, __LINE__);
+		return true;
+	}
+	char data[size];
+	if (!CBasicServer::receive_data(connfd, data, size)) {
+		fprintf(stderr, "%s %s %d: receive_data failed\n", __FILE__, __func__, __LINE__);
+		return true;
+	}
+	if (data[size - 1]) {
+		fprintf(stderr, "%s %s %d: unterminated string\n", __FILE__, __func__, __LINE__);
+		return true;
+	}
+	std::string luascript(LUAPLUGINDIR "/");
+	luascript += data;
+	luascript += ".lua";
+	if (access(luascript, R_OK)) {
+		fprintf(stderr, "%s %s %d: %s not found\n", __FILE__, __func__, __LINE__, luascript.c_str());
+		const char *result_code = "-1";
+		const char *result_string = "";
+		std::string error_string = luascript + " not found\n";
+		size_t result_code_len = strlen(result_code) + 1;
+		size_t result_string_len = strlen(result_string) + 1;
+		size_t error_string_len = strlen(error_string.c_str()) + 1;
+		size = result_code_len + result_string_len + error_string_len;
+		char result[size + sizeof(size)];
+		char *rp = result;
+		memcpy(rp, &size, sizeof(size));
+		rp += sizeof(size);
+		size += sizeof(size);
+		memcpy(rp, result_code, result_code_len);
+		rp += result_code_len;
+		memcpy(rp, result_string, result_string_len);
+		rp += result_string_len;
+		memcpy(rp, error_string.c_str(), error_string_len);
+		rp += error_string_len;
+		CBasicServer::send_data(connfd, result, size);
+		return true;
+	}
+	luaserver_data *lsd = new luaserver_data(connfd, luascript);
+	char *datap = data;
+	while (size > 0) {
+		lsd->argv.push_back(std::string(datap));
+		size_t len = strlen(datap) + 1;
+		datap += len;
+		size -= len;
+	}
+
+	luaserver_lock();
+	if (!luaserver_count)
+		sem_wait(&CNeutrinoApp::getInstance()->lua_may_run);
+	luaserver_unlock();
+
+	pthread_t thr;
+	pthread_create (&thr, NULL, luaserver_thread, (void *) lsd);
+	pthread_detach(thr);
+
+	return true;
+}
+
+void *luaserver_main_thread(void *) {
+	set_threadname(__func__);
+
+	CBasicServer server;
+	if (!server.prepare(LUACLIENT_UDS_NAME)) {
+		fprintf(stderr, "%s %s %d: prepare failed\n", __FILE__, __func__, __LINE__);
+		pthread_exit(NULL);
+	}
+
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
+	pthread_mutex_init(&luaserver_mutex, &attr);
+
+	server.run(luaserver_parse_command, LUACLIENT_VERSION);
+	pthread_exit(NULL);
 }
 
 // --------------------------------------------------------------------------------

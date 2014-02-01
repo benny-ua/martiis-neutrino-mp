@@ -30,6 +30,7 @@ extern "C" {
 #include <gui/widget/hintbox.h>
 #include <gui/widget/messagebox.h>
 #include <gui/components/cc.h>
+#include <vector>
 
 /* this is stored as userdata in the lua_State */
 struct CLuaData
@@ -145,7 +146,7 @@ class CLuaInstance
 public:
 	CLuaInstance();
 	~CLuaInstance();
-	void runScript(const char *fileName);
+	void runScript(const char *fileName, std::vector<std::string> *argv = NULL, std::string *result_code = NULL, std::string *result_string = NULL, std::string *error_string = NULL);
 
 private:
 	lua_State* lua;

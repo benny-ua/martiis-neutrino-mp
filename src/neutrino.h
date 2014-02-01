@@ -36,6 +36,7 @@
 #include "config.h"
 
 #include <configfile.h>
+#include <semaphore.h>
 
 #include <neutrinoMessages.h>
 #include "driver/framebuffer.h"
@@ -183,6 +184,9 @@ public:
 	bool				shairplay_enabled_cur;
 #endif
 	bool                            timer_wakeup;
+
+	sem_t				lua_may_run;
+	sem_t				lua_did_run;
 
 	static CNeutrinoApp* getInstance();
 
