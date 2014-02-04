@@ -148,27 +148,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 
 	// define classes
 	CSubChannelSelectMenu subchanselect;
-<<<<<<< HEAD
 	CStreamFeaturesChangeExec StreamFeaturesChanger;
 	CNeutrinoApp * neutrino					= CNeutrinoApp::getInstance();
-=======
-	CStreamInfo2 * streamInfo				= NULL;
-	CEventListHandler* tmpEventListHandler                  = NULL;
-	CEPGplusHandler* tmpEPGplusHandler                      = NULL;
-	CEPGDataHandler* tmpEPGDataHandler                      = NULL;
-	CTimerList* Timerlist					= NULL;
-	CRCLock *rcLock						= NULL;
-	CStreamFeaturesChangeExec *StreamFeaturesChanger	= NULL;
-	CImageInfo *imageinfo					= NULL;
-	CDBoxInfoWidget *boxinfo				= NULL;
-	CNeutrinoApp * neutrino					= NULL;
-	CPluginList * games					= NULL;
-	CPluginList * tools					= NULL;
-	CPluginList * scripts					= NULL;
-#if ENABLE_LUA
-	CPluginList * lua					= NULL;
-#endif
->>>>>>> origin/next-cc
 	
 	std::string txt = g_settings.usermenu_text[button];
 	if (button < COL_BUTTONMAX && txt.empty())
@@ -286,29 +267,11 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_item = new CMenuDForwarder(LOCALE_MAINMENU_GAMES, g_PluginList->hasPlugin(CPlugins::P_TYPE_GAME), NULL, new CPluginList(LOCALE_MAINMENU_GAMES,CPlugins::P_TYPE_GAME), "-1", key, icon );
 			menu_item->setHint(NEUTRINO_ICON_HINT_GAMES, LOCALE_MENU_HINT_GAMES);
 			break;
-		case SNeutrinoSettings::ITEM_TOOLS:
-			menu_items++;
-			menu_prev = SNeutrinoSettings::ITEM_TOOLS;
-			tools = new CPluginList(LOCALE_MAINMENU_TOOLS,CPlugins::P_TYPE_TOOL);
-			keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_MAINMENU_TOOLS, g_PluginList->hasPlugin(CPlugins::P_TYPE_TOOL), NULL, tools, "-1", key, icon );
-			menu->addItem(menu_item, false);
-			break;
 		case SNeutrinoSettings::ITEM_SCRIPTS:
 			keyhelper.get(&key,&icon);
 			menu_item = new CMenuDForwarder(LOCALE_MAINMENU_SCRIPTS, g_PluginList->hasPlugin(CPlugins::P_TYPE_SCRIPT), NULL, new CPluginList(LOCALE_MAINMENU_SCRIPTS,CPlugins::P_TYPE_SCRIPT), "-1", key, icon );
 			menu_item->setHint(NEUTRINO_ICON_HINT_SCRIPTS, LOCALE_MENU_HINT_SCRIPTS);
 			break;
-#if ENABLE_LUA
-		case SNeutrinoSettings::ITEM_LUA:
-			menu_items++;
-			menu_prev = SNeutrinoSettings::ITEM_LUA;
-			lua = new CPluginList(LOCALE_MAINMENU_LUA,CPlugins::P_TYPE_LUA);
-			keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_MAINMENU_LUA, g_PluginList->hasPlugin(CPlugins::P_TYPE_LUA), NULL, lua, "-1", key, icon );
-			menu->addItem(menu_item, false);
-			break;
-#endif
 		case SNeutrinoSettings::ITEM_PLUGIN:
 		{
 			unsigned int number_of_plugins = (unsigned int) g_PluginList->getNumberOfPlugins();
@@ -318,13 +281,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			int cnt = 0;
 			for (unsigned int count = 0; count < number_of_plugins; count++)
 			{
-<<<<<<< HEAD
 				bool show = g_PluginList->getType(count) == CPlugins::P_TYPE_TOOL ||
 					    g_PluginList->getType(count) == CPlugins::P_TYPE_LUA;
-=======
-				bool show = g_PluginList->getType(count) == g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE];
-
->>>>>>> origin/next-cc
 				if (show && !g_PluginList->isHidden(count))
 				{
 					sprintf(id, "%d", count);

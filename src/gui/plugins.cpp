@@ -138,12 +138,7 @@ void CPlugins::scanDir(const char *dir)
 					new_plugin.pluginfile.append(".sh");
 				else if (new_plugin.type == CPlugins::P_TYPE_LUA)
 					new_plugin.pluginfile.append(".lua");
-<<<<<<< HEAD
 				else
-=======
-#endif
-				else // CPlugins::P_TYPE_GAME or CPlugins::P_TYPE_TOOL
->>>>>>> origin/next-cc
 					new_plugin.pluginfile.append(".so");
 				// We do not check if new_plugin.pluginfile exists since .cfg in
 				// PLUGINDIR_VAR can overwrite settings in read only dir

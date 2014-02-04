@@ -47,9 +47,7 @@ const struct personalize_settings_t personalize_settings[SNeutrinoSettings::P_SE
 	{"personalize_media"			, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE}, 
 	
 	{"personalize_games"			, CPersonalizeGui::PERSONALIZE_MODE_NOTVISIBLE},	
-	{"personalize_tools"			, CPersonalizeGui::PERSONALIZE_MODE_NOTVISIBLE},
 	{"personalize_scripts"			, CPersonalizeGui::PERSONALIZE_MODE_NOTVISIBLE},
-	{"personalize_lua"			, CPersonalizeGui::PERSONALIZE_MODE_NOTVISIBLE},
 	{"personalize_settings"			, CPersonalizeGui::PERSONALIZE_PROTECT_MODE_NOT_PROTECTED},
 	{"personalize_service"			, CPersonalizeGui::PERSONALIZE_PROTECT_MODE_NOT_PROTECTED},
 	{"personalize_sleeptimer"		, CPersonalizeGui::PERSONALIZE_MODE_VISIBLE}, 
@@ -111,8 +109,6 @@ const struct personalize_settings_t personalize_settings[SNeutrinoSettings::P_SE
 	{"personalize_feat_key_vtxt"		, CPersonalizeGui::PERSONALIZE_FEAT_KEY_BLUE},
 	{"personalize_feat_key_rclock"		, CPersonalizeGui::PERSONALIZE_FEAT_KEY_AUTO},
 	
-	//plugin type
-	{"personalize_usermenu_plugin_type"	, CPlugins::P_TYPE_TOOL },
 	//user menu
 	{"personalize_usermenu_show_cancel"	, true},
 };
