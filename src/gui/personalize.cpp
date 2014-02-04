@@ -195,14 +195,7 @@ const CMenuOptionChooser::keyval PERSONALIZE_PROTECT_MODE_OPTIONS[CPersonalizeGu
 	{ CPersonalizeGui::PERSONALIZE_PROTECT_MODE_PIN_PROTECTED	, LOCALE_PERSONALIZE_PINPROTECT      	},// The menu/option is protected by a PIN
 };
 
-#define PERSONALIZE_UMENU_PLUGIN_TYPE_MAX 4
-const CMenuOptionChooser::keyval PERSONALIZE_UMENU_PLUGIN_TYPE[PERSONALIZE_UMENU_PLUGIN_TYPE_MAX] =
-{
-	{ CPlugins::P_TYPE_GAME		, LOCALE_MAINMENU_GAMES		},
-	{ CPlugins::P_TYPE_TOOL		, LOCALE_MAINMENU_TOOLS		},
-	{ CPlugins::P_TYPE_SCRIPT	, LOCALE_MAINMENU_SCRIPTS	},
-	{ CPlugins::P_TYPE_LUA		, LOCALE_MAINMENU_LUA		}
-};
+
 
 CPersonalizeGui::CPersonalizeGui() : CPINProtection(g_settings.personalize_pincode)
 {
@@ -461,12 +454,7 @@ void CPersonalizeGui::ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuS
 	p_widget->addItem(fw_fkeys);
 
 	p_widget->addItem(GenericMenuSeparatorLine);
-<<<<<<< HEAD
 
-=======
-	p_widget->addItem(GenericMenuSeparator);
-	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_PLUGIN_TYPE, &g_settings.personalize[SNeutrinoSettings::P_UMENU_PLUGIN_TYPE], PERSONALIZE_UMENU_PLUGIN_TYPE, PERSONALIZE_UMENU_PLUGIN_TYPE_MAX, true));
->>>>>>> origin/next-cc
 	p_widget->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 }
 
