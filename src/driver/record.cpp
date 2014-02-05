@@ -173,6 +173,7 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 		hintBox.paint();
 
 	tsfile = std::string(filename) + ".ts";
+	bool standby = hdd_get_standby(Directory.c_str());
 
 	printf("%s: file %s vpid %x apid %x\n", __FUNCTION__, tsfile.c_str(), allpids.PIDs.vpid, apids[0]);
 
@@ -232,6 +233,8 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 	if (StreamPAT && numpids < REC_MAX_APIDS)
 		apids[numpids++] = 0;
 	psi.genpsi(fd);
+	if (standby)
+		hdd_flush(tsfile.c_str());
 
 #if HAVE_SPARK_HARDWARE
 	if(record == NULL) {
