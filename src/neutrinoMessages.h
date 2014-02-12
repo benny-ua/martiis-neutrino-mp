@@ -157,6 +157,8 @@ struct NeutrinoMessages {
 		EVT_HDMI_CEC_ON	    			 = CRCInput::RC_WithData + 28,
 		EVT_HDMI_CEC_VIEW_ON	    		 = CRCInput::RC_WithData + 29,
 		EVT_HDMI_CEC_STANDBY	    		 = CRCInput::RC_WithData + 30, 
+		EVT_SET_MUTE                             = CRCInput::RC_WithData + 31,
+		EVT_SET_VOLUME                           = CRCInput::RC_WithData + 32
 	};
 	enum
 	{

@@ -525,6 +525,7 @@ bool CMoviePlayerGui::SelectFile()
 	file_name = "";
 
 	printf("CMoviePlayerGui::SelectFile: isBookmark %d timeshift %d isMovieBrowser %d\n", isBookmark, timeshift, isMovieBrowser);
+	wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
 
 	if (timeshift) {
 		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
