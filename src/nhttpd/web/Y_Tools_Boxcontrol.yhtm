@@ -39,7 +39,9 @@ function standby(_standby){
 			<input type="button" value="{=L:on=}" onclick='standby("on");'/>
 			<input type="button" value="{=L:off=}" onclick='standby("off");'/>
 			<input type="button" value="{=L:bc.control.status=}" onclick='goUrl("/control/standby");'/>
+			{=comment:unsupported on spark~
 			CEC: <input id="checkCEC" name="checkCEC" type="checkbox" checked="checked"/>
+			=}
 			</td>
 		</tr>
 		<tr><td class="y_form_header">{=L:bc.control.playback=}</td><td class="y_form_header">{=L:bc.control.recording_mode=}</td></tr>
