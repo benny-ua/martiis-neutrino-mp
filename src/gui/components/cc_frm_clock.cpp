@@ -81,7 +81,7 @@ void CComponentsFrmClock::initVarClock(	const int& x_pos, const int& y_pos, cons
 	cl_blink_str		= format_str;
 	paintClock		= false;
 
-	activeClock	= activ;
+	activeClock		= activ;
 	if (activeClock)
 		startThread();
 }
@@ -376,4 +376,13 @@ Font** CComponentsFrmClock::getClockFont()
 		cl_font = &g_Font[cl_font_type];
 	return cl_font;
 
+}
+
+void CComponentsFrmClock::setClockActiv(bool activ/* = true*/)
+{
+	activeClock = activ;
+	if (activ && !cl_thread)
+		startThread();
+	if (!activ && cl_thread)
+		stopThread();
 }
