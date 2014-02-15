@@ -351,6 +351,16 @@ void CLuaInstance::runScript(const char *fileName, std::vector<std::string> *arg
 	}
 }
 
+static void abortHook(lua_State *lua, lua_Debug *)
+{
+	luaL_error(lua, "aborted");
+}
+
+void CLuaInstance::abortScript()
+{
+	lua_sethook(lua, &abortHook, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+}
+
 const luaL_Reg CLuaInstance::methods[] =
 {
 	{ "PaintBox", CLuaInstance::PaintBox },

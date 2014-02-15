@@ -147,6 +147,7 @@ public:
 	CLuaInstance();
 	~CLuaInstance();
 	void runScript(const char *fileName, std::vector<std::string> *argv = NULL, std::string *result_code = NULL, std::string *result_string = NULL, std::string *error_string = NULL);
+	void abortScript();
 
 private:
 	lua_State* lua;
