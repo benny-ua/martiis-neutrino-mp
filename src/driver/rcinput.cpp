@@ -5,6 +5,7 @@
                       2003 thegoodguy
 
 	Copyright (C) 2008-2012 Stefan Seyfried
+	Copyright (C) 2013-2014 martii
 
 	License: GPL
 
@@ -156,6 +157,7 @@ CRCInput::CRCInput(bool &_timer_wakeup)
 	repeat_block = repeat_block_generic = 0;
 	open();
 	rc_last_key =  KEY_MAX;
+	longPressEnd = 0;
 
 	//select and setup remote control hardware
 	set_rc_hw();
@@ -542,8 +544,14 @@ uint32_t *CRCInput::setAllowRepeat(uint32_t *rk) {
 	return r;
 }
 
-bool CRCInput::mayRepeat(uint32_t key)
+bool CRCInput::mayRepeat(uint32_t key, bool bAllowRepeatLR)
 {
+	if((key == RC_up) || (key == RC_down)
+	|| (key == RC_plus) || (key == RC_minus)
+	|| (key == RC_page_down) || (key == RC_page_up)
+	|| ((bAllowRepeatLR) && ((key == RC_left ) || (key == RC_right))))
+		return true;
+
 	if (repeatkeys) {
 		uint32_t *k = repeatkeys;
 		while (*k != RC_nokey) {
@@ -571,7 +579,6 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 
 	int timer_id;
 	fd_set rfds;
-	t_input_event ev;
 
 	*data = 0;
 
@@ -592,10 +599,9 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 #else
 	uint64_t getKeyBegin = time_monotonic_us();
 #endif
+
 	while(1) {
 		/* we later check for ev.type = EV_SYN which is 0x00, so set something invalid here... */
-		memset(&ev, 0, sizeof(ev));
-		ev.type = EV_MAX;
 		timer_id = 0;
 		if ( !timers.empty() )
 		{
@@ -1291,8 +1297,8 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 
 		for (int i = 0; i < NUMBER_OF_EVENT_DEVICES; i++) {
 			if ((fd_rc[i] != -1) && (FD_ISSET(fd_rc[i], &rfds))) {
-				int ret;
-				ret = read(fd_rc[i], &ev, sizeof(t_input_event));
+				t_input_event ev;
+				int ret = read(fd_rc[i], &ev, sizeof(t_input_event));
 				if (ret != sizeof(t_input_event)) {
 					if (errno == ENODEV) {
 						/* hot-unplugged? */
@@ -1306,13 +1312,40 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 				SHTDCNT::getInstance()->resetSleepTimer();
 				uint32_t trkey = translate(ev.code, i);
 #ifdef _DEBUG
-				printf("key: %04x value %d, translate: %04x -%s-\n", ev.code, ev.value, trkey, getKeyName(trkey).c_str());
+				printf("%d key: %04x value %d, translate: %04x -%s-\n", ev.value, ev.code, ev.value, trkey, getKeyName(trkey).c_str());
 #endif
 				if (trkey == RC_nokey)
 					continue;
+
+				if (g_settings.longkeypress_duration > LONGKEYPRESS_OFF) {
+					uint64_t longPressNow = time_monotonic_us();
+					if (ev.value == 0 && longPressEnd && longPressNow < longPressEnd) {
+						// Key was a potential long press, but wasn't pressed long enough
+						longPressEnd = 0;
+						ev.value = 1;
+					} else if (ev.value == 2 && longPressEnd && longPressEnd < longPressNow) {
+						// repeat event, and we're already in a potential long-press sequence.
+						if (longPressNow < longPressEnd)
+							continue;
+						ev.value = 1;
+						trkey |= RC_Repeat;
+					} else if (ev.value == 2 && longPressEnd) {
+						// Long-press, but key still not released. Skip.
+						continue;
+					} else if (ev.value == 0 && longPressEnd) {
+						// Long-press, key released after time limit
+						longPressEnd = 0;
+						continue;
+					} else if (ev.value == 1 && !mayRepeat(trkey, bAllowRepeatLR)) {
+						// A long-press may start here.
+						longPressEnd = longPressNow + 1000 * g_settings.longkeypress_duration;
+						rc_last_key = KEY_MAX;
+						continue;
+					}
+				}
+
 				if (ev.value) {
 #ifdef RCDEBUG
-					printf("got keydown native key: %04x %04x, translate: %04x -%s-\n", ev.code, ev.code&0x1f, translate(ev.code, 0), getKeyName(translate(ev.code, 0)).c_str());
 					printf("rc_last_key %04x rc_last_repeat_key %04x\n\n", rc_last_key, rc_last_repeat_key);
 #endif
 					if (*timer_wakeup) {
@@ -1329,22 +1362,17 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 
 					tv = ev.time;
 					now_pressed = (uint64_t) tv.tv_usec + (uint64_t)((uint64_t) tv.tv_sec * (uint64_t) 1000000);
-					if (ev.code == rc_last_key) {
+					if (trkey == rc_last_key) {
 						/* only allow selected keys to be repeated */
-						/* (why?)                                  */
-						if( 	(trkey == RC_up) || (trkey == RC_down   ) ||
-							(trkey == RC_plus   ) || (trkey == RC_minus  ) ||
-							(trkey == RC_page_down   ) || (trkey == RC_page_up  ) ||
-							((bAllowRepeatLR) && ((trkey == RC_left ) || (trkey == RC_right))) ||
-							(mayRepeat(trkey)) ||
-							(g_settings.shutdown_real_rcdelay && ((trkey == RC_standby) && (g_info.hw_caps->can_shutdown))))
+						if (mayRepeat(trkey, bAllowRepeatLR) ||
+						    (g_settings.shutdown_real_rcdelay && ((trkey == RC_standby) && (g_info.hw_caps->can_shutdown))))
 						{
 #ifdef ENABLE_REPEAT_CHECK
-							if (rc_last_repeat_key != ev.code) {
+							if (rc_last_repeat_key != trkey) {
 								if ((now_pressed > last_keypress + repeat_block) ||
 										/* accept all keys after time discontinuity: */
 										(now_pressed < last_keypress))
-									rc_last_repeat_key = ev.code;
+									rc_last_repeat_key = trkey;
 								else
 									keyok = false;
 							}
@@ -1356,7 +1384,7 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					else
 						rc_last_repeat_key = KEY_MAX;
 
-					rc_last_key = ev.code;
+					rc_last_key = trkey;
 
 					if (keyok) {
 #ifdef ENABLE_REPEAT_CHECK
@@ -1377,9 +1405,6 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 				} /* if (ev.value) */
 				else {
 					// clear rc_last_key on keyup event
-#ifdef RCDEBUG
-					printf("got keyup native key: %04x %04x, translate: %04x -%s-\n", ev.code, ev.code&0x1f, translate(ev.code, 0), getKeyName(translate(ev.code, 0)).c_str() );
-#endif
 					rc_last_key = KEY_MAX;
 					if (trkey == RC_standby) {
 						*msg = RC_standby;
@@ -1389,8 +1414,6 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 				}
 			}/* if FDSET */
 		} /* for NUMBER_OF_EVENT_DEVICES */
-		if (ev.type == EV_SYN)
-			continue; /* ignore... */
 
 		if(FD_ISSET(fd_pipe_low_priority[0], &rfds))
 		{
@@ -1696,7 +1719,10 @@ const char * CRCInput::getSpecialKeyName(const unsigned int key)
 
 std::string CRCInput::getKeyName(const unsigned int key)
 {
-	return (std::string)getKeyNameC(key);
+	std::string res(getKeyNameC(key & ~RC_Repeat));
+	if ((key & RC_Repeat) && res != "unknown")
+		res += " (long)";
+	return res;
 }
 
 const char *CRCInput::getKeyNameC(const unsigned int key)

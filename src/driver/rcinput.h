@@ -142,6 +142,7 @@ class CRCInput
 		std::vector<timer> timers;
 
 		uint32_t	*repeatkeys;
+		uint64_t	longPressEnd;
 		int 		fd_pipe_high_priority[2];
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
@@ -161,7 +162,7 @@ class CRCInput
 		int translate(int code, int num);
 		void calculateMaxFd(void);
 		int checkTimers();
-		bool mayRepeat(uint32_t key);
+		bool mayRepeat(uint32_t key, bool bAllowRepeatLR = false);
 #ifdef IOC_IR_SET_PRI_PROTOCOL
 		void set_rc_hw(ir_protocol_t ir_protocol, unsigned int ir_address);
 #endif

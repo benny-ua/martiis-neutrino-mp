@@ -4630,6 +4630,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 		g_settings.repeat_blocker = 450;
 		g_settings.repeat_genericblocker = 100;
 	}
+	g_settings.longkeypress_duration = tconfig.getInt32("longkeypress_duration", LONGKEYPRESS_OFF);
 #if HAVE_SPARK_HARDWARE
 	g_settings.accept_other_remotes = tconfig.getInt32( "accept_other_remotes", 1);
 #endif
@@ -4708,6 +4709,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_click", g_settings.key_click );
 	tconfig.setInt32( "repeat_blocker", g_settings.repeat_blocker );
 	tconfig.setInt32( "repeat_genericblocker", g_settings.repeat_genericblocker );
+	tconfig.setInt32( "longkeypress_duration", g_settings.longkeypress_duration );
 #if HAVE_SPARK_HARDWARE
 	tconfig.setInt32("accept_other_remotes", g_settings.accept_other_remotes);
 #endif
