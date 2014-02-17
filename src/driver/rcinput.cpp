@@ -1240,7 +1240,7 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 				if (ev.type == EV_SYN)
 					continue; /* ignore... */
 				SHTDCNT::getInstance()->resetSleepTimer();
-				uint32_t trkey = translate(ev.code, i);
+				uint32_t trkey = translate(ev.code);
 #ifdef _DEBUG
 				printf("%d key: %04x value %d, translate: %04x -%s-\n", ev.value, ev.code, ev.value, trkey, getKeyName(trkey).c_str());
 #endif
@@ -1668,7 +1668,7 @@ const char *CRCInput::getKeyNameC(const unsigned int key)
 *	transforms the rc-key to generic - internal use only!
 *
 **************************************************************************/
-int CRCInput::translate(int code, int /*num*/)
+int CRCInput::translate(int code)
 {
 	if (code == g_settings.key_help)
 		return RC_help;
@@ -1679,9 +1679,9 @@ int CRCInput::translate(int code, int /*num*/)
 		case KEY_HOME:
 			return RC_home;
 #endif
-		case 0x100: // FIXME -- needed?
+		case BTN_0: // FIXME -- needed?
 			return RC_up;
-		case 0x101: // FIXME -- needed?
+		case BTN_1: // FIXME -- needed?
 			return RC_down;
 #ifdef HAVE_AZBOX_HARDWARE
 		case KEY_HOME:
@@ -1698,8 +1698,8 @@ int CRCInput::translate(int code, int /*num*/)
 	}
 	if ((code >= 0) && (code <= KEY_MAX))
 		return code;
-	else
-		return ( unsigned int)RC_nokey;
+
+	return (int)RC_nokey;
 }
 
 void CRCInput::close_click()

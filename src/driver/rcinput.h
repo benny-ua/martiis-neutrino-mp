@@ -159,7 +159,7 @@ class CRCInput
 
 		void open(int dev = -1);
 		void close();
-		int translate(int code, int num);
+		int translate(int code);
 		void calculateMaxFd(void);
 		int checkTimers();
 		bool mayRepeat(uint32_t key, bool bAllowRepeatLR = false);
