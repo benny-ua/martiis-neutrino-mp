@@ -211,6 +211,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void clearSubtitle();
 	void selectChapter();
 #endif
+	void selectAutoLang();
 
 	void Cleanup();
 	static void *ShowStartHint(void *arg);

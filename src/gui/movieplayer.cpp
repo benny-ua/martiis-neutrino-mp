@@ -956,6 +956,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			playback->SetSpeed(1);
 		}
 	}
+	selectAutoLang();
 
 	CAudioMute::getInstance()->enableMuteIcon(true);
 	InfoClock->enableInfoClock(true);
@@ -2079,5 +2080,43 @@ void CMoviePlayerGui::SetStreamType(void)
 		default:
 			StreamType = AUDIO_FMT_AUTO;
 			break;
+	}
+}
+
+void CMoviePlayerGui::selectAutoLang()
+{
+	if (ext_subs) {
+		playback->FindAllSubs(spids, sub_supported, &numsubs, slanguage);
+		for (unsigned count = 0; count < numsubs; count++) {
+			if (spids[count] == 0x1FFF) {
+				currentspid = spids[count];
+				playback->SelectSubtitles(currentspid);
+			}
+		}
+	}
+	if(g_settings.auto_lang) {
+		int pref_idx = -1;
+
+		playback->FindAllPids(apids, ac3flags, &numpida, language);
+		for(int i = 0; i < 3; i++) {
+			for (unsigned j = 0; j < numpida; j++) {
+				std::map<std::string, std::string>::const_iterator it;
+				for(it = iso639.begin(); it != iso639.end(); ++it) {
+					if (g_settings.pref_lang[i] == it->second && strncasecmp(language[j].c_str(), it->first.c_str(), 3) == 0) {
+						pref_idx = j;
+						break;
+					}
+				}
+				if (pref_idx >= 0)
+					break;
+			}
+			if (pref_idx >= 0)
+				break;
+		}
+		if (pref_idx >= 0) {
+			currentapid = apids[pref_idx];
+			currentac3 = ac3flags[pref_idx];
+			playback->SetAPid(currentapid, currentac3);
+		}
 	}
 }
