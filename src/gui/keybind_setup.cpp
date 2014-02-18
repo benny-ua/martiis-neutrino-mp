@@ -204,7 +204,8 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_EXTRA_KEY_PIP_SWAP,		&g_settings.key_pip_swap,		LOCALE_MENU_HINT_KEY_PIP_CLOSE },
 	{LOCALE_EXTRA_KEY_FORMAT_MODE,		&g_settings.key_format_mode_active,	LOCALE_MENU_HINT_KEY_FORMAT_MODE_ACTIVE },
 	{LOCALE_EXTRA_KEY_PIC_MODE,		&g_settings.key_pic_mode_active,	LOCALE_MENU_HINT_KEY_PIC_MODE_ACTIVE },
-	{LOCALE_EXTRA_KEY_PIC_SIZE,		&g_settings.key_pic_size_active,	LOCALE_MENU_HINT_KEY_PIC_SIZE_ACTIVE }
+	{LOCALE_EXTRA_KEY_PIC_SIZE,		&g_settings.key_pic_size_active,	LOCALE_MENU_HINT_KEY_PIC_SIZE_ACTIVE },
+	{LOCALE_EXTRA_KEY_RECORD,		&g_settings.key_record,			LOCALE_MENU_HINT_KEY_RECORD },
 };
 
 
@@ -351,7 +352,7 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	//video
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VIDEO));
-	for (int i = KEY_NEXT43MODE; i <= KEY_SWITCHFORMAT; i++) {
+	for (int i = NKEY_NEXT43MODE; i <= NKEY_SWITCHFORMAT; i++) {
 		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings->addItem(mf);
@@ -359,7 +360,7 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	//navigation
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_NAVIGATION));
-	for (int i = KEY_PAGE_UP; i <= KEY_PAGE_DOWN; i++) {
+	for (int i = NKEY_PAGE_UP; i <= NKEY_PAGE_DOWN; i++) {
 		mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings->addItem(mf);
@@ -370,12 +371,12 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	//volume
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_VOLUME));
-	for (int i = KEY_VOLUME_UP; i <= KEY_VOLUME_DOWN; i++)
+	for (int i = NKEY_VOLUME_UP; i <= NKEY_VOLUME_DOWN; i++)
 		bindSettings->addItem(new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]));
 
 	//misc
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MISC));
-	//bindSettings->addItem(new CMenuForwarder(keydescription[KEY_PLUGIN], true, NULL, keychooser[KEY_PLUGIN]));
+	//bindSettings->addItem(new CMenuForwarder(keydescription[NKEY_PLUGIN], true, NULL, keychooser[NKEY_PLUGIN]));
 
 	//Special keys
 	CMenuWidget* bindSettings_special = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_SPECIAL);
@@ -385,27 +386,28 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	bindSettings->addItem(mf);
 
 	// unlock
-	mf = new CMenuForwarder(key_settings[KEY_UNLOCK].keydescription, true, keychooser[KEY_UNLOCK]->getKeyName(), keychooser[KEY_UNLOCK]);
-	mf->setHint("", key_settings[KEY_UNLOCK].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_UNLOCK].keydescription, true, keychooser[NKEY_UNLOCK]->getKeyName(), keychooser[NKEY_UNLOCK]);
+	mf->setHint("", key_settings[NKEY_UNLOCK].hint);
 	bindSettings->addItem(mf);
 	// screenshot
-	mf = new CMenuForwarder(key_settings[KEY_SCREENSHOT].keydescription, true, keychooser[KEY_SCREENSHOT]->getKeyName(), keychooser[KEY_SCREENSHOT]);
-	mf->setHint("", key_settings[KEY_SCREENSHOT].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_SCREENSHOT].keydescription, true, keychooser[NKEY_SCREENSHOT]->getKeyName(), keychooser[NKEY_SCREENSHOT]);
+	mf->setHint("", key_settings[NKEY_SCREENSHOT].hint);
 	bindSettings->addItem(mf);
 #ifdef ENABLE_PIP
 	// pip
-	mf = new CMenuForwarder(key_settings[KEY_PIP_CLOSE].keydescription, true, keychooser[KEY_PIP_CLOSE]->getKeyName(), keychooser[KEY_PIP_CLOSE]);
-	mf->setHint("", key_settings[KEY_PIP_CLOSE].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_PIP_CLOSE].keydescription, true, keychooser[NKEY_PIP_CLOSE]->getKeyName(), keychooser[NKEY_PIP_CLOSE]);
+	mf->setHint("", key_settings[NKEY_PIP_CLOSE].hint);
 	bindSettings->addItem(mf);
-	mf = new CMenuForwarder(key_settings[KEY_PIP_SETUP].keydescription, true, keychooser[KEY_PIP_SETUP]->getKeyName(), keychooser[KEY_PIP_SETUP]);
-	mf->setHint("", key_settings[KEY_PIP_SETUP].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_PIP_SETUP].keydescription, true, keychooser[NKEY_PIP_SETUP]->getKeyName(), keychooser[NKEY_PIP_SETUP]);
+	mf->setHint("", key_settings[NKEY_PIP_SETUP].hint);
 	bindSettings->addItem(mf);
-	mf = new CMenuForwarder(key_settings[KEY_PIP_SWAP].keydescription, true, keychooser[KEY_PIP_SWAP]->getKeyName(), keychooser[KEY_PIP_SWAP]);
-	mf->setHint("", key_settings[KEY_PIP_SWAP].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_PIP_SWAP].keydescription, true, keychooser[NKEY_PIP_SWAP]->getKeyName(), keychooser[NKEY_PIP_SWAP]);
+	mf->setHint("", key_settings[NKEY_PIP_SWAP].hint);
 	bindSettings->addItem(mf);
 #endif
 
-	bindSettings->addItem(new CMenuForwarder(key_settings[KEY_Help].keydescription, true, keychooser[KEY_Help]->getKeyName(), keychooser[KEY_Help]));
+	bindSettings->addItem(new CMenuForwarder(key_settings[NKEY_HELP].keydescription, true, keychooser[NKEY_HELP]->getKeyName(), keychooser[NKEY_HELP]));
+	bindSettings->addItem(new CMenuForwarder(key_settings[NKEY_RECORD].keydescription, true, keychooser[NKEY_RECORD]->getKeyName(), keychooser[NKEY_RECORD]));
 
 	// right key
 	mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV, &g_settings.mode_left_right_key_tv, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_OPTIONS, KEYBINDINGMENU_MODE_LEFT_RIGHT_KEY_TV_COUNT, true);
@@ -419,12 +421,12 @@ void CKeybindSetup::showKeyBindModeSetup(CMenuWidget *bindSettings_modes)
 	bindSettings_modes->addIntroItems(LOCALE_KEYBINDINGMENU_MODECHANGE);
 
 	// tv/radio
-	mf = new CMenuForwarder(key_settings[KEY_TV_RADIO_MODE].keydescription, true, keychooser[KEY_TV_RADIO_MODE]->getKeyName(), keychooser[KEY_TV_RADIO_MODE], NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
-	mf->setHint("", key_settings[KEY_TV_RADIO_MODE].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_TV_RADIO_MODE].keydescription, true, keychooser[NKEY_TV_RADIO_MODE]->getKeyName(), keychooser[NKEY_TV_RADIO_MODE], NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf->setHint("", key_settings[NKEY_TV_RADIO_MODE].hint);
 	bindSettings_modes->addItem(mf);
 
-	mf = new CMenuForwarder(key_settings[KEY_POWER_OFF].keydescription, true, keychooser[KEY_POWER_OFF]->getKeyName(), keychooser[KEY_POWER_OFF], NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
-	mf->setHint("", key_settings[KEY_POWER_OFF].hint);
+	mf = new CMenuForwarder(key_settings[NKEY_POWER_OFF].keydescription, true, keychooser[NKEY_POWER_OFF]->getKeyName(), keychooser[NKEY_POWER_OFF], NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf->setHint("", key_settings[NKEY_POWER_OFF].hint);
 	bindSettings_modes->addItem(mf);
 }
 
@@ -435,7 +437,7 @@ void CKeybindSetup::showKeyBindChannellistSetup(CMenuWidget *bindSettings_chlist
 	CMenuOptionChooser *oj = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_BOUQUETHANDLING, &g_settings.bouquetlist_mode, KEYBINDINGMENU_BOUQUETHANDLING_OPTIONS, KEYBINDINGMENU_BOUQUETHANDLING_OPTION_COUNT, true );
 	bindSettings_chlist->addItem(oj);
 #endif
-	for (int i = KEY_LIST_START; i <= KEY_CURRENT_TRANSPONDER; i++) {
+	for (int i = NKEY_LIST_START; i <= NKEY_CURRENT_TRANSPONDER; i++) {
 		CMenuForwarder * mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_chlist->addItem(mf);
@@ -450,7 +452,7 @@ void CKeybindSetup::showKeyBindQuickzapSetup(CMenuWidget *bindSettings_qzap)
 {
 	bindSettings_qzap->addIntroItems(LOCALE_KEYBINDINGMENU_QUICKZAP);
 
-	for (int i = KEY_CHANNEL_UP; i <= KEY_LASTCHANNEL; i++) {
+	for (int i = NKEY_CHANNEL_UP; i <= NKEY_LASTCHANNEL; i++) {
 		CMenuForwarder * mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_qzap->addItem(mf);
@@ -472,7 +474,7 @@ void CKeybindSetup::showKeyBindSpecialSetup(CMenuWidget *bindSettings_special)
 {
 	bindSettings_special->addIntroItems(LOCALE_KEYBINDINGMENU_SPECIAL_ACTIVE);
 
-	for (int i = KEY_FORMAT_MODE; i <= KEY_PIC_SIZE; i++) {
+	for (int i = NKEY_FORMAT_MODE; i <= NKEY_PIC_SIZE; i++) {
 		CMenuOptionChooser * mf = new CMenuOptionChooser(key_settings[i].keydescription, key_settings[i].keyvalue_p, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_special->addItem(mf);

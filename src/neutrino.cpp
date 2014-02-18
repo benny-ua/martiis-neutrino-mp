@@ -2616,7 +2616,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					}
 				}
 			}
-			else if( msg == CRCInput::RC_record) {
+			else if( msg == (neutrino_msg_t) g_settings.key_record) {
 				if (mode != mode_webtv) {
 					StopSubtitles();
 					if (recordingstatus)
@@ -4593,6 +4593,8 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_bouquet_down = tconfig.getInt32( "key_bouquet_down",  CRCInput::RC_left);
 	g_settings.key_help = tconfig.getInt32( "key_help", CRCInput::RC_help );
 
+	g_settings.key_record = tconfig.getInt32( "key_record", CRCInput::RC_record );
+
 	g_settings.mpkey_rewind = tconfig.getInt32( "mpkey.rewind", CRCInput::RC_rewind );
 	g_settings.mpkey_forward = tconfig.getInt32( "mpkey.forward", CRCInput::RC_forward );
 	g_settings.mpkey_pause = tconfig.getInt32( "mpkey.pause", CRCInput::RC_pause );
@@ -4685,6 +4687,8 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_bouquet_up", g_settings.key_bouquet_up );
 	tconfig.setInt32( "key_bouquet_down", g_settings.key_bouquet_down );
 	tconfig.setInt32( "key_help", g_settings.key_help );
+
+	tconfig.setInt32( "key_record", g_settings.key_record );
 
 	tconfig.setInt32( "mpkey.rewind", g_settings.mpkey_rewind );
 	tconfig.setInt32( "mpkey.forward", g_settings.mpkey_forward );

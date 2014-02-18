@@ -424,6 +424,7 @@ extra.key_pip_close Stop/Start PiP
 extra.key_pip_setup Configure PiP
 extra.key_pip_swap Swap PiP/live
 extra.key_plugin One touch plugin
+extra.key_record Record key
 extra.key_screenshot Screenshot key
 extra.key_showclock Clock
 extra.key_switchformat Next resolution
@@ -1046,7 +1047,8 @@ menu.hint_key_pip_close Assign button to stop PiP\nor start it for current chann
 menu.hint_key_pip_setup Assign button to configure PiP
 menu.hint_key_pip_swap Assign button to swap PiP and live channel
 menu.hint_key_poweroff Assign button to switch power state\n (standby/deepstandby <-> running)
-menu.hint_key_quickzap Configure keybingdings for quick\nchannel switch
+menu.hint_key_quickzap Configure keybindings for quick\nchannel switch
+menu.hint_key_record Assign button to start a recording
 menu.hint_key_repeatblock Delay after button press and before\nfirst key repeat
 menu.hint_key_repeatblockgeneric Delay between key repeats\nwhile button pressed
 menu.hint_key_right Select 'right' function in live TV/Radio mode
