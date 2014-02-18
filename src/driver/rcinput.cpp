@@ -1266,7 +1266,7 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 						// Long-press, key released after time limit
 						longPressEnd = 0;
 						continue;
-					} else if (ev.value == 1 && !mayRepeat(trkey, bAllowRepeatLR)) {
+					} else if (ev.value == 1 && !mayRepeat(trkey, bAllowRepeatLR) && !isNumeric(trkey)) {
 						// A long-press may start here.
 						longPressEnd = longPressNow + 1000 * g_settings.longkeypress_duration;
 						rc_last_key = KEY_MAX;
