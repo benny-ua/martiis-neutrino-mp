@@ -143,6 +143,7 @@ class CRCInput
 
 		uint32_t	*repeatkeys;
 		uint64_t	longPressEnd;
+		bool		longPressAny;
 		int 		fd_pipe_high_priority[2];
 		int 		fd_pipe_low_priority[2];
 		int         	fd_gamerc;
@@ -163,6 +164,7 @@ class CRCInput
 		void calculateMaxFd(void);
 		int checkTimers();
 		bool mayRepeat(uint32_t key, bool bAllowRepeatLR = false);
+		bool mayLongPress(uint32_t key, bool bAllowRepeatLR = false);
 #ifdef IOC_IR_SET_PRI_PROTOCOL
 		void set_rc_hw(ir_protocol_t ir_protocol, unsigned int ir_address);
 #endif
@@ -334,6 +336,8 @@ class CRCInput
 		void close_click();
 		void play_click();
 		void reset_dsp(int rate);
+
+		void setLongPressAny(bool b) { longPressAny = b; };
 };
 
 

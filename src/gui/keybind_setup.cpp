@@ -208,6 +208,20 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_EXTRA_KEY_RECORD,		&g_settings.key_record,			LOCALE_MENU_HINT_KEY_RECORD },
 };
 
+// used by driver/rcinput.cpp
+bool checkLongPress(uint32_t key)
+{
+	if (g_settings.longkeypress_duration == LONGKEYPRESS_OFF)
+		return false;
+	key |= CRCInput::RC_Repeat;
+	for (unsigned int i = 0; i < CKeybindSetup::KEYBINDS_COUNT; i++)
+		if ((uint32_t)*key_settings[i].keyvalue_p == key)
+			return true;
+	for (unsigned int i = 0; i < SNeutrinoSettings::BUTTON_MAX; i++)
+		if ((uint32_t)g_settings.usermenu_key[i] == key)
+			return true;
+	return false;
+}
 
 int CKeybindSetup::showKeySetup()
 {

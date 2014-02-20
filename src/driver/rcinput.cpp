@@ -94,6 +94,7 @@ CRCInput::CRCInput(bool &_timer_wakeup)
 	timerid= 1;
 	repeatkeys = NULL;
 	timer_wakeup = &_timer_wakeup;
+	longPressAny = false;
 
 	// pipe for internal event-queue
 	// -----------------------------
@@ -488,6 +489,17 @@ uint32_t *CRCInput::setAllowRepeat(uint32_t *rk) {
 	uint32_t *r = repeatkeys;
 	repeatkeys = rk;
 	return r;
+}
+
+bool checkLongPress(uint32_t key); // keybind_setup.cpp
+
+bool CRCInput::mayLongPress(uint32_t key, bool bAllowRepeatLR)
+{
+	if (mayRepeat(key, bAllowRepeatLR))
+		return false;
+	if (longPressAny)
+		return true;
+	return checkLongPress(key);
 }
 
 bool CRCInput::mayRepeat(uint32_t key, bool bAllowRepeatLR)
@@ -1249,28 +1261,30 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 
 				if (g_settings.longkeypress_duration > LONGKEYPRESS_OFF) {
 					uint64_t longPressNow = time_monotonic_us();
-					if (ev.value == 0 && longPressEnd && longPressNow < longPressEnd) {
-						// Key was a potential long press, but wasn't pressed long enough
-						longPressEnd = 0;
-						ev.value = 1;
-					} else if (ev.value == 2 && longPressEnd && longPressEnd < longPressNow) {
-						// repeat event, and we're already in a potential long-press sequence.
-						if (longPressNow < longPressEnd)
+					if (ev.value == 0 && longPressEnd) {
+						if (longPressNow < longPressEnd) {
+							// Key was a potential long press, but wasn't pressed long enough
+							longPressEnd = 0;
+							ev.value = 1;
+						} else {
+							// Long-press, key released after time limit
+							longPressEnd = 0;
 							continue;
-						ev.value = 1;
-						trkey |= RC_Repeat;
-					} else if (ev.value == 2 && longPressEnd) {
-						// Long-press, but key still not released. Skip.
-						continue;
-					} else if (ev.value == 0 && longPressEnd) {
-						// Long-press, key released after time limit
-						longPressEnd = 0;
-						continue;
-					} else if (ev.value == 1 && !mayRepeat(trkey, bAllowRepeatLR) && !isNumeric(trkey)) {
+						}
+					} else if (ev.value == 1 && mayLongPress(trkey, bAllowRepeatLR)) {
 						// A long-press may start here.
 						longPressEnd = longPressNow + 1000 * g_settings.longkeypress_duration;
 						rc_last_key = KEY_MAX;
 						continue;
+					} else if (ev.value == 2 && longPressEnd) {
+						if (longPressEnd < longPressNow) {
+							// Key was pressed long enough.
+							ev.value = 1;
+							trkey |= RC_Repeat;
+						} else {
+							// Long-press, but key still not released. Skip.
+							continue;
+						}
 					}
 				}
 
