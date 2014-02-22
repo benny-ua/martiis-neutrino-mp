@@ -444,7 +444,7 @@ void CKeybindSetup::showKeyBindModeSetup(CMenuWidget *bindSettings_modes)
 	mf->setHint("", key_settings[NKEY_POWER_OFF].hint);
 	bindSettings_modes->addItem(mf);
 
-	mf = new CMenuForwarder(key_settings[NKEY_RESTART].keydescription, true, keychooser[NKEY_RESTART]->getKeyName(), keychooser[NKEY_RESTART], NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf = new CMenuForwarder(key_settings[NKEY_RESTART].keydescription, true, keychooser[NKEY_RESTART]->getKeyName(), keychooser[NKEY_RESTART], NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
 	mf->setHint("", key_settings[NKEY_RESTART].hint);
 	bindSettings_modes->addItem(mf);
 }
