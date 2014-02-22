@@ -254,24 +254,8 @@ void CMenuItem::paintItemButton(const bool select_mode, const int &item_height, 
 	int icon_h = 0;
 
 	//define icon name depends of numeric value
-	if (icon_name.empty()) {
-		if (g_settings.menu_numbers_as_icons && CRCInput::isNumeric(directKey))
+	if (g_settings.menu_numbers_as_icons && icon_name.empty() && CRCInput::isNumeric(directKey))
 			icon_name = to_string(CRCInput::getNumericValue(directKey));
-		else switch (directKey) {
-			case CRCInput::RC_red:
-				icon_name = NEUTRINO_ICON_BUTTON_RED;
-				break;
-			case CRCInput::RC_green:
-				icon_name = NEUTRINO_ICON_BUTTON_GREEN;
-				break;
-			case CRCInput::RC_yellow:
-				icon_name = NEUTRINO_ICON_BUTTON_YELLOW;
-				break;
-			case CRCInput::RC_blue:
-				icon_name = NEUTRINO_ICON_BUTTON_BLUE;
-				break;
-		}
-	}
 
 	//define select icon
 	if  (selected && offx > 0)
@@ -327,6 +311,38 @@ const char *CMenuItem::getName(void)
 	if (name != NONEXISTANT_LOCALE)
 		return g_Locale->getText(name);
 	return nameString.c_str();
+}
+
+void CMenuItem::setIconName(const char * const IconName)
+{
+	if (IconName)
+		iconName = IconName;
+	else switch (directKey) {
+		case CRCInput::RC_red:
+			iconName = NEUTRINO_ICON_BUTTON_RED;
+			break;
+		case CRCInput::RC_green:
+			iconName = NEUTRINO_ICON_BUTTON_GREEN;
+			break;
+		case CRCInput::RC_yellow:
+			iconName = NEUTRINO_ICON_BUTTON_YELLOW;
+			break;
+		case CRCInput::RC_blue:
+			iconName = NEUTRINO_ICON_BUTTON_BLUE;
+			break;
+		case CRCInput::RC_standby:
+			iconName = NEUTRINO_ICON_BUTTON_POWER;
+			break;
+		case CRCInput::RC_setup:
+			iconName = NEUTRINO_ICON_BUTTON_MENU_SMALL;
+			break;
+		case CRCInput::RC_help:
+			iconName = NEUTRINO_ICON_BUTTON_HELP_SMALL;
+			break;
+		case CRCInput::RC_info:
+			iconName = NEUTRINO_ICON_BUTTON_INFO_SMALL;
+			break;
+	}
 }
 
 //small helper class to manage values e.g.: handling needed but deallocated widget objects
@@ -1844,7 +1860,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
 	directKey = DirectKey;
-	iconName = IconName ? IconName : "";
+	setIconName(IconName);
 	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
 	isStatic = IsStatic;
 }
@@ -1858,7 +1874,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
 	directKey = DirectKey;
-	iconName = IconName ? IconName : "";
+	setIconName(IconName);
 	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
 	isStatic = IsStatic;
 }
@@ -1873,7 +1889,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
 	directKey = DirectKey;
-	iconName = IconName ? IconName : "";
+	setIconName(IconName);
 	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
 	isStatic = IsStatic;
 }
@@ -1888,7 +1904,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
 	directKey = DirectKey;
-	iconName = IconName ? IconName : "";
+	setIconName(IconName);
 	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
 	isStatic = IsStatic;
 }

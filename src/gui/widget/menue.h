@@ -123,6 +123,8 @@ class CMenuItem
 		neutrino_locale_t hint;
 
 		CMenuItem();
+		void setIconName(const char * const IconName);
+
 		virtual ~CMenuItem(){}
 		
 		virtual void isUsed(void)
