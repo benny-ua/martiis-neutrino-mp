@@ -782,6 +782,7 @@ keybindingmenu.remotecontrol_hardware_philips Philips
 keybindingmenu.remotecontrol_hardware_tripledragon Triple Dragon
 keybindingmenu.repeatblock Anfangsverzögerung
 keybindingmenu.repeatblockgeneric Wiederholungsverzögerung
+keybindingmenu.restart Neustart von Neutrino
 keybindingmenu.sort Sortierreihenfolge ändern
 keybindingmenu.special_active Sondertasten
 keybindingmenu.subchanneldown Unterkanal zurück
@@ -1051,6 +1052,7 @@ menu.hint_key_quickzap Konfigurieren Sie die Tastenbelegung für die Schnellumsc
 menu.hint_key_record Konfigurieren Sie die Taste für den Aufnahmestart
 menu.hint_key_repeatblock Die Verzögerung nach einem Tastendruck bis die Box reagieren soll
 menu.hint_key_repeatblockgeneric Die Verzögerung zwischen den Tastewiederholungen bis die Box reagieren soll
+menu.hint_key_restart Wählen Sie eine Taste, um Neutrino neu zu starten
 menu.hint_key_right Wählen Sie die Funktion für die Tasten 'links' und 'rechts' im TV/Radio-Modus
 menu.hint_key_save Speichern Sie Ihre Tastenbelegungen in einer Datei ab
 menu.hint_key_screenshot Weisen Sie eine Taste zu, um Menü- und/oder TV-Screenshots zu speichern

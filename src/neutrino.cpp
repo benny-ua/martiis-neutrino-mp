@@ -3000,6 +3000,9 @@ _repeat:
 		g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
 		return messages_return::cancel_all | messages_return::handled;
 	}
+	else if (msg == (neutrino_msg_t) g_settings.key_restart) {
+		exec(NULL, "restart");
+	}
 	else if (msg == (neutrino_msg_t) g_settings.key_power_off /*CRCInput::RC_standby*/) {
 		if (data == 0) {
 			neutrino_msg_t new_msg;
@@ -4561,6 +4564,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_volumedown = tconfig.getInt32( "key_volumedown", CRCInput::RC_minus );
 
 	g_settings.key_power_off = tconfig.getInt32( "key_power_off", CRCInput::RC_standby );
+	g_settings.key_restart = tconfig.getInt32( "key_restart", CRCInput::RC_Repeat | CRCInput::RC_standby );
 
 	g_settings.key_pageup = tconfig.getInt32("key_pageup", tconfig.getInt32("key_channelList_pageup", CRCInput::RC_page_up));
 	g_settings.key_pagedown = tconfig.getInt32("key_pagedown", tconfig.getInt32("key_channelList_pagedown", CRCInput::RC_page_down));
@@ -4656,6 +4660,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_volumedown", g_settings.key_volumedown );
 	tconfig.setInt32( "key_tvradio_mode", g_settings.key_tvradio_mode );
 	tconfig.setInt32( "key_power_off", g_settings.key_power_off );
+	tconfig.setInt32( "key_restart", g_settings.key_restart );
 
 	tconfig.setInt32( "key_pageup", g_settings.key_pageup );
 	tconfig.setInt32( "key_pagedown", g_settings.key_pagedown );
