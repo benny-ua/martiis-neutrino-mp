@@ -254,8 +254,24 @@ void CMenuItem::paintItemButton(const bool select_mode, const int &item_height, 
 	int icon_h = 0;
 
 	//define icon name depends of numeric value
-	if (g_settings.menu_numbers_as_icons && icon_name.empty() && CRCInput::isNumeric(directKey))
-		icon_name = to_string(CRCInput::getNumericValue(directKey));
+	if (icon_name.empty()) {
+		if (g_settings.menu_numbers_as_icons && CRCInput::isNumeric(directKey))
+			icon_name = to_string(CRCInput::getNumericValue(directKey));
+		else switch (directKey) {
+			case CRCInput::RC_red:
+				icon_name = NEUTRINO_ICON_BUTTON_RED;
+				break;
+			case CRCInput::RC_green:
+				icon_name = NEUTRINO_ICON_BUTTON_GREEN;
+				break;
+			case CRCInput::RC_yellow:
+				icon_name = NEUTRINO_ICON_BUTTON_YELLOW;
+				break;
+			case CRCInput::RC_blue:
+				icon_name = NEUTRINO_ICON_BUTTON_BLUE;
+				break;
+		}
+	}
 
 	//define select icon
 	if  (selected && offx > 0)
