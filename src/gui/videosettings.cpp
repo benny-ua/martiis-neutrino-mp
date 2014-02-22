@@ -481,7 +481,7 @@ int CVideoSettings::showVideoSetup()
 	CMenuOptionNumberChooser *mc;
 
 	videosetup->addItem(GenericMenuSeparatorLine);
-	mf = new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_VIDEO_PSI);
 	videosetup->addItem(mf);
 
@@ -509,13 +509,13 @@ int CVideoSettings::showVideoSetup()
 
 	videosetup->addItem(GenericMenuSeparatorLine);
 
-	mf = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_VIDEO_THREE_D);
 	videosetup->addItem(mf);
 
 	CScreenSetup channelScreenSetup;
 	channelScreenSetup.loadBorder(CZapit::getInstance()->GetCurrentChannelID());
-	mf = new CMenuForwarder(LOCALE_VIDEOMENU_MASKSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf = new CMenuForwarder(LOCALE_VIDEOMENU_MASKSETUP, true, NULL, &channelScreenSetup, NULL, CRCInput::RC_yellow);
 	mf->setHint("", LOCALE_MENU_HINT_VIDEO_MASK);
 	videosetup->addItem(mf);
 #endif

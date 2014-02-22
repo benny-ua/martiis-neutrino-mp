@@ -251,7 +251,7 @@ int CNetworkSetup::showNetworkSetup()
 	networkSettings->setWizardMode(is_wizard);
 
 	//apply button
-	CMenuForwarder *m0 = new CMenuForwarder(LOCALE_NETWORKMENU_SETUPNOW, true, NULL, this, "networkapply", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder *m0 = new CMenuForwarder(LOCALE_NETWORKMENU_SETUPNOW, true, NULL, this, "networkapply", CRCInput::RC_red);
 	m0->setHint("", LOCALE_MENU_HINT_NET_SETUPNOW);
 
 	//eth id
@@ -301,11 +301,11 @@ int CNetworkSetup::showNetworkSetup()
 	networkSettings->addIntroItems(LOCALE_MAINSETTINGS_NETWORK); //intros
 	//-------------------------------------------------
 	networkSettings->addItem( m0 ); //apply
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_NETWORKMENU_TEST, true, NULL, this, "networktest", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_NETWORKMENU_TEST, true, NULL, this, "networktest", CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_NET_TEST);
 	networkSettings->addItem(mf); //test
 
-	mf = new CMenuForwarder(LOCALE_NETWORKMENU_SHOW, true, NULL, this, "networkshow", CRCInput::RC_info, NEUTRINO_ICON_BUTTON_INFO);
+	mf = new CMenuForwarder(LOCALE_NETWORKMENU_SHOW, true, NULL, this, "networkshow", CRCInput::RC_info);
 	mf->setHint("", LOCALE_MENU_HINT_NET_SHOW);
 	networkSettings->addItem(mf);	//show settings
 
@@ -367,7 +367,7 @@ int CNetworkSetup::showNetworkSetup()
 	//ntp submenu
 	sectionsdConfigNotifier = new CSectionsdConfigNotifier;
 	CMenuWidget ntp(LOCALE_MAINSETTINGS_NETWORK, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_NETWORKSETUP_NTP);
-	mf = new CMenuForwarder(LOCALE_NETWORKMENU_NTPTITLE, true, NULL, &ntp, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf = new CMenuForwarder(LOCALE_NETWORKMENU_NTPTITLE, true, NULL, &ntp, NULL, CRCInput::RC_yellow);
 	mf->setHint("", LOCALE_MENU_HINT_NET_NTP);
 	networkSettings->addItem(mf);
 
@@ -376,7 +376,7 @@ int CNetworkSetup::showNetworkSetup()
 #ifdef ENABLE_GUI_MOUNT
 	//nfs mount submenu
 	CMenuWidget networkmounts(LOCALE_MAINSETTINGS_NETWORK, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_NETWORKSETUP_MOUNTS);
-	mf = new CMenuForwarder(LOCALE_NETWORKMENU_MOUNT, true, NULL, &networkmounts, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+	mf = new CMenuForwarder(LOCALE_NETWORKMENU_MOUNT, true, NULL, &networkmounts, NULL, CRCInput::RC_blue);
 	mf->setHint("", LOCALE_MENU_HINT_NET_MOUNT);
 	networkSettings->addItem(mf);
 	showNetworkNFSMounts(&networkmounts);
@@ -442,10 +442,10 @@ void CNetworkSetup::showNetworkNTPSetup(CMenuWidget *menu_ntp)
 void CNetworkSetup::showNetworkNFSMounts(CMenuWidget *menu_nfs)
 {
 	menu_nfs->addIntroItems(LOCALE_NETWORKMENU_MOUNT);
-	CMenuForwarder * mf = new CMenuDForwarder(LOCALE_NFS_MOUNT , true, NULL, new CNFSMountGui(), NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * mf = new CMenuDForwarder(LOCALE_NFS_MOUNT , true, NULL, new CNFSMountGui(), NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_NET_NFS_MOUNT);
 	menu_nfs->addItem(mf);
-	mf = new CMenuDForwarder(LOCALE_NFS_UMOUNT, true, NULL, new CNFSUmountGui(), NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuDForwarder(LOCALE_NFS_UMOUNT, true, NULL, new CNFSUmountGui(), NULL, CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_NET_NFS_UMOUNT);
 	menu_nfs->addItem(mf);
 }

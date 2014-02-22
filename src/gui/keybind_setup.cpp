@@ -340,28 +340,28 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	//modes
 	CMenuWidget* bindSettings_modes = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_MODES);
 	showKeyBindModeSetup(bindSettings_modes);
-	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_MODECHANGE, true, NULL, bindSettings_modes, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_MODECHANGE, true, NULL, bindSettings_modes, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_MODECHANGE);
 	bindSettings->addItem(mf);
 
 	// channellist keybindings
 	CMenuWidget* bindSettings_chlist = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_CHANNELLIST);
 	showKeyBindChannellistSetup(bindSettings_chlist);
-	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_CHANNELLIST, true, NULL, bindSettings_chlist, NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_CHANNELLIST, true, NULL, bindSettings_chlist, NULL, CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_CHANNELLIST);
 	bindSettings->addItem(mf);
 
 	// Zapping keys quickzap
 	CMenuWidget* bindSettings_qzap = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_QUICKZAP);
 	showKeyBindQuickzapSetup(bindSettings_qzap);
-	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_QUICKZAP, true, NULL, bindSettings_qzap, NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf = new CMenuDForwarder(LOCALE_KEYBINDINGMENU_QUICKZAP, true, NULL, bindSettings_qzap, NULL, CRCInput::RC_yellow);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_QUICKZAP);
  	bindSettings->addItem(mf);
 
 	//movieplayer
 	CMenuWidget* bindSettings_mplayer = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_MOVIEPLAYER);
 	showKeyBindMovieplayerSetup(bindSettings_mplayer);
-	mf = new CMenuDForwarder(LOCALE_MAINMENU_MOVIEPLAYER, true, NULL, bindSettings_mplayer, NULL, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+	mf = new CMenuDForwarder(LOCALE_MAINMENU_MOVIEPLAYER, true, NULL, bindSettings_mplayer, NULL, CRCInput::RC_blue);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_MOVIEPLAYER);
 	bindSettings->addItem(mf);
 
@@ -436,15 +436,15 @@ void CKeybindSetup::showKeyBindModeSetup(CMenuWidget *bindSettings_modes)
 	bindSettings_modes->addIntroItems(LOCALE_KEYBINDINGMENU_MODECHANGE);
 
 	// tv/radio
-	mf = new CMenuForwarder(key_settings[NKEY_TV_RADIO_MODE].keydescription, true, keychooser[NKEY_TV_RADIO_MODE]->getKeyName(), keychooser[NKEY_TV_RADIO_MODE], NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuForwarder(key_settings[NKEY_TV_RADIO_MODE].keydescription, true, keychooser[NKEY_TV_RADIO_MODE]->getKeyName(), keychooser[NKEY_TV_RADIO_MODE], NULL, CRCInput::RC_red);
 	mf->setHint("", key_settings[NKEY_TV_RADIO_MODE].hint);
 	bindSettings_modes->addItem(mf);
 
-	mf = new CMenuForwarder(key_settings[NKEY_POWER_OFF].keydescription, true, keychooser[NKEY_POWER_OFF]->getKeyName(), keychooser[NKEY_POWER_OFF], NULL, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuForwarder(key_settings[NKEY_POWER_OFF].keydescription, true, keychooser[NKEY_POWER_OFF]->getKeyName(), keychooser[NKEY_POWER_OFF], NULL, CRCInput::RC_green);
 	mf->setHint("", key_settings[NKEY_POWER_OFF].hint);
 	bindSettings_modes->addItem(mf);
 
-	mf = new CMenuForwarder(key_settings[NKEY_RESTART].keydescription, true, keychooser[NKEY_RESTART]->getKeyName(), keychooser[NKEY_RESTART], NULL, CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	mf = new CMenuForwarder(key_settings[NKEY_RESTART].keydescription, true, keychooser[NKEY_RESTART]->getKeyName(), keychooser[NKEY_RESTART], NULL, CRCInput::RC_yellow);
 	mf->setHint("", key_settings[NKEY_RESTART].hint);
 	bindSettings_modes->addItem(mf);
 }

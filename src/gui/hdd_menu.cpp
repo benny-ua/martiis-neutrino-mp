@@ -176,7 +176,7 @@ int CHDDMenuHandler::doMenu ()
 	CHDDChkExec chkexec;
 
 	CHDDDestExec hddexec;
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_HDD_ACTIVATE, true, NULL, &hddexec, NULL, CRCInput::RC_red,NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_HDD_ACTIVATE, true, NULL, &hddexec, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_HDD_APPLY);
 	hddmenu->addItem(mf);
 

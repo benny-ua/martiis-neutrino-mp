@@ -187,7 +187,7 @@ int C3DSetup::show3DSetup()
 	}
 
 	m->addItem(GenericMenuSeparatorLine);
-	m->addItem(new CMenuForwarder(LOCALE_THREE_D_SAVE, true, NULL, this, "save", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+	m->addItem(new CMenuForwarder(LOCALE_THREE_D_SAVE, true, NULL, this, "save", CRCInput::RC_red));
 
 	int res = m->exec (NULL, "");
 

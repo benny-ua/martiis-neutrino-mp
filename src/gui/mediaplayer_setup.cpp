@@ -97,19 +97,19 @@ int CMediaPlayerSetup::showMediaPlayerSetup()
 	CMenuForwarder *mf;
 
 	CAudioPlayerSetup asetup;
-	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, &asetup, "", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	mf = new CMenuForwarder(LOCALE_AUDIOPLAYER_NAME, true, NULL, &asetup, "", CRCInput::RC_red);
 	mf->setHint(NEUTRINO_ICON_HINT_APLAY, LOCALE_MENU_HINT_APLAY_SETUP);
 	mediaSetup->addItem(mf);
 
 #if ENABLE_SHAIRPLAY
 	CShairPlaySetup isetup;
-	mf = new CMenuForwarder(LOCALE_SHAIRPLAY_HEAD, true, NULL, &isetup, "", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	mf = new CMenuForwarder(LOCALE_SHAIRPLAY_HEAD, true, NULL, &isetup, "", CRCInput::RC_green);
 	mf->setHint("" /* FIXME */, LOCALE_MENU_HINT_SHAIRPLAY_SETUP);
 	mediaSetup->addItem(mf);
 #endif
 
 	CPictureViewerSetup psetup;
-	mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_HEAD, true, NULL, &psetup, "", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+	mf = new CMenuForwarder(LOCALE_PICTUREVIEWER_HEAD, true, NULL, &psetup, "", CRCInput::RC_blue);
 	mf->setHint(NEUTRINO_ICON_HINT_PICVIEW, LOCALE_MENU_HINT_PICTUREVIEWER_SETUP);
 	mediaSetup->addItem(mf);
 

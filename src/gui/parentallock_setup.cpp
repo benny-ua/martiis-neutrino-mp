@@ -109,7 +109,7 @@ int CParentalSetup::showParentalSetup()
 	plock->addIntroItems();
 
 	CPersonalizeGui &p = CNeutrinoApp::getInstance()->getPersonalizeGui();
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PARENTALLOCK_MENU, true, NULL, &p, NULL, CRCInput::RC_red , NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PARENTALLOCK_MENU, true, NULL, &p, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_PARENTALLOCK_MENU);
 	plock->addItem(mf);
 

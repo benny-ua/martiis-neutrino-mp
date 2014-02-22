@@ -233,7 +233,7 @@ int CBouquetList::doMenu()
 
 	sprintf(cnt, "%d", i);
 	if(!zapitBouquet->bUser) {
-		menu->addItem(new CMenuForwarder(LOCALE_FAVORITES_COPY, true, NULL, selector, cnt, CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE), old_selected == i ++);
+		menu->addItem(new CMenuForwarder(LOCALE_FAVORITES_COPY, true, NULL, selector, cnt, CRCInput::RC_blue), old_selected == i ++);
 		menu->exec(NULL, "");
 		delete menu;
 		delete selector;
@@ -276,7 +276,7 @@ int CBouquetList::doMenu()
 		}
 		return -1;
 	} else {
-		menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_DELETE, true, NULL, selector, cnt, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED), old_selected == i ++);
+		menu->addItem(new CMenuForwarder(LOCALE_BOUQUETEDITOR_DELETE, true, NULL, selector, cnt, CRCInput::RC_red), old_selected == i ++);
 		menu->exec(NULL, "");
 		delete menu;
 		delete selector;

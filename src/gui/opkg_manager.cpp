@@ -245,7 +245,7 @@ int COPKGManager::showMenu()
 	menuBack.setHint(NEUTRINO_ICON_HINT_BACK, LOCALE_MENU_HINT_BACK_BRIEF);
 	menu->addItem(GenericMenuSeparatorLine);
 
-	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].c_str(), CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	upgrade_forwarder = new CMenuForwarder(LOCALE_OPKG_UPGRADE, true, NULL , this, pkg_types[OM_UPGRADE].c_str(), CRCInput::RC_red);
 	upgrade_forwarder->setHint(NEUTRINO_ICON_HINT_SW_UPDATE, LOCALE_MENU_HINT_OPKG_UPGRADE);
 	menu->addItem(upgrade_forwarder);
 	menu->addItem(GenericMenuSeparatorLine);

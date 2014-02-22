@@ -271,9 +271,9 @@ int CNFSMountGui::menuEntry(int nr)
 	CMACInput macInput(LOCALE_RECORDINGMENU_SERVER_MAC, &g_settings.network_nfs[nr].mac, LOCALE_IPSETUP_HINT_1, LOCALE_IPSETUP_HINT_2);
 	CMenuForwarder *macInput_fwd = new CMenuForwarder(LOCALE_RECORDINGMENU_SERVER_MAC, true, NULL, &macInput);
 
-	CMenuForwarder *refreshMAC_fwd = new CMenuForwarder(LOCALE_NFS_REFRESH_MAC, true, NULL, this, ("refreshMAC" + to_string(nr)).c_str(), CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	CMenuForwarder *refreshMAC_fwd = new CMenuForwarder(LOCALE_NFS_REFRESH_MAC, true, NULL, this, ("refreshMAC" + to_string(nr)).c_str(), CRCInput::RC_yellow);
 
-	CMenuForwarder *mountnow_fwd = new CMenuForwarder(LOCALE_NFS_MOUNTNOW, !(CFSMounter::isMounted(g_settings.network_nfs[nr].local_dir)), NULL, this, ("domount" + to_string(nr)).c_str(), CRCInput::RC_red,NEUTRINO_ICON_BUTTON_RED);
+	CMenuForwarder *mountnow_fwd = new CMenuForwarder(LOCALE_NFS_MOUNTNOW, !(CFSMounter::isMounted(g_settings.network_nfs[nr].local_dir)), NULL, this, ("domount" + to_string(nr)).c_str(), CRCInput::RC_red);
 
 	mountnow_fwd->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true);
 	COnOffNotifier notifier(CFSMounter::NFS);
