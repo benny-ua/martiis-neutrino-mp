@@ -1518,14 +1518,12 @@ bool CRecordManager::ShowMenu(void)
 	//bool status_rec		= rec_mode & RECMODE_REC;
 
 	//record item
-	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_REC_AKT, true /*!status_rec*/, NULL,
-			this, "Record", CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_REC_AKT, true /*!status_rec*/, NULL, this, "Record", CRCInput::RC_red);
 	//if no recordings are running, set the focus to the record menu item
 	menu.addItem(iteml, rec_count == 0 ? true: false);
 
 	//timeshift item
-	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_TIMESHIFT, !status_ts, NULL,
-			this, "Timeshift", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	iteml = new CMenuForwarder(LOCALE_RECORDINGMENU_MULTIMENU_TIMESHIFT, !status_ts, NULL, this, "Timeshift", CRCInput::RC_yellow);
 	menu.addItem(iteml, false);
 
 	if(rec_count > 0)

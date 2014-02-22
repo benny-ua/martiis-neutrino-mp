@@ -64,7 +64,7 @@ int CZapitSetup::showMenu()
 	zapit->addIntroItems(LOCALE_ZAPITSETUP_INFO);
 	COnOffNotifier* miscZapitNotifier = new COnOffNotifier(1);
 	//zapit
-	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_ZAPITSETUP_LAST_USE, &g_settings.uselastchannel, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, miscZapitNotifier, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
+	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_ZAPITSETUP_LAST_USE, &g_settings.uselastchannel, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, miscZapitNotifier, CRCInput::RC_red);
 	mc->setHint("", LOCALE_MENU_HINT_LAST_USE);
 
 	CSelectChannelWidget select;

@@ -131,7 +131,7 @@ CMenuOptionStringChooser* COsdLangSetup::getTzItems()
 	CMenuOptionStringChooser* tzSelect = NULL;
 	if (parser != NULL)
 	{
-		tzSelect = new CMenuOptionStringChooser(LOCALE_MAINSETTINGS_TIMEZONE, &g_settings.timezone, true, tzNotifier, CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN, true);
+		tzSelect = new CMenuOptionStringChooser(LOCALE_MAINSETTINGS_TIMEZONE, &g_settings.timezone, true, tzNotifier, CRCInput::RC_green, NULL, true);
 		tzSelect->setHint("", LOCALE_MENU_HINT_TIMEZONE);
 		xmlNodePtr search = xmlDocGetRootElement(parser)->xmlChildrenNode;
 		bool found = false;

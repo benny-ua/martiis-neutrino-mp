@@ -226,14 +226,12 @@ void GLCD_Menu::GLCD_Menu_Settings()
 				&g_settings.glcd_scroll_speed, true, 1, 63, this));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_OSD, &g_settings.glcd_mirror_osd,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
-				CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN));
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this, CRCInput::RC_green));
 	m.addItem(new CMenuOptionChooser(LOCALE_GLCD_MIRROR_VIDEO, &g_settings.glcd_mirror_video,
-				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
-				CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW));
+				OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this, CRCInput::RC_yellow));
 	m.addItem(GenericMenuSeparatorLine);
 	m.addItem(new CMenuForwarder(LOCALE_GLCD_RESTART, true, NULL, this, "rescan",
-				CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED));
+				CRCInput::RC_red));
 	m.exec(NULL, "");
 	selected = m.getSelected();
 	nGLCD::getInstance()->StandbyMode(false);
