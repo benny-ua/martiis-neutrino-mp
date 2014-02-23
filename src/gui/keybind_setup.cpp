@@ -249,21 +249,22 @@ int CKeybindSetup::showKeySetup()
 	for (int i = 0; i < KEYBINDS_COUNT; i++)
 		keychooser[i] = new CKeyChooser(key_settings[i].keyvalue_p, key_settings[i].keydescription/*as head caption*/, NEUTRINO_ICON_SETTINGS);
 
-	int shortcut = 1;
 	showKeyBindSetup(&bindSettings);
 	CMenuForwarder * mf;
 
-	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_EDIT, true, NULL, &bindSettings, NULL, CRCInput::convertDigitToKey(shortcut++));
+	mf = new CMenuForwarder(LOCALE_KEYBINDINGMENU_EDIT, true, NULL, &bindSettings, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_BINDING);
 	keySettings->addItem(mf);
 
-	mf = new CMenuForwarder(LOCALE_EXTRA_LOADKEYS, true, NULL, this, "loadkeys", CRCInput::convertDigitToKey(shortcut++));
+	mf = new CMenuForwarder(LOCALE_EXTRA_LOADKEYS, true, NULL, this, "loadkeys", CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_LOAD);
 	keySettings->addItem(mf);
 
-	mf = new CMenuForwarder(LOCALE_EXTRA_SAVEKEYS, true, NULL, this, "savekeys", CRCInput::convertDigitToKey(shortcut++));
+	mf = new CMenuForwarder(LOCALE_EXTRA_SAVEKEYS, true, NULL, this, "savekeys", CRCInput::RC_yellow);
 	mf->setHint("", LOCALE_MENU_HINT_KEY_SAVE);
 	keySettings->addItem(mf);
+
+	keySettings->addItem(GenericMenuSeparatorLine);
 
 	//rc tuning
 	std::string ms_number_format("%d ");
