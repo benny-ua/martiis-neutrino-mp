@@ -119,8 +119,8 @@ class CMenuItem
 		neutrino_msg_t 	msg;
 		const char *	iconName;
 		const char *	selected_iconName;
-		std::string	iconName_Info_right;
-		std::string	hintIcon;
+		const char *	iconName_Info_right;
+		const char *	hintIcon;
 		std::string	hintText;
 		neutrino_locale_t hint;
 
@@ -169,8 +169,8 @@ class CMenuItem
 		virtual void paintItemSlider( const bool select_mode, const int &item_height, const int &optionvalue, const int &factor, const char * left_text=NULL, const char * right_text=NULL);
 
 		virtual int isMenueOptionChooser(void) const{return 0;}
-		void setHint(const std::string icon, const neutrino_locale_t text) { hintIcon = icon; hint = text; }
-		void setHint(const std::string icon, const std::string text) { hintIcon = icon; hintText = text; }
+		void setHint(const char * const icon, const neutrino_locale_t text) { hintIcon = icon; hint = text; }
+		void setHint(const char * const icon, const std::string text) { hintIcon = icon; hintText = text; }
 
 		void setLua(lua_State *_luaState, std::string &_luaAction, std::string &_luaId) { luaState = _luaState; luaAction = _luaAction; luaId = _luaId; };
 
@@ -601,8 +601,6 @@ class CLockedMenuForwarder : public CMenuForwarder, public CPINProtection
 						//but use always an info icon if defined in parameter 'IconName_Info_right'
 						if (IconName_Info_right || ask)
 							iconName_Info_right = IconName_Info_right ? IconName_Info_right : NEUTRINO_ICON_LOCK; 
-						else
-							iconName_Info_right = "";
 					};
 
 		virtual int exec(CMenuTarget* parent);

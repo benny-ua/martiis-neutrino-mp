@@ -65,7 +65,7 @@ CMenuItem::CMenuItem(neutrino_msg_t DirectKey)
 {
 	x		= -1;
 	directKey	= DirectKey;
-	iconName_Info_right = "";
+	iconName_Info_right = NULL;
 	used		= false;
 	icon_frame_w	= 10;
 	hint		= NONEXISTANT_LOCALE;
@@ -174,8 +174,8 @@ void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height,
 	int _dx = dx;
 	int icon_w = 0;
 	int icon_h = 0;
-	if (!iconName_Info_right.empty()) {
-		CFrameBuffer::getInstance()->getIconSize(iconName_Info_right.c_str(), &icon_w, &icon_h);
+	if (iconName_Info_right) {
+		CFrameBuffer::getInstance()->getIconSize(iconName_Info_right, &icon_w, &icon_h);
 		if (icon_w)
 			_dx -= icon_frame_w + icon_w;
 	}
@@ -296,9 +296,9 @@ void CMenuItem::paintItemButton(const bool select_mode, const int &item_height, 
 	}
 
 	//get data of number right info icon and paint
-	if (!iconName_Info_right.empty())
+	if (iconName_Info_right)
 	{
-		frameBuffer->getIconSize(iconName_Info_right.c_str(), &icon_w, &icon_h);
+		frameBuffer->getIconSize(iconName_Info_right, &icon_w, &icon_h);
 
 		if (icon_w>0 && icon_h>0)
 		{
@@ -868,7 +868,7 @@ void CMenuWidget::checkHints()
 {
 	GenericMenuBack->setHint("", NONEXISTANT_LOCALE);
 	for (unsigned int i= 0; i< items.size(); i++) {
-		if(!items[i]->hintIcon.empty() || items[i]->hint != NONEXISTANT_LOCALE || !items[i]->hintText.empty()) {
+		if(items[i]->hintIcon || items[i]->hint != NONEXISTANT_LOCALE || !items[i]->hintText.empty()) {
 			has_hints = true;
 			break;
 		}
@@ -886,8 +886,8 @@ void CMenuWidget::calcSize()
 	int wi, hi;
 	for (unsigned int i= 0; i< items.size(); i++) {
 		wi = 0;
-		if (!items[i]->iconName_Info_right.empty()) {
-			frameBuffer->getIconSize(items[i]->iconName_Info_right.c_str(), &wi, &hi);
+		if (items[i]->iconName_Info_right) {
+			frameBuffer->getIconSize(items[i]->iconName_Info_right, &wi, &hi);
 			if ((wi > 0) && (hi > 0))
 				wi += 10;
 			else
@@ -1192,7 +1192,7 @@ void CMenuWidget::paintHint(int pos)
 
 	CMenuItem* item = items[pos];
 	
-	if (item->hintIcon.empty() && item->hint == NONEXISTANT_LOCALE && item->hintText.empty()) {
+	if (!item->hintIcon && item->hint == NONEXISTANT_LOCALE && item->hintText.empty()) {
 		if (info_box) {
 			savescreen ? info_box->hide(false) : info_box->kill();
 			hint_painted = false;
@@ -1859,7 +1859,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	actionKey = ActionKey ? ActionKey : "";
 	if (IconName)
 		iconName = IconName;
-	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
 }
 
@@ -1873,7 +1873,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	actionKey = ActionKey ? ActionKey : "";
 	if (IconName)
 		iconName = IconName;
-	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
 }
 
@@ -1888,7 +1888,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	actionKey = ActionKey ? ActionKey : "";
 	if (IconName)
 		iconName = IconName;
-	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
 }
 
@@ -1903,7 +1903,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	actionKey = ActionKey ? ActionKey : "";
 	if (IconName)
 		iconName = IconName;
-	iconName_Info_right = IconName_Info_right ? IconName_Info_right : "";
+	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
 }
 
