@@ -700,7 +700,7 @@ int CChannelList::show()
 			} else
 				loop=false;
 		}
-		else if( msg == CRCInput::RC_record &&
+		else if( msg == (neutrino_msg_t) g_settings.key_record &&
 			 CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_ts &&
 			 CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_webtv) { //start direct recording from channellist
 #if 0

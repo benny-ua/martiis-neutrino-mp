@@ -1146,7 +1146,7 @@ int CMovieBrowser::exec(const char* path)
 						refresh();
 				}
 			}
-			else if ((show_mode == MB_SHOW_YT || show_mode == MB_SHOW_NK) && (msg == CRCInput::RC_record) && m_movieSelectionHandler)
+			else if ((show_mode == MB_SHOW_YT || show_mode == MB_SHOW_NK) && (msg == (neutrino_msg_t) g_settings.key_record) && m_movieSelectionHandler)
 			{
 				m_movieSelectionHandler->source = (show_mode == MB_SHOW_YT) ? MI_MOVIE_INFO::YT : MI_MOVIE_INFO::NK;
 				if (show_mode == MB_SHOW_NK)
