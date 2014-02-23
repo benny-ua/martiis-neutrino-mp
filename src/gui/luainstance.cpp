@@ -629,6 +629,7 @@ int CLuaInstance::GetInput(lua_State *L)
 	{
 		DBG("CLuaInstance::%s: msg 0x%08"PRIx32" data 0x%08"PRIx32"\n", __func__, msg, data);
 		CNeutrinoApp::getInstance()->handleMsg(msg, data);
+		return 0;
 	}
 	/* signed int is debatable, but the "big" messages can't yet be handled
 	 * inside lua scripts anyway. RC_timeout == -1, RC_nokey == -2 */
