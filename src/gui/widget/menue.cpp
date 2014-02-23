@@ -61,22 +61,32 @@ std::string &CMenuTarget::getValue(void)
 	return *valueString;
 }
 
-CMenuItem::CMenuItem(neutrino_msg_t DirectKey)
+CMenuItem::CMenuItem(bool Active, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
 {
-	x		= -1;
+	active		= Active;
 	directKey	= DirectKey;
-	iconName_Info_right = NULL;
+	isStatic	= IsStatic;
+
+	if (IconName && *IconName)
+		iconName = IconName;
+	else
+		setIconName();
+
+	if (IconName_Info_right && *IconName_Info_right)
+		iconName_Info_right = IconName_Info_right;
+	else
+		iconName_Info_right = NULL;
+
+	x		= -1;
 	used		= false;
 	icon_frame_w	= 10;
 	hint		= NONEXISTANT_LOCALE;
 	name		= NONEXISTANT_LOCALE;
 	nameString	= "";
-	isStatic	= false;
 	marked		= false;
 	inert		= false;
 	directKeyOK	= true;
 	selected_iconName = NULL;
-	setIconName();
 }
 
 void CMenuItem::init(const int X, const int Y, const int DX, const int OFFX)
@@ -949,7 +959,10 @@ void CMenuWidget::calcSize()
 
 	iconOffset= 0;
 	for (unsigned int i= 0; i< items.size(); i++) {
-		if (items[i]->iconName || CRCInput::isNumeric(items[i]->directKey))
+		const char *icon_name = items[i]->iconName;
+		if (!icon_name && g_settings.menu_numbers_as_icons && CRCInput::isNumeric(items[i]->directKey))
+			icon_name = to_string(CRCInput::getNumericValue(items[i]->directKey)).c_str();
+		if (items[i]->iconName)
 		{
 			int w, h;
 			frameBuffer->getIconSize(items[i]->iconName, &w, &h);
@@ -1275,11 +1288,14 @@ void CMenuWidget::setFooter(const struct button_label *_fbutton_labels, const in
 
 
 //-------------------------------------------------------------------------------------------------------------------------------
-CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn) : CAbstractMenuOptionChooser(DirectKey)
+CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active,
+	const int min_value, const int max_value,
+	CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName,
+	const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
+	: CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	name		= Name;
-	active		= Active;
 	optionValue	= OptionValue;
 
 	lower_bound	= min_value;
@@ -1299,17 +1315,17 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name,
 
 	numeric_input	= false;
 
-	if (IconName && *IconName)
-		iconName = IconName;
-
 	directKeyOK	= false;
 }
 
-CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn): CAbstractMenuOptionChooser(DirectKey)
+CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int * const OptionValue, const bool Active,
+	const int min_value, const int max_value,
+	CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName,
+	const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
+	: CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	name		= NONEXISTANT_LOCALE;
-	active		= Active;
 	optionValue	= OptionValue;
 
 	lower_bound	= min_value;
@@ -1327,9 +1343,6 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int 
 	slider_on = sliderOn;
 
 	numeric_input	= false;
-
-	if (IconName && *IconName)
-		iconName = IconName;
 
 	directKeyOK	= false;
 }
@@ -1448,17 +1461,14 @@ int CMenuOptionNumberChooser::getWidth(void)
 	return width + 10; /* min 10 pixels between option name and value. enough? */
 }
 
-CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int * const OptionValue, const struct keyval * const Options, const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int * const OptionValue, const struct keyval * const Options, const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= "";
 	name		= OptionName;
-	active		= Active;
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
 	{
@@ -1470,17 +1480,14 @@ CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int *
 	}
 }
 
-CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * const OptionValue, const struct keyval * const Options, const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * const OptionValue, const struct keyval * const Options, const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= OptionName;
 	name		= NONEXISTANT_LOCALE;
-	active		= Active;
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
 	{
@@ -1494,17 +1501,14 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 
 CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int * const OptionValue, const struct keyval_ext * const Options,
 				       const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ,
-				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= "";
 	name		= OptionName;
-	active		= Active;
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
 		options.push_back(Options[i]);
@@ -1512,17 +1516,14 @@ CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int *
 
 CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * const OptionValue, const struct keyval_ext * const Options,
 				       const unsigned Number_Of_Options, const bool Active, CChangeObserver * const Observ,
-				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= OptionName;
 	name		= NONEXISTANT_LOCALE;
-	active		= Active;
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
 		options.push_back(Options[i]);
@@ -1530,35 +1531,29 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 
 CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int * const OptionValue, std::vector<keyval_ext> &Options,
 				       const bool Active, CChangeObserver * const Observ,
-				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= "";
 	name		= OptionName;
-	active		= Active;
 	optionValue	= OptionValue;
 	options		= Options;
 	number_of_options = options.size();
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 }
 
 CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * const OptionValue, std::vector<keyval_ext> &Options,
 				       const bool Active, CChangeObserver * const Observ,
-				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(DirectKey)
+				       const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CAbstractMenuOptionChooser(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= OptionName;
 	name		= NONEXISTANT_LOCALE;
-	active		= Active;
 	optionValue	= OptionValue;
 	options		= Options;
 	number_of_options = options.size();
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 }
 
@@ -1709,29 +1704,23 @@ int CMenuOptionChooser::getWidth(void)
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
-CMenuOptionStringChooser::CMenuOptionStringChooser(const neutrino_locale_t OptionName, std::string* OptionValue, bool Active, CChangeObserver* Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CMenuItem(DirectKey)
+CMenuOptionStringChooser::CMenuOptionStringChooser(const neutrino_locale_t OptionName, std::string* OptionValue, bool Active, CChangeObserver* Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CMenuItem(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= "";
 	name		= OptionName;
-	active		= Active;
 	optionValueString = OptionValue;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown	= Pulldown;
 }
 
-CMenuOptionStringChooser::CMenuOptionStringChooser(const std::string &OptionName, std::string* OptionValue, bool Active, CChangeObserver* Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CMenuItem(DirectKey)
+CMenuOptionStringChooser::CMenuOptionStringChooser(const std::string &OptionName, std::string* OptionValue, bool Active, CChangeObserver* Observ, const neutrino_msg_t DirectKey, const char * const IconName, bool Pulldown) : CMenuItem(Active, DirectKey, IconName)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	nameString	= OptionName;
 	name		= NONEXISTANT_LOCALE;
-	active		= Active;
 	optionValueString = OptionValue;
 	observ		= Observ;
-	if (IconName && *IconName)
-		iconName = IconName;
 	pulldown = Pulldown;
 }
 
@@ -1867,62 +1856,42 @@ int CMenuOptionLanguageChooser::paint( bool selected )
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------
-CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(DirectKey)
+CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 {
 	option_string_ptr = &Option;
 	name = Text;
 	nameString = "";
-	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName && *IconName)
-		iconName = IconName;
-	iconName_Info_right = IconName_Info_right;
-	isStatic = IsStatic;
 }
 
-CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(DirectKey)
+CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 {
 	option_string_ptr = &Option;
 	name = NONEXISTANT_LOCALE;
 	nameString = Text;
-	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName && *IconName)
-		iconName = IconName;
-	iconName_Info_right = IconName_Info_right;
-	isStatic = IsStatic;
 }
 
-CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(DirectKey)
+CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 {
 	option_string = Option ? Option : "";
 	option_string_ptr = &option_string;
 	name = Text;
 	nameString = "";
-	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName && *IconName)
-		iconName = IconName;
-	iconName_Info_right = IconName_Info_right;
-	isStatic = IsStatic;
 }
 
-CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(DirectKey)
+CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const char * const Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 {
 	option_string = Option ? Option : "";
 	option_string_ptr = &option_string;
 	name = NONEXISTANT_LOCALE;
 	nameString = Text;
-	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName && *IconName)
-		iconName = IconName;
-	iconName_Info_right = IconName_Info_right;
-	isStatic = IsStatic;
 }
 
 void CMenuForwarder::setName(const std::string& t)
@@ -2009,20 +1978,18 @@ int CMenuForwarder::paint(bool selected)
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------
-CMenuSeparator::CMenuSeparator(const int Type, const neutrino_locale_t Text, bool IsStatic)
+CMenuSeparator::CMenuSeparator(const int Type, const neutrino_locale_t Text, bool IsStatic) : CMenuItem(false, CRCInput::RC_nokey, NULL, NULL, IsStatic)
 {
 	type		= Type;
 	name		= Text;
 	nameString	= "";
-	isStatic	= IsStatic;
 }
 
-CMenuSeparator::CMenuSeparator(const int Type, const std::string Text, bool IsStatic)
+CMenuSeparator::CMenuSeparator(const int Type, const std::string Text, bool IsStatic) : CMenuItem(false, CRCInput::RC_nokey, NULL, NULL, IsStatic)
 {
 	type		= Type;
 	name		= NONEXISTANT_LOCALE;
 	nameString	= Text;
-	isStatic	= IsStatic;
 }
 
 

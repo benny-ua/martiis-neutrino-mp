@@ -125,7 +125,7 @@ class CMenuItem
 		std::string	hintText;
 		neutrino_locale_t hint;
 
-		CMenuItem(neutrino_msg_t DirectKey = CRCInput::RC_nokey);
+		CMenuItem(bool Active = true, neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName= NULL, const char * const IconName_Info_right = NULL, bool IsStatic = false);
 
 		virtual ~CMenuItem(){}
 		
@@ -144,10 +144,7 @@ class CMenuItem
 		}
 		virtual int getYPosition(void) const { return y; }
 
-		virtual bool isSelectable(void) const
-		{
-			return false;
-		}
+		virtual bool isSelectable(void) const { return active; }
 
 		virtual int exec(CMenuTarget* /*parent*/)
 		{
@@ -206,6 +203,7 @@ class CMenuSeparator : public CMenuItem
 
 		void setName(const std::string& text);
 		void setName(const neutrino_locale_t text);
+		bool isSelectable(void) const { return false; }
 };
 
 class CMenuForwarder : public CMenuItem
@@ -244,7 +242,6 @@ class CMenuForwarder : public CMenuItem
 	std::string getActionKey(){return actionKey;}
 
 	int exec(CMenuTarget* parent);
-	bool isSelectable(void) const { return active; }
 	void setOption(const std::string &Option);
 	void setName(const std::string& text);
 	void setName(const neutrino_locale_t text);
@@ -281,11 +278,9 @@ class CAbstractMenuOptionChooser : public CMenuItem
 
 		int getHeight(void) const{return height;}
 
-		bool isSelectable(void) const{return active;}
 	public:
-		CAbstractMenuOptionChooser(const neutrino_msg_t DirectKey = CRCInput::RC_nokey) : CMenuItem(DirectKey)
+		CAbstractMenuOptionChooser(bool Active, const neutrino_msg_t DirectKey, const char * const IconName, const char *const IconName_Info_right = NULL, bool IsStatic = false) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 		{
-			name = NONEXISTANT_LOCALE;
 			height = 0;
 			optionValue = NULL;
 		}
@@ -413,7 +408,6 @@ class CMenuOptionStringChooser : public CMenuItem
 		void removeOptions(){options.clear();};
 		int paint(bool selected);
 		int getHeight(void) const { return height; }
-		bool isSelectable(void) const { return active; }
 		void sortOptions();
 		int exec(CMenuTarget* parent);
 		int isMenueOptionChooser(void) const{return 1;}
