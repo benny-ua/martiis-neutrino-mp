@@ -1032,7 +1032,7 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 		} else if (type == "numeric") {
 			b->int_val = range_from;
 			sscanf(value.c_str(), "%d", &b->int_val);
-			mi = new CMenuOptionNumberChooser(b->name, &b->int_val, enabled, range_from, range_to, m->observ, 0, 0, NONEXISTANT_LOCALE, pulldown);
+			mi = new CMenuOptionNumberChooser(b->name, &b->int_val, enabled, range_from, range_to, m->observ, directkey, icon, 0, 0, NONEXISTANT_LOCALE, pulldown);
 		} else if (type == "string") {
 			b->str_val = value;
 			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon, pulldown);

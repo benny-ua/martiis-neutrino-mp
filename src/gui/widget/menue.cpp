@@ -74,6 +74,7 @@ CMenuItem::CMenuItem(neutrino_msg_t DirectKey)
 	isStatic	= false;
 	marked		= false;
 	inert		= false;
+	directKeyOK	= true;
 	selected_iconName = NULL;
 	setIconName();
 }
@@ -641,7 +642,10 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 						selected= i;
 						paintHint(selected);
 						pos = selected;
-						msg= CRCInput::RC_ok;
+						if (titem->directKeyOK)
+							msg = CRCInput::RC_ok;
+						else
+							msg = CRCInput::RC_nokey;
 					} else {
 						// swallow-key...
 						handled= true;
@@ -674,6 +678,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 			case CRCInput::RC_page_down:
 			case CRCInput::RC_up:
 			case CRCInput::RC_down:
+			case CRCInput::RC_nokey:
 			{
 				/* dir and wrap are used when searching for a selectable item:
 				 * if the item is not selectable, try the previous (dir = -1) or
@@ -682,6 +687,8 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 				int dir = 1;
 				bool wrap = false;
 				switch (msg) {
+					case CRCInput::RC_nokey:
+						break;
 					case CRCInput::RC_page_up:
 						if (current_page) {
 							pos = page_start[current_page] - 1;
@@ -1268,7 +1275,7 @@ void CMenuWidget::setFooter(const struct button_label *_fbutton_labels, const in
 
 
 //-------------------------------------------------------------------------------------------------------------------------------
-CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
+CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn) : CAbstractMenuOptionChooser(DirectKey)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	name		= Name;
@@ -1283,6 +1290,7 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name,
 	localized_value	= special_value;
 	localized_value_name = special_value_name;
 	
+	display_offset	= print_offset;
 	nameString	= "";
 	numberFormat	= "%d";
 	numberFormatFunction = NULL;
@@ -1290,9 +1298,14 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const neutrino_locale_t Name,
 	slider_on	= sliderOn;
 
 	numeric_input	= false;
+
+	if (IconName && *IconName)
+		iconName = IconName;
+
+	directKeyOK	= false;
 }
 
-CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn)
+CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int * const OptionValue, const bool Active, const int min_value, const int max_value, CChangeObserver * const Observ, const neutrino_msg_t DirectKey, const char * const IconName, const int print_offset, const int special_value, const neutrino_locale_t special_value_name, bool sliderOn): CAbstractMenuOptionChooser(DirectKey)
 {
 	height		= g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	name		= NONEXISTANT_LOCALE;
@@ -1314,6 +1327,11 @@ CMenuOptionNumberChooser::CMenuOptionNumberChooser(const std::string &Name, int 
 	slider_on = sliderOn;
 
 	numeric_input	= false;
+
+	if (IconName && *IconName)
+		iconName = IconName;
+
+	directKeyOK	= false;
 }
 
 int CMenuOptionNumberChooser::exec(CMenuTarget*)

@@ -115,6 +115,7 @@ class CMenuItem
 		bool		marked;
 		bool		inert;
 		bool		isStatic;
+		bool 		directKeyOK;
 		neutrino_msg_t 	directKey;
 		neutrino_msg_t 	msg;
 		const char *	iconName;
@@ -310,10 +311,14 @@ private:
 
  public:
 	CMenuOptionNumberChooser(const neutrino_locale_t name, int * const OptionValue, const bool Active,
-				 const int min_value, const int max_value, CChangeObserver * const Observ = NULL, const int print_offset = 0,
+				 const int min_value, const int max_value, CChangeObserver * const Observ = NULL,
+				 const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL,
+				 const int print_offset = 0,
 				 const int special_value = 0, const neutrino_locale_t special_value_name = NONEXISTANT_LOCALE, bool sliderOn = false );
 	CMenuOptionNumberChooser(const std::string &name, int * const OptionValue, const bool Active,
-				 const int min_value, const int max_value, CChangeObserver * const Observ = NULL, const int print_offset = 0,
+				 const int min_value, const int max_value, CChangeObserver * const Observ = NULL,
+				 const neutrino_msg_t DirectKey = CRCInput::RC_nokey, const char * const IconName = NULL,
+				 const int print_offset = 0,
 				 const int special_value = 0, const neutrino_locale_t special_value_name = NONEXISTANT_LOCALE, bool sliderOn = false );
 
 	int paint(bool selected);

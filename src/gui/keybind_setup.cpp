@@ -271,8 +271,11 @@ int CKeybindSetup::showKeySetup()
 	ms_number_format += g_Locale->getText(LOCALE_UNIT_SHORT_MILLISECOND);
 	CMenuOptionNumberChooser *cc;
 
+	int shortcut = 1;
+
 	cc = new CMenuOptionNumberChooser(LOCALE_KEYBINDINGMENU_LONGKEYPRESS_DURATION,
-		&g_settings.longkeypress_duration, true, LONGKEYPRESS_OFF, 9999, NULL, 0, LONGKEYPRESS_OFF, LOCALE_OPTIONS_OFF);
+		&g_settings.longkeypress_duration, true, LONGKEYPRESS_OFF, 9999, NULL,
+		CRCInput::convertDigitToKey(shortcut++), NULL, 0, LONGKEYPRESS_OFF, LOCALE_OPTIONS_OFF);
 	cc->setNumberFormat(ms_number_format);
 	cc->setNumericInput(true);
 	cc->setHint("", LOCALE_MENU_HINT_LONGKEYPRESS_DURATION);
@@ -280,27 +283,33 @@ int CKeybindSetup::showKeySetup()
 
 #if HAVE_SPARK_HARDWARE
 	g_settings.accept_other_remotes = access("/etc/lircd_predata_lock", R_OK) ? 1 : 0;
-	CMenuOptionChooser *mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES, &g_settings.accept_other_remotes, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
+	CMenuOptionChooser *mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_ACCEPT_OTHER_REMOTES,
+		&g_settings.accept_other_remotes, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this,
+		CRCInput::convertDigitToKey(shortcut++));
 	mc->setHint("", LOCALE_MENU_HINT_ACCEPT_OTHER_REMOTES);
 	keySettings->addItem(mc);
 #endif
 #if !HAVE_SPARK_HARDWARE
 	if (RC_HW_SELECT) {
-		CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE, &g_settings.remote_control_hardware, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTIONS, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTION_COUNT, true);
+		CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_KEYBINDINGMENU_REMOTECONTROL_HARDWARE,
+			&g_settings.remote_control_hardware, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTIONS, KEYBINDINGMENU_REMOTECONTROL_HARDWARE_OPTION_COUNT, true, NULL,
+			CRCInput::convertDigitToKey(shortcut++));
 		mc->setHint("", LOCALE_MENU_HINT_KEY_HARDWARE);
 		keySettings->addItem(mc);
 	}
 #endif
 
 	cc = new CMenuOptionNumberChooser(LOCALE_KEYBINDINGMENU_REPEATBLOCK,
-		&g_settings.repeat_blocker, true, 0, 999, NULL, 0, 0, LOCALE_OPTIONS_OFF);
+		&g_settings.repeat_blocker, true, 0, 999, NULL,
+		CRCInput::convertDigitToKey(shortcut++), NULL, 0, 0, LOCALE_OPTIONS_OFF);
 	cc->setNumberFormat(ms_number_format);
 	cc->setNumericInput(true);
 	cc->setHint("", LOCALE_MENU_HINT_KEY_REPEATBLOCK);
 	keySettings->addItem(cc);
 
 	cc = new CMenuOptionNumberChooser(LOCALE_KEYBINDINGMENU_REPEATBLOCKGENERIC,
-		&g_settings.repeat_genericblocker, true, 0, 999, NULL, 0, 0, LOCALE_OPTIONS_OFF);
+		&g_settings.repeat_genericblocker, true, 0, 999, NULL,
+		CRCInput::convertDigitToKey(shortcut++), NULL, 0, 0, LOCALE_OPTIONS_OFF);
 	cc->setNumberFormat(ms_number_format);
 	cc->setNumericInput(true);
 	cc->setHint("", LOCALE_MENU_HINT_KEY_REPEATBLOCKGENERIC);

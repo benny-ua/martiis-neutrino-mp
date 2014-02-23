@@ -176,7 +176,7 @@ int CAudioSetup::showAudioSetup()
 
 	// initial volume
 	CMenuOptionNumberChooser * as_oj_iv = NULL;
-	as_oj_iv = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_INITIAL_VOLUME, &g_settings.audio_initial_volume, true, -1, 100, NULL, 0, -1, LOCALE_AUDIOMENU_INITIAL_VOLUME_RESTORE, false);
+	as_oj_iv = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_INITIAL_VOLUME, &g_settings.audio_initial_volume, true, -1, 100, NULL, CRCInput::RC_nokey, NULL, 0, -1, LOCALE_AUDIOMENU_INITIAL_VOLUME_RESTORE, false);
 	as_oj_iv->setNumberFormat("%d%%");
 	as_oj_iv->setHint("", LOCALE_MENU_HINT_AUDIO_INITIAL_VOLUME);
 

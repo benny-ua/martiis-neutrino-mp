@@ -1085,13 +1085,13 @@ void CScanSetup::addScanMenuTempSat(CMenuWidget *temp_sat, sat_config_t & satcon
 	CMenuForwarder			*mf;
 
 	if (!unicable) {
-		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, (dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED), -1, 15, this, 1, -1, LOCALE_OPTIONS_OFF);
+		diseqc	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_DISEQC_INPUT, &satconfig.diseqc, (dmode != NO_DISEQC) && (dmode != DISEQC_ADVANCED), -1, 15, this, CRCInput::RC_nokey, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		diseqc->setHint("", LOCALE_MENU_HINT_SCAN_DISEQC);
-		comm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_COMM_INPUT, &satconfig.commited, dmode == DISEQC_ADVANCED, -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
+		comm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_COMM_INPUT, &satconfig.commited, dmode == DISEQC_ADVANCED, -1, 15, NULL, CRCInput::RC_nokey, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		comm->setHint("", LOCALE_MENU_HINT_SCAN_COMMITED);
-		uncomm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_UNCOMM_INPUT, &satconfig.uncommited, dmode == DISEQC_ADVANCED, -1, 15, NULL, 1, -1, LOCALE_OPTIONS_OFF);
+		uncomm	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_UNCOMM_INPUT, &satconfig.uncommited, dmode == DISEQC_ADVANCED, -1, 15, NULL, CRCInput::RC_nokey, NULL, 1, -1, LOCALE_OPTIONS_OFF);
 		uncomm->setHint("", LOCALE_MENU_HINT_SCAN_UNCOMMITED);
-		motor	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_MOTOR_POS, &satconfig.motor_position, true /*dmode == DISEQC_ADVANCED*/, 0, 64, this, 0, 0, LOCALE_OPTIONS_OFF);
+		motor	= new CMenuOptionNumberChooser(LOCALE_SATSETUP_MOTOR_POS, &satconfig.motor_position, true /*dmode == DISEQC_ADVANCED*/, 0, 64, this, CRCInput::RC_nokey, NULL, 0, 0, LOCALE_OPTIONS_OFF);
 		motor->setHint("", LOCALE_MENU_HINT_SCAN_MOTORPOS);
 		usals	= new CMenuOptionChooser(LOCALE_EXTRA_USE_GOTOXX,  &satconfig.use_usals, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true /*dmode == DISEQC_ADVANCED*/);
 		usals->setHint("", LOCALE_MENU_HINT_SCAN_USEUSALS);
