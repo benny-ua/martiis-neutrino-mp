@@ -975,7 +975,7 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 		if (type == "forwarder") {
 			b->str_val = value;
 			CLuaMenuForwarder *forwarder = new CLuaMenuForwarder(L, action, id);
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, NULL, right_icon.c_str());
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, forwarder, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			if (!hint.empty() || !hint_icon.empty())
 				mi->setHint(hint_icon, hint);
 			m->targets.push_back(forwarder);
@@ -1021,15 +1021,15 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 			mi = new CMenuOptionNumberChooser(b->name, &b->int_val, enabled, range_from, range_to, m->observ, 0, 0, NONEXISTANT_LOCALE, pulldown);
 		} else if (type == "string") {
 			b->str_val = value;
-			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, NULL, pulldown);
+			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon.c_str(), pulldown);
 		} else if (type == "stringinput") {
 			b->str_val = value;
 			std::string valid_chars = "abcdefghijklmnopqrstuvwxyz0123456789!\"§$%&/()=?-. ";
 			tableLookup(L, "valid_chars", valid_chars);
 			int sms = 0;	tableLookup(L, "sms", sms);
 			int size = 30;	tableLookup(L, "size", size);
-			CLuaMenuStringinput *stringinput = new CLuaMenuStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, NULL, sms);
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, NULL, right_icon.c_str());
+			CLuaMenuStringinput *stringinput = new CLuaMenuStringinput(L, action, id, b->name.c_str(), &b->str_val, size, valid_chars, m->observ, icon.c_str(), sms);
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, stringinput, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			m->targets.push_back(stringinput);
 		} else if (type == "filebrowser") {
 			b->str_val = value;
@@ -1045,7 +1045,7 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 				}
 			lua_pop(L, 1);
 
-			mi = new CMenuForwarder(b->name, enabled, b->str_val, filebrowser, NULL/*ActionKey*/, directkey, NULL, right_icon.c_str());
+			mi = new CMenuForwarder(b->name, enabled, b->str_val, filebrowser, NULL/*ActionKey*/, directkey, icon.c_str(), right_icon.c_str());
 			m->targets.push_back(filebrowser);
 		}
 		if (mi) {
