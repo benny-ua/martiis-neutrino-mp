@@ -1237,7 +1237,7 @@ void CMenuWidget::paintHint(int pos)
 		info_box->syncSysColors();
 		info_box->setColorBody(COL_MENUCONTENTDARK_PLUS_0);
 		info_box->setShadowOnOff(CC_SHADOW_ON);
-		info_box->setPicture(item->hintIcon);
+		info_box->setPicture(item->hintIcon ? item->hintIcon : "");
 	}
 	
 	//paint result
@@ -1439,7 +1439,7 @@ CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int *
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
@@ -1461,7 +1461,7 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
@@ -1485,7 +1485,7 @@ CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int *
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
@@ -1503,7 +1503,7 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 	optionValue	= OptionValue;
 	number_of_options = Number_Of_Options;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 	for (unsigned int i = 0; i < number_of_options; i++)
@@ -1522,7 +1522,7 @@ CMenuOptionChooser::CMenuOptionChooser(const neutrino_locale_t OptionName, int *
 	options		= Options;
 	number_of_options = options.size();
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 }
@@ -1539,7 +1539,7 @@ CMenuOptionChooser::CMenuOptionChooser(const std::string &OptionName, int * cons
 	options		= Options;
 	number_of_options = options.size();
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 }
@@ -1699,7 +1699,7 @@ CMenuOptionStringChooser::CMenuOptionStringChooser(const neutrino_locale_t Optio
 	active		= Active;
 	optionValueString = OptionValue;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown	= Pulldown;
 }
@@ -1712,7 +1712,7 @@ CMenuOptionStringChooser::CMenuOptionStringChooser(const std::string &OptionName
 	active		= Active;
 	optionValueString = OptionValue;
 	observ		= Observ;
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	pulldown = Pulldown;
 }
@@ -1857,7 +1857,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
@@ -1871,7 +1871,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
@@ -1886,7 +1886,7 @@ CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, 
 	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
@@ -1901,7 +1901,7 @@ CMenuForwarder::CMenuForwarder(const std::string& Text, const bool Active, const
 	active = Active;
 	jumpTarget = Target;
 	actionKey = ActionKey ? ActionKey : "";
-	if (IconName)
+	if (IconName && *IconName)
 		iconName = IconName;
 	iconName_Info_right = IconName_Info_right;
 	isStatic = IsStatic;
