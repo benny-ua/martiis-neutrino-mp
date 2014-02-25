@@ -153,6 +153,7 @@ class CMoviePlayerGui : public CMenuTarget
 	bool isNK;
 	bool showStartingHint;
 	bool stopped;
+	bool iso_file;
 	CMovieBrowser* moviebrowser;
 	MI_MOVIE_INFO * p_movie_info;
 	MI_MOVIE_INFO mi;
@@ -212,6 +213,9 @@ class CMoviePlayerGui : public CMenuTarget
 	void selectChapter();
 #endif
 	void selectAutoLang();
+	void parsePlaylist(CFile *file);
+	bool mountIso(CFile *file);
+	void makeFilename();
 
 	void Cleanup();
 	static void *ShowStartHint(void *arg);
