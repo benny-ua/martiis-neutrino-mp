@@ -1802,7 +1802,7 @@ personalize.pinhint Enter the Personalization PIN Code
 personalize.pinprotect Yes
 personalize.pinstatus Require PIN
 personalize.plugins Plugins
-personalize.usermenu_other_buttons Assign menus to other keys
+personalize.usermenu_other_buttons Assign menus to further keys
 personalize.usermenu_show_cancel Show "Cancel"-Button
 personalize.visible Visible
 pictureviewer.defdir start dir.
