@@ -110,7 +110,10 @@ class CMenuItem
 		std::string	luaId;
 		neutrino_locale_t name;
 		std::string nameString;
+		neutrino_locale_t desc;
+		std::string descString;
 	public:
+		int		height;
 		bool		active;
 		bool		marked;
 		bool		inert;
@@ -137,7 +140,7 @@ class CMenuItem
 		virtual void init(const int X, const int Y, const int DX, const int OFFX);
 
 		virtual int paint (bool selected = false) = 0;
-		virtual int getHeight(void) const = 0;
+		virtual int getHeight(void);
 		virtual int getWidth(void)
 		{
 			return 0;
@@ -154,7 +157,7 @@ class CMenuItem
 		virtual void setMarked(const bool Marked);
 		virtual void setInert(const bool Inert);
 		
-		virtual void paintItemButton(const bool select_mode, const int &item_height, const char * const icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
+		virtual void paintItemButton(const bool select_mode, int item_height, const char * const icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
 		
 		virtual void paintItemBackground (const bool select_mode, const int &item_height);
 		
@@ -162,7 +165,7 @@ class CMenuItem
 
 		virtual void setItemButton(const char * const icon_Name, const bool is_select_button = false);
 		
-		virtual void paintItemCaption(const bool select_mode, const int &item_height, const char * left_text=NULL, const char * right_text=NULL, const fb_pixel_t right_bgcol=0);
+		virtual void paintItemCaption(const bool select_mode, const int &item_height, const char * left_text=NULL, const char * right_text=NULL, const char *desc_text = NULL, const fb_pixel_t right_bgcol=0);
 
 		virtual void paintItemSlider( const bool select_mode, const int &item_height, const int &optionvalue, const int &factor, const char * left_text=NULL, const char * right_text=NULL);
 
@@ -173,6 +176,13 @@ class CMenuItem
 		void setLua(lua_State *_luaState, std::string &_luaAction, std::string &_luaId) { luaState = _luaState; luaAction = _luaAction; luaId = _luaId; };
 
 		virtual const char *getName();
+		virtual void setName(const std::string& text);
+		virtual void setName(const neutrino_locale_t text);
+
+		virtual const char *getDescription();
+		virtual void setDescription(const std::string& text);
+		virtual void setDescription(const neutrino_locale_t text);
+		virtual int getDescriptionHeight(void);
 };
 
 class CMenuSeparator : public CMenuItem
@@ -198,11 +208,9 @@ class CMenuSeparator : public CMenuItem
 		virtual ~CMenuSeparator(){}
 
 		int paint(bool selected=false);
-		int getHeight(void) const;
+		int getHeight(void);
 		int getWidth(void);
 
-		void setName(const std::string& text);
-		void setName(const neutrino_locale_t text);
 		bool isSelectable(void) const { return false; }
 };
 
@@ -235,7 +243,6 @@ class CMenuForwarder : public CMenuItem
 	virtual ~CMenuForwarder(){}
 
 	int paint(bool selected=false);
-	int getHeight(void) const;
 	int getWidth(void);
 	neutrino_locale_t getTextLocale() const {return name;}
 	CMenuTarget* getTarget() const {return jumpTarget;}
@@ -243,8 +250,6 @@ class CMenuForwarder : public CMenuItem
 
 	int exec(CMenuTarget* parent);
 	void setOption(const std::string &Option);
-	void setName(const std::string& text);
-	void setName(const neutrino_locale_t text);
 };
 
 class CMenuDForwarder : public CMenuForwarder
@@ -273,15 +278,11 @@ class CMenuDForwarder : public CMenuForwarder
 class CAbstractMenuOptionChooser : public CMenuItem
 {
 	protected:
-		int	height;
 		int *	optionValue;
-
-		int getHeight(void) const{return height;}
 
 	public:
 		CAbstractMenuOptionChooser(bool Active, const neutrino_msg_t DirectKey, const char * const IconName, const char *const IconName_Info_right = NULL, bool IsStatic = false) : CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 		{
-			height = 0;
 			optionValue = NULL;
 		}
 		~CAbstractMenuOptionChooser(){}
@@ -388,7 +389,6 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 
 class CMenuOptionStringChooser : public CMenuItem
 {
-		int			height;
 		std::string *		optionValueString;
 		std::vector<std::string> options;
 		CChangeObserver *	observ;
@@ -407,7 +407,6 @@ class CMenuOptionStringChooser : public CMenuItem
 		void addOption(const std::string &value);
 		void removeOptions(){options.clear();};
 		int paint(bool selected);
-		int getHeight(void) const { return height; }
 		void sortOptions();
 		int exec(CMenuTarget* parent);
 		int isMenueOptionChooser(void) const{return 1;}
@@ -415,7 +414,6 @@ class CMenuOptionStringChooser : public CMenuItem
 
 class CMenuOptionLanguageChooser : public CMenuItem
 {
-		int			height;
 		std::string		optionValue;
 		CChangeObserver *	observ;
 
@@ -424,7 +422,6 @@ class CMenuOptionLanguageChooser : public CMenuItem
 		~CMenuOptionLanguageChooser();
 
 		int paint(bool selected);
-		int getHeight(void) const { return height; }
 		bool isSelectable(void) const { return true; }
 
 		int exec(CMenuTarget* parent);
