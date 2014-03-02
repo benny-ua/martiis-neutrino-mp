@@ -1229,11 +1229,9 @@ int CTimerList::newTimer()
 	CStringInputSMS timerSettings_msg(LOCALE_TIMERLIST_MESSAGE, &timerNew_message, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-.,:!?/ ");
 	CMenuForwarder *m9 = new CMenuForwarder(LOCALE_TIMERLIST_MESSAGE, false, NULL, &timerSettings_msg );
 
-	strcpy(timerNew.pluginName,"---");
-	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL | CPlugins::P_TYPE_LUA, timerNew.pluginName);
-	std::string timerNew_pluginName(timerNew.pluginName);
+	std::string timerNew_pluginName("---");
+	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL | CPlugins::P_TYPE_LUA, timerNew_pluginName);
 	CMenuForwarder *m10 = new CMenuForwarder(LOCALE_TIMERLIST_PLUGIN, false, timerNew_pluginName, &plugin_chooser);
-	CMenuForwarder *m11 = new CMenuForwarder(LOCALE_TIMERLIST_BATCHEPG, false, "", &plugin_chooser);
 
 	CTimerListNewNotifier notifier2((int *)&timerNew.eventType,
 					&timerNew.stopTime,m2,m6,m8,m9,m10,m7,
@@ -1257,11 +1255,11 @@ int CTimerList::newTimer()
 	timerSettings.addItem( m8);
 	timerSettings.addItem( m9);
 	timerSettings.addItem( m10);
-	timerSettings.addItem( m11);
 
 	notifier2.changeNotify(NONEXISTANT_LOCALE, NULL);
 	int ret=timerSettings.exec(this,"");
 
+	cstrncpy(timerNew.pluginName, timerNew_pluginName, sizeof(timerNew.pluginName));
 	cstrncpy(timerNew.message, timerNew_message, sizeof(timerNew.message));
 
 	// delete dynamic created objects
