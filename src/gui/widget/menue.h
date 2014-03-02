@@ -165,7 +165,7 @@ class CMenuItem
 
 		virtual void setItemButton(const char * const icon_Name, const bool is_select_button = false);
 		
-		virtual void paintItemCaption(const bool select_mode, const int &item_height, const char * left_text=NULL, const char * right_text=NULL, const char *desc_text = NULL, const fb_pixel_t right_bgcol=0);
+		virtual void paintItemCaption(const bool select_mode, const char * right_text=NULL, const fb_pixel_t right_bgcol=0);
 
 		virtual void paintItemSlider( const bool select_mode, const int &item_height, const int &optionvalue, const int &factor, const char * left_text=NULL, const char * right_text=NULL);
 

@@ -171,8 +171,12 @@ void CMenuItem::paintItemBackground (const bool select_mode, const int &item_hei
 		frameBuffer->paintBoxRel(x, y, dx, item_height, item_bgcolor, RADIUS_LARGE);
 }
 
-void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height, const char * left_text, const char * right_text, const char *desc_text, const fb_pixel_t right_bgcol)
+void CMenuItem::paintItemCaption(const bool select_mode, const char * right_text, const fb_pixel_t right_bgcol)
 {
+	int item_height = height;
+	const char *left_text = getName();
+	const char *desc_text = getDescription();
+
 	if (select_mode)
 	{
 		if (right_text && *right_text) 
@@ -1477,7 +1481,7 @@ int CMenuOptionNumberChooser::paint(bool selected)
 	if(slider_on)
 		paintItemSlider(selected, height, *optionValue, (upper_bound - lower_bound), getName(), l_option);
 	//paint text
-	paintItemCaption(selected, height, getName(), l_option, getDescription());
+	paintItemCaption(selected, l_option);
 
 	return y+height;
 }
@@ -1732,7 +1736,7 @@ int CMenuOptionChooser::paint( bool selected)
 	paintItemButton(selected, height, NEUTRINO_ICON_BUTTON_OKAY);
 	
 	//paint text
-	paintItemCaption(selected, height, getName(), l_option, getDescription());
+	paintItemCaption(selected, l_option);
 
 	return y+height;
 }
@@ -1865,7 +1869,7 @@ int CMenuOptionStringChooser::paint( bool selected )
 	paintItemButton(selected, height, NEUTRINO_ICON_BUTTON_OKAY);
 
 	//paint text
-	paintItemCaption(selected, height, getName(), optionValueString->c_str(), getDescription());
+	paintItemCaption(selected, optionValueString->c_str());
 
 	return y+height;
 }
@@ -1969,7 +1973,7 @@ int CMenuForwarder::paint(bool selected)
 	paintItemButton(selected, height);
 	
 	//caption
-	paintItemCaption(selected, height, getName(), option_name.c_str(), getDescription(), bgcol);
+	paintItemCaption(selected, option_name.c_str(), bgcol);
 	
 	return y+ height;
 }
@@ -2048,7 +2052,7 @@ int CMenuSeparator::paint(bool selected)
 			
  			frameBuffer->paintBoxRel(name_start_x-5, y, stringwidth+10, height, item_bgcolor);
 			
-			paintItemCaption(selected, height, l_name);
+			paintItemCaption(selected);
 		}
 	}
 	return y+ height;
