@@ -91,7 +91,7 @@ class CMenuTarget
 		virtual ~CMenuTarget(){}
 		virtual void hide(){}
 		virtual int exec(CMenuTarget* parent, const std::string & actionKey) = 0;
-		virtual std::string &getValue(void);
+		virtual std::string &getValue(void) { return *valueString; }
 		virtual fb_pixel_t getColor(void) { return 0; }
 };
 
@@ -158,8 +158,6 @@ class CMenuItem
 		virtual void setInert(const bool Inert);
 		
 		virtual void paintItemButton(const bool select_mode, int item_height, const char * const icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
-		
-		virtual void paintItemBackground (const bool select_mode, const int &item_height);
 		
 		virtual void prepareItem(const bool select_mode, const int &item_height);
 

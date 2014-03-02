@@ -48,7 +48,7 @@ class CLangSelectNotifier : public CChangeObserver
 		bool changeNotify(const neutrino_locale_t, void * data);
 };
 
-class COsdLangSetup : public CMenuTarget, CChangeObserver
+class COsdLangSetup : public CMenuTarget
 {	
 	private:				
 		int  width;
@@ -61,9 +61,6 @@ class COsdLangSetup : public CMenuTarget, CChangeObserver
 		
 		CMenuOptionStringChooser* getTzItems();
 		
-		
-		bool changeNotify(const neutrino_locale_t, void *);
-
 	public:
 		enum OSDLANG_SETUP_MODE
 		{

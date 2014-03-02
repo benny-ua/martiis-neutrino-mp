@@ -253,14 +253,6 @@ void COsdLangSetup::showPrefMenu(CMenuWidget *prefMenu, CLangSelectNotifier *lan
 	}
 }
 
-bool COsdLangSetup::changeNotify(const neutrino_locale_t, void *)
-{
-	//apply osd language
-	g_Locale->loadLocale(g_settings.language.c_str());
-
-	return true;
-}
-
 bool CLangSelectNotifier::changeNotify(const neutrino_locale_t, void *)
 {
 	std::vector<std::string> v_languages;
