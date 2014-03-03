@@ -408,9 +408,9 @@ void CFEManager::linkFrontends(bool init)
 		int femode = fe->getMode();
 		fe->slave = false;
 		fe->have_loop = false;
+		fe->have_rotor = false;
 		fe->linkmap.clear();
 		if (femode == CFrontend::FE_MODE_MASTER) {
-			INFO("Frontend #%d: is master", fe->fenumber);
 			fe->linkmap.push_back(fe);
 			/* fe is master, find all linked */
 			for(fe_map_iterator_t it2 = femap.begin(); it2 != femap.end(); it2++) {
@@ -428,6 +428,16 @@ void CFEManager::linkFrontends(bool init)
 					INFO("Frontend #%d: link to master %d as TWIN", fe2->fenumber, fe->fenumber);
 				}
 			}
+			frontend_config_t & fe_config = fe->getConfig();
+			satellite_map_t &satellites = fe->getSatellites();
+			for(sat_iterator_t sit = satellites.begin(); sit != satellites.end(); ++sit) {
+				if (fe_config.use_usals || (sit->second.configured && (sit->second.motor_position || sit->second.use_usals))) {
+					fe->have_rotor = true;
+					break;
+				}
+			}
+			INFO("Frontend #%d: is master, with loop: %s, with rotor: %s", fe->fenumber,
+					fe->have_loop ? "yes" : "no", fe->have_rotor ? "yes" : "no");
 		} else if (femode == CFrontend::FE_MODE_LINK_LOOP) {
 			INFO("Frontend #%d: is LOOP, master %d", fe->fenumber, fe->getMaster());
 			if (init)
@@ -459,35 +469,6 @@ void CFEManager::linkFrontends(bool init)
 	}
 }
 
-#if 0
-void CFEManager::setMode(fe_mode_t newmode, bool initial)
-{
-	if(!initial && (newmode == mode))
-		return;
-
-	fe_mode_t oldmode = mode;
-	mode = newmode;
-	if(femap.size() == 1)
-		mode = FE_MODE_SINGLE;
-
-	bool setslave = (mode == FE_MODE_LOOP) || (mode == FE_MODE_SINGLE);
-	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
-		CFrontend * fe = it->second;
-		if(it != femap.begin()) {
-			if (mode != FE_MODE_SINGLE) {
-				if (oldmode == FE_MODE_SINGLE)
-					fe->Open(true); /* secondary FE is not opened in single mode */
-				INFO("Frontend %d as slave: %s", fe->fenumber, setslave ? "yes" : "no");
-				fe->setMasterSlave(setslave);
-			} else {
-				INFO("Frontend %d not used in single mode, closing", fe->fenumber);
-				fe->Close();
-			}
-		} else
-			fe->Init();
-	}
-}
-#endif
 void CFEManager::Open()
 {
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
@@ -579,7 +560,7 @@ CFrontend * CFEManager::getFrontend(CZapitChannel * channel)
 						fe->Locked(), fe->getFrequency(), fe->getTsidOnid(), channel->getFreqId(), channel->getTransponderId());
 
 				if(fe->Locked()) {
-					if (fe->isSat() && (fe->getCurrentSatellitePosition() != satellitePosition)) {
+					if (mfe->have_rotor && (fe->getCurrentSatellitePosition() != satellitePosition)) {
 						free_frontend = NULL;
 						free_twin = NULL;
 						break;

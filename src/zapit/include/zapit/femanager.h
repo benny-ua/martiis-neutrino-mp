@@ -120,7 +120,6 @@ class CFEManager
 		CFrontend *	getFrontend(CZapitChannel * channel);
 
 		fe_mode_t	getMode() { return mode; };
-		void		setMode(fe_mode_t newmode, bool initial = false);
 
 		int		getFrontendCount() { return femap.size(); };
 		int		getEnabledCount();
