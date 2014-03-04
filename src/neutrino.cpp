@@ -465,7 +465,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	//misc
 	g_settings.power_standby = configfile.getInt32( "power_standby", 0);
-	g_settings.rotor_swap = configfile.getInt32( "rotor_swap", 0);
 
 	//led
 #if HAVE_SPARK_HARDWARE
@@ -1074,7 +1073,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	//misc
 	configfile.setInt32( "power_standby", g_settings.power_standby);
-	configfile.setInt32( "rotor_swap", g_settings.rotor_swap);
 	configfile.setInt32( "zap_cycle", g_settings.zap_cycle );
 	configfile.setInt32( "hdd_fs", g_settings.hdd_fs);
 	configfile.setInt32( "hdd_sleep", g_settings.hdd_sleep);
