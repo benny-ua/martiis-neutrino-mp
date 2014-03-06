@@ -461,11 +461,29 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 
 	bool return_title = false;
 	neutrino_locale_t loc = NONEXISTANT_LOCALE;
-	char *text = NULL;
+	const char *text = NULL;
 
-	for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX && !return_title; pos++) {
-		int item = g_settings.usermenu[button][pos];
+	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
+		int item = -1;
+		if (it->find_first_not_of("0123456789") == std::string::npos)
+			item = atoi(*it);
+
 		switch(item) {
+			case -1:
+				if(loc != NONEXISTANT_LOCALE || text)
+					return_title = true;
+				else {
+					int nop = g_PluginList->getNumberOfPlugins();
+					for(int count = 0; count < nop; count++) {
+						if (std::string(g_PluginList->getFileName(count)) == *it) {
+							text = g_PluginList->getName(count);
+							active = true;
+							break;
+						}
+					}
+				}
+				continue;
 			case SNeutrinoSettings::ITEM_NONE:
 			case SNeutrinoSettings::ITEM_BAR:
 				continue;
@@ -475,7 +493,7 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 				continue;
 			case SNeutrinoSettings::ITEM_SUBCHANNEL:
 				if (!g_RemoteControl->subChannels.empty()) {
-					if(loc == NONEXISTANT_LOCALE)
+					if(loc == NONEXISTANT_LOCALE && !text)
 						loc = g_RemoteControl->are_subchannels ? LOCALE_NVODSELECTOR_SUBSERVICE : LOCALE_NVODSELECTOR_HEAD;
 					else
 						return_title = true;
@@ -486,36 +504,48 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 				return_title = true;
 				continue;
 			case SNeutrinoSettings::ITEM_CLOCK:
-				if(loc == NONEXISTANT_LOCALE)
+				if(loc == NONEXISTANT_LOCALE && !text)
 					loc = g_settings.mode_clock ? LOCALE_CLOCK_SWITCH_OFF : LOCALE_CLOCK_SWITCH_ON;
 				else
 					return_title = true;
 				active = true;
 				continue;
 			case SNeutrinoSettings::ITEM_AUDIO_SELECT:
-				if (g_RemoteControl->current_PIDs.APIDs.size() > 0)
-					text = g_RemoteControl->current_PIDs.APIDs[
-						g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
-				// fallthrough
+				if(loc == NONEXISTANT_LOCALE && !text) {
+					if (g_RemoteControl->current_PIDs.APIDs.size() > 0)
+						text = g_RemoteControl->current_PIDs.APIDs[
+							g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
+				} else
+					return_title = true;
+				active = true;
+				continue;
+			case SNeutrinoSettings::ITEM_RASS:
+				if (!(CNeutrinoApp::getInstance()->getMode() == CNeutrinoApp::mode_radio && g_Radiotext && g_Radiotext->haveRASS()))
+					continue;
 			default:
-				if(loc == NONEXISTANT_LOCALE)
+				if(loc == NONEXISTANT_LOCALE && !text)
 					loc = CUserMenuSetup::getLocale(item);
 				else
 					return_title = true;
 				active = true;
 				continue;
 		}
+		if (return_title)
+			break;
 	}
 
-	if (!return_title && (loc != NONEXISTANT_LOCALE)) {
-		if(text)
-			return text;
+	if (!return_title && text)
+		return text;
+
+	if (!return_title && (loc != NONEXISTANT_LOCALE))
 		return g_Locale->getText(loc);
-	}
+
 	if (return_title && g_settings.usermenu_text[button].length())
 		return g_settings.usermenu_text[button].c_str();
-	if (return_title)
+
+	if (return_title && button < USERMENU_ITEMS_COUNT)
 		return g_Locale->getText(usermenu[button].def_name);
+
 	return "";
 }
 

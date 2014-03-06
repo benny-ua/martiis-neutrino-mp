@@ -70,6 +70,7 @@ struct keyvals
 
 static keyvals usermenu_items[] =
 {
+	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_BAR,			LOCALE_USERMENU_ITEM_BAR,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_EPG_LIST,		LOCALE_EPGMENU_EVENTLIST,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_EPG_SUPER,		LOCALE_EPGMENU_EPGPLUS,			usermenu_show },
@@ -102,8 +103,7 @@ static keyvals usermenu_items[] =
 	{ SNeutrinoSettings::ITEM_NETZKINO,		LOCALE_MOVIEPLAYER_NKPLAYBACK,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_RECORD,		LOCALE_TIMERLIST_TYPE_RECORD,		usermenu_show },
 	{ SNeutrinoSettings::ITEM_HDDMENU,		LOCALE_HDD_SETTINGS,			usermenu_show },
-// order is not important, but ITEM_NONE needs to be last
-	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show }
+	{ SNeutrinoSettings::ITEM_MAX,			NONEXISTANT_LOCALE,			usermenu_show }
 };
 
 CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
@@ -115,7 +115,7 @@ CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
 	pref_name = g_settings.usermenu_text[button]; //set current button name as prefered name
 	forwarder = NULL;
 
-	for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++) {
+	for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_MAX; i++) {
 		const char *loc = g_Locale->getText(usermenu_items[i].value);
 		if (usermenu_items[i].show)
 			options.push_back(loc);
@@ -142,7 +142,19 @@ CUserMenuSetup::~CUserMenuSetup()
 
 int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 {
-	if(parent != NULL)
+	if (actionKey == ">d") {
+		int selected = ums->getSelected();
+		if (selected >= item_offset) {
+			if(parent)
+				parent->hide();
+			ums->removeItem(selected);
+			ums->hide();
+			return menu_return::RETURN_REPAINT;
+		}
+		return menu_return::RETURN_NONE;
+	}
+
+	if(parent)
 		parent->hide();
 
 	if (actionKey == ">a") {
@@ -159,16 +171,6 @@ int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		return menu_return::RETURN_REPAINT;
 	}
 
-	if (actionKey == ">d") {
-		int selected = ums->getSelected();
-		if (selected >= item_offset) {
-			ums->removeItem(selected);
-			ums->hide();
-			return menu_return::RETURN_REPAINT;
-		}
-		return menu_return::RETURN_NONE;
-	}
-	
 	int res = showSetup();
 	checkButtonName();
 	
@@ -183,7 +185,7 @@ neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
 		initialized = true;
 		for (int i = 0; i < SNeutrinoSettings::ITEM_MAX; i++)
 			locals[i] = NONEXISTANT_LOCALE;
-		for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++) 
+		for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_MAX; i++) 
 			locals[usermenu_items[i].key] = usermenu_items[i].value;
 	}
 	return locals[key];
@@ -294,7 +296,7 @@ void CUserMenuSetup::checkButtonItems()
 	}
 #endif
 
-	//if found only 1 configured item, ensure that the caption of usermenu is the same like this	
+	//if found only 1 configured item, ensure that the caption of usermenu is the same like this
 	if (used_items == 1) {
 		bool dummy;
 		g_settings.usermenu_text[button] =  CUserMenu::getUserMenuButtonName(button, dummy);
@@ -303,7 +305,7 @@ void CUserMenuSetup::checkButtonItems()
 
 //check button name for details like empty string and show an user message on issue
 void CUserMenuSetup::checkButtonName()
-{	
+{
 	checkButtonItems();
 	
 	//exit function, if no items found
@@ -311,7 +313,7 @@ void CUserMenuSetup::checkButtonName()
 		return;
 	
 	bool is_empty = g_settings.usermenu_text[button].empty();
-	if (is_empty)
+	if (is_empty && button < USERMENU_ITEMS_COUNT)
 	{
 		std::string 	msg = g_Locale->getText(LOCALE_USERMENU_MSG_INFO_IS_EMPTY);
 				msg += g_Locale->getText(usermenu[button].def_name);
