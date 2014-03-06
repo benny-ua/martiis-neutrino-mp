@@ -388,6 +388,7 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 class CMenuOptionStringChooser : public CMenuItem
 {
 		std::string *		optionValuePtr;
+		std::string	title;
 		std::string	optionValue;
 		std::vector<std::string> options;
 		CChangeObserver *	observ;
@@ -406,6 +407,8 @@ class CMenuOptionStringChooser : public CMenuItem
 		void addOption(const std::string &value);
 		void removeOptions(){options.clear();}
 		void setOptions(std::vector<std::string> &vec) { options = vec; }
+		void setTitle(std::string &Title);
+		void setTitle(const neutrino_locale_t Title);
 		int paint(bool selected);
 		void sortOptions();
 		int exec(CMenuTarget* parent);

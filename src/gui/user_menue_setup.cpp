@@ -214,6 +214,7 @@ int CUserMenuSetup::showSetup()
 	item_offset = ums->getItemsCount();
 	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
 		CMenuOptionStringChooser *c = new CMenuOptionStringChooser(std::string(""), NULL, true, NULL, CRCInput::RC_nokey, NULL, true);
+		c->setTitle(LOCALE_USERMENU_ITEMS);
 		c->setOptions(options);
 		c->setOptionValue(vals[*it]);
 		ums->addItem(c);

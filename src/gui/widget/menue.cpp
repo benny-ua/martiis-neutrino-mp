@@ -1778,6 +1778,16 @@ CMenuOptionStringChooser::~CMenuOptionStringChooser()
 	options.clear();
 }
 
+void CMenuOptionStringChooser::setTitle(std::string &Title)
+{
+	title = Title;
+}
+
+void CMenuOptionStringChooser::setTitle(const neutrino_locale_t Title)
+{
+	title = g_Locale->getText(Title);
+}
+
 void CMenuOptionStringChooser::addOption(const std::string &value)
 {
 	options.push_back(value);
@@ -1799,7 +1809,9 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 		if (parent)
 			parent->hide();
 
-		CMenuWidget* menu = new CMenuWidget(getName(), NEUTRINO_ICON_SETTINGS);
+		std::string title_str = title.empty() ? getName() : title;
+
+		CMenuWidget* menu = new CMenuWidget(title_str, NEUTRINO_ICON_SETTINGS);
 		menu->addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
 		//if(parent) menu->move(20, 0);
 		CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
