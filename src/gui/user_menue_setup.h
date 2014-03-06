@@ -37,6 +37,8 @@
 #include <system/settings.h>
 
 #include <string>
+#include <vector>
+#include <map>
 
 typedef struct usermenu_props_t
 {
@@ -64,16 +66,19 @@ class CUserMenuSetup : public CMenuTarget
 		int width;
 		int max_char;
 		int button;
+		int item_offset;
 		std::string pref_name;
 		neutrino_locale_t local;
 		CMenuForwarder *forwarder;
+		CMenuWidget * ums;
+		std::vector<std::string> options;
+		std::map<std::string,std::string> keys;
+		std::map<std::string,std::string> vals;
 
 		int showSetup();
 		void checkButtonItems();
 		void checkButtonName();
-		
-		CMenuWidget * ums;
-		
+
 	public:
 		CUserMenuSetup(neutrino_locale_t menue_title, int menue_button);
 		~CUserMenuSetup();

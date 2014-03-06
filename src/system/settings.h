@@ -815,7 +815,7 @@ struct SNeutrinoSettings
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
 	std::string usermenu_text[BUTTON_MAX];
-	int usermenu[BUTTON_MAX][ITEM_MAX];  // (USER_ITEM)  [button][position in Menue] = feature item
+	std::string usermenu[BUTTON_MAX];  // (USER_ITEM)  [button][position in Menue] = feature item
 	int usermenu_key[BUTTON_MAX];
 
 	//progressbar arrangement for infobar

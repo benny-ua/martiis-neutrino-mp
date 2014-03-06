@@ -321,7 +321,7 @@ void CPlugins::start_plugin_by_name(const std::string & filename,int param)
 {
 	for (int i = 0; i <  (int) plugin_list.size(); i++)
 	{
-		if (filename.compare(g_PluginList->getName(i))==0)
+		if (!filename.compare(g_PluginList->getFileName(i)))
 		{
 			startPlugin(i,param);
 			return;

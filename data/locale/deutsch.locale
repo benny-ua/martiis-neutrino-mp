@@ -2215,6 +2215,7 @@ usermenu.item_bar ---- Trennung ----
 usermenu.item_epg_misc EPG Funktionen
 usermenu.item_none (frei)
 usermenu.item_vtxt Teletext
+usermenu.items Menüpunkte
 usermenu.key Taste
 usermenu.key_select Taste zuweisen
 usermenu.msg_info_is_empty Es wurde kein Name für dieses Menü vergeben.\nVerwende Standardname:\n

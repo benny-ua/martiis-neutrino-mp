@@ -387,7 +387,8 @@ class CMenuOptionChooser : public CAbstractMenuOptionChooser
 
 class CMenuOptionStringChooser : public CMenuItem
 {
-		std::string *		optionValueString;
+		std::string *		optionValuePtr;
+		std::string	optionValue;
 		std::vector<std::string> options;
 		CChangeObserver *	observ;
 		bool			pulldown;
@@ -403,11 +404,17 @@ class CMenuOptionStringChooser : public CMenuItem
 		~CMenuOptionStringChooser();
 
 		void addOption(const std::string &value);
-		void removeOptions(){options.clear();};
+		void removeOptions(){options.clear();}
+		void setOptions(std::vector<std::string> &vec) { options = vec; }
 		int paint(bool selected);
 		void sortOptions();
 		int exec(CMenuTarget* parent);
 		int isMenueOptionChooser(void) const{return 1;}
+		void setOptionValue(std::string &val) {
+			if (!optionValuePtr) optionValuePtr = &optionValue;
+			*optionValuePtr = val;
+		}
+		std::string getOptionValue() { return *optionValuePtr; }
 };
 
 class CMenuGlobal

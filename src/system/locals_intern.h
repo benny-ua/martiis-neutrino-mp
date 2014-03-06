@@ -2242,6 +2242,7 @@ const char * locale_real_names[] =
 	"usermenu.item_epg_misc",
 	"usermenu.item_none",
 	"usermenu.item_vtxt",
+	"usermenu.items",
 	"usermenu.key",
 	"usermenu.key_select",
 	"usermenu.msg_info_is_empty",

@@ -73,12 +73,15 @@
 #include <driver/record.h>
 #include <driver/screen_max.h>
 
+#include <system/helpers.h>
+
 #include <daemonc/remotecontrol.h>
-extern CRemoteControl * g_RemoteControl; /* neutrino.cpp */
-// extern CPlugins * g_PluginList;
+extern CRemoteControl * g_RemoteControl;	/* neutrino.cpp */
+extern CPlugins * g_PluginList;			/* neutrino.cpp */
 #if !HAVE_SPARK_HARDWARE
 extern CCAMMenuHandler * g_CamHandler;
 #endif
+
 // 
 #include <system/debug.h>
 
@@ -89,10 +92,8 @@ CUserMenu::CUserMenu()
 
 CUserMenu::~CUserMenu()
 {
-	
 }
 
-// USERMENU
 bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 {
 	int button = -1;
@@ -141,9 +142,8 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	
 	//set default feature key
 	neutrino_msg_t key = feat_key[CPersonalizeGui::PERSONALIZE_FEAT_KEY_AUTO].key; //CRCInput::RC_nokey
-	
-	const char * icon = NULL;
 
+	const char * icon = NULL;
 	int menu_items = 0;
 
 	// define classes
@@ -168,14 +168,17 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	else
 		menu->addItem(GenericMenuSeparator);
 	
-	int item_last = SNeutrinoSettings::ITEM_BAR;
+	std::string itemstr_last = "1";
 
-	// go through any postition number
-	for (int pos = 0; pos < SNeutrinoSettings::ITEM_MAX ; pos++) {
-		// now compare pos with the position of any item. Add this item if position is the same
-		int item = g_settings.usermenu[button][pos];
-		if (item == item_last)
+	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
+		if (it->empty())
 			continue;
+		if (*it == itemstr_last)
+			continue;
+		int item = -1;
+		if (it->find_first_not_of("0123456789") == std::string::npos)
+			item = atoi(*it);
 		menu_item = NULL;
 		switch (item) {
 		case SNeutrinoSettings::ITEM_NONE:
@@ -388,29 +391,45 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			menu_item = new CMenuForwarder(LOCALE_HDD_SETTINGS, true, NULL, neutrino, "hddmenu", key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_HDD, LOCALE_MENU_HINT_HDD);
 			break;
-		default:
-			printf("[neutrino] WARNING! menu wrong item!!\n");
-			continue;
+		case -1: // plugin
+		    {
+			int number_of_plugins = g_PluginList->getNumberOfPlugins();
+			if (!number_of_plugins)
+				continue;
+			int count = 0;
+			for(; count < number_of_plugins; count++) {
+				const char *pname = g_PluginList->getFileName(count);
+				if (pname && (std::string(pname) == *it)) {
+					keyhelper.get(&key,&icon);
+					menu_item = new CMenuForwarder(g_PluginList->getName(count), true, NULL, this, pname, key, icon);
+					const std::string hint = g_PluginList->getDescription(count);
+					if (hint != "") {
+						const char *hint_icon = NULL;
+						switch(g_PluginList->getType(count)) {
+							case CPlugins::P_TYPE_GAME:
+								hint_icon = NEUTRINO_ICON_HINT_GAMES;
+							break;
+							case CPlugins::P_TYPE_SCRIPT:
+								hint_icon = NEUTRINO_ICON_HINT_SCRIPTS;
+							break;
+						}
+						menu_item->setHint(hint_icon, hint);
+					}
+					break;
+				}
+			}
+			if (count == number_of_plugins)
+				continue;
+		    }
 		}
-		item_last = item;
+			
+		itemstr_last = *it;
 		if (menu_item) {
 			menu_items++;
 			menu->addItem(menu_item, false);
 			last_menu_item = menu_item;
 		}
 	}
-
-#if 0
-	// Allow some tailoring for privat image bakers ;)
-	if (button == SNeutrinoSettings::BUTTON_RED) {
-	}
-	else if ( button == SNeutrinoSettings::BUTTON_GREEN) {
-	}
-	else if ( button == SNeutrinoSettings::BUTTON_YELLOW) {
-	}
-	else if ( button == SNeutrinoSettings::BUTTON_BLUE) {
-	}
-#endif
 
 	extern CInfoClock *InfoClock;
 	InfoClock->enableInfoClock(false);
@@ -510,4 +529,12 @@ bool CUserMenu::changeNotify(const neutrino_locale_t OptionName, void * Data)
 	}
 	
 	return false;
+}
+
+int CUserMenu::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
+{
+	if (actionKey == "")
+		return menu_return::RETURN_NONE;
+	g_PluginList->startPlugin(actionKey.c_str());
+	return menu_return::RETURN_REPAINT;
 }

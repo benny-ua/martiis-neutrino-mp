@@ -189,13 +189,18 @@ void CMenuItem::paintItemCaption(const bool select_mode, const char * right_text
 	if (desc_text && *desc_text)
 		desc_height = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_HINT]->getHeight();
 
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(name_start_x, y+ item_height - desc_height, _dx- (name_start_x - x), left_text, item_color, 0, true); // UTF-8
+	if (*left_text)
+		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(name_start_x, y+ item_height - desc_height, _dx- (name_start_x - x), left_text, item_color, 0, true); // UTF-8
 
 	//right text
 	if (right_text && (*right_text || right_bgcol))
 	{
 		int stringwidth = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(right_text, true);
-		int stringstartposOption = std::max(name_start_x + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(left_text, true) + icon_frame_w, x + dx - stringwidth - icon_frame_w); //+ offx
+		int stringstartposOption;
+		if (*left_text)
+			stringstartposOption = std::max(name_start_x + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(left_text, true) + icon_frame_w, x + dx - stringwidth - icon_frame_w); //+ offx
+		else
+			stringstartposOption = name_start_x;
 		if (right_bgcol) {
 			if (!*right_text)
 				stringstartposOption -= 60;
@@ -1751,7 +1756,7 @@ CMenuOptionStringChooser::CMenuOptionStringChooser(const neutrino_locale_t Optio
 {
 	nameString	= "";
 	name		= OptionName;
-	optionValueString = OptionValue;
+	optionValuePtr	= OptionValue ? OptionValue : &optionValue;
 	observ		= Observ;
 	pulldown	= Pulldown;
 }
@@ -1762,9 +1767,9 @@ CMenuOptionStringChooser::CMenuOptionStringChooser(const std::string &OptionName
 {
 	nameString	= OptionName;
 	name		= NONEXISTANT_LOCALE;
-	optionValueString = OptionValue;
+	optionValuePtr	= OptionValue ? OptionValue : &optionValue;
 	observ		= Observ;
-	pulldown = Pulldown;
+	pulldown	= Pulldown;
 }
 
 
@@ -1800,28 +1805,28 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 		CMenuSelectorTarget * selector = new CMenuSelectorTarget(&select);
 		for(unsigned int count = 0; count < options.size(); count++) 
 		{
-			bool selected = optionValueString && (options[count] == *optionValueString);
+			bool selected = optionValuePtr && (options[count] == *optionValuePtr);
 			CMenuForwarder *mn_option = new CMenuForwarder(options[count], true, NULL, selector, to_string(count).c_str());
 			mn_option->setItemButton(NEUTRINO_ICON_BUTTON_OKAY, true /*for selected item*/);
 			menu->addItem(mn_option, selected);
 		}
 		menu->exec(NULL, "");
 		ret = menu_return::RETURN_REPAINT;
-		if(select >= 0 && optionValueString)
-			*optionValueString = options[select];
+		if(select >= 0 && optionValuePtr)
+			*optionValuePtr = options[select];
 		delete menu;
 		delete selector;
 	} else {
 		//select next value
 		for(unsigned int count = 0; count < options.size(); count++) {
-			if (optionValueString && (options[count] == *optionValueString)) {
+			if (optionValuePtr && (options[count] == *optionValuePtr)) {
 				if(msg == CRCInput::RC_left) {
 					if(count > 0)
-						*optionValueString = options[(count - 1) % options.size()];
+						*optionValuePtr = options[(count - 1) % options.size()];
 					else
-						*optionValueString = options[options.size() - 1];
+						*optionValuePtr = options[options.size() - 1];
 				} else
-					*optionValueString = options[(count + 1) % options.size()];
+					*optionValuePtr = options[(count + 1) % options.size()];
 				//wantsRepaint = true;
 				break;
 			}
@@ -1830,9 +1835,9 @@ int CMenuOptionStringChooser::exec(CMenuTarget* parent)
 		paint(true);
 	}
 	if(observ && !luaAction.empty())
-		wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, (void *)(optionValueString ? optionValueString->c_str() : ""));
+		wantsRepaint = observ->changeNotify(luaState, luaAction, luaId, (void *)(optionValuePtr ? optionValuePtr->c_str() : ""));
 	else if(observ) {
-		wantsRepaint = observ->changeNotify(name, (void *)(optionValueString ? optionValueString->c_str() : ""));
+		wantsRepaint = observ->changeNotify(name, (void *)(optionValuePtr ? optionValuePtr->c_str() : ""));
 	}
 	if (wantsRepaint)
 		ret = menu_return::RETURN_REPAINT;
@@ -1849,7 +1854,7 @@ int CMenuOptionStringChooser::paint( bool selected )
 	paintItemButton(selected, height, NEUTRINO_ICON_BUTTON_OKAY);
 
 	//paint text
-	paintItemCaption(selected, optionValueString->c_str());
+	paintItemCaption(selected, optionValuePtr->c_str());
 
 	return y+height;
 }

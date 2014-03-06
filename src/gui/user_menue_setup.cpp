@@ -39,6 +39,7 @@
 #include <global.h>
 #include <neutrino.h>
 #include <neutrino_menue.h>
+#include <gui/plugins.h>
 #include <gui/widget/icons.h>
 #include <gui/widget/stringinput.h>
 #include <gui/widget/keychooser.h>
@@ -46,34 +47,8 @@
 
 #include <driver/screen_max.h>
 
+#include <system/helpers.h>
 #include <system/debug.h>
-
-CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
-{
-	local = menue_title;
-	button = menue_button;
-	max_char = 24;
-	width = w_max (40, 10);
-	pref_name = g_settings.usermenu_text[button]; //set current button name as prefered name
-	ums = NULL;
-	forwarder = NULL;
-}
-
-CUserMenuSetup::~CUserMenuSetup()
-{
-	delete ums;
-}
-
-int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &)
-{
-	if(parent != NULL)
-		parent->hide();
-	
-	int res = showSetup();
-	checkButtonName();
-	
-	return res; 
-}
 
 static bool usermenu_show = true;
 #if HAVE_SPARK_HARDWARE
@@ -131,6 +106,75 @@ static keyvals usermenu_items[] =
 	{ SNeutrinoSettings::ITEM_NONE,			LOCALE_USERMENU_ITEM_NONE,		usermenu_show }
 };
 
+CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
+{
+	local = menue_title;
+	button = menue_button;
+	max_char = 24;
+	width = w_max (40, 10);
+	pref_name = g_settings.usermenu_text[button]; //set current button name as prefered name
+	forwarder = NULL;
+
+	for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++) {
+		const char *loc = g_Locale->getText(usermenu_items[i].value);
+		if (usermenu_items[i].show)
+			options.push_back(loc);
+		keys[loc] = to_string(usermenu_items[i].key);
+		vals[keys[loc]] = loc;
+	}
+
+	int number_of_plugins = g_PluginList->getNumberOfPlugins();
+	for (int count = 0; count < number_of_plugins; count++) {
+		const char *loc = g_PluginList->getName(count);
+		const char *key = g_PluginList->getFileName(count);
+		if (loc && *loc && key && *key) {
+			options.push_back(loc);
+			keys[loc] = key;
+			vals[keys[loc]] = loc;
+		}
+	}
+	std::sort(options.begin(), options.end());
+}
+
+CUserMenuSetup::~CUserMenuSetup()
+{
+}
+
+int CUserMenuSetup::exec(CMenuTarget* parent, const std::string &actionKey)
+{
+	if(parent != NULL)
+		parent->hide();
+
+	if (actionKey == ">a") {
+		int selected = ums->getSelected();
+		CMenuOptionStringChooser *c = new CMenuOptionStringChooser(std::string(""), NULL, true, NULL, CRCInput::RC_nokey, NULL, true);
+		c->setOptions(options);
+		std::string n(g_Locale->getText(LOCALE_USERMENU_ITEM_NONE));
+		c->setOptionValue(n);
+		if (selected >= item_offset)
+			ums->insertItem(selected, c);
+		else
+			ums->addItem(c);
+		ums->hide();
+		return menu_return::RETURN_REPAINT;
+	}
+
+	if (actionKey == ">d") {
+		int selected = ums->getSelected();
+		if (selected >= item_offset) {
+			ums->removeItem(selected);
+			ums->hide();
+			return menu_return::RETURN_REPAINT;
+		}
+		return menu_return::RETURN_NONE;
+	}
+	
+	int res = showSetup();
+	checkButtonName();
+	
+	return res; 
+}
+
 static neutrino_locale_t locals[SNeutrinoSettings::ITEM_MAX];
 neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
 {
@@ -147,68 +191,57 @@ neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
 
 int CUserMenuSetup::showSetup()
 {
-	std::map<std::string,int> locmap;
-	unsigned int i = 0;
-	unsigned USERMENU_ITEM_OPTION_COUNT = 0;
-	for (; usermenu_items[i].key != SNeutrinoSettings::ITEM_NONE; i++)
-		if (usermenu_items[i].show) {
-			locmap[std::string(g_Locale->getText(usermenu_items[i].value))] = i;
-			USERMENU_ITEM_OPTION_COUNT++;
-		}
+	mn_widget_id_t widget_id = MN_WIDGET_ID_USERMENU_RED + button; //add up ''button'' and becomes to MN_WIDGET_ID_USERMENU_ GREEN, MN_WIDGET_ID_USERMENU_ YELLOW, MN_WIDGET_ID_USERMENU_BLUE
+	ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
 
-	std::vector<CMenuOptionChooser::keyval_ext> vec;
-	CMenuOptionChooser::keyval_ext kext;
-	kext.valname = NULL;
-	kext.key = usermenu_items[i].key;
-	kext.value = usermenu_items[i].value;
-	vec.push_back(kext);
+	ums->addIntroItems();
 
-	i = 1;
-	for(std::map<string,int>::iterator it = locmap.begin(); it != locmap.end(); ++it) {
-                kext.key = usermenu_items[(*it).second].key;
-                kext.value = usermenu_items[(*it).second].value;
-		vec.push_back(kext);
-		i++;
-	}
-
-	if (ums == NULL) {
-		mn_widget_id_t widget_id = MN_WIDGET_ID_USERMENU_RED + button; //add up ''button'' and becomes to MN_WIDGET_ID_USERMENU_ GREEN, MN_WIDGET_ID_USERMENU_ YELLOW, MN_WIDGET_ID_USERMENU_BLUE
-		ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
-	} else { 
-		//if widget not clean, ensure that we have an empty widget without any item and set the last selected item
-		int sel = ums->getSelected(); 
-		ums->resetWidget(true);
-		ums->setSelected(sel);
-	}
-	
-	//CUserMenuNotifier *notify = new CUserMenuNotifier();
 	int old_key = g_settings.usermenu_key[button];
 	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 20, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, NULL, &name);
 
-	CMenuDForwarder *kf = NULL;
+	ums->addItem(mf);
+
 	if (button > 3 /* BLUE */) {
 		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu_key[button], LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
-		kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
-	}
-	
-	//-------------------------------------
-	ums->addIntroItems();
-	//-------------------------------------
-	ums->addItem(mf);
-	if (kf)
+		CMenuDForwarder *kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
 		ums->addItem(kf);
-	ums->addItem(GenericMenuSeparatorLine);
-	//-------------------------------------
-	for(int item = 0; item < SNeutrinoSettings::ITEM_MAX && item <13; item++) // Do not show more than 13 items
-	{
-		char text[max_char];
-		snprintf(text,max_char,"%d.",item+1);
-		text[max_char-1]=0;// terminate for sure
-		ums->addItem(new CMenuOptionChooser(text, &g_settings.usermenu[button][item], vec, true, NULL, CRCInput::RC_nokey, "", true ));	
 	}
-	
+
+	ums->addItem(new CMenuSeparator(CMenuSeparator::STRING | CMenuSeparator::LINE, LOCALE_USERMENU_ITEMS));
+
+	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	item_offset = ums->getItemsCount();
+	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
+		CMenuOptionStringChooser *c = new CMenuOptionStringChooser(std::string(""), NULL, true, NULL, CRCInput::RC_nokey, NULL, true);
+		c->setOptions(options);
+		c->setOptionValue(vals[*it]);
+		ums->addItem(c);
+	}
+
+	const struct button_label footerButtons[2] = {
+		{ NEUTRINO_ICON_BUTTON_RED, LOCALE_BOUQUETEDITOR_DELETE },
+		{ NEUTRINO_ICON_BUTTON_GREEN, LOCALE_BOUQUETEDITOR_ADD }
+	};
+	ums->setFooter(footerButtons, 2);
+	ums->addKey(CRCInput::RC_red, this, ">d");
+	ums->addKey(CRCInput::RC_green, this, ">a");
+
 	int res = ums->exec(NULL, "");
+	int items_end = ums->getItemsCount();
+
+	const char *delim = "";
+	g_settings.usermenu[button] = "";
+	std::string none = to_string(SNeutrinoSettings::ITEM_NONE);
+	for (int count = item_offset; count < items_end; count++) {
+		std::string lk = keys[reinterpret_cast<CMenuOptionStringChooser*>(ums->getItem(count))->getOptionValue()];
+		if (lk == none)
+			continue;
+		g_settings.usermenu[button] += delim + lk;
+		delim = ",";
+	}
+
+	delete ums;
 
 	if (forwarder && (old_key != g_settings.usermenu_key[button]))
 		forwarder->setName(CRCInput::getKeyName(g_settings.usermenu_key[button]));
@@ -216,12 +249,10 @@ int CUserMenuSetup::showSetup()
 	return res;
 }
 
+
 //check items of current button menu and set prefered menue name
 void CUserMenuSetup::checkButtonItems()
 {
-	//count of all items of widget
-	int count = ums->getItemsCount();
-	
 	//count of configured items
 	int used_items = getUsedItemsCount();
 	
@@ -233,6 +264,11 @@ void CUserMenuSetup::checkButtonItems()
 		}
 		return;
 	}
+
+#if 0	
+	//count of all items of widget
+	std::vector<std::string> vec = ::split(g_settings.usermenu[button], ',');
+	int count = vec.size();
 	
 	//found configured items and set as prefered name
 	for(int i = 0; i < count ; i++)
@@ -255,6 +291,7 @@ void CUserMenuSetup::checkButtonItems()
 			}
 		}
 	}
+#endif
 
 	//if found only 1 configured item, ensure that the caption of usermenu is the same like this	
 	if (used_items == 1) {
@@ -287,11 +324,6 @@ void CUserMenuSetup::checkButtonName()
 //get count of used items
 int CUserMenuSetup::getUsedItemsCount()
 {
-	int def_items = 0;
-	for(int item = 0; item < SNeutrinoSettings::ITEM_MAX; item++)
-		if (g_settings.usermenu[button][item] != 0)
-			def_items++;
-	
-	return def_items;
+	return ::split(g_settings.usermenu[button], ',').size();
 }
 

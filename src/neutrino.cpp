@@ -928,28 +928,9 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 		std::string txt1("usermenu_tv_");
 		txt1 += usermenu_button_def[button];
-		std::string txt2 = configfile.getString(txt1,usermenu_default[button]);	
-		const char* txt2ptr = txt2.c_str();
-		for( int pos = 0; pos < SNeutrinoSettings::ITEM_MAX; pos++)
-		{
-			// find next comma or end of string - if it's not the first round
-			if(pos) {
-				while(*txt2ptr && *txt2ptr != ',')
-					txt2ptr++;
-				if(*txt2ptr)
-					txt2ptr++;
-			}
-			if(*txt2ptr) {
-				g_settings.usermenu[button][pos] = atoi(txt2ptr);  // there is still a string
-				if(g_settings.usermenu[button][pos] >= SNeutrinoSettings::ITEM_MAX)
-					g_settings.usermenu[button][pos] = 0;
-			} else
-				g_settings.usermenu[button][pos] = 0;     // string empty, fill up with 0
-
-		}
+		g_settings.usermenu[button] = configfile.getString(txt1,usermenu_default[button]);	
 		txt1 += "_text";
 		g_settings.usermenu_text[button] = configfile.getString(txt1, "");
-
 	}
 
 	if(configfile.getUnknownKeyQueryedFlag() && (erg==0))
@@ -1406,18 +1387,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		std::string usermenu_key("usermenu_key_");
 		usermenu_key += usermenu_button_def[button];
 		configfile.setInt32(usermenu_key, g_settings.usermenu_key[button]);
-
 		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
-
-		std::string txt2;
-		for(int pos = 0; pos < SNeutrinoSettings::ITEM_MAX; pos++) {
-			if( g_settings.usermenu[button][pos]) {
-				if(!txt2.empty())
-					txt2 += ",";
-				txt2 += to_string(g_settings.usermenu[button][pos]);
-			}
-		}
-		configfile.setString(txt1,txt2);
+		configfile.setString(txt1, g_settings.usermenu[button]);
 		txt1 += "_text";
 		configfile.setString(txt1, g_settings.usermenu_text[button]);
 	}
