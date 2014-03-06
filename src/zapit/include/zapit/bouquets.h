@@ -107,7 +107,7 @@ class CBouquetManager
 
 		void saveBouquets(void);
 		void saveUBouquets(void);
-		void saveBouquets(const CZapitClient::bouquetMode bouquetMode, const char * const providerName);
+		void saveBouquets(const CZapitClient::bouquetMode bouquetMode, const char * const providerName, t_satellite_position satellitePosition = -1);
 		void loadBouquets(bool ignoreBouquetFile = false);
 		void renumServices();
 
@@ -120,6 +120,7 @@ class CBouquetManager
 		bool existsChannelInBouquet(unsigned int bq_id, const t_channel_id channel_id);
 
 		void clearAll(bool user = true);
+		void deletePosition(t_satellite_position satellitePosition);
 
 		void sortBouquets(void);
 };
