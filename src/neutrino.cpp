@@ -222,18 +222,6 @@ static bool can_deepstandby = false;
 
 extern const char * locale_real_names[]; /* #include <system/locals_intern.h> */
 
-// USERMENU
-const char* usermenu_button_def[SNeutrinoSettings::BUTTON_MAX]={
-	"red","green","yellow","blue",
-	"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19" };
-const unsigned int usermenu_key_def[SNeutrinoSettings::BUTTON_MAX]={
-	CRCInput::RC_red, CRCInput::RC_green, CRCInput::RC_yellow, CRCInput::RC_blue,
-	CRCInput::RC_archive, CRCInput::RC_play, CRCInput::RC_usb, CRCInput::RC_timer,
-	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey,
-	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey,
-	CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey, CRCInput::RC_nokey
-};
-
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 +          CNeutrinoApp - Constructor, initialize g_fontRenderer                      +
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -311,6 +299,19 @@ const lcd_setting_struct_t lcd_setting[SNeutrinoSettings::LCD_SETTING_COUNT] =
 	, {"lcd_standbydisplaymode", DEFAULT_LCD_DISPLAYMODE   }
 #endif
 };
+
+static SNeutrinoSettings::usermenu_t usermenu_default[] = {
+	{ CRCInput::RC_red,		"2,3,4,13",				"",	"red" 		},
+	{ CRCInput::RC_green,		"6",					"",	"green" 	},
+	{ CRCInput::RC_yellow,		"7",					"",	"yellow" 	},
+	{ CRCInput::RC_blue,		"22,23,24,12,11,20,21,19,15,27,28,29",	"",	"blue" 		},
+	{ CRCInput::RC_archive,		"30",					"",	"4" 		},
+	{ CRCInput::RC_play,		"9",					"",	"5" 		},
+	{ CRCInput::RC_usb,		"31",					"",	"6" 		},
+	{ CRCInput::RC_timer,		"19",					"",	"7" 		},
+	{ CRCInput::RC_nokey,		"",					"",	""		},
+};
+
 
 /**************************************************************************************
 *          CNeutrinoApp -  loadSetup, load the application-settings                   *
@@ -895,41 +896,38 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	// USERMENU -> in system/settings.h
 	//-------------------------------------------
-	// this is as the current neutrino usermen
-	const char* usermenu_default[SNeutrinoSettings::BUTTON_MAX]={
-		"2,3,4,13",				// RED
-		"6",					// GREEN
-		"7",					// YELLOW
-		"22,23,24,12,11,20,21,19,15,27,28,29",	// BLUE
-		"30",					// 4 (fileplayer/RC_archive)
-		"9",					// 5 (movieplayer/RC_play)
-		"31",					// 6 (hdd menu/RC_usb)
-		"19",					// 7 (toggle clock/RC_time)
-		"",					// 8
-		"",					// 9
-		"",					// 10
-		"",					// 11
-		"",					// 12
-		"",					// 13
-		"",					// 14
-		"",					// 15
-		"",					// 16
-		"",					// 17
-		"",					// 18
-		"",					// 19
-	};
 
-	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++)
-	{
-		std::string usermenu_key("usermenu_key_");
-		usermenu_key += usermenu_button_def[button];
-		g_settings.usermenu_key[button] = configfile.getInt32(usermenu_key, usermenu_key_def[button]);
+	if (configfile.getString("usermenu_key_red", "").empty() ||
+	    configfile.getString("usermenu_key_green", "").empty() ||
+	    configfile.getString("usermenu_key_yellow", "").empty() ||
+	    configfile.getString("usermenu_key_blue", "").empty()) {
+		for(SNeutrinoSettings::usermenu_t *um = usermenu_default; um->key != (int) CRCInput::RC_nokey; um++) {
+			SNeutrinoSettings::usermenu_t *u = new SNeutrinoSettings::usermenu_t;
+			*u = *um;
+			g_settings.usermenu.push_back(u);
+		}
+	} else {
+		for (unsigned int i = 0; ; i++) {
+			std::string name = (i < 4) ? usermenu_default[i].name : to_string(i);
+			std::string usermenu_key("usermenu_key_");
+			usermenu_key += name;
+			int uk = configfile.getInt32(usermenu_key, CRCInput::RC_nokey);
+			if (!uk || uk == (int)CRCInput::RC_nokey) {
+				if (i > 3)
+					break;
+				continue;
+			}
+			SNeutrinoSettings::usermenu_t *u = new SNeutrinoSettings::usermenu_t;
+			u->key = uk;
 
-		std::string txt1("usermenu_tv_");
-		txt1 += usermenu_button_def[button];
-		g_settings.usermenu[button] = configfile.getString(txt1,usermenu_default[button]);	
-		txt1 += "_text";
-		g_settings.usermenu_text[button] = configfile.getString(txt1, "");
+			std::string txt1("usermenu_tv_");
+			txt1 += name;
+			u->items = configfile.getString(txt1, "");
+			txt1 += "_text";
+			u->title = configfile.getString(txt1, "");
+
+			g_settings.usermenu.push_back(u);
+		}
 	}
 
 	if(configfile.getUnknownKeyQueryedFlag() && (erg==0))
@@ -1381,14 +1379,22 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	// USERMENU
 	//---------------------------------------
-	for(int button = 0; button < SNeutrinoSettings::BUTTON_MAX; button++) {
-		std::string usermenu_key("usermenu_key_");
-		usermenu_key += usermenu_button_def[button];
-		configfile.setInt32(usermenu_key, g_settings.usermenu_key[button]);
-		std::string txt1("usermenu_tv_" + std::string(usermenu_button_def[button]));
-		configfile.setString(txt1, g_settings.usermenu[button]);
-		txt1 += "_text";
-		configfile.setString(txt1, g_settings.usermenu_text[button]);
+	for (unsigned int i = 0, count = 4; i < g_settings.usermenu.size(); i++) {
+		if (g_settings.usermenu[i]->key != (int)CRCInput::RC_nokey) {
+			std::string name;
+			if (i < 4)
+				name = usermenu_default[i].name;
+			else
+				name = to_string(count++);
+			std::string usermenu_key("usermenu_key_");
+			usermenu_key += name;
+			configfile.setInt32(usermenu_key, g_settings.usermenu[i]->key);
+			std::string txt1("usermenu_tv_");
+			txt1 += name;
+			configfile.setString(txt1, g_settings.usermenu[i]->items);
+			txt1 += "_text";
+			configfile.setString(txt1, g_settings.usermenu[i]->title);
+		}
 	}
 
 #if 0

@@ -218,8 +218,8 @@ bool checkLongPress(uint32_t key)
 	for (unsigned int i = 0; i < CKeybindSetup::KEYBINDS_COUNT; i++)
 		if ((uint32_t)*key_settings[i].keyvalue_p == key)
 			return true;
-	for (unsigned int i = 0; i < SNeutrinoSettings::BUTTON_MAX; i++)
-		if ((uint32_t)g_settings.usermenu_key[i] == key)
+	for (std::vector<SNeutrinoSettings::usermenu_t*>::iterator it = g_settings.usermenu.begin(); it != g_settings.usermenu.end(); ++it)
+		if (*it && (uint32_t)((*it)->key) == key)
 			return true;
 	return false;
 }

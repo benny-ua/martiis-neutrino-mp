@@ -224,7 +224,7 @@ void CInfoViewerBB::getBBButtonInfo()
 			text = CUserMenu::getUserMenuButtonName(0, active);
 			if (!text.empty())
 				break;
-			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_RED];
+			text = g_settings.usermenu[SNeutrinoSettings::BUTTON_RED]->title;
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
 			break;
@@ -234,7 +234,7 @@ void CInfoViewerBB::getBBButtonInfo()
 			text = CUserMenu::getUserMenuButtonName(1, active);
 			if (!text.empty())
 				break;
-			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_GREEN];
+			text = g_settings.usermenu[SNeutrinoSettings::BUTTON_GREEN]->title;
 			if (text == g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD))
 				text = "";
 			if(NeutrinoMessages::mode_ts == CNeutrinoApp::getInstance()->getMode() && !CMoviePlayerGui::getInstance().timeshift){
@@ -252,7 +252,7 @@ void CInfoViewerBB::getBBButtonInfo()
 			text = CUserMenu::getUserMenuButtonName(2, active);
 			if (!text.empty())
 				break;
-			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_YELLOW];
+			text = g_settings.usermenu[SNeutrinoSettings::BUTTON_YELLOW]->title;
 			if (text.empty())
 				text = g_Locale->getText((g_RemoteControl->are_subchannels) ? LOCALE_INFOVIEWER_SUBSERVICE : LOCALE_INFOVIEWER_SELECTTIME);
 			break;
@@ -262,7 +262,7 @@ void CInfoViewerBB::getBBButtonInfo()
 			text = CUserMenu::getUserMenuButtonName(3, active);
 			if (!text.empty())
 				break;
-			text = g_settings.usermenu_text[SNeutrinoSettings::BUTTON_BLUE];
+			text = g_settings.usermenu[SNeutrinoSettings::BUTTON_BLUE]->title;
 			if (text.empty())
 				text = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
 			break;

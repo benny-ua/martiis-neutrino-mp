@@ -112,7 +112,8 @@ CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
 	button = menue_button;
 	max_char = 24;
 	width = w_max (40, 10);
-	pref_name = g_settings.usermenu_text[button]; //set current button name as prefered name
+	if (menue_button < g_settings.usermenu.size())
+		pref_name = g_settings.usermenu[button]->title; //set current button name as prefered name
 	forwarder = NULL;
 
 	for (int i = 0; usermenu_items[i].key != SNeutrinoSettings::ITEM_MAX; i++) {
@@ -193,26 +194,26 @@ neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
 
 int CUserMenuSetup::showSetup()
 {
-	mn_widget_id_t widget_id = MN_WIDGET_ID_USERMENU_RED + button; //add up ''button'' and becomes to MN_WIDGET_ID_USERMENU_ GREEN, MN_WIDGET_ID_USERMENU_ YELLOW, MN_WIDGET_ID_USERMENU_BLUE
+	mn_widget_id_t widget_id = (button < 4) ? MN_WIDGET_ID_USERMENU_RED + button : NO_WIDGET_ID;
 	ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
 
 	ums->addIntroItems();
 
-	int old_key = g_settings.usermenu_key[button];
-	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu_text[button], 20, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
+	int old_key = g_settings.usermenu[button]->key;
+	CStringInputSMS name(LOCALE_USERMENU_NAME, &g_settings.usermenu[button]->title, 20, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüß/- "/*, notify*/);
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_USERMENU_NAME, true, NULL, &name);
 
 	ums->addItem(mf);
 
 	if (button > 3 /* BLUE */) {
-		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu_key[button], LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
+		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu[button]->key, LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
 		CMenuDForwarder *kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
 		ums->addItem(kf);
 	}
 
 	ums->addItem(new CMenuSeparator(CMenuSeparator::STRING | CMenuSeparator::LINE, LOCALE_USERMENU_ITEMS));
 
-	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	std::vector<std::string> items = ::split(g_settings.usermenu[button]->items, ',');
 	item_offset = ums->getItemsCount();
 	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
 		CMenuOptionStringChooser *c = new CMenuOptionStringChooser(std::string(""), NULL, true, NULL, CRCInput::RC_nokey, NULL, true);
@@ -234,20 +235,20 @@ int CUserMenuSetup::showSetup()
 	int items_end = ums->getItemsCount();
 
 	const char *delim = "";
-	g_settings.usermenu[button] = "";
+	g_settings.usermenu[button]->items = "";
 	std::string none = to_string(SNeutrinoSettings::ITEM_NONE);
 	for (int count = item_offset; count < items_end; count++) {
-		std::string lk = keys[reinterpret_cast<CMenuOptionStringChooser*>(ums->getItem(count))->getOptionValue()];
+		std::string lk = keys[static_cast<CMenuOptionStringChooser*>(ums->getItem(count))->getOptionValue()];
 		if (lk == none)
 			continue;
-		g_settings.usermenu[button] += delim + lk;
+		g_settings.usermenu[button]->items += delim + lk;
 		delim = ",";
 	}
 
 	delete ums;
 
-	if (forwarder && (old_key != g_settings.usermenu_key[button]))
-		forwarder->setName(CRCInput::getKeyName(g_settings.usermenu_key[button]));
+	if (forwarder && (old_key != g_settings.usermenu[button]->key))
+		forwarder->setName(CRCInput::getKeyName(g_settings.usermenu[button]->key));
 
 	return res;
 }
@@ -261,9 +262,9 @@ void CUserMenuSetup::checkButtonItems()
 	
 	//warn if no items defined and reset menu name, if empty
 	if (used_items == 0){
-		if (!g_settings.usermenu_text[button].empty()){
+		if (!g_settings.usermenu[button]->title.empty()){
 			// DisplayInfoMessage(g_Locale->getText(LOCALE_USERMENU_MSG_WARNING_NO_ITEMS));
-			g_settings.usermenu_text[button] = "";
+			g_settings.usermenu[button]->title = "";
 		}
 		return;
 	}
@@ -299,7 +300,7 @@ void CUserMenuSetup::checkButtonItems()
 	//if found only 1 configured item, ensure that the caption of usermenu is the same like this
 	if (used_items == 1) {
 		bool dummy;
-		g_settings.usermenu_text[button] =  CUserMenu::getUserMenuButtonName(button, dummy);
+		g_settings.usermenu[button]->title =  CUserMenu::getUserMenuButtonName(button, dummy);
 	}
 }
 
@@ -312,14 +313,14 @@ void CUserMenuSetup::checkButtonName()
 	if (getUsedItemsCount() == 0)
 		return;
 	
-	bool is_empty = g_settings.usermenu_text[button].empty();
+	bool is_empty = g_settings.usermenu[button]->title.empty();
 	if (is_empty && button < USERMENU_ITEMS_COUNT)
 	{
 		std::string 	msg = g_Locale->getText(LOCALE_USERMENU_MSG_INFO_IS_EMPTY);
 				msg += g_Locale->getText(usermenu[button].def_name);
 				
 		DisplayInfoMessage(msg.c_str());
-		g_settings.usermenu_text[button] = is_empty ? g_Locale->getText(usermenu[button].def_name) : g_settings.usermenu_text[button].c_str();
+		g_settings.usermenu[button]->title = is_empty ? g_Locale->getText(usermenu[button].def_name) : g_settings.usermenu[button]->title;
 	}
 }
 
@@ -327,6 +328,6 @@ void CUserMenuSetup::checkButtonName()
 //get count of used items
 int CUserMenuSetup::getUsedItemsCount()
 {
-	return ::split(g_settings.usermenu[button], ',').size();
+	return ::split(g_settings.usermenu[button]->items, ',').size();
 }
 

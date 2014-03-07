@@ -67,7 +67,7 @@ int CWebTVSetup::exec(CMenuTarget* parent, const std::string & actionKey)
 		fileBrowser.Filter = &fileFilter;
 		selected = m->getSelected();
 		CMenuItem* item = m->getItem(selected);
-		CMenuForwarder *f = reinterpret_cast<CMenuForwarder*>(item);
+		CMenuForwarder *f = static_cast<CMenuForwarder*>(item);
 		std::string dirname(f->getName());
 		if (fileBrowser.exec(dirname.substr(0, dirname.rfind('/')).c_str())) {
 			f->setName(fileBrowser.getSelectedFile()->Name);
@@ -115,7 +115,7 @@ void CWebTVSetup::Show()
 			g_settings.webtv_xml.clear();
 			for (int i = item_offset; i < m->getItemsCount(); i++) {
 				CMenuItem *item = m->getItem(i);
-				CMenuForwarder *f = reinterpret_cast<CMenuForwarder*>(item);
+				CMenuForwarder *f = static_cast<CMenuForwarder*>(item);
 				g_settings.webtv_xml.push_back(f->getName());
 			}
 			g_Zapit->reinitChannels();

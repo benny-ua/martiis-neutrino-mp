@@ -770,7 +770,6 @@ struct SNeutrinoSettings
 		BUTTON_GREEN = 1,
 		BUTTON_YELLOW = 2,
 		BUTTON_BLUE = 3,
-		BUTTON_MAX = 20  // MUST be always the last in the list
 	} USER_BUTTON;
 	typedef enum
 	{
@@ -813,9 +812,14 @@ struct SNeutrinoSettings
 		ITEM_INETPLAY = 33,
 		ITEM_MAX   // MUST be always the last in the list
 	} USER_ITEM;
-	std::string usermenu_text[BUTTON_MAX];
-	std::string usermenu[BUTTON_MAX];  // (USER_ITEM)  [button][position in Menue] = feature item
-	int usermenu_key[BUTTON_MAX];
+
+	typedef struct {
+		int key;
+		std::string items;
+		std::string title;
+		std::string name;
+	} usermenu_t;
+	std::vector<usermenu_t *> usermenu;
 
 	//progressbar arrangement for infobar
 	typedef enum

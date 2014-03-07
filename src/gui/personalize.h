@@ -143,12 +143,14 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 	private:
 		CUserMenuNotifier *user_menu_notifier;
 		CPinSetupNotifier *pin_setup_notifier;
-		CMenuWidget* otherKeyMenu;
 		CMenuWidget* tmpW;
+		CMenuWidget* uMenu;
 
 		int width, widget_count, shortcut, options_count;
 		bool show_usermenu, show_pin_setup;
 		bool show_pluginmenu;
+
+		int customkey_offset;
 
 		//stuff for settings handlers
 		void	handleSetting(int *setting);
@@ -159,13 +161,14 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 
 		std::vector<menu_item_t> v_item;
 		std::vector<CMenuWidget *> v_widget;
+		std::vector<CUserMenuSetup*> v_userMenuSetup;
 		std::vector<observ_menu_item_t> v_observ;
 
 		int 	ShowPersonalizationMenu();
 		int 	ShowMenuOptions(const int& menu);
 		void 	ShowHelpPersonalize();
 		void 	ShowPinSetup(CMenuWidget* p_widget, CPINChangeWidget *pin_widget);
-		void 	ShowUserMenu(CMenuWidget* p_widget, std::vector<CUserMenuSetup*> &v_umenu);
+		void 	ShowUserMenu();
 		void 	ShowPluginMenu(CMenuWidget* p_widget, std::string da[], int ia[]);
 		void 	SaveAndExit();
 		void	ApplySettings();

@@ -97,8 +97,9 @@ CUserMenu::~CUserMenu()
 bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 {
 	int button = -1;
-	for (int i = 0; i < SNeutrinoSettings::BUTTON_MAX; i++)
-		if (g_settings.usermenu_key[i] == (int) msg) {
+	unsigned ums = g_settings.usermenu.size();
+	for (unsigned int i = 0; i < ums; i++)
+		if (g_settings.usermenu[i]->key == (int) msg) {
 			button = i;
 			break;
 		}
@@ -151,7 +152,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	CStreamFeaturesChangeExec StreamFeaturesChanger;
 	CNeutrinoApp * neutrino					= CNeutrinoApp::getInstance();
 	
-	std::string txt = g_settings.usermenu_text[button];
+	std::string txt = g_settings.usermenu[button]->title;
 	if (button < COL_BUTTONMAX && txt.empty())
 		txt = g_Locale->getText(user_menu[button].caption);
 
@@ -170,7 +171,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	
 	std::string itemstr_last = "1";
 
-	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	std::vector<std::string> items = ::split(g_settings.usermenu[button]->items, ',');
 	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
 		if (it->empty())
 			continue;
@@ -456,14 +457,14 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 {
 	active = false;
-	if(button < 0 || button >= SNeutrinoSettings::BUTTON_MAX)
+	if(button < 0 || button >= (int) g_settings.usermenu.size())
 		return "";
 
 	bool return_title = false;
 	neutrino_locale_t loc = NONEXISTANT_LOCALE;
 	const char *text = NULL;
 
-	std::vector<std::string> items = ::split(g_settings.usermenu[button], ',');
+	std::vector<std::string> items = ::split(g_settings.usermenu[button]->items, ',');
 	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
 		int item = -1;
 		if (it->find_first_not_of("0123456789") == std::string::npos)
@@ -540,8 +541,8 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 	if (!return_title && (loc != NONEXISTANT_LOCALE))
 		return g_Locale->getText(loc);
 
-	if (return_title && g_settings.usermenu_text[button].length())
-		return g_settings.usermenu_text[button].c_str();
+	if (return_title && g_settings.usermenu[button]->title.length())
+		return g_settings.usermenu[button]->title.c_str();
 
 	if (return_title && button < USERMENU_ITEMS_COUNT)
 		return g_Locale->getText(usermenu[button].def_name);
