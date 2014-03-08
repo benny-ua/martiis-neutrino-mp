@@ -70,7 +70,8 @@ public:
 	bool SelectSubtitles(int pid);
 	void GetChapters(std::vector<int> &positions, std::vector<std::string> &titles);
 	void RequestAbort();
-<<<<<<< HEAD
+	void GetTitles(std::vector<int> &playlists, std::vector<std::string> &titles, int &current);
+	void SetTitle(int title);
 	bool SetTeletextPid(int ){return false;}//FIXME
 	void FindAllSubtitlePids(int */*pids*/, unsigned int */*numpids*/, std::string */*language*/){}
 	void FindAllDvbsubtitlePids(int */*pids*/, unsigned int */*numpidd*/, std::string */*language*/){}
@@ -80,10 +81,6 @@ public:
 	bool SetSubtitlePid(int /*pid*/){return false;}
 	bool SetDvbsubtitlePid(int /*pid*/){return false;}
 	void GetMetadata(std::vector<std::string> &keys, std::vector<std::string> &values) { keys.clear(); values.clear(); }
-=======
-	void GetTitles(std::vector<int> &playlists, std::vector<std::string> &titles, int &current);
-	void SetTitle(int title);
->>>>>>> origin/next-cc
 };
 
 #endif // __PLAYBACK_CS_H_
