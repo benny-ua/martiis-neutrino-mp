@@ -252,11 +252,10 @@ int CPersonalizeGui::exec(CMenuTarget* parent, const string & actionKey)
 
 		unsigned int i = g_settings.usermenu.size();
 		CUserMenuSetup *cms = new CUserMenuSetup(LOCALE_USERMENU_HEAD, i);
-		v_userMenuSetup.push_back(cms);
 		SNeutrinoSettings::usermenu_t *um = new SNeutrinoSettings::usermenu_t;
 		um->key = CRCInput::RC_nokey;
 		g_settings.usermenu.push_back(um);
-		CMenuForwarder *fw = new CMenuForwarder(CRCInput::getKeyName(um->key), true, um->title, cms, to_string(i).c_str());
+		CMenuDForwarder *fw = new CMenuDForwarder(CRCInput::getKeyName(um->key), true, um->title, cms, to_string(i).c_str());
 		cms->setCaller(fw);
 
 		if (selected >= customkey_offset)
@@ -311,14 +310,6 @@ int CPersonalizeGui::exec(CMenuTarget* parent, const string & actionKey)
 	return res;
 }
 
-const CMenuOptionChooser::keyval OPTIONS_FEAT_KEY_OPTIONS[CPersonalizeGui::PERSONALIZE_FEAT_KEY_MAX] =
-{
-	{ CPersonalizeGui::PERSONALIZE_FEAT_KEY_RED		, LOCALE_PERSONALIZE_BUTTON_RED 	},
-	{ CPersonalizeGui::PERSONALIZE_FEAT_KEY_GREEN		, LOCALE_PERSONALIZE_BUTTON_GREEN 	},
-	{ CPersonalizeGui::PERSONALIZE_FEAT_KEY_YELLOW		, LOCALE_PERSONALIZE_BUTTON_YELLOW 	},
-	{ CPersonalizeGui::PERSONALIZE_FEAT_KEY_BLUE		, LOCALE_PERSONALIZE_BUTTON_BLUE 	},
-	{ CPersonalizeGui::PERSONALIZE_FEAT_KEY_AUTO		, LOCALE_PERSONALIZE_BUTTON_AUTO	}
-};
 //This is the main personalization menu. From here we can go to the other sub-menu's and enable/disable
 //the PIN code feature, as well as determine whether or not the EPG menu/Features menu is accessible.
 int CPersonalizeGui::ShowPersonalizationMenu()
@@ -413,23 +404,21 @@ int CPersonalizeGui::ShowPersonalizationMenu()
 		g_PluginList->loadPlugins();
 	}
 
+	if (show_usermenu)
+		for(std::vector<SNeutrinoSettings::usermenu_t *>::iterator it = g_settings.usermenu.begin(); it != g_settings.usermenu.end();) {
+			if (!*it)
+				it = g_settings.usermenu.erase(it);
+			else
+				++it;
+		}
+
 	delete pMenu;
 	delete uMenu;
 	delete pinChangeWidget;
 	delete plMenu;
-	for(std::vector<CUserMenuSetup*>::iterator it = v_userMenuSetup.begin(); it != v_userMenuSetup.end(); ++it)
-		delete *it;
-	v_userMenuSetup.clear();
 	delete user_menu_notifier;
 	delete pin_setup_notifier;
 	
-	for(std::vector<SNeutrinoSettings::usermenu_t *>::iterator it = g_settings.usermenu.begin(); it != g_settings.usermenu.end();) {
-		if (!*it)
-			it = g_settings.usermenu.erase(it);
-		else
-			++it;
-	}
-
 	return res;
 }
 
@@ -463,13 +452,7 @@ void CPersonalizeGui::ShowUserMenu()
 	for (uint i = 0; i<USERMENU_ITEMS_COUNT; i++)
 	{
 		CUserMenuSetup *cms = new CUserMenuSetup(usermenu[i].menue_title, usermenu[i].menue_button);
-		v_userMenuSetup.push_back(cms);
-		
-		//ensure correct default string, e.g: required after settings reset
-		if (v_userMenuSetup[i]->getUsedItemsCount() > 0)
-			g_settings.usermenu[i]->title = g_settings.usermenu[i]->title.empty() ? g_Locale->getText(usermenu[i].def_name) : g_settings.usermenu[i]->title;
-		
-		CMenuForwarder *fw = new CMenuForwarder(usermenu[i].menue_title, true, g_settings.usermenu[i]->title, v_userMenuSetup[i], g_settings.usermenu[i]->name.c_str(), /*usermenu[i].DirectKey*/CRCInput::RC_nokey, usermenu[i].IconName);
+		CMenuDForwarder *fw = new CMenuDForwarder(usermenu[i].menue_title, true, g_settings.usermenu[i]->title, cms, g_settings.usermenu[i]->name.c_str(), /*usermenu[i].DirectKey*/CRCInput::RC_nokey, usermenu[i].IconName);
 		cms->setCaller(fw);
 		v_umenu_fw.push_back(fw);
 	}
@@ -480,6 +463,7 @@ void CPersonalizeGui::ShowUserMenu()
 
 	uMenu->addItem(GenericMenuSeparatorLine);
 	uMenu->addItem(new CMenuOptionChooser(LOCALE_PERSONALIZE_USERMENU_SHOW_CANCEL, &g_settings.personalize[SNeutrinoSettings::P_UMENU_SHOW_CANCEL], OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
+
 	//add usermenu items
 	uMenu->addItem(new CMenuSeparator(CMenuSeparator::ALIGN_RIGHT | CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_USERMENU_NAME));
 	user_menu_notifier->changeNotify();
@@ -492,11 +476,11 @@ void CPersonalizeGui::ShowUserMenu()
 	for (unsigned int i = USERMENU_ITEMS_COUNT; i < ums; i++)
 		if (g_settings.usermenu[i]->key != (int) CRCInput::RC_nokey) {
 			CUserMenuSetup *cms = new CUserMenuSetup(LOCALE_USERMENU_HEAD, i);
-			v_userMenuSetup.push_back(cms);
-			CMenuForwarder *fw = new CMenuForwarder(CRCInput::getKeyName(g_settings.usermenu[i]->key), true, g_settings.usermenu[i]->title, v_userMenuSetup[i], to_string(i).c_str());
+			CMenuDForwarder *fw = new CMenuDForwarder(CRCInput::getKeyName(g_settings.usermenu[i]->key), true, g_settings.usermenu[i]->title, cms, to_string(i).c_str());
 			cms->setCaller(fw);
 			uMenu->addItem(fw);
 		}
+
 	uMenu->setFooter(footerButtons, 2);
 	uMenu->addKey(CRCInput::RC_red, this, ">d");
 	uMenu->addKey(CRCInput::RC_green, this, ">a");

@@ -112,7 +112,7 @@ CUserMenuSetup::CUserMenuSetup(neutrino_locale_t menue_title, int menue_button)
 	button = menue_button;
 	max_char = 24;
 	width = w_max (40, 10);
-	if (menue_button < g_settings.usermenu.size())
+	if (menue_button < (int) g_settings.usermenu.size())
 		pref_name = g_settings.usermenu[button]->title; //set current button name as prefered name
 	forwarder = NULL;
 
@@ -269,34 +269,6 @@ void CUserMenuSetup::checkButtonItems()
 		return;
 	}
 
-#if 0	
-	//count of all items of widget
-	std::vector<std::string> vec = ::split(g_settings.usermenu[button], ',');
-	int count = vec.size();
-	
-	//found configured items and set as prefered name
-	for(int i = 0; i < count ; i++)
-	{
-		if (ums->getItem(i)->isMenueOptionChooser()) //choosers only
-		{
-			CMenuOptionChooser * opt_c = NULL;
-			opt_c = static_cast <CMenuOptionChooser*>(ums->getItem(i));
-			neutrino_locale_t opt_locale = usermenu_items[opt_c->getOption()].value;
-			int set_key = usermenu_items[opt_c->getOption()].key;
-			opt_c = NULL;
-			
-			if (set_key != SNeutrinoSettings::ITEM_NONE)
-				pref_name = g_Locale->getText(opt_locale);
-			
-			//warn if we have more than 1 items and the name of usermenu is the same like before, exit function and let user decide, what to do 
-			if (used_items > 1 && g_settings.usermenu_text[button]==pref_name){
-				DisplayInfoMessage(g_Locale->getText(LOCALE_USERMENU_MSG_WARNING_NAME));
-				return;
-			}
-		}
-	}
-#endif
-
 	//if found only 1 configured item, ensure that the caption of usermenu is the same like this
 	if (used_items == 1) {
 		bool dummy;
@@ -313,14 +285,13 @@ void CUserMenuSetup::checkButtonName()
 	if (getUsedItemsCount() == 0)
 		return;
 	
-	bool is_empty = g_settings.usermenu[button]->title.empty();
-	if (is_empty && button < USERMENU_ITEMS_COUNT)
+	if (button < USERMENU_ITEMS_COUNT && g_settings.usermenu[button]->title.empty())
 	{
-		std::string 	msg = g_Locale->getText(LOCALE_USERMENU_MSG_INFO_IS_EMPTY);
-				msg += g_Locale->getText(usermenu[button].def_name);
-				
+		std::string msg(g_Locale->getText(LOCALE_USERMENU_MSG_INFO_IS_EMPTY));
+		msg += g_Locale->getText(usermenu[button].def_name);
 		DisplayInfoMessage(msg.c_str());
-		g_settings.usermenu[button]->title = is_empty ? g_Locale->getText(usermenu[button].def_name) : g_settings.usermenu[button]->title;
+
+		g_settings.usermenu[button]->title = g_Locale->getText(usermenu[button].def_name);
 	}
 }
 

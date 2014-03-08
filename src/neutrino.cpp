@@ -906,6 +906,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 			*u = *um;
 			g_settings.usermenu.push_back(u);
 		}
+		// default titles correspond to gui/user_menue_setup.h:struct usermenu_props_t usermenu
+		g_settings.usermenu[0]->title = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
+		g_settings.usermenu[1]->title = g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD);
+		g_settings.usermenu[2]->title = g_Locale->getText(LOCALE_INFOVIEWER_SUBSERVICE);
+		g_settings.usermenu[3]->title = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
 	} else {
 		for (unsigned int i = 0; ; i++) {
 			std::string name = (i < 4) ? usermenu_default[i].name : to_string(i);

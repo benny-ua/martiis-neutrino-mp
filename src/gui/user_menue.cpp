@@ -535,17 +535,17 @@ const char *CUserMenu::getUserMenuButtonName(int button, bool &active)
 			break;
 	}
 
-	if (!return_title && text)
-		return text;
-
-	if (!return_title && (loc != NONEXISTANT_LOCALE))
-		return g_Locale->getText(loc);
-
-	if (return_title && g_settings.usermenu[button]->title.length())
-		return g_settings.usermenu[button]->title.c_str();
-
-	if (return_title && button < USERMENU_ITEMS_COUNT)
-		return g_Locale->getText(usermenu[button].def_name);
+	if (return_title) {
+		if (!g_settings.usermenu[button]->title.empty())
+			return g_settings.usermenu[button]->title.c_str();
+		if (button < USERMENU_ITEMS_COUNT)
+			return g_Locale->getText(usermenu[button].def_name);
+	} else {
+		if (text)
+			return text;
+		if (loc != NONEXISTANT_LOCALE)
+			return g_Locale->getText(loc);
+	}
 
 	return "";
 }

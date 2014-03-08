@@ -161,7 +161,6 @@ class CPersonalizeGui : public CMenuTarget, public CChangeObserver, public CPINP
 
 		std::vector<menu_item_t> v_item;
 		std::vector<CMenuWidget *> v_widget;
-		std::vector<CUserMenuSetup*> v_userMenuSetup;
 		std::vector<observ_menu_item_t> v_observ;
 
 		int 	ShowPersonalizationMenu();
