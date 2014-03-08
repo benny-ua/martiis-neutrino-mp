@@ -453,7 +453,6 @@ struct SNeutrinoSettings
 	int filesystem_is_utf8;
 	// default plugin for ts-movieplayer (red button)
 	std::string movieplayer_plugin;
-	std::string onekey_plugin;
 	std::string plugin_hdd_dir;
 	
 	std::string logo_hdd_dir;

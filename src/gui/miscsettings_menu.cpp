@@ -95,31 +95,6 @@ int CMiscMenue::exec(CMenuTarget* parent, const std::string &actionKey)
 
 		return menu_return::RETURN_REPAINT;
 	}
-#ifdef ONE_KEY_PLUGIN
-	else if(actionKey == "onekeyplugin")
-	{
-		CMenuWidget MoviePluginSelector(LOCALE_EXTRA_KEY_PLUGIN, NEUTRINO_ICON_FEATURES);
-		MoviePluginSelector.addItem(GenericMenuSeparator);
-
-		char id[5];
-		int cnt = 0;
-		int enabled_count = 0;
-		for(unsigned int count=0;count < (unsigned int) g_PluginList->getNumberOfPlugins();count++)
-		{
-			if (g_PluginList->getType(count)== CPlugins::P_TYPE_TOOL && !g_PluginList->isHidden(count))
-			{
-				// e.g. vtxt-plugins
-				sprintf(id, "%d", count);
-				enabled_count++;
-				MoviePluginSelector.addItem(new CMenuForwarder(g_PluginList->getName(count), true, NULL, new COnekeyPluginChangeExec(), id, CRCInput::convertDigitToKey(count)), (cnt == 0));
-				cnt++;
-			}
-		}
-
-		MoviePluginSelector.exec(NULL, "");
-		return menu_return::RETURN_REPAINT;
-	}
-#endif /*ONE_KEY_PLUGIN*/
 	else if(actionKey == "info")
 	{
 		unsigned num = CEitManager::getInstance()->getEventsCount();
@@ -352,9 +327,6 @@ void CMiscMenue::showMiscSettingsMenuGeneral(CMenuWidget *ms_general)
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_PLUGINS_HDD_DIR, true, g_settings.plugin_hdd_dir, this, "plugin_dir");
 	mf->setHint("", LOCALE_MENU_HINT_PLUGINS_HDD_DIR);
 	ms_general->addItem(mf);
-#ifdef ONE_KEY_PLUGIN
-	ms_general->addItem(new CMenuForwarder(LOCALE_EXTRA_KEY_PLUGIN, true, g_settings.onekey_plugin,this,"onekeyplugin"));
-#endif /*ONE_KEY_PLUGIN*/
 }
 
 //energy and shutdown settings

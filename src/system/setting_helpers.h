@@ -146,40 +146,34 @@ class CMoviePluginChangeExec : public CMenuTarget
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 };
 
-class COnekeyPluginChangeExec : public CMenuTarget
-{
-	public:
-		int exec(CMenuTarget* parent, const std::string & actionKey);
-};
-
 class CTZChangeNotifier : public CChangeObserver
 {
-public:
-        bool changeNotify(const neutrino_locale_t, void * data);
+	public:
+		bool changeNotify(const neutrino_locale_t, void * data);
 };
 
 class CDataResetNotifier : public CMenuTarget
 {
-public:
-        int exec(CMenuTarget* parent, const std::string& actionKey);
+	public:
+		int exec(CMenuTarget* parent, const std::string& actionKey);
 };
 
 class CFanControlNotifier : public CChangeObserver
 {
-public:
-        bool changeNotify(const neutrino_locale_t, void * data);
-	static void setSpeed(unsigned int speed);
+	public:
+		bool changeNotify(const neutrino_locale_t, void * data);
+		static void setSpeed(unsigned int speed);
 };
 
 class CCpuFreqNotifier : public CChangeObserver
 {
-public:
-        bool changeNotify(const neutrino_locale_t, void * data);
+	public:
+		bool changeNotify(const neutrino_locale_t, void * data);
 };
 
 class CAutoModeNotifier : public CChangeObserver
 {
-public:
-        bool changeNotify(const neutrino_locale_t, void * data);
+	public:
+		bool changeNotify(const neutrino_locale_t, void * data);
 };
 #endif

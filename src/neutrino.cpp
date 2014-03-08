@@ -685,7 +685,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 
 	// default plugin for movieplayer
 	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "noplugin" );
-	g_settings.onekey_plugin = configfile.getString( "onekey_plugin", "noplugin" );
 	g_settings.plugin_hdd_dir = configfile.getString( "plugin_hdd_dir", "/media/sda1/plugins" );
 
 	g_settings.plugins_disabled = configfile.getString( "plugins_disabled", "" );
@@ -1240,7 +1239,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 
 	// default plugin for movieplayer
 	configfile.setString ( "movieplayer_plugin", g_settings.movieplayer_plugin );
-	configfile.setString ( "onekey_plugin", g_settings.onekey_plugin );
 	configfile.setString ( "plugin_hdd_dir", g_settings.plugin_hdd_dir );
 
 	configfile.setString ( "plugins_disabled", g_settings.plugins_disabled );
@@ -2572,9 +2570,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			else if( msg == (neutrino_msg_t) g_settings.key_lastchannel ) {
 				// Quick Zap
 				numericZap( msg );
-			}
-			else if( msg == (neutrino_msg_t) g_settings.key_plugin ) {
-				g_PluginList->startPlugin_by_name(g_settings.onekey_plugin.c_str());
 			}
 			else if(msg == (neutrino_msg_t) g_settings.key_timeshift) {
 				if (mode == mode_webtv) {
