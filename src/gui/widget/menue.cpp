@@ -156,17 +156,12 @@ void CMenuItem::initItemColors(const bool select_mode)
 	}
 }
 
-<<<<<<< HEAD
 void CMenuItem::paintItemCaption(const bool select_mode, const char * right_text, const fb_pixel_t right_bgcol)
 {
 	int item_height = height;
 	const char *left_text = getName();
 	const char *desc_text = getDescription();
 
-=======
-void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height, const char * left_text, const char * right_text, const fb_pixel_t right_bgcol)
-{
->>>>>>> origin/next-cc
 	if (select_mode)
 	{
 		if (right_text && *right_text) 
@@ -218,11 +213,7 @@ void CMenuItem::paintItemCaption(const bool select_mode, const int &item_height,
 				right_bg_col = COL_MENUCONTENTINACTIVE_TEXT;
 				right_frame_col = COL_MENUCONTENTINACTIVE_TEXT;
 			}
-<<<<<<< HEAD
-			CComponentsShapeSquare col(stringstartposOption, y + 2, dx - stringstartposOption + x - 2, item_height - 4 - desc_height, false, right_frame_col, right_bg_col);
-=======
 			CComponentsShapeSquare col(stringstartposOption, y + 2, dx - stringstartposOption + x - 2, item_height - 4, NULL, false, right_frame_col, right_bg_col);
->>>>>>> origin/next-cc
 			col.setFrameThickness(3);
 			col.setCorner(RADIUS_LARGE);
 			col.paint(false);
@@ -242,12 +233,8 @@ void CMenuItem::prepareItem(const bool select_mode, const int &item_height)
  	initItemColors(select_mode);
 
 	//paint item background
-<<<<<<< HEAD
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
 	frameBuffer->paintBoxRel(x, y, dx, item_height, item_bgcolor, RADIUS_LARGE);
-=======
-	CFrameBuffer::getInstance()->paintBoxRel(x, y, dx, item_height, item_bgcolor, RADIUS_LARGE);
->>>>>>> origin/next-cc
 }
 
 void CMenuItem::paintItemSlider( const bool select_mode, const int &item_height, const int &optionvalue, const int &factor, const char * left_text, const char * right_text)
@@ -1884,19 +1871,11 @@ int CMenuOptionStringChooser::paint( bool selected )
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------
-<<<<<<< HEAD
 CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey,
 	neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
 	: CMenuItem(Active, DirectKey, IconName, IconName_Info_right, IsStatic)
 {
 	option_string_ptr = &Option;
-=======
-
-CMenuForwarder::CMenuForwarder(const neutrino_locale_t Text, const bool Active, const std::string &Option, CMenuTarget* Target, const char * const ActionKey, neutrino_msg_t DirectKey, const char * const IconName, const char * const IconName_Info_right, bool IsStatic)
-{
-	option_string = &Option;
-	option = NULL;
->>>>>>> origin/next-cc
 	name = Text;
 	nameString = "";
 	jumpTarget = Target;

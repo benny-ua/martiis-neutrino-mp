@@ -659,11 +659,9 @@ void CPictureViewer::getSize(const char* name, int* width, int *height)
 }
 
 #define LOGO_FLASH_DIR DATADIR "/neutrino/icons/logo"
-#define LOGO_FLASH_DIR_VAR "/var/tuxbox/icons/logo"
 
 bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& _ChannelName, std::string & name, int *width, int *height)
 {
-<<<<<<< HEAD
 	if (g_settings.logo_hdd_dir.empty())
 		return false;
 
@@ -740,58 +738,6 @@ bool CPictureViewer::GetLogoName(const uint64_t& channel_id, const std::string& 
 			if (!access(name, R_OK))
 				goto found;
 		}
-=======
-	std::string fileType[] = { ".png", ".jpg" , ".gif" };
-
-	//get channel id as string
-	char strChnId[16];
-	snprintf(strChnId, 16, "%llx", channel_id & 0xFFFFFFFFFFFFULL);
-	strChnId[15] = '\0';
-
-	for (size_t i = 0; i<(sizeof(fileType) / sizeof(fileType[0])); i++){
-		std::vector<std::string> v_path;
-		std::string id_tmp_path;
-
-		//create filename with channel name (logo_hdd_dir)
-		id_tmp_path = g_settings.logo_hdd_dir + "/";
-		id_tmp_path += ChannelName + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//create filename with id (logo_hdd_dir)
-		id_tmp_path = g_settings.logo_hdd_dir + "/";
-		id_tmp_path += strChnId + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//create filename with channel name (LOGO_FLASH_DIR_VAR)
-		id_tmp_path = LOGO_FLASH_DIR_VAR "/";
-		id_tmp_path += ChannelName + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//create filename with id (LOGO_FLASH_DIR_VAR)
-		id_tmp_path = LOGO_FLASH_DIR_VAR "/";
-		id_tmp_path += strChnId + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//create filename with channel name (LOGO_FLASH_DIR)
-		id_tmp_path = LOGO_FLASH_DIR "/";
-		id_tmp_path += ChannelName + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//create filename with id (LOGO_FLASH_DIR)
-		id_tmp_path = LOGO_FLASH_DIR "/";
-		id_tmp_path += strChnId + fileType[i];
-		v_path.push_back(id_tmp_path);
-
-		//check if file is available, name with real name is preferred, return true on success
-		for (size_t j = 0; j < v_path.size(); j++){
-			if (access(v_path[j].c_str(), R_OK) != -1){
-				if(width && height)
-					getSize(v_path[j].c_str(), width, height);
-				name = v_path[j];
-				return true;
-			}
-		}	
->>>>>>> origin/next-cc
 	}
 
 	name = "";

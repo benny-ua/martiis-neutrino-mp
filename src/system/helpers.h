@@ -88,7 +88,6 @@ template<class C> std::string to_string(C i)
 	return s.str();
 }
 
-<<<<<<< HEAD
 inline int atoi(std::string &s) { return atoi(s.c_str()); }
 inline int atoi(const std::string &s) { return atoi(s.c_str()); }
 inline int access(std::string &s, int mode) { return access(s.c_str(), mode); }
@@ -98,8 +97,4 @@ inline void cstrncpy(char *dest, const char * const src, size_t n) { n--; strncp
 inline void cstrncpy(char *dest, const std::string &src, size_t n) { n--; strncpy(dest, src.c_str(), n); dest[n] = 0; }
 
 std::vector<std::string> split(const std::string &s, char delim);
-=======
-inline void cstrncpy(char *dest, const char * const src, size_t n) { n--; strncpy(dest, src, n); dest[n] = 0; }
-inline void cstrncpy(char *dest, const std::string &src, size_t n) { n--; strncpy(dest, src.c_str(), n); dest[n] = 0; }
->>>>>>> origin/next-cc
 #endif

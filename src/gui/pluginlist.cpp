@@ -74,11 +74,7 @@ CPluginList::CPluginList(const neutrino_locale_t Title, const uint32_t listtype)
 
 int CPluginList::run()
 {
-<<<<<<< HEAD
-	g_PluginList->startPlugin(number, 0);
-=======
 	g_PluginList->startPlugin(number);
->>>>>>> origin/next-cc
 	if (!g_PluginList->getScriptOutput().empty()) {
 		hide();
 		ShowMsg(LOCALE_PLUGINS_RESULT, g_PluginList->getScriptOutput(), CMessageBox::mbrBack, CMessageBox::mbBack, NEUTRINO_ICON_SHELL);
@@ -93,11 +89,7 @@ int CPluginList::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	number = -1;
 	if (actionKey != "")
-<<<<<<< HEAD
 		number = atoi(actionKey);
-=======
-		number = atoi(actionKey.c_str());
->>>>>>> origin/next-cc
 
 	if (number > -1)
 		return run();
@@ -105,7 +97,6 @@ int CPluginList::exec(CMenuTarget* parent, const std::string &actionKey)
 	const char *icon = "";
 	if (pluginlisttype == CPlugins::P_TYPE_GAME)
 		icon = NEUTRINO_ICON_GAMES;
-<<<<<<< HEAD
 	else if (pluginlisttype == CPlugins::P_TYPE_SCRIPT)
 		icon = NEUTRINO_ICON_SHELL;
 
@@ -129,32 +120,6 @@ int CPluginList::exec(CMenuTarget* parent, const std::string &actionKey)
 	selected = m.getSelected();
 
 	return menu_return::RETURN_REPAINT;
-=======
-	else
-		icon = NEUTRINO_ICON_SHELL;
-
-	CMenuWidget m(title, icon, width);
-	m.setSelected(selected);
-	m.addIntroItems();
-
-	int nop = g_PluginList->getNumberOfPlugins();
-
-	int shortcut = 1;
-
-	for(int count = 0; count < nop; count++) {
-		if ((g_PluginList->getType(count) & pluginlisttype) && !g_PluginList->isHidden(count)) {
-			CMenuForwarder *f = new CMenuForwarder(std::string(g_PluginList->getName(count)), true, "", this, to_string(count).c_str(), CRCInput::convertDigitToKey(shortcut++));
-			//TODO: use hint-icons; header-icons are to small
-			f->setHint("", g_PluginList->getDescription(count));
-			m.addItem(f);
-		}
-	}
-	int res = m.exec(NULL, "");
-	m.hide();
-	selected = m.getSelected();
-
-	return res;
->>>>>>> origin/next-cc
 }
 
 CPluginChooser::CPluginChooser(const neutrino_locale_t Name, const uint32_t listtype, std::string &selectedFile) : CPluginList(Name, listtype)

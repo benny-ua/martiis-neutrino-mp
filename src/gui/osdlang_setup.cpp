@@ -100,11 +100,7 @@ int COsdLangSetup::showLocalSetup()
 	CMenuWidget osdl_setup(LOCALE_LANGUAGESETUP_OSD, NEUTRINO_ICON_LANGUAGE, width, MN_WIDGET_ID_LANGUAGESETUP_LOCALE);
 	showLanguageSetup(&osdl_setup);
 
-<<<<<<< HEAD
 	CMenuForwarder * mf = new CMenuForwarder(LOCALE_LANGUAGESETUP_OSD, true, g_settings.language, &osdl_setup, NULL, CRCInput::RC_red);
-=======
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_LANGUAGESETUP_OSD, true, g_settings.language, &osdl_setup, NULL, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED);
->>>>>>> origin/next-cc
 	mf->setHint("", LOCALE_MENU_HINT_OSD_LANGUAGE);
 	localSettings->addItem(mf);
 
@@ -205,11 +201,7 @@ void COsdLangSetup::showLanguageSetup(CMenuWidget *osdl_setup)
 					*pos = '\0';
 					std::string loc(locale);
 					loc.at(0) = toupper(loc.at(0));
-<<<<<<< HEAD
-					
-=======
 
->>>>>>> origin/next-cc
 					CMenuForwarder *mf = new CMenuForwarder(loc, true, NULL, this, locale);
 					mf->iconName = mf->getActionKey();
 					osdl_setup->addItem(mf, !strcmp(locale, g_settings.language.c_str()));

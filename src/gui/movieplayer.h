@@ -149,11 +149,7 @@ class CMoviePlayerGui : public CMenuTarget
 	int currentspid;
 	int min_x, min_y, max_x, max_y;
 	time_t end_time;
-<<<<<<< HEAD
 #endif
-=======
-	bool ext_subs;
->>>>>>> origin/next-cc
 
 	bool isMovieBrowser;
 	bool isHTTP;
@@ -172,12 +168,6 @@ class CMoviePlayerGui : public CMenuTarget
 
 	const static int MOVIE_HINT_BOX_TIMER = 5;	// time to show bookmark hints in seconds
 
-<<<<<<< HEAD
-=======
-	/* playback from file */
-	bool is_file_player;
-	bool iso_file;
->>>>>>> origin/next-cc
 	CFileBrowser * filebrowser;
 	CFileFilter tsfilefilter;
 	CFileList filelist;
@@ -223,18 +213,10 @@ class CMoviePlayerGui : public CMenuTarget
 
 #if 0
 	void selectSubtitle();
-	bool convertSubtitle(std::string &text);
 	void showSubtitle(neutrino_msg_data_t data);
 	void clearSubtitle();
 	void selectChapter();
-<<<<<<< HEAD
 #endif
-=======
-	void selectAutoLang();
-	void parsePlaylist(CFile *file);
-	bool mountIso(CFile *file);
-	void makeFilename();
->>>>>>> origin/next-cc
 
 	void Cleanup();
 	static void *ShowStartHint(void *arg);

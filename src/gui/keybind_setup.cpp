@@ -195,10 +195,6 @@ const key_settings_struct_t key_settings[CKeybindSetup::KEYBINDS_COUNT] =
 	{LOCALE_MPKEY_VTXT,			&g_settings.mpkey_vtxt,	 		NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_TIMESHIFT,		&g_settings.key_timeshift,  		LOCALE_MENU_HINT_KEY_MPTIMESHIFT },
 	{LOCALE_MPKEY_PLUGIN,			&g_settings.mpkey_plugin,		LOCALE_MENU_HINT_KEY_MPPLUGIN },
-<<<<<<< HEAD
-=======
-	{LOCALE_EXTRA_KEY_PLUGIN,		&g_settings.key_plugin,			LOCALE_MENU_HINT_KEY_PLUGIN },
->>>>>>> origin/next-cc
 	{LOCALE_EXTRA_KEY_UNLOCK,		&g_settings.key_unlock,			LOCALE_MENU_HINT_KEY_UNLOCK},
 	{LOCALE_EXTRA_KEY_HELP,			&g_settings.key_help,			NONEXISTANT_LOCALE},
 	{LOCALE_EXTRA_KEY_NEXT43MODE,		&g_settings.key_next43mode,		NONEXISTANT_LOCALE},
@@ -222,12 +218,9 @@ bool checkLongPress(uint32_t key)
 	for (unsigned int i = 0; i < CKeybindSetup::KEYBINDS_COUNT; i++)
 		if ((uint32_t)*key_settings[i].keyvalue_p == key)
 			return true;
-<<<<<<< HEAD
 	for (std::vector<SNeutrinoSettings::usermenu_t*>::iterator it = g_settings.usermenu.begin(); it != g_settings.usermenu.end(); ++it)
 		if (*it && (uint32_t)((*it)->key) == key)
 			return true;
-=======
->>>>>>> origin/next-cc
 	return false;
 }
 
@@ -304,21 +297,7 @@ int CKeybindSetup::showKeySetup()
 		mc->setHint("", LOCALE_MENU_HINT_KEY_HARDWARE);
 		keySettings->addItem(mc);
 	}
-<<<<<<< HEAD
 #endif
-=======
-
-	std::string ms_number_format("%d ");
-	ms_number_format += g_Locale->getText(LOCALE_UNIT_SHORT_MILLISECOND);
-	CMenuOptionNumberChooser *cc;
-
-	cc = new CMenuOptionNumberChooser(LOCALE_KEYBINDINGMENU_LONGKEYPRESS_DURATION,
-		&g_settings.longkeypress_duration, true, LONGKEYPRESS_OFF, 9999, NULL, 0, LONGKEYPRESS_OFF, LOCALE_OPTIONS_OFF);
-	cc->setNumberFormat(ms_number_format);
-	cc->setNumericInput(true);
-	cc->setHint("", LOCALE_MENU_HINT_LONGKEYPRESS_DURATION);
-	keySettings->addItem(cc);
->>>>>>> origin/next-cc
 
 	cc = new CMenuOptionNumberChooser(LOCALE_KEYBINDINGMENU_REPEATBLOCK,
 		&g_settings.repeat_blocker, true, 0, 999, NULL,
@@ -422,10 +401,7 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 
 	//misc
 	bindSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_KEYBINDINGMENU_MISC));
-<<<<<<< HEAD
 	//bindSettings->addItem(new CMenuForwarder(keydescription[NKEY_PLUGIN], true, NULL, keychooser[NKEY_PLUGIN]));
-=======
->>>>>>> origin/next-cc
 
 	//Special keys
 	CMenuWidget* bindSettings_special = new CMenuWidget(LOCALE_KEYBINDINGMENU_HEAD, NEUTRINO_ICON_KEYBINDING, width, MN_WIDGET_ID_KEYSETUP_KEYBINDING_SPECIAL);
@@ -434,10 +410,6 @@ void CKeybindSetup::showKeyBindSetup(CMenuWidget *bindSettings)
 	mf->setHint("", LOCALE_MENU_HINT_KEY_SPECIAL_ACTIVE);
 	bindSettings->addItem(mf);
 
-	//onekey-plugin
-	mf = new CMenuForwarder(key_settings[KEY_PLUGIN].keydescription, true, keychooser[KEY_PLUGIN]->getKeyName(), keychooser[KEY_PLUGIN]);
-	mf->setHint("", key_settings[KEY_PLUGIN].hint);
-	bindSettings->addItem(mf);
 	// unlock
 	mf = new CMenuForwarder(key_settings[NKEY_UNLOCK].keydescription, true, keychooser[NKEY_UNLOCK]->getKeyName(), keychooser[NKEY_UNLOCK]);
 	mf->setHint("", key_settings[NKEY_UNLOCK].hint);
@@ -520,7 +492,7 @@ void CKeybindSetup::showKeyBindMovieplayerSetup(CMenuWidget *bindSettings_mplaye
 {
 	bindSettings_mplayer->addIntroItems(LOCALE_MAINMENU_MOVIEPLAYER);
 
-	for (int i = MPKEY_REWIND; i <= MPKEY_PLUGIN; i++) {
+	for (int i = MPKEY_REWIND; i < MPKEY_PLUGIN; i++) {
 		CMenuForwarder * mf = new CMenuForwarder(key_settings[i].keydescription, true, keychooser[i]->getKeyName(), keychooser[i]);
 		mf->setHint("", key_settings[i].hint);
 		bindSettings_mplayer->addItem(mf);

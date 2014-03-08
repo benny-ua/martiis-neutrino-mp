@@ -75,16 +75,12 @@ extern CPlugins       * g_PluginList;    /* neutrino.cpp */
 extern CRemoteControl * g_RemoteControl; /* neutrino.cpp */
 
 #define PLUGINDIR_VAR "/var/tuxbox/plugins"
+#define PLUGINDIR_USB "/mnt/usb/tuxbox/plugins"
 
 CPlugins::CPlugins()
 {
 	frameBuffer = NULL;
 	number_of_plugins = 0;
-}
-
-CPlugins::~CPlugins()
-{
-	plugin_list.clear();
 }
 
 bool CPlugins::plugin_exists(const std::string & filename)
@@ -162,13 +158,13 @@ void CPlugins::loadPlugins()
 	plugin_list.clear();
 	sindex = 100;
 	scanDir(g_settings.plugin_hdd_dir.c_str());
+	scanDir(PLUGINDIR_USB);
 	scanDir(PLUGINDIR_VAR);
 	scanDir(PLUGINDIR);
 
 	sort (plugin_list.begin(), plugin_list.end());
 }
 
-<<<<<<< HEAD
 CPlugins::~CPlugins()
 {
 	plugin_list.clear();
@@ -189,8 +185,6 @@ bool CPlugins::overrideType(plugin *plugin_data, std::string &setting, p_type ty
 	return false;
 }
 
-=======
->>>>>>> origin/next-cc
 bool CPlugins::parseCfg(plugin *plugin_data)
 {
 	std::ifstream inFile;
@@ -313,15 +307,11 @@ PluginParam * CPlugins::makeParam(const char * const id, const int value, Plugin
 	return makeParam(id, aval, next);
 }
 
-void CPlugins::startPlugin_by_name(const std::string & name)
+void CPlugins::startPlugin_by_name(const std::string & filename)
 {
 	for (int i = 0; i <  (int) plugin_list.size(); i++)
 	{
-<<<<<<< HEAD
 		if (!filename.compare(g_PluginList->getFileName(i)))
-=======
-		if (name.compare(g_PluginList->getName(i))==0)
->>>>>>> origin/next-cc
 		{
 			startPlugin(i);
 			return;
@@ -431,13 +421,9 @@ void CPlugins::startPlugin(int number)
 
 	g_RCInput->clearRCMsg();
 	g_RCInput->stopInput();
-<<<<<<< HEAD
 	/* stop automatic updates etc. */
 	frameBuffer->Lock();
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
-=======
-
->>>>>>> origin/next-cc
 	printf("Starting %s\n", plugin_list[number].pluginfile.c_str());
 
 	// workaround for manually messed up permissions
@@ -445,16 +431,12 @@ void CPlugins::startPlugin(int number)
 		chmod(plugin_list[number].pluginfile.c_str(), 0755);
 
 	my_system(2, plugin_list[number].pluginfile.c_str(), NULL);
-<<<<<<< HEAD
 	//frameBuffer->setMode(720, 576, 8 * sizeof(fb_pixel_t));
 	frameBuffer->Unlock();
 #if HAVE_SPARK_HARDWARE
 	frameBuffer->ClearFB();
 #endif
 	videoDecoder->Pig(-1, -1, -1, -1);
-=======
-
->>>>>>> origin/next-cc
 	frameBuffer->paintBackground();
 	g_RCInput->restartInput();
 	g_RCInput->clearRCMsg();

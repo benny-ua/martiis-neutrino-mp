@@ -66,10 +66,7 @@
 #include <system/settings.h>
 #include <system/fsmounter.h>
 #include <system/helpers.h>
-<<<<<<< HEAD
 #include <system/localize_bouquetnames.h>
-=======
->>>>>>> origin/next-cc
 
 #include <global.h>
 #include <neutrino.h>
@@ -266,11 +263,6 @@ CTimerList::CTimerList()
 	listmaxshow = 0;
 	Timer = new CTimerdClient();
 	skipEventID=0;
-<<<<<<< HEAD
-=======
-	timerNew_message = "";
-	timerNew_pluginName = "";
->>>>>>> origin/next-cc
 
 	/* most probable default */
 	saved_dispmode = (int)CVFD::MODE_TVRADIO;
@@ -1235,23 +1227,11 @@ int CTimerList::newTimer()
 
 	std::string timerNew_message(timerNew.message);
 	CStringInputSMS timerSettings_msg(LOCALE_TIMERLIST_MESSAGE, &timerNew_message, 30, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, "abcdefghijklmnopqrstuvwxyz0123456789-.,:!?/ ");
-<<<<<<< HEAD
 	CMenuForwarder *m9 = new CMenuForwarder(LOCALE_TIMERLIST_MESSAGE, false, NULL, &timerSettings_msg );
-=======
-	CMenuForwarder *m9 = new CMenuForwarder(LOCALE_TIMERLIST_MESSAGE, false, timerNew_message, &timerSettings_msg );
 
 	timerNew_pluginName = "---";
-	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL
-#if ENABLE_LUA
-										       | CPlugins::P_TYPE_LUA
-#endif
-										       , timerNew_pluginName);
-	CMenuForwarder *m10 = new CMenuForwarder(LOCALE_TIMERLIST_PLUGIN, false, timerNew_pluginName, &plugin_chooser);
->>>>>>> origin/next-cc
-
-	std::string timerNew_pluginName("---");
-	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL | CPlugins::P_TYPE_LUA, timerNew_pluginName);
-	CMenuForwarder *m10 = new CMenuForwarder(LOCALE_TIMERLIST_PLUGIN, false, timerNew_pluginName, &plugin_chooser);
+	CPluginChooser plugin_chooser(LOCALE_TIMERLIST_PLUGIN, CPlugins::P_TYPE_SCRIPT | CPlugins::P_TYPE_TOOL | CPlugins::P_TYPE_LUA , timerNew_pluginName);
+	CMenuForwarder *m10 = new CMenuForwarder(LOCALE_TIMERLIST_PLUGIN, false, NULL, &plugin_chooser);
 
 	CTimerListNewNotifier notifier2((int *)&timerNew.eventType,
 					&timerNew.stopTime,m2,m6,m8,m9,m10,m7,

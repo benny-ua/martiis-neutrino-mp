@@ -148,7 +148,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	int menu_items = 0;
 
 	// define classes
-<<<<<<< HEAD
 	CSubChannelSelectMenu subchanselect;
 	CStreamFeaturesChangeExec StreamFeaturesChanger;
 	CNeutrinoApp * neutrino					= CNeutrinoApp::getInstance();
@@ -158,41 +157,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		txt = g_Locale->getText(user_menu[button].caption);
 
 	CMenuWidget *menu = new CMenuWidget(txt, (button < COL_BUTTONMAX) ? user_menu[button].menu_icon_def : "", width);
-=======
-	CFavorites* tmpFavorites				= NULL;
-	CAudioSelectMenuHandler* tmpAudioSelectMenuHandler	= NULL;
-	CMenuWidget* tmpNVODSelector				= NULL;
-	CSubChannelSelectMenu subchanselect;
-	CStreamInfo2 * streamInfo				= NULL;
-	CEventListHandler* tmpEventListHandler			= NULL;
-	CEPGplusHandler* tmpEPGplusHandler			= NULL;
-	CEPGDataHandler* tmpEPGDataHandler			= NULL;
-	CTimerList* Timerlist					= NULL;
-	CRCLock *rcLock						= NULL;
-	CStreamFeaturesChangeExec *StreamFeaturesChanger	= NULL;
-	CImageInfo *imageinfo					= NULL;
-	CDBoxInfoWidget *boxinfo				= NULL;
-	CNeutrinoApp * neutrino					= NULL;
-	CPluginList * games					= NULL;
-	CPluginList * tools					= NULL;
-	CPluginList * scripts					= NULL;
-#if ENABLE_LUA
-	CPluginList * lua					= NULL;
-#endif
-	
-	std::string txt = g_settings.usermenu_text[button];
-	neutrino_locale_t caption = user_menu[button].caption;
-	
-	//ensure correct caption for yellow menue
-	if ( button == SNeutrinoSettings::BUTTON_YELLOW) 
-		caption = g_RemoteControl->are_subchannels ? LOCALE_INFOVIEWER_SUBSERVICE : LOCALE_INFOVIEWER_SELECTTIME;
-	
-	//ensure no empty caption
-	if ( txt.empty() )
-		txt = g_Locale->getText(caption);
-	
-	CMenuWidget *menu = new CMenuWidget(txt.c_str(), user_menu[button].menu_icon_def, width);
->>>>>>> origin/next-cc
 	if (menu == NULL)
 		return true;
 
@@ -247,55 +211,29 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 			break;
 		case SNeutrinoSettings::ITEM_REMOTE:
 			keyhelper.get(&key,&icon,feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_RC_LOCK]].key); //CRCInput::RC_nokey);
-<<<<<<< HEAD
 			menu_item = new CMenuDForwarder(LOCALE_RCLOCK_MENUEADD, true, NULL, new CRCLock, "-1" , key, icon );
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
-=======
-			rcLock = new CRCLock();
-			menu_item = new CMenuForwarder(LOCALE_RCLOCK_MENUEADD, true, NULL, rcLock, "-1", key, icon );
-			menu->addItem(menu_item, false);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_EPG_SUPER:
 			keyhelper.get(&key,&icon,CRCInput::RC_green);
-<<<<<<< HEAD
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EPGPLUS   , true, NULL, new CEPGplusHandler,  "-1", key, icon);
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
-=======
-			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EPGPLUS, true, NULL, tmpEPGplusHandler, "-1", key, icon);
-			menu->addItem(menu_item, false);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_EPG_LIST:
 			keyhelper.get(&key,&icon,CRCInput::RC_red);
-<<<<<<< HEAD
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EVENTLIST , true, NULL, new CEventListHandler,  "-1", key, icon);
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
-=======
-			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EVENTLIST, true, NULL, tmpEventListHandler, "-1", key, icon);
-			menu->addItem(menu_item, false);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_EPG_INFO:
 			keyhelper.get(&key,&icon,CRCInput::RC_yellow);
-<<<<<<< HEAD
 			menu_item = new CMenuDForwarder(LOCALE_EPGMENU_EVENTINFO , true, NULL, new CEPGDataHandler,  "-1", key, icon);
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
-=======
-			menu_item = new CMenuForwarder(LOCALE_EPGMENU_EVENTINFO, true, NULL, tmpEPGDataHandler, "-1", key, icon);
-			menu->addItem(menu_item, false);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_EPG_MISC:
 		{
 			int dummy = g_Sectionsd->getIsScanningActive();
 			keyhelper.get(&key,&icon);
-<<<<<<< HEAD
 			menu_item = new CMenuOptionChooser(LOCALE_MAINMENU_PAUSESECTIONSD, &dummy, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this , key, icon );
-=======
-			menu_item = new CMenuOptionChooser(LOCALE_MAINMENU_PAUSESECTIONSD, &dummy, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this, key, icon );
-			menu->addItem(menu_item, false);
->>>>>>> origin/next-cc
 			menu_items++;
 			menu->addItem(menu_item, false);
 			keyhelper.get(&key,&icon);
@@ -355,10 +293,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 					menu_items++;
 					neutrino_msg_t d_key = g_PluginList->getKey(count);
 					//printf("[neutrino usermenu] plugin %d, set key %d...\n", count, g_PluginList->getKey(count));
-<<<<<<< HEAD
-=======
-					StreamFeaturesChanger = new CStreamFeaturesChangeExec();
->>>>>>> origin/next-cc
 					keyhelper.get(&key,&icon, d_key);
 					menu_item = new CMenuForwarder(g_PluginList->getName(count), true, NULL, &StreamFeaturesChanger, id, key, icon);
 					menu_item->setHint("", g_PluginList->getDescription(count));
@@ -372,23 +306,13 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 		}
 		case SNeutrinoSettings::ITEM_VTXT:
 			keyhelper.get(&key,&icon, feat_key[g_settings.personalize[SNeutrinoSettings::P_FEAT_KEY_VTXT]].key); //CRCInput::RC_blue
-<<<<<<< HEAD
 			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_VTXT, true, NULL, &StreamFeaturesChanger, "teletext", key, icon);
 			// FIXME menu_item->setHint("", NONEXISTANT_LOCALE);
-=======
-			StreamFeaturesChanger = new CStreamFeaturesChangeExec();
-			menu_item = new CMenuForwarder(LOCALE_USERMENU_ITEM_VTXT, true, NULL, StreamFeaturesChanger, "teletext", key, icon);
-			menu->addItem(menu_item, 0);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_IMAGEINFO:
 			keyhelper.get(&key,&icon);
-<<<<<<< HEAD
 			menu_item = new CMenuDForwarder(LOCALE_SERVICEMENU_IMAGEINFO,  true, NULL, new CImageInfo, NULL, key, icon);
 			menu_item->setHint(NEUTRINO_ICON_HINT_IMAGEINFO, LOCALE_MENU_HINT_IMAGEINFO);
-=======
-			menu->addItem(new CMenuForwarder(LOCALE_SERVICEMENU_IMAGEINFO, true, NULL, imageinfo, NULL, key, icon ), false);
->>>>>>> origin/next-cc
 			break;
 		case SNeutrinoSettings::ITEM_BOXINFO:
 			keyhelper.get(&key,&icon);
@@ -519,30 +443,6 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	else if (last_menu_item != NULL)
 		last_menu_item->exec( NULL );
 	
-<<<<<<< HEAD
-=======
-	user_menu[button].selected = menu->getSelected();
-
-	// clear the heap
-	if (tmpFavorites)		delete tmpFavorites;
-	if (tmpAudioSelectMenuHandler)	delete tmpAudioSelectMenuHandler;
-	if (tmpNVODSelector)		delete tmpNVODSelector;
-	if (streamInfo)			delete streamInfo;
-	if (tmpEventListHandler)	delete tmpEventListHandler;
-	if (tmpEPGplusHandler)		delete tmpEPGplusHandler;
-	if (tmpEPGDataHandler)		delete tmpEPGDataHandler;
-	if (Timerlist)			delete Timerlist;
-	if (rcLock)			delete rcLock;
-	if (StreamFeaturesChanger)	delete StreamFeaturesChanger;
-	if (imageinfo)			delete imageinfo;
-	if (boxinfo)			delete boxinfo;
-	if (games)			delete games;
-	if (tools)			delete tools;
-	if (scripts)			delete scripts;
-	if (lua)			delete lua;
-	if (menu)			delete menu;
-
->>>>>>> origin/next-cc
 	InfoClock->enableInfoClock(true);
 	CNeutrinoApp::getInstance()->StartSubtitles();
 

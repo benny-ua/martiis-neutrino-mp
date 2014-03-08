@@ -1131,11 +1131,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		configfile.setString("pref_lang_" + i_str, g_settings.pref_lang[i]);
 		configfile.setString("pref_subs_" + i_str, g_settings.pref_subs[i]);
 	}
-<<<<<<< HEAD
 	configfile.setInt32( "dvb_subtitle_delay", g_settings.dvb_subtitle_delay );
-=======
 	configfile.setString("subs_charset", g_settings.subs_charset);
->>>>>>> origin/next-cc
 
 	//vcr
 	configfile.setBool("vcr_AutoSwitch"       , g_settings.vcr_AutoSwitch       );
@@ -2184,10 +2181,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 #if !HAVE_SPARK_HARDWARE
 	cpuFreq = new cCpuFreqManager();
 	cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
-<<<<<<< HEAD
 #endif
-=======
->>>>>>> origin/next-cc
 	switch (CFEManager::getInstance()->getLiveFE()->getInfo()->type) {
 		case FE_QPSK:
 			g_info.delivery_system = DVB_S;
@@ -2269,7 +2263,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	//load Pluginlist before main menu (only show script menu if at least one script is available
 	g_PluginList->loadPlugins();
 
-<<<<<<< HEAD
 	MoviePluginChanger        = new CMoviePluginChangeExec;
 	AdZapChanger              = NULL;
 	batchEPGSettings	  = new CBatchEPG_Menu;
@@ -2277,8 +2270,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	threeDSetup		  = new C3DSetup;
 #endif
 
-=======
->>>>>>> origin/next-cc
 	// setup recording device
 	setupRecordingDevice();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -4356,7 +4347,6 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		return menu_return::RETURN_REPAINT;
 	}
-<<<<<<< HEAD
 	else if(actionKey == "movieplugin") {
 		parent->hide();
 		CMenuWidget MoviePluginSelector(LOCALE_MOVIEPLAYER_DEFPLUGIN, NEUTRINO_ICON_FEATURES);
@@ -4376,8 +4366,6 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		MoviePluginSelector.exec(NULL, "");
 		return menu_return::RETURN_REPAINT;
 	}
-=======
->>>>>>> origin/next-cc
 	else if(actionKey == "clearSectionsd")
 	{
 		g_Sectionsd->freeMemory();
@@ -4637,16 +4625,13 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.mpkey_time = tconfig.getInt32( "mpkey.time", CRCInput::RC_setup );
 #endif
 	g_settings.mpkey_bookmark = tconfig.getInt32( "mpkey.bookmark", CRCInput::RC_blue );
-<<<<<<< HEAD
 	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", CRCInput::RC_red );
 	g_settings.mpkey_next3dmode = tconfig.getInt32( "mpkey.next3dmode", CRCInput::RC_nokey );
 	g_settings.mpkey_next_repeat_mode = tconfig.getInt32( "mpkey.next_repeat_mode", CRCInput::RC_playmode );
 	g_settings.mpkey_vtxt = tconfig.getInt32( "mpkey.vtxt", CRCInput::RC_text );
 	g_settings.mpkey_goto = tconfig.getInt32( "mpkey.goto", CRCInput::RC_nokey );
 
-=======
 	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", (unsigned int)CRCInput::RC_nokey );
->>>>>>> origin/next-cc
 	g_settings.mpkey_subtitle = tconfig.getInt32( "mpkey.subtitle", CRCInput::RC_sub );
 
 	g_settings.key_format_mode_active = tconfig.getInt32( "key_format_mode_active", 1 );
@@ -4658,7 +4643,6 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_click = tconfig.getInt32( "key_click", 1 );
 	g_settings.repeat_blocker = tconfig.getInt32("repeat_blocker", 450);
 	g_settings.repeat_genericblocker = tconfig.getInt32("repeat_genericblocker", 100);
-	g_settings.longkeypress_duration = tconfig.getInt32("longkeypress_duration", LONGKEYPRESS_OFF);
 
 	if (g_settings.conf_version < 1) {
 		// Use default key repeat settings when upgrading from earlier releases:
@@ -4748,12 +4732,9 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "repeat_blocker", g_settings.repeat_blocker );
 	tconfig.setInt32( "repeat_genericblocker", g_settings.repeat_genericblocker );
 	tconfig.setInt32( "longkeypress_duration", g_settings.longkeypress_duration );
-<<<<<<< HEAD
 #if HAVE_SPARK_HARDWARE
 	tconfig.setInt32("accept_other_remotes", g_settings.accept_other_remotes);
 #endif
-=======
->>>>>>> origin/next-cc
 
 	tconfig.setInt32( "bouquetlist_mode", g_settings.bouquetlist_mode );
 	tconfig.setInt32( "sms_channel", g_settings.sms_channel );

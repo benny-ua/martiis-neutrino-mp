@@ -578,12 +578,9 @@ struct SNeutrinoSettings
 	int repeat_genericblocker;
 #define LONGKEYPRESS_OFF 499
 	int longkeypress_duration;
-<<<<<<< HEAD
 #if HAVE_SPARK_HARDWARE
 	int accept_other_remotes;
 #endif
-=======
->>>>>>> origin/next-cc
 	int remote_control_hardware;
 	int audiochannel_up_down_enable;
 
@@ -667,7 +664,9 @@ struct SNeutrinoSettings
 		FONT_TYPE_INFOBAR_SMALL,
 		FONT_TYPE_FILEBROWSER_ITEM,
 		FONT_TYPE_MENU_HINT,
+#if !HAVE_SPARK_HARDWARE
 		FONT_TYPE_SUBTITLES,
+#endif
 		FONT_TYPE_COUNT
 	};
 

@@ -144,11 +144,19 @@ const SNeutrinoSettings::FONT_TYPES menu_font_sizes[4] =
 	SNeutrinoSettings::FONT_TYPE_MENU_INFO,
 	SNeutrinoSettings::FONT_TYPE_MENU_HINT
 };
+
+#if HAVE_SPARK_HARDWARE
+const SNeutrinoSettings::FONT_TYPES other_font_sizes[1] =
+{
+	SNeutrinoSettings::FONT_TYPE_FILEBROWSER_ITEM
+};
+#else
 const SNeutrinoSettings::FONT_TYPES other_font_sizes[2] =
 {
 	SNeutrinoSettings::FONT_TYPE_SUBTITLES,
 	SNeutrinoSettings::FONT_TYPE_FILEBROWSER_ITEM
 };
+#endif
 
 #define FONT_GROUP_COUNT 7
 font_sizes_groups font_sizes_groups[FONT_GROUP_COUNT] =
@@ -159,7 +167,11 @@ font_sizes_groups font_sizes_groups[FONT_GROUP_COUNT] =
 	{LOCALE_FONTMENU_EPG        , 4, epg_font_sizes        , "fontsize.depg", LOCALE_MENU_HINT_EPG_FONTS },
 	{LOCALE_FONTMENU_INFOBAR    , 4, infobar_font_sizes    , "fontsize.dinf", LOCALE_MENU_HINT_INFOBAR_FONTS },
 	{LOCALE_FONTMENU_GAMELIST   , 2, gamelist_font_sizes   , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS },
+#if HAVE_SPARK_HARDWARE
+	{LOCALE_FONTMENU_OTHER      , 1, other_font_sizes      , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS }
+#else
 	{LOCALE_FONTMENU_OTHER      , 2, other_font_sizes      , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS }
+#endif
 };
 
 font_sizes_struct neutrino_font[SNeutrinoSettings::FONT_TYPE_COUNT] =
@@ -189,7 +201,9 @@ font_sizes_struct neutrino_font[SNeutrinoSettings::FONT_TYPE_COUNT] =
 	{LOCALE_FONTSIZE_INFOBAR_SMALL      ,  14, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
 	{LOCALE_FONTSIZE_FILEBROWSER_ITEM   ,  16, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
 	{LOCALE_FONTSIZE_MENU_HINT          ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 0},
+#if !HAVE_SPARK_HARDWARE
 	{LOCALE_FONTSIZE_SUBTITLES          ,  25, CNeutrinoFonts::FONT_STYLE_BOLD   , 0}
+#endif
 };
 
 int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)

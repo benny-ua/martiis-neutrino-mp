@@ -93,10 +93,7 @@ CRCInput::CRCInput(bool &_timer_wakeup)
 {
 	timerid= 1;
 	repeatkeys = NULL;
-<<<<<<< HEAD
 	timer_wakeup = &_timer_wakeup;
-=======
->>>>>>> origin/next-cc
 	longPressAny = false;
 
 	// pipe for internal event-queue
@@ -1175,14 +1172,11 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 								*data = (unsigned long) p;
 								dont_delete_p = true;
 								break;
-<<<<<<< HEAD
 							case CTimerdClient::EVT_BATCHEPG :
 								*msg = NeutrinoMessages::EVT_BATCHEPG;
 								*data = 0;
 								break;
 
-=======
->>>>>>> origin/next-cc
 							default :
 								printf("[neutrino] event INITID_TIMERD - unknown eventID 0x%x\n",  emsg.eventID );
 
@@ -1259,11 +1253,7 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					continue; /* ignore... */
 				SHTDCNT::getInstance()->resetSleepTimer();
 				uint32_t trkey = translate(ev.code);
-<<<<<<< HEAD
 #ifdef _DEBUG
-=======
-#ifdef DEBUG
->>>>>>> origin/next-cc
 				printf("%d key: %04x value %d, translate: %04x -%s-\n", ev.value, ev.code, ev.value, trkey, getKeyName(trkey).c_str());
 #endif
 				if (trkey == RC_nokey)
@@ -1319,11 +1309,7 @@ void CRCInput::getMsg_us(neutrino_msg_t * msg, neutrino_msg_data_t * data, uint6
 					if (trkey == rc_last_key) {
 						/* only allow selected keys to be repeated */
 						if (mayRepeat(trkey, bAllowRepeatLR) ||
-<<<<<<< HEAD
 						    (g_settings.shutdown_real_rcdelay && (trkey == RC_standby) && (g_info.hw_caps->can_shutdown)))
-=======
-						    (g_settings.shutdown_real_rcdelay && ((trkey == RC_standby) && (cs_get_revision() > 7))) )
->>>>>>> origin/next-cc
 						{
 #ifdef ENABLE_REPEAT_CHECK
 							if (rc_last_repeat_key != trkey) {
@@ -1678,7 +1664,6 @@ const char *CRCInput::getKeyNameC(const unsigned int key)
 **************************************************************************/
 int CRCInput::translate(int code)
 {
-<<<<<<< HEAD
 	if (code == g_settings.key_help)
 		return RC_help;
 	switch(code)
@@ -1702,14 +1687,6 @@ int CRCInput::translate(int code)
 		case KEY_PLAY:
 			return RC_pause;
 #endif
-=======
-	switch(code)
-	{
-		case 0x100: // FIXME -- needed?
-			return RC_up;
-		case 0x101: // FIXME -- needed?
-			return RC_down;
->>>>>>> origin/next-cc
 		default:
 			break;
 	}
