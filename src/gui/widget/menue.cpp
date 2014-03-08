@@ -1020,15 +1020,14 @@ void CMenuWidget::calcSize()
 	iconOffset += 10;
 	width += iconOffset;
 
-	if (fbutton_count) {
-		int maxItemHeight = 0;
-		if (total_pages > 1) {
-			for (unsigned int i= 0; i< items.size(); i++)
-				maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
-			itemHeightTotal = items.size() * maxItemHeight;
-		}
-		width = std::max(width, fbutton_width);
+	int maxItemHeight = 0;
+	if (total_pages > 1) {
+		for (unsigned int i= 0; i< items.size(); i++)
+			maxItemHeight = std::max(maxItemHeight, items[i]->getHeight());
+		itemHeightTotal = items.size() * maxItemHeight;
 	}
+	if (fbutton_count)
+		width = std::max(width, fbutton_width);
 
 	if (width > (int)frameBuffer->getScreenWidth())
 		width = frameBuffer->getScreenWidth();
