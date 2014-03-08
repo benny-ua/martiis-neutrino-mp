@@ -81,7 +81,6 @@ neutrino_LDADD = \
 	@CURL_LIBS@ \
 	@FREETYPE_LIBS@ \
 	@PNG_LIBS@ \
-	@BLURAY_LIBS@ \
 	@LIBCS_LIBS@ \
 	-ldvbsi++ \
 	-ljpeg \
