@@ -234,13 +234,8 @@ bool CFEManager::loadSettings()
 		}
 	}
 	bool fsat = true;
-<<<<<<< HEAD
 	// bool fcable = true;
 	// bool fterr = true;
-=======
-	//bool fcable = true;
-	bool fterr = true;
->>>>>>> origin/next-cc
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
 		CFrontend * fe = it->second;
 		frontend_config_t & fe_config = fe->getConfig();
@@ -277,21 +272,15 @@ bool CFEManager::loadSettings()
 			def_mode = CFrontend::FE_MODE_INDEPENDENT;
 		}
 		if (fe->isTerr()) {
-<<<<<<< HEAD
 #if 0
-=======
->>>>>>> origin/next-cc
 			if (fterr) {
 				fterr = false;
 				def_mode = def_mode0;
 			}
 			if (def_mode > CFrontend::FE_MODE_INDEPENDENT)
 				def_mode = CFrontend::FE_MODE_INDEPENDENT;
-<<<<<<< HEAD
 #endif
 			def_mode = CFrontend::FE_MODE_INDEPENDENT;
-=======
->>>>>>> origin/next-cc
 		}
 		if (femap.size() == 1)
 			def_mode = CFrontend::FE_MODE_INDEPENDENT;

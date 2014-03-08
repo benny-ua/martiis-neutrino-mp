@@ -578,11 +578,7 @@ void CFrontend::getDelSys(uint8_t type, int f, int m, char *&fec, char *&sys, ch
 		}
 		break;
 	default:
-<<<<<<< HEAD
 		INFO("unknown type %d!", type);
-=======
-		printf("[frontend] unknown type %d!\n", type);
->>>>>>> origin/next-cc
 		sys = (char *)"UNKNOWN";
 		mod = (char *)"UNKNOWN";
 		break;
@@ -791,11 +787,7 @@ bool CFrontend::buildProperties(const FrontendParameters *feparams, struct dtv_p
 			cmdseq.props[BANDWIDTH].u.data	= 8000000;
 			break;
 		default:
-<<<<<<< HEAD
 			INFO("[fe%d] unknown OFDM bandwidth %d",
-=======
-			printf("[fe%d] unknown bandwidth for OFDM %d\n",
->>>>>>> origin/next-cc
 				fenumber, feparams->dvb_feparams.u.ofdm.bandwidth);
 			/* fallthrough */
 		case BANDWIDTH_AUTO:
@@ -1222,32 +1214,12 @@ int CFrontend::setParameters(TP_params *TP, bool nowait)
 		getDelSys(feparams.dvb_feparams.u.qpsk.fec_inner, dvbs_get_modulation(feparams.dvb_feparams.u.qpsk.fec_inner),  f, s, m);
 		break;
 	case FE_QAM:
-<<<<<<< HEAD
 		if (freq < 1000*1000)
 			feparams.dvb_feparams.frequency = freq * 1000;
 		getDelSys(feparams.dvb_feparams.u.qam.fec_inner, feparams.dvb_feparams.u.qam.modulation, f, s, m);
 	case FE_OFDM:
 		if (freq < 1000*1000)
 			feparams.dvb_feparams.frequency = freq * 1000;
-=======
-		if (freq < 1000*1000)
-			feparams.dvb_feparams.frequency = freq * 1000;
-		getDelSys(feparams.dvb_feparams.u.qam.fec_inner,feparams.dvb_feparams.u.qam.modulation, f, s, m);
-#if 0
-		switch (TP->feparams.dvb_feparams.inversion) {
-		case INVERSION_OFF:
-			TP->feparams.dvb_feparams.inversion = INVERSION_ON;
-			break;
-		case INVERSION_ON:
-		default:
-			TP->feparams.dvb_feparams.inversion = INVERSION_OFF;
-			break;
-		}
-#endif
-	case FE_OFDM:
-		if (freq < 1000*1000)
-			feparams.dvb_feparams.frequency = freq * 1000;
->>>>>>> origin/next-cc
 		getDelSys(feparams.dvb_feparams.u.ofdm.code_rate_HP,feparams.dvb_feparams.u.ofdm.constellation, f, s, m);
 		break;
 	default:
