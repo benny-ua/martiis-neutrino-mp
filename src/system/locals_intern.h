@@ -671,7 +671,7 @@ const char * locale_real_names[] =
 	"fontsize.menu_hint",
 	"fontsize.menu_info",
 	"fontsize.menu_title",
-<<<<<<< HEAD
+	"fontsize.subtitles",
 	"glcd.brightness",
 	"glcd.brightness_standby",
 	"glcd.color.black",
@@ -701,9 +701,6 @@ const char * locale_real_names[] =
 	"glcd.size_time_standby",
 	"glcd.time_in_standby",
 	"glcd.volume",
-=======
-	"fontsize.subtitles",
->>>>>>> origin/next-cc
 	"hdd_10min",
 	"hdd_1min",
 	"hdd_20min",
@@ -1083,7 +1080,6 @@ const char * locale_real_names[] =
 	"menu.hint_key_pip_close",
 	"menu.hint_key_pip_setup",
 	"menu.hint_key_pip_swap",
-	"menu.hint_key_plugin",
 	"menu.hint_key_poweroff",
 	"menu.hint_key_quickzap",
 	"menu.hint_key_record",
@@ -1115,10 +1111,6 @@ const char * locale_real_names[] =
 	"menu.hint_leds_tv",
 	"menu.hint_load",
 	"menu.hint_longkeypress_duration",
-<<<<<<< HEAD
-=======
-	"menu.hint_lua",
->>>>>>> origin/next-cc
 	"menu.hint_make_hdlist",
 	"menu.hint_make_newlist",
 	"menu.hint_make_removedlist",
@@ -1140,11 +1132,7 @@ const char * locale_real_names[] =
 	"menu.hint_misc_kerneloptions",
 	"menu.hint_misc_zapit",
 	"menu.hint_movie",
-<<<<<<< HEAD
 	"menu.hint_moviebrowser_setup",
-=======
-	"menu.hint_movieplayer_plugin",
->>>>>>> origin/next-cc
 	"menu.hint_net_broadcast",
 	"menu.hint_net_dhcp",
 	"menu.hint_net_djmount",
@@ -1182,12 +1170,8 @@ const char * locale_real_names[] =
 	"menu.hint_nkplay",
 	"menu.hint_nkplayback_setup",
 	"menu.hint_numeric_adjust",
-<<<<<<< HEAD
 	"menu.hint_opkg",
 	"menu.hint_opkg_upgrade",
-=======
-	"menu.hint_onekey_plugin",
->>>>>>> origin/next-cc
 	"menu.hint_osd",
 	"menu.hint_osd_language",
 	"menu.hint_osd_preset",
@@ -1691,11 +1675,8 @@ const char * locale_real_names[] =
 	"movieplayer.head",
 	"movieplayer.nkplayback",
 	"movieplayer.starting",
-<<<<<<< HEAD
 	"movieplayer.stopping",
-=======
 	"movieplayer.titles",
->>>>>>> origin/next-cc
 	"movieplayer.toomanybookmarks",
 	"movieplayer.tshelp1",
 	"movieplayer.tshelp10",
@@ -2156,16 +2137,12 @@ const char * locale_real_names[] =
 	"streaming.write_error",
 	"stringinput.caps",
 	"stringinput.clear",
-<<<<<<< HEAD
-	"subtitles.delay",
-=======
 	"subtitles.charset",
->>>>>>> origin/next-cc
+	"subtitles.delay",
 	"subtitles.head",
 	"subtitles.stop",
 	"terrestrialsetup.area",
 	"terrestrialsetup.provider",
-<<<<<<< HEAD
 	"three.d.off",
 	"three.d.save",
 	"three.d.settings",
@@ -2173,8 +2150,6 @@ const char * locale_real_names[] =
 	"three.d.sideside",
 	"three.d.tile",
 	"three.d.topbottom",
-=======
->>>>>>> origin/next-cc
 	"timer.eventrecord.msg",
 	"timer.eventrecord.title",
 	"timer.eventremoved.msg",
