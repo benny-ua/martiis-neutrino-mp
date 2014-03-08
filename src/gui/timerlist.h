@@ -65,7 +65,13 @@ class CTimerList : public CMenuTarget
 		int timerNew_standby_on;
 		std::string timerNew_channel_name;
 		std::string m_weekdaysStr;
+<<<<<<< HEAD
 		
+=======
+		std::string timerNew_message;
+		std::string timerNew_pluginName;
+
+>>>>>>> origin/next-cc
 		int timer_apids_dflt;
 		int timer_apids_std;
 		int timer_apids_ac3;

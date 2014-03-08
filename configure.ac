@@ -46,6 +46,7 @@ TUXBOX_APPS_LIB_PKGCONFIG(PNG,libpng)
 TUXBOX_APPS_LIB_PKGCONFIG(AVFORMAT,libavformat)
 TUXBOX_APPS_LIB_PKGCONFIG(AVCODEC,libavcodec)
 TUXBOX_APPS_LIB_PKGCONFIG(AVUTIL,libavutil)
+<<<<<<< HEAD
 TUXBOX_APPS_LIB_PKGCONFIG(SWRESAMPLE,libswresample)
 
 # either use dynamic lualib in package lua (openSUSE)
@@ -58,6 +59,9 @@ PKG_CHECK_MODULES([LUA], [lua >= 5.2], echo "lua >= 5.2 found", [
 		AC_DEFINE(STATIC_LUAPOSIX,1,[Define to 1 for static lua build.])
 	])
 ])
+=======
+TUXBOX_APPS_LIB_PKGCONFIG(BLURAY,libbluray)
+>>>>>>> origin/next-cc
 
 #TUXBOX_APPS_LIB_PKGCONFIG(CONFIGFILE,tuxbox-configfile)
 #TUXBOX_APPS_LIB_PKGCONFIG(CONNECTION,tuxbox-connection)
@@ -218,6 +222,7 @@ AC_SUBST(STB_HAL_INC)
 AC_SUBST(STB_HAL_LIB)
 AC_SUBST(LUA_CFLAGS)
 AC_SUBST(LUA_LIBS)
+AC_SUBST(BLURAY_LIBS)
 
 AC_OUTPUT([
 Makefile

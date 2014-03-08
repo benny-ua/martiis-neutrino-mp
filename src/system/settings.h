@@ -233,6 +233,7 @@ struct SNeutrinoSettings
 
 	std::string pref_lang[3];
 	std::string pref_subs[3];
+	std::string subs_charset;
 
 	// EPG
 	int epg_save;
@@ -556,6 +557,10 @@ struct SNeutrinoSettings
 	int pip_height;
 	int pip_x;
 	int pip_y;
+	int pip_radio_width;
+	int pip_radio_height;
+	int pip_radio_x;
+	int pip_radio_y;
 	int bigFonts;
 	int window_size;
 	int window_width;
@@ -573,9 +578,12 @@ struct SNeutrinoSettings
 	int repeat_genericblocker;
 #define LONGKEYPRESS_OFF 499
 	int longkeypress_duration;
+<<<<<<< HEAD
 #if HAVE_SPARK_HARDWARE
 	int accept_other_remotes;
 #endif
+=======
+>>>>>>> origin/next-cc
 	int remote_control_hardware;
 	int audiochannel_up_down_enable;
 
@@ -659,6 +667,7 @@ struct SNeutrinoSettings
 		FONT_TYPE_INFOBAR_SMALL,
 		FONT_TYPE_FILEBROWSER_ITEM,
 		FONT_TYPE_MENU_HINT,
+		FONT_TYPE_SUBTITLES,
 		FONT_TYPE_COUNT
 	};
 

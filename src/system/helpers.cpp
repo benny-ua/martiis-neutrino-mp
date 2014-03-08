@@ -214,8 +214,8 @@ FILE* my_popen( pid_t& pid, const char *cmdstring, const char *type)
 		close(pfd[1]);
 		if ((fp = fdopen(pfd[0], type)) == NULL)
 			return(NULL);
-		} else {
-			close(pfd[0]);
+	} else {
+		close(pfd[0]);
 		if ((fp = fdopen(pfd[1], type)) == NULL)
 			return(NULL);
 	}
@@ -431,6 +431,50 @@ time_t toEpoch(std::string &date)
 		return mktime(&t);
 	return 0;
 }
+
+std::string& str_replace(const std::string &search, const std::string &replace, std::string &text)
+{
+	if (search.empty() || text.empty())
+		return text;
+
+	size_t searchLen = search.length();
+	while (1) {
+		size_t pos = text.find(search);
+		if (pos == std::string::npos)
+			break;
+		text.replace(pos, searchLen, replace);
+	}
+	return text;
+}
+
+std::string& htmlEntityDecode(std::string& text)
+{
+	struct decode_table {
+		const char* code;
+		const char* htmlCode;
+	};
+	decode_table dt[] =
+	{
+		{" ",  "&nbsp;"},
+		{"&",  "&amp;"},
+		{"<",  "&lt;"},
+		{">",  "&gt;"},
+		{"\"", "&quot;"},
+		{"'",  "&apos;"},
+		{"€",  "&euro;"},
+		{"–",  "&#8211;"},
+		{"“",  "&#8220;"},
+		{"”",  "&#8221;"},
+		{"„",  "&#8222;"},
+		{"•",  "&#8226;"},
+		{"…",  "&#8230;"},
+		{NULL,  NULL}
+	};
+	for (int i = 0; dt[i].code != NULL; i++)
+		text = str_replace(dt[i].htmlCode, dt[i].code, text);
+
+	return text;
+}	
 
 CFileHelpers::CFileHelpers()
 {

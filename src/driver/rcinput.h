@@ -154,7 +154,10 @@ class CRCInput
 
 		int		fd_max;
 		int		clickfd;
+<<<<<<< HEAD
 		bool		*timer_wakeup;
+=======
+>>>>>>> origin/next-cc
 		__u16 rc_last_key;
 		void set_dsp();
 

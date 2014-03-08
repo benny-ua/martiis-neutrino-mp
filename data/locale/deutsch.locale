@@ -424,12 +424,17 @@ extra.key_pic_size 4:3 Anzeigeverhalten
 extra.key_pip_close Stop/Start PiP
 extra.key_pip_setup PiP Konfiguration
 extra.key_pip_swap Umschalten PiP/live
+<<<<<<< HEAD
 extra.key_plugin One-touch-Plugin
 extra.key_record Aufnahme-Taste
 extra.key_screenshot Screenshot-Taste
 extra.key_showclock Zeitanzeige
 extra.key_switchformat Nächste Auflösung
 extra.key_timerlist Timer-Liste
+=======
+extra.key_plugin Schnellstart-Plugin
+extra.key_screenshot Screenshot Taste
+>>>>>>> origin/next-cc
 extra.key_timeshift Timeshift
 extra.key_unlock Entsperrtaste
 extra.ladirection Breitengrad-Ausrichtung
@@ -613,9 +618,18 @@ fontmenu.gamelist Spiele-Liste
 fontmenu.head Schrift
 fontmenu.infobar Infobar
 fontmenu.menu Menü
+<<<<<<< HEAD
 fontmenu.scaling Schriftgrößenfaktor
 fontmenu.scaling_x Horizontal
 fontmenu.scaling_y Vertikal
+=======
+fontmenu.other Andere
+fontmenu.scaling Schriftgrössenfaktor
+fontmenu.scaling_x Horizontal (in %)
+fontmenu.scaling_x_hint2 Horizontal (in %) min 50 / max 200
+fontmenu.scaling_y Vertikal (in %)
+fontmenu.scaling_y_hint2 Vertikal (in %) min 50 / max 200
+>>>>>>> origin/next-cc
 fontmenu.sizes Schriftgrössen
 fontsize.channel_num_zap Direktauswahl
 fontsize.channellist Kanalliste
@@ -643,6 +657,7 @@ fontsize.menu Menütext
 fontsize.menu_hint Menü-Hilfe
 fontsize.menu_info Menüinfo
 fontsize.menu_title Menütitel
+<<<<<<< HEAD
 glcd.brightness Helligkeit
 glcd.brightness_standby Helligkeit in Standby
 glcd.color.black Schwarz
@@ -672,6 +687,9 @@ glcd.size_time Uhrzeit-Größe
 glcd.size_time_standby Uhrzeit-Größe in Standby
 glcd.time_in_standby Zeitanzeige in Standby
 glcd.volume Lautstärke
+=======
+fontsize.subtitles Text Untertitel
+>>>>>>> origin/next-cc
 hdd_10min 10 min.
 hdd_1min 1 min.
 hdd_20min 20 min.
@@ -681,20 +699,20 @@ hdd_60min 60 min.
 hdd_activate Übernehmen
 hdd_check Dateisystemprüfung
 hdd_check_failed Festplattenprüfung fehlgeschlagen
-hdd_ext3 ext3
+hdd_check_format_bad Überprüfung von Datenträgern mit Format %s wird nicht unterstützt.
 hdd_extended_settings Erweiterte Festplatteneinstellungen
 hdd_fast Schnell
 hdd_format Formatiere Festplatte
 hdd_format_failed Formatierung fehlgeschlagen
 hdd_format_warn Formatierung wird gestartet
-hdd_fs Dateisystem
+hdd_fs Dateisystem zum formatieren
+hdd_fs_unknown unbekannt
 hdd_manage Laufwerke verwalten
 hdd_middle Mittel
 hdd_mount einhängen
 hdd_mount_umount Laufwerke ein-/aushängen
 hdd_noise Akustikkontrolle (AAM)
 hdd_not_found Keine Festplatte
-hdd_reiser ReiserFS
 hdd_removable_device Wechseldatenträger
 hdd_settings Laufwerke
 hdd_sleep Ausschalten nach...
@@ -980,6 +998,7 @@ menu.hint_games Zeige Liste der installierten Spiele
 menu.hint_hdd Formatierung und Prüfung der Datenträger
 menu.hint_hdd_apply Die veränderten Einstellungen zum Sleep- und Akustik-Modus werden übernommen
 menu.hint_hdd_check Überprüft das Dateisystem und führt gegebenfalls eine Reparatur durch (fsck)
+menu.hint_hdd_fmt Wählen Sie das Datenträgerformat aus
 menu.hint_hdd_format Erstellt eine Partition auf dem Datenträger und formatiert diese
 menu.hint_hdd_noise Setzen Sie Parameter für das Automatic Acoustic Management.\nNicht alle Laufwerke unterstützen diese Funktion
 menu.hint_hdd_sleep Dieser Wert definiert, nach wieviel Minuten die Festplatte bei Inaktivität in den Sleep-Modus geschaltet wird
@@ -1050,6 +1069,7 @@ menu.hint_key_pic_size_active Die Taste für das 4:3 Anzeigeverhalten deaktivier
 menu.hint_key_pip_close Tastenzuordnung für Stop PiP oder Start mit aktuellem Kanal
 menu.hint_key_pip_setup Tastenzuordnung für PiP Konfiguration
 menu.hint_key_pip_swap Tastenzuordnung zum Umschalten PiP und aktuellem Kanal
+menu.hint_key_plugin Wählen Sie eine Taste für das Schnellstart-Plugin
 menu.hint_key_poweroff Wählen Sie eine Taste für den Standby und für das Verhalten für Standby und Deep-Standby
 menu.hint_key_quickzap Konfigurieren Sie die Tastenbelegung für die Schnellumschaltung
 menu.hint_key_record Konfigurieren Sie die Taste für den Aufnahmestart
@@ -1079,8 +1099,14 @@ menu.hint_leds_deepstandby Definiert den Status der Power-LEDs im Deep-Standby
 menu.hint_leds_record Definiert, ob die Power-LEDs blinken sollen, wenn eine Aufnahme aktiv ist
 menu.hint_leds_standby Definiert den Status der Power-LEDs im Standby
 menu.hint_leds_tv Definiert den Status der Power-LEDs im TV-Modus
+<<<<<<< HEAD
 menu.hint_load Laden der Neutrino-Einstellungen aus einer Datei
 menu.hint_longkeypress_duration Tasten, die länger als die angegebene Zeit betätigt werden, werden als "langer Tastendruck" behandelt.
+=======
+menu.hint_load Laden der Neutrino-HD-Einstellungen aus einer Datei
+menu.hint_longkeypress_duration Tasten, die länger als die angegebene Zeit betätigt werden, werden als "langer Tastendruck" behandelt.
+menu.hint_lua Plugins ausführen
+>>>>>>> origin/next-cc
 menu.hint_make_hdlist Bei aktiver Option wird ein Bouquet namens 'HD' erzeugt, in dem alle HD-Sender zusammengefasst sind
 menu.hint_make_newlist Nach einer Kanalsuche wird ein Bouquet namens 'neue Kanäle' erzeugt
 menu.hint_make_removedlist Nach einer Kanalsuche wird ein Bouquet namens 'gelöschte Kanäle' erzeugt
@@ -1102,7 +1128,11 @@ menu.hint_misc_general Standby-, Teletext- und Rotor-Einstellungen, Pluginverzei
 menu.hint_misc_kerneloptions Wählen Sie die Kernel-Module aus, die zusätzlich geladen werden sollen
 menu.hint_misc_zapit Verwaltung der Start-Kanäle für den TV/Radio-Modus
 menu.hint_movie Wiedergabe von Filmen
+<<<<<<< HEAD
 menu.hint_moviebrowser_setup Legen Sie Auswahl- und Anzeigeoptionen des MovieBrowsers fest
+=======
+menu.hint_movieplayer_plugin Wählen Sie ein Plugin, das mit einer Schnellstart-Taste im Movieplayer-Modus gestartet wird
+>>>>>>> origin/next-cc
 menu.hint_net_broadcast Ändern Sie die Broadcast-Adresse.\nWenn Sie unsicher sind, verwenden Sie zuletzt .255
 menu.hint_net_dhcp Verwenden Sie einen DHCP-Server für die automatische Vergabe einer IP-Adresse im Netzwerk
 menu.hint_net_djmount Mountet UPnP-Geräte als Dateisystem unter /media/00upnp
@@ -1140,8 +1170,12 @@ menu.hint_new_zap_mode Aktiviert Quickzap in der Kanalliste. Nach Betätigen der
 menu.hint_nkplay Wiedergabe von netzkino.de-Filmen
 menu.hint_nkplayback_setup Konfigurieren Sie Netzkino-spezifische Optionen wie maximale Ergebnisse bei Suchen oder Cache-Verzeichnis
 menu.hint_numeric_adjust Adjust channel list mode on numeric zap
+<<<<<<< HEAD
 menu.hint_opkg Hier können Sie neue Software-Pakete installieren oder vorhandene aktualisieren
 menu.hint_opkg_upgrade Aktualisiert alle installierten Pakete auf die neueste verfügbare Version
+=======
+menu.hint_onekey_plugin Wählen Sie ein Plugin, das mit einer Schnellstart-Taste gestartet wird
+>>>>>>> origin/next-cc
 menu.hint_osd Farben, Schriftarten, Anzeigegröße, Ansichtsoptionen der Menüs und mehr
 menu.hint_osd_language Wählen Sie ihre Menü-Sprache
 menu.hint_osd_preset Wählen Sie zwischen Röhren-TV (CRT) oder Flachbildschirm (LCD)
@@ -1156,6 +1190,10 @@ menu.hint_pictureviewer_scaling Stellen Sie die Bildauflösung ein
 menu.hint_pictureviewer_setup Konfigurieren Sie die Bildbetrachter-Optionen
 menu.hint_pictureviewer_slide_time Ändern Sie den Diashow-Intervall.\nStandardmäßig sind 10 Sekunden eingstellt
 menu.hint_picview Bilder anzeigen
+menu.hint_plugin_type_games Legt fest, ob Spiele im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
+menu.hint_plugin_type_lua Legt fest, ob Plugins im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
+menu.hint_plugin_type_scripts Legt fest, ob Skripte im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
+menu.hint_plugin_type_tools Legt fest, ob Werkzeuge im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
 menu.hint_plugins_hdd_dir Auswahl des Verzeichnisses zum Laden der Plugins von einem externen Datenträger
 menu.hint_power_leds Konfiguriert das Verhalten der LEDs an der Power-Taste
 menu.hint_pref_lang Wählen Sie ihre bevorzugte Tonspur und EPG-Sprache,\ndie Einstellung 'none' deaktiviert diese Option
@@ -1633,12 +1671,18 @@ movieplayer.bookmark Bookmarks
 movieplayer.bookmarkname Bookmark Name
 movieplayer.bookmarkname_hint1 Geben Sie den Namen für das neue Lesezeichen ein
 movieplayer.bookmarkname_hint2 
+movieplayer.chapters Kapitel
 movieplayer.defplugin Start-Plugin
 movieplayer.fileplayback Datei-Browser
 movieplayer.head Movieplayer
+<<<<<<< HEAD
 movieplayer.nkplayback Netzkino
 movieplayer.starting Wiedergabe starten ...
 movieplayer.stopping Wiedergabe wird beendet ...
+=======
+movieplayer.starting Wiedergabe starten...
+movieplayer.titles Titel
+>>>>>>> origin/next-cc
 movieplayer.toomanybookmarks Sie haben bereits zu viele Lesezeichen angelegt.\nEs muß erst ein anderes gelöscht werden.
 movieplayer.tshelp1 Stopp
 movieplayer.tshelp10 ca. 10 Minuten zurück
@@ -1662,7 +1706,7 @@ mpkey.next3dmode Nächster 3D-Modus
 mpkey.next_repeat_mode Nächster Wiederholungs-Modus
 mpkey.pause Pause
 mpkey.play Play
-mpkey.plugin Starte Plugin
+mpkey.plugin Movieplayer-Plugin
 mpkey.rewind Rücklauf
 mpkey.stop Stopp
 mpkey.subtitle Untertitel
@@ -2099,11 +2143,16 @@ streaming.slow System oder Datenträger zu langsam! Bitte ggf. einige Aufnahmen 
 streaming.write_error Die Aufnahme wurde leider abgebrochen,\nda ein Fehler beim Schreiben der Daten auftrat.
 stringinput.caps Groß-/Kleinbuchstaben
 stringinput.clear Alles löschen
+<<<<<<< HEAD
 subtitles.delay Verzögerung DVB-Untertitel
+=======
+subtitles.charset Zeichensatz
+>>>>>>> origin/next-cc
 subtitles.head Untertitel
 subtitles.stop Untertitel aus
 terrestrialsetup.area Region
 terrestrialsetup.provider DVB-T Versorgungsbereich
+<<<<<<< HEAD
 three.d.off Deaktiviert
 three.d.save Für Kanal speichern
 three.d.settings 3D-Einstellung
@@ -2111,6 +2160,8 @@ three.d.settings.general Verfahren
 three.d.sideside Side-by-Side
 three.d.tile Tile
 three.d.topbottom Top-and-Bottom
+=======
+>>>>>>> origin/next-cc
 timer.eventrecord.msg Die Sendung wurde zur Aufnahme vorgemerkt.
 timer.eventrecord.title Aufnahme vormerken
 timer.eventremoved.msg Die Aufnahme der Sendung wurde storniert.

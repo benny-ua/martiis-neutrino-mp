@@ -640,6 +640,7 @@ const char * locale_real_names[] =
 	"fontmenu.head",
 	"fontmenu.infobar",
 	"fontmenu.menu",
+	"fontmenu.other",
 	"fontmenu.scaling",
 	"fontmenu.scaling_x",
 	"fontmenu.scaling_y",
@@ -670,6 +671,7 @@ const char * locale_real_names[] =
 	"fontsize.menu_hint",
 	"fontsize.menu_info",
 	"fontsize.menu_title",
+<<<<<<< HEAD
 	"glcd.brightness",
 	"glcd.brightness_standby",
 	"glcd.color.black",
@@ -699,6 +701,9 @@ const char * locale_real_names[] =
 	"glcd.size_time_standby",
 	"glcd.time_in_standby",
 	"glcd.volume",
+=======
+	"fontsize.subtitles",
+>>>>>>> origin/next-cc
 	"hdd_10min",
 	"hdd_1min",
 	"hdd_20min",
@@ -708,20 +713,20 @@ const char * locale_real_names[] =
 	"hdd_activate",
 	"hdd_check",
 	"hdd_check_failed",
-	"hdd_ext3",
+	"hdd_check_format_bad",
 	"hdd_extended_settings",
 	"hdd_fast",
 	"hdd_format",
 	"hdd_format_failed",
 	"hdd_format_warn",
 	"hdd_fs",
+	"hdd_fs_unknown",
 	"hdd_manage",
 	"hdd_middle",
 	"hdd_mount",
 	"hdd_mount_umount",
 	"hdd_noise",
 	"hdd_not_found",
-	"hdd_reiser",
 	"hdd_removable_device",
 	"hdd_settings",
 	"hdd_sleep",
@@ -1007,6 +1012,7 @@ const char * locale_real_names[] =
 	"menu.hint_hdd",
 	"menu.hint_hdd_apply",
 	"menu.hint_hdd_check",
+	"menu.hint_hdd_fmt",
 	"menu.hint_hdd_format",
 	"menu.hint_hdd_noise",
 	"menu.hint_hdd_sleep",
@@ -1077,6 +1083,7 @@ const char * locale_real_names[] =
 	"menu.hint_key_pip_close",
 	"menu.hint_key_pip_setup",
 	"menu.hint_key_pip_swap",
+	"menu.hint_key_plugin",
 	"menu.hint_key_poweroff",
 	"menu.hint_key_quickzap",
 	"menu.hint_key_record",
@@ -1108,6 +1115,10 @@ const char * locale_real_names[] =
 	"menu.hint_leds_tv",
 	"menu.hint_load",
 	"menu.hint_longkeypress_duration",
+<<<<<<< HEAD
+=======
+	"menu.hint_lua",
+>>>>>>> origin/next-cc
 	"menu.hint_make_hdlist",
 	"menu.hint_make_newlist",
 	"menu.hint_make_removedlist",
@@ -1129,7 +1140,11 @@ const char * locale_real_names[] =
 	"menu.hint_misc_kerneloptions",
 	"menu.hint_misc_zapit",
 	"menu.hint_movie",
+<<<<<<< HEAD
 	"menu.hint_moviebrowser_setup",
+=======
+	"menu.hint_movieplayer_plugin",
+>>>>>>> origin/next-cc
 	"menu.hint_net_broadcast",
 	"menu.hint_net_dhcp",
 	"menu.hint_net_djmount",
@@ -1167,8 +1182,12 @@ const char * locale_real_names[] =
 	"menu.hint_nkplay",
 	"menu.hint_nkplayback_setup",
 	"menu.hint_numeric_adjust",
+<<<<<<< HEAD
 	"menu.hint_opkg",
 	"menu.hint_opkg_upgrade",
+=======
+	"menu.hint_onekey_plugin",
+>>>>>>> origin/next-cc
 	"menu.hint_osd",
 	"menu.hint_osd_language",
 	"menu.hint_osd_preset",
@@ -1183,6 +1202,10 @@ const char * locale_real_names[] =
 	"menu.hint_pictureviewer_setup",
 	"menu.hint_pictureviewer_slide_time",
 	"menu.hint_picview",
+	"menu.hint_plugin_type_games",
+	"menu.hint_plugin_type_lua",
+	"menu.hint_plugin_type_scripts",
+	"menu.hint_plugin_type_tools",
 	"menu.hint_plugins_hdd_dir",
 	"menu.hint_power_leds",
 	"menu.hint_pref_lang",
@@ -1662,12 +1685,17 @@ const char * locale_real_names[] =
 	"movieplayer.bookmarkname",
 	"movieplayer.bookmarkname_hint1",
 	"movieplayer.bookmarkname_hint2",
+	"movieplayer.chapters",
 	"movieplayer.defplugin",
 	"movieplayer.fileplayback",
 	"movieplayer.head",
 	"movieplayer.nkplayback",
 	"movieplayer.starting",
+<<<<<<< HEAD
 	"movieplayer.stopping",
+=======
+	"movieplayer.titles",
+>>>>>>> origin/next-cc
 	"movieplayer.toomanybookmarks",
 	"movieplayer.tshelp1",
 	"movieplayer.tshelp10",
@@ -2128,11 +2156,16 @@ const char * locale_real_names[] =
 	"streaming.write_error",
 	"stringinput.caps",
 	"stringinput.clear",
+<<<<<<< HEAD
 	"subtitles.delay",
+=======
+	"subtitles.charset",
+>>>>>>> origin/next-cc
 	"subtitles.head",
 	"subtitles.stop",
 	"terrestrialsetup.area",
 	"terrestrialsetup.provider",
+<<<<<<< HEAD
 	"three.d.off",
 	"three.d.save",
 	"three.d.settings",
@@ -2140,6 +2173,8 @@ const char * locale_real_names[] =
 	"three.d.sideside",
 	"three.d.tile",
 	"three.d.topbottom",
+=======
+>>>>>>> origin/next-cc
 	"timer.eventrecord.msg",
 	"timer.eventrecord.title",
 	"timer.eventremoved.msg",

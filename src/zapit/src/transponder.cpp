@@ -146,7 +146,11 @@ void transponder::dump(std::string label)
 				transponder_id, dvb_feparams->frequency, dvb_feparams->u.qpsk.symbol_rate,
 				dvb_feparams->u.qpsk.fec_inner, polarization);
 	else if (deltype == FE_OFDM)
+<<<<<<< HEAD
 		printf("%s tp-id %016" PRIx64 " freq %d bw %d coderate %d\n", label.c_str(),
+=======
+		printf("%s tp-id %016llx freq %d bw %d coderate %d\n", label.c_str(),
+>>>>>>> origin/next-cc
 				transponder_id, dvb_feparams->frequency, dvb_feparams->u.ofdm.bandwidth,
 				dvb_feparams->u.ofdm.code_rate_HP);
 }

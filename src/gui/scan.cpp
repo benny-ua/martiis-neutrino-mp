@@ -2,6 +2,11 @@
 	Neutrino-GUI  -   DBoxII-Project
 
 	Copyright (C) 2001 Steffen Hehn 'McClean'
+<<<<<<< HEAD
+=======
+	Homepage: http://dbox.cyberphoria.org/
+
+>>>>>>> origin/next-cc
 	Copyright (C) 2011-2012 Stefan Seyfried
 
 	License: GPL
@@ -154,7 +159,8 @@ void CScanTs::testFunc()
 	} else if (deltype == FE_OFDM) {
 		sprintf(buffer, "%u", TP.feparams.dvb_feparams.frequency); /* no way int can overflow the buffer */
 	}
-printf("CScanTs::testFunc: %s\n", buffer);
+
+	printf("CScanTs::testFunc: %s\n", buffer);
 	paintLine(xpos2, ypos_cur_satellite, w - 95, pname.c_str());
 	paintLine(xpos2, ypos_frequency, w, buffer);
 	paintRadar();
@@ -237,7 +243,11 @@ int CScanTs::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
 			TP.polarization = scansettings.sat_TP_pol;
 		} else if (deltype == FE_OFDM) {
 			/* DVB-T. TODO: proper menu and parameter setup, not all "AUTO" */
+<<<<<<< HEAD
 			TP.feparams.dvb_feparams.frequency = atoi(scansettings.terr_TP_freq);
+=======
+			TP.feparams.dvb_feparams.frequency = atoi(scansettings.terr_TP_freq.c_str());
+>>>>>>> origin/next-cc
 			if (TP.feparams.dvb_feparams.frequency < 300000)
 				TP.feparams.dvb_feparams.u.ofdm.bandwidth	= BANDWIDTH_7_MHZ;
 			else

@@ -36,7 +36,11 @@
 
 
 
+<<<<<<< HEAD
 CTimeOSD::CTimeOSD():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", false, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
+=======
+CTimeOSD::CTimeOSD():CComponentsFrmClock( 0, 0, 0, 50, "%H:%M:%S", true, NULL, CC_SHADOW_ON, COL_LIGHT_GRAY, COL_MENUCONTENT_PLUS_0,COL_MENUCONTENTDARK_PLUS_0)
+>>>>>>> origin/next-cc
 {
 	Init();
 }

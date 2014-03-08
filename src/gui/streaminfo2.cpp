@@ -580,9 +580,19 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	const char *p;
 
 	//satellite
+<<<<<<< HEAD
 	transponder t;
 	if (!mp) {
 		CServiceManager::getInstance()->GetTransponder(channel->getTransponderId(), t);
+=======
+	ypos += iheight;
+	if(t.deltype == FE_QPSK)
+		sprintf (buf, "%s:",g_Locale->getText (LOCALE_SATSETUP_SATELLITE));//swiped locale
+	else if(t.deltype == FE_QAM)
+		sprintf (buf, "%s:",g_Locale->getText (LOCALE_CHANNELLIST_PROVS));
+	else
+		snprintf (buf, sizeof(buf), "%s:",g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA));
+>>>>>>> origin/next-cc
 
 		ypos += iheight;
 		if(t.deltype == FE_QPSK)

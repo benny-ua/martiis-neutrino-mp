@@ -171,6 +171,9 @@ static bool nhttpd_thread_started = false;
 //#define DISABLE_SECTIONSD
 
 extern cVideo * videoDecoder;
+#ifdef ENABLE_PIP
+extern cVideo *pipDecoder;
+#endif
 extern cDemux *videoDemux;
 extern cAudio * audioDecoder;
 cPowerManager *powerManager;
@@ -450,7 +453,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 #endif
 	g_settings.rounded_corners = configfile.getInt32("rounded_corners", 1);
 	g_settings.ci_standby_reset = configfile.getInt32("ci_standby_reset", 0);
-	g_settings.ci_clock = configfile.getInt32("ci_clock", 7);
+	g_settings.ci_clock = configfile.getInt32("ci_clock", 9);
 	g_settings.ci_ignore_messages = configfile.getInt32("ci_ignore_messages", 0);
 
 #ifndef CPU_FREQ
@@ -546,6 +549,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 		g_settings.pref_lang[i] = configfile.getString("pref_lang_" + i_str, "none");
 		g_settings.pref_subs[i] = configfile.getString("pref_subs_" + i_str, "none");
 	}
+	g_settings.subs_charset = configfile.getString("subs_charset", "CP1252");
 	g_settings.zap_cycle = configfile.getInt32( "zap_cycle", 0 );
 
 	//vcr
@@ -680,7 +684,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.recording_startstop_msg	   = configfile.getBool("recording_startstop_msg"     , true);
 
 	// default plugin for movieplayer
-	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "Teletext" );
+	g_settings.movieplayer_plugin = configfile.getString( "movieplayer_plugin", "noplugin" );
 	g_settings.onekey_plugin = configfile.getString( "onekey_plugin", "noplugin" );
 	g_settings.plugin_hdd_dir = configfile.getString( "plugin_hdd_dir", "/media/sda1/plugins" );
 
@@ -959,6 +963,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.pip_y = configfile.getInt32("pip_y", 50);
 	g_settings.pip_width = configfile.getInt32("pip_width", 365);
 	g_settings.pip_height = configfile.getInt32("pip_height", 200);
+
+	g_settings.pip_radio_x = configfile.getInt32("pip_radio_x", g_settings.pip_x);
+	g_settings.pip_radio_y = configfile.getInt32("pip_radio_y", g_settings.pip_y);
+	g_settings.pip_radio_width = configfile.getInt32("pip_radio_width", g_settings.pip_width);
+	g_settings.pip_radio_height = configfile.getInt32("pip_radio_height", g_settings.pip_height);
 #endif
 
 	g_settings.infoClockFormat0 = configfile.getString("infoClockFormat0", "%H:%M:%S");
@@ -1122,7 +1131,11 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		configfile.setString("pref_lang_" + i_str, g_settings.pref_lang[i]);
 		configfile.setString("pref_subs_" + i_str, g_settings.pref_subs[i]);
 	}
+<<<<<<< HEAD
 	configfile.setInt32( "dvb_subtitle_delay", g_settings.dvb_subtitle_delay );
+=======
+	configfile.setString("subs_charset", g_settings.subs_charset);
+>>>>>>> origin/next-cc
 
 	//vcr
 	configfile.setBool("vcr_AutoSwitch"       , g_settings.vcr_AutoSwitch       );
@@ -1418,6 +1431,11 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("pip_y", g_settings.pip_y);
 	configfile.setInt32("pip_width", g_settings.pip_width);
 	configfile.setInt32("pip_height", g_settings.pip_height);
+
+	configfile.setInt32("pip_radio_x", g_settings.pip_radio_x);
+	configfile.setInt32("pip_radio_y", g_settings.pip_radio_y);
+	configfile.setInt32("pip_radio_width", g_settings.pip_radio_width);
+	configfile.setInt32("pip_radio_height", g_settings.pip_radio_height);
 #endif
 	configfile.setString("infoClockFormat0", g_settings.infoClockFormat0);
 	configfile.setString("infoClockFormat1", g_settings.infoClockFormat1);
@@ -2166,7 +2184,10 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 #if !HAVE_SPARK_HARDWARE
 	cpuFreq = new cCpuFreqManager();
 	cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> origin/next-cc
 	switch (CFEManager::getInstance()->getLiveFE()->getInfo()->type) {
 		case FE_QPSK:
 			g_info.delivery_system = DVB_S;
@@ -2248,6 +2269,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	//load Pluginlist before main menu (only show script menu if at least one script is available
 	g_PluginList->loadPlugins();
 
+<<<<<<< HEAD
 	MoviePluginChanger        = new CMoviePluginChangeExec;
 	AdZapChanger              = NULL;
 	batchEPGSettings	  = new CBatchEPG_Menu;
@@ -2255,6 +2277,8 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	threeDSetup		  = new C3DSetup;
 #endif
 
+=======
+>>>>>>> origin/next-cc
 	// setup recording device
 	setupRecordingDevice();
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2559,7 +2583,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				numericZap( msg );
 			}
 			else if( msg == (neutrino_msg_t) g_settings.key_plugin ) {
-				g_PluginList->start_plugin_by_name(g_settings.onekey_plugin.c_str(), 0);
+				g_PluginList->startPlugin_by_name(g_settings.onekey_plugin.c_str());
 			}
 			else if(msg == (neutrino_msg_t) g_settings.key_timeshift) {
 				if (mode == mode_webtv) {
@@ -3796,6 +3820,11 @@ void CNeutrinoApp::tvMode( bool rezap )
 	bool stopauto = (mode != mode_ts);
 	int oldmode = mode;
 	mode = mode_tv;
+#ifdef ENABLE_PIP
+	pipDecoder->Pig(g_settings.pip_x, g_settings.pip_y,
+			g_settings.pip_width, g_settings.pip_height,
+			frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));
+#endif
 	if(stopauto /*&& autoshift*/) {
 		//printf("standby on: autoshift ! stopping ...\n");
 		CRecordManager::getInstance()->StopAutoRecord();
@@ -4066,7 +4095,11 @@ void CNeutrinoApp::radioMode( bool rezap)
 		videoDecoder->Standby(false);
 	}
 	mode = mode_radio;
-
+#ifdef ENABLE_PIP
+	pipDecoder->Pig(g_settings.pip_radio_x, g_settings.pip_radio_y,
+			g_settings.pip_radio_width, g_settings.pip_radio_height,
+			frameBuffer->getScreenWidth(true), frameBuffer->getScreenHeight(true));
+#endif
 	CRecordManager::getInstance()->StopAutoRecord();
 
 	g_RemoteControl->radioMode();
@@ -4323,6 +4356,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		return menu_return::RETURN_REPAINT;
 	}
+<<<<<<< HEAD
 	else if(actionKey == "movieplugin") {
 		parent->hide();
 		CMenuWidget MoviePluginSelector(LOCALE_MOVIEPLAYER_DEFPLUGIN, NEUTRINO_ICON_FEATURES);
@@ -4342,6 +4376,8 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 		MoviePluginSelector.exec(NULL, "");
 		return menu_return::RETURN_REPAINT;
 	}
+=======
+>>>>>>> origin/next-cc
 	else if(actionKey == "clearSectionsd")
 	{
 		g_Sectionsd->freeMemory();
@@ -4601,12 +4637,16 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.mpkey_time = tconfig.getInt32( "mpkey.time", CRCInput::RC_setup );
 #endif
 	g_settings.mpkey_bookmark = tconfig.getInt32( "mpkey.bookmark", CRCInput::RC_blue );
+<<<<<<< HEAD
 	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", CRCInput::RC_red );
 	g_settings.mpkey_next3dmode = tconfig.getInt32( "mpkey.next3dmode", CRCInput::RC_nokey );
 	g_settings.mpkey_next_repeat_mode = tconfig.getInt32( "mpkey.next_repeat_mode", CRCInput::RC_playmode );
 	g_settings.mpkey_vtxt = tconfig.getInt32( "mpkey.vtxt", CRCInput::RC_text );
 	g_settings.mpkey_goto = tconfig.getInt32( "mpkey.goto", CRCInput::RC_nokey );
 
+=======
+	g_settings.mpkey_plugin = tconfig.getInt32( "mpkey.plugin", (unsigned int)CRCInput::RC_nokey );
+>>>>>>> origin/next-cc
 	g_settings.mpkey_subtitle = tconfig.getInt32( "mpkey.subtitle", CRCInput::RC_sub );
 
 	g_settings.key_format_mode_active = tconfig.getInt32( "key_format_mode_active", 1 );
@@ -4618,6 +4658,7 @@ void CNeutrinoApp::loadKeys(const char * fname)
 	g_settings.key_click = tconfig.getInt32( "key_click", 1 );
 	g_settings.repeat_blocker = tconfig.getInt32("repeat_blocker", 450);
 	g_settings.repeat_genericblocker = tconfig.getInt32("repeat_genericblocker", 100);
+	g_settings.longkeypress_duration = tconfig.getInt32("longkeypress_duration", LONGKEYPRESS_OFF);
 
 	if (g_settings.conf_version < 1) {
 		// Use default key repeat settings when upgrading from earlier releases:
@@ -4707,9 +4748,12 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "repeat_blocker", g_settings.repeat_blocker );
 	tconfig.setInt32( "repeat_genericblocker", g_settings.repeat_genericblocker );
 	tconfig.setInt32( "longkeypress_duration", g_settings.longkeypress_duration );
+<<<<<<< HEAD
 #if HAVE_SPARK_HARDWARE
 	tconfig.setInt32("accept_other_remotes", g_settings.accept_other_remotes);
 #endif
+=======
+>>>>>>> origin/next-cc
 
 	tconfig.setInt32( "bouquetlist_mode", g_settings.bouquetlist_mode );
 	tconfig.setInt32( "sms_channel", g_settings.sms_channel );
@@ -5022,7 +5066,6 @@ void CNeutrinoApp::Cleanup()
 
 	printf("cleanup 13\n");fflush(stdout);
 	delete audioSetupNotifier; audioSetupNotifier = NULL;
-	delete MoviePluginChanger; MoviePluginChanger = NULL;
 	printf("cleanup 14\n");fflush(stdout);
 
 	delete TVbouquetList; TVbouquetList = NULL;

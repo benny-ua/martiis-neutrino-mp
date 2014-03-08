@@ -81,6 +81,7 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			MPKEY_VTXT,
 			NKEY_TIMESHIFT,
 			MPKEY_PLUGIN,
+<<<<<<< HEAD
 			NKEY_UNLOCK,
 			NKEY_HELP,
 			NKEY_NEXT43MODE,
@@ -93,6 +94,17 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 			NKEY_PIC_MODE,
 			NKEY_PIC_SIZE,
 			NKEY_RECORD,
+=======
+			KEY_PLUGIN,
+			KEY_UNLOCK,
+			KEY_SCREENSHOT,
+			KEY_PIP_CLOSE,
+			KEY_PIP_SETUP,
+			KEY_PIP_SWAP,
+			KEY_FORMAT_MODE,
+			KEY_PIC_MODE,
+			KEY_PIC_SIZE,
+>>>>>>> origin/next-cc
 			
 			KEYBINDS_COUNT
 		};

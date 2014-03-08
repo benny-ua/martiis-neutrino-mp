@@ -35,7 +35,11 @@
 
 #include <gui/color.h>
 #include <stdio.h>
+#include <math.h>
 
+#ifndef FLT_EPSILON
+#define FLT_EPSILON 1E-5
+#endif
 
 int convertSetupColor2RGB(const unsigned char r, const unsigned char g, const unsigned char b)
 {
@@ -147,6 +151,7 @@ fb_pixel_t changeBrightnessRGB(fb_pixel_t color, unsigned char br)
 
 void Hsv2Rgb(HsvColor *hsv, RgbColor *rgb)
 {
+<<<<<<< HEAD
 	unsigned char region, remainder, p, q, t;
 
 	if (hsv->s == 0) {
@@ -182,6 +187,53 @@ void Hsv2Rgb(HsvColor *hsv, RgbColor *rgb)
 		default:
 			rgb->r = hsv->v; rgb->g = p; rgb->b = q;
 			break;
+=======
+	float f_H = hsv->h;
+	float f_S = hsv->s;
+	float f_V = hsv->v;
+	if (fabsf(f_S) < FLT_EPSILON) {
+		rgb->r = (uint8_t)(f_V * 255);
+		rgb->g = (uint8_t)(f_V * 255);
+		rgb->b = (uint8_t)(f_V * 255);
+
+	} else {
+		float f_R;
+		float f_G;
+		float f_B;
+		float hh = f_H;
+		if (hh >= 360) hh = 0;
+		hh /= 60;
+		int i = (int)hh;
+		float ff = hh - (float)i;
+		float p = f_V * (1 - f_S);
+		float q = f_V * (1 - (f_S * ff));
+		float t = f_V * (1 - (f_S * (1 - ff)));
+
+		switch (i) {
+			case 0:
+				f_R = f_V; f_G = t; f_B = p;
+				break;
+			case 1:
+				f_R = q; f_G = f_V; f_B = p;
+				break;
+			case 2:
+				f_R = p; f_G = f_V; f_B = t;
+				break;
+			case 3:
+				f_R = p; f_G = q; f_B = f_V;
+				break;
+			case 4:
+				f_R = t; f_G = p; f_B = f_V;
+				break;
+			case 5:
+			default:
+				f_R = f_V; f_G = p; f_B = q;
+				break;
+		}
+		rgb->r = (uint8_t)(f_R * 255);
+		rgb->g = (uint8_t)(f_G * 255);
+		rgb->b = (uint8_t)(f_B * 255);
+>>>>>>> origin/next-cc
 	}
 
 	return;
@@ -189,6 +241,7 @@ void Hsv2Rgb(HsvColor *hsv, RgbColor *rgb)
 
 void Rgb2Hsv(RgbColor *rgb, HsvColor *hsv)
 {
+<<<<<<< HEAD
 	unsigned char rgbMin, rgbMax;
 
 	rgbMin = rgb->r < rgb->g ? (rgb->r < rgb->b ? rgb->r : rgb->b) : (rgb->g < rgb->b ? rgb->g : rgb->b);
@@ -205,6 +258,35 @@ void Rgb2Hsv(RgbColor *rgb, HsvColor *hsv)
 	if (hsv->s == 0) {
 		hsv->h = 0;
 		return;
+=======
+	float f_R = (float)rgb->r / (float)255;
+	float f_G = (float)rgb->g / (float)255;
+	float f_B = (float)rgb->b / (float)255;
+
+	float min = f_R < f_G ? (f_R < f_B ? f_R : f_B) : (f_G < f_B ? f_G : f_B);
+	float max = f_R > f_G ? (f_R > f_B ? f_R : f_B) : (f_G > f_B ? f_G : f_B);
+	float delta = max - min;
+
+	float f_V = max;
+	float f_H = 0;
+	float f_S = 0;
+
+	if (fabsf(delta) < FLT_EPSILON) { //gray
+		f_S = 0;
+		f_H = 0;
+	} else {
+		f_S = (delta / max);
+		if (f_R >= max)
+			f_H = (f_G - f_B) / delta;
+		else if (f_G >= max)
+			f_H = 2 + (f_B - f_R) / delta;
+		else
+			f_H = 4 + (f_R - f_G) / delta;
+
+		f_H *= 60;
+		if (f_H < 0)
+			f_H += 360;
+>>>>>>> origin/next-cc
 	}
 
 	if (rgbMax == rgb->r)

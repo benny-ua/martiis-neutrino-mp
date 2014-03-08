@@ -157,7 +157,11 @@ class CMenuItem
 		virtual void setMarked(const bool Marked);
 		virtual void setInert(const bool Inert);
 		
+<<<<<<< HEAD
 		virtual void paintItemButton(const bool select_mode, int item_height, const char * const icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
+=======
+		virtual void paintItemButton(const bool select_mode, const int &item_height, const std::string& icon_Name = NEUTRINO_ICON_BUTTON_RIGHT);
+>>>>>>> origin/next-cc
 		
 		virtual void prepareItem(const bool select_mode, const int &item_height);
 
@@ -413,11 +417,14 @@ class CMenuOptionStringChooser : public CMenuItem
 		void sortOptions();
 		int exec(CMenuTarget* parent);
 		int isMenueOptionChooser(void) const{return 1;}
+<<<<<<< HEAD
 		void setOptionValue(std::string &val) {
 			if (!optionValuePtr) optionValuePtr = &optionValue;
 			*optionValuePtr = val;
 		}
 		std::string getOptionValue() { return *optionValuePtr; }
+=======
+>>>>>>> origin/next-cc
 };
 
 class CMenuGlobal
