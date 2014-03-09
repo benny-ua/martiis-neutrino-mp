@@ -65,7 +65,7 @@ std::string strftime(const char *format, const struct tm *tm);
 std::string strftime(const char *format, time_t when, bool gm = false);
 time_t toEpoch(std::string &date);
 std::string& str_replace(const std::string &search, const std::string &replace, std::string &text);
-std::string& htmlEntityDecode(std::string& text);
+std::string& htmlEntityDecode(std::string& text, bool removeTags = false);
 
 class CFileHelpers
 {
