@@ -777,6 +777,7 @@ struct SNeutrinoSettings
 		BUTTON_GREEN = 1,
 		BUTTON_YELLOW = 2,
 		BUTTON_BLUE = 3,
+		BUTTON_MAX
 	} USER_BUTTON;
 	typedef enum
 	{

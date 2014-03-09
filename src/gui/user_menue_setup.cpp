@@ -194,7 +194,7 @@ neutrino_locale_t CUserMenuSetup::getLocale(unsigned int key)
 
 int CUserMenuSetup::showSetup()
 {
-	mn_widget_id_t widget_id = (button < 4) ? MN_WIDGET_ID_USERMENU_RED + button : NO_WIDGET_ID;
+	mn_widget_id_t widget_id = (button < SNeutrinoSettings::BUTTON_MAX) ? MN_WIDGET_ID_USERMENU_RED + button : NO_WIDGET_ID;
 	ums = new CMenuWidget(local, NEUTRINO_ICON_KEYBINDING, width, widget_id);
 
 	ums->addIntroItems();
@@ -205,7 +205,7 @@ int CUserMenuSetup::showSetup()
 
 	ums->addItem(mf);
 
-	if (button > 3 /* BLUE */) {
+	if (button >= SNeutrinoSettings::BUTTON_MAX) {
 		CKeyChooser *kc = new CKeyChooser(&g_settings.usermenu[button]->key, LOCALE_USERMENU_KEY_SELECT, NEUTRINO_ICON_SETTINGS);
 		CMenuDForwarder *kf = new CMenuDForwarder(LOCALE_USERMENU_KEY, true, kc->getKeyName(), kc);
 		ums->addItem(kf);

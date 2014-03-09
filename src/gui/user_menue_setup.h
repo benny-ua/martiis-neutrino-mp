@@ -50,7 +50,7 @@ typedef struct usermenu_props_t
 
 }usermenu_props_struct_t;
 
-#define USERMENU_ITEMS_COUNT 4
+#define USERMENU_ITEMS_COUNT SNeutrinoSettings::BUTTON_MAX
 const struct usermenu_props_t usermenu[USERMENU_ITEMS_COUNT] =
 {
 	{LOCALE_USERMENU_BUTTON_RED	, SNeutrinoSettings::BUTTON_RED		, CRCInput::RC_red	,NEUTRINO_ICON_BUTTON_RED	,LOCALE_INFOVIEWER_EVENTLIST	},

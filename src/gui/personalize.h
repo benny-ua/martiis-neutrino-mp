@@ -69,7 +69,7 @@ class CUserMenuNotifier : public CChangeObserver
 {
 	private:
 
-		CMenuItem* toDisable[4];
+		CMenuItem* toDisable[USERMENU_ITEMS_COUNT];
 
 	public:
 		CUserMenuNotifier( CMenuItem*, CMenuItem*, CMenuItem*, CMenuItem*);
