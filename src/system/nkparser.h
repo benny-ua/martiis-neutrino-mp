@@ -84,7 +84,6 @@ class cNKFeedParser
 		bool parseFeedJSON(std::string &answer);
 		bool parseCategoriesJSON(std::string &answer);
 		bool ParseFeed(std::string &url);
-		void removeHTMLMarkup(std::string &s);
 		void DownloadThumbnailsEnd(void);
 	public:
 		enum nk_feed_mode_t
