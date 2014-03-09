@@ -274,15 +274,20 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 	int icon_h = 0;
 
 	//define icon name depends of numeric value
-	if (g_settings.menu_numbers_as_icons && (!icon_name || !*icon_name) && CRCInput::isNumeric(directKey))
-		icon_name = to_string(CRCInput::getNumericValue(directKey)).c_str();
+	bool isNumeric = CRCInput::isNumeric(directKey);
+	if (isNumeric) {
+		if (g_settings.menu_numbers_as_icons)
+			icon_name = to_string(CRCInput::getNumericValue(directKey)).c_str();
+		else if (icon_name && icon_name[0] >= '0' && icon_name[0] <= '9' && !icon_name[1])
+			icon_name = NULL;
+	}
 
 	//define select icon
-	if  (selected && offx > 0)
+	if (selected && offx > 0)
 	{
 		if (selected_iconName)
 			icon_name = selected_iconName;
-		else if (!(icon_name && *icon_name) && !CRCInput::isNumeric(directKey))
+		else if (!(icon_name && *icon_name) && !isNumeric)
 			icon_name = icon_Name;
 	}
 	
@@ -292,7 +297,7 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 	int icon_space_mid = icon_start_x + icon_space_x/2;
 
 	//get data of number icon and paint
-	if (icon_name)
+	if (icon_name && *icon_name)
 	{
 		frameBuffer->getIconSize(icon_name, &icon_w, &icon_h);
 
@@ -305,7 +310,7 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 	}
 
 	//paint only number if no icon was painted and keyval is numeric
-	if (active && CRCInput::isNumeric(directKey) && !icon_painted)
+	if (active && isNumeric && !icon_painted)
 	{			
 		int number_w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(CRCInput::getKeyName(directKey));
 		
