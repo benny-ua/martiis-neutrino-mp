@@ -1093,6 +1093,7 @@ menu.hint_mb Hier spielen Sie ihre Aufnahmen und andere vorhandene Filme ab.
 menu.hint_media Abspielen von Musik, Internetradio und Filmen; Betrachten Sie Bilder
 menu.hint_menu_fonts Ändern Sie die Schriftgrößen im Menü
 menu.hint_menu_hints Zeigt Ihnen Hinweise zu den Menüpunkten an. Sie erreichen das auch jederzeit mit der Taste 'Hilfe'
+menu.hint_menu_numbers_as_icons Wählen Sie bei numerischen Direktauswahl-Tasten zwischen Text- und Icon-Anzeige.
 menu.hint_menu_pos Legen Sie die Anzeigeposition der Menüs fest
 menu.hint_menus Wählen Sie die Anzeigeoptionen für die Menüs
 menu.hint_misc_cec HDMI-CEC Optionen

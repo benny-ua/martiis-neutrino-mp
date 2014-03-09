@@ -1120,6 +1120,7 @@ const char * locale_real_names[] =
 	"menu.hint_media",
 	"menu.hint_menu_fonts",
 	"menu.hint_menu_hints",
+	"menu.hint_menu_numbers_as_icons",
 	"menu.hint_menu_pos",
 	"menu.hint_menus",
 	"menu.hint_misc_cec",

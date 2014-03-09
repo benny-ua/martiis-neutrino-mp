@@ -1050,7 +1050,7 @@ void COsdSetup::showOsdMenusSetup(CMenuWidget *menu_menus)
 
 	// numeric direct keys as numbers or icons
 	mc = new CMenuOptionChooser(LOCALE_MENU_NUMBERS_AS_ICONS, &g_settings.menu_numbers_as_icons, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	//mc->setHint("", FIXME);
+	mc->setHint("", LOCALE_MENU_HINT_MENU_NUMBERS_AS_ICONS);
 	submenu_menus->addItem(mc);
 }
 
