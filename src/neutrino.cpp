@@ -153,8 +153,6 @@ CHintBox * reloadhintBox = 0;
 CInfoClock      *InfoClock;
 int allow_flash = 1;
 Zapit_config zapitCfg;
-char zapit_lat[20]="#";
-char zapit_long[20]="#";
 bool autoshift = false;
 uint32_t scrambled_timer;
 t_channel_id standby_channel_id = 0;

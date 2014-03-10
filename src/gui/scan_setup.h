@@ -120,6 +120,8 @@ class CScanSetup : public CMenuTarget, public CChangeObserver
 		void saveScanSetup();
 
 		CScanSetup(bool wizard_mode = SCAN_SETUP_MODE_WIZARD_NO);
+		char zapit_lat[20];
+		char zapit_long[20];
 	public:	
 		enum SCAN_SETUP_MODE
 		{

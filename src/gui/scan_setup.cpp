@@ -66,8 +66,6 @@
 
 //extern std::map<transponder_id_t, transponder> select_transponders;
 extern Zapit_config zapitCfg;
-extern char zapit_lat[20];
-extern char zapit_long[20];
 /* ugly */
 extern CHintBox *reloadhintBox;
 
@@ -231,6 +229,8 @@ CScanSetup::CScanSetup(bool wizard_mode)
 	linkfe		= NULL;
 	in_menu		= false;
 	allow_start	= true;
+	zapit_lat[0] = 0;
+	zapit_long[0] = 0;
 	if (CFEManager::getInstance()->haveCable())
 		nid = new CIntInput(LOCALE_SATSETUP_CABLE_NID, &scansettings.cable_nid, 5, NONEXISTANT_LOCALE, NONEXISTANT_LOCALE);
 }
@@ -633,8 +633,8 @@ int CScanSetup::showScanMenuFrontendSetup()
 	std::string zapit_long_str;
 
 	if (CFEManager::getInstance()->haveSat()) {
-		sprintf(zapit_lat, "%02.6f", zapitCfg.gotoXXLatitude);
-		sprintf(zapit_long, "%02.6f", zapitCfg.gotoXXLongitude);
+		snprintf(zapit_lat, sizeof(zapit_lat), "%02.6f", zapitCfg.gotoXXLatitude);
+		snprintf(zapit_long, sizeof(zapit_long), "%02.6f", zapitCfg.gotoXXLongitude);
 		zapit_lat_str = std::string(zapit_lat);
 		zapit_long_str = std::string(zapit_long);
 
@@ -1460,9 +1460,9 @@ void CScanSetup::saveScanSetup()
 		dprintf(DEBUG_NORMAL, "error while saving scan-settings!\n");
 
 	//CServiceManager::getInstance()->SaveMotorPositions();
-	if(zapit_lat[0] != '#')//check if var ok
+	if(zapit_lat[0])	//check if set
 		zapitCfg.gotoXXLatitude = strtod(zapit_lat, NULL);
-	if(zapit_long[0] != '#')//check if var ok
+	if(zapit_long[0])	//check if set
 		zapitCfg.gotoXXLongitude = strtod(zapit_long, NULL);
 
 	CZapit::getInstance()->SetConfig(&zapitCfg);
