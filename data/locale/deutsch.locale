@@ -443,7 +443,8 @@ extra.neutrinosettings.title Neutrino-Einstellungen
 extra.north Norden
 extra.record_bufsize Schreib-Puffer-Größe
 extra.record_bufsize_dmx DMX-Puffer-Größe
-extra.record_time Maximale Aufnahmezeit
+extra.record_time Maximale Aufnahmedauer
+extra.record_time_ts Maximale Timeshift-Dauer
 extra.rotor_swap Rotor dreht Ost/West
 extra.rounded_corners Eckendarstellung
 extra.rounded_corners_off eckig
