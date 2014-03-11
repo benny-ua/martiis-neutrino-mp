@@ -519,7 +519,7 @@ std::string& htmlEntityDecode(std::string& text, bool removeTags)
 			}
 
 			decode_table_s *d = dt;
-			while (d->utf8Code && strncasecmp(p, d->htmlCode, d->htmlCodeLen))
+			while (d->utf8Code && strncmp(p, d->htmlCode, d->htmlCodeLen))
 				d++;
 			if (d->utf8Code) {
 				p += d->htmlCodeLen;
