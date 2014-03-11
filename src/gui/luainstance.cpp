@@ -555,6 +555,7 @@ int CLuaInstance::DisplayImage(lua_State *L)
 	if (lua_isnumber(L, 7))
 		trans = luaL_checkint(L, 7);
 	g_PicViewer->DisplayImage(fname, x, y, w, h, trans);
+	CFrameBuffer::getInstance()->blit();
 	return 0;
 }
 
@@ -892,8 +893,11 @@ int CLuaInstance::MenuNew(lua_State *L)
 	CMenuWidget *m;
 
 	if (lua_istable(L, 1)) {
-		std::string name, icon;
+		std::string name, icon, encoding;
 		tableLookup(L, "name", name) || tableLookup(L, "title", name);
+		tableLookup(L, "encoding", encoding);
+		if (encoding == "html")
+			htmlEntityDecode(name);
 		tableLookup(L, "icon", icon);
 		lua_Integer mwidth;
 		if(tableLookup(L, "mwidth", mwidth))
@@ -961,6 +965,10 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 	CLuaMenuItem *b = &m->items.back();
 
 	tableLookup(L, "name", b->name);
+	std::string encoding;
+	tableLookup(L, "encoding", encoding);
+	if (encoding == "html")
+		htmlEntityDecode(b->name);
 	std::string icon_str;	tableLookup(L, "icon", icon_str);
 	std::string type;	tableLookup(L, "type", type);
 	char *icon = NULL;
@@ -1040,10 +1048,13 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 				for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 2)) {
 					lua_pushvalue(L, -2);
 					const char *key = lua_tostring(L, -1);
-					const char *val = lua_tostring(L, -2);
+					const char *_val = lua_tostring(L, -2);
+					std::string val(_val ? lua_tostring(L, -2) : "");
+					if (encoding == "html")
+						htmlEntityDecode(val);
 					kext[j].key = atoi(key);
 					kext[j].value = NONEXISTANT_LOCALE;
-					kext[j].valname = strdup(val);
+					kext[j].valname = strdup(val.c_str());
 					m->tofree.push_back((void *)kext[j].valname);
 					if (!strcmp(value.c_str(), kext[j].valname))
 						b->int_val = kext[j].key;
@@ -1057,7 +1068,20 @@ int CLuaInstance::MenuAddItem(lua_State *L)
 			mi = new CMenuOptionNumberChooser(b->name, &b->int_val, enabled, range_from, range_to, m->observ, directkey, icon, 0, 0, NONEXISTANT_LOCALE, pulldown);
 		} else if (type == "string") {
 			b->str_val = value;
-			mi = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon, pulldown);
+			CMenuOptionStringChooser *misc = new CMenuOptionStringChooser(b->name.c_str(), &b->str_val, enabled, m->observ, directkey, icon, pulldown);
+			lua_pushstring(L, "options");
+			lua_gettable(L, -2);
+			if (lua_istable(L, -1))
+				for (lua_pushnil(L); lua_next(L, -2); lua_pop(L, 2)) {
+					lua_pushvalue(L, -1);
+					const char *_val = lua_tostring(L, -2);
+					std::string val(_val ? lua_tostring(L, -2) : "");
+					if (encoding == "html")
+						htmlEntityDecode(val);
+					misc->addOption(val);
+				}
+			lua_pop(L, 1);
+			mi = misc;
 		} else if (type == "stringinput") {
 			b->str_val = value;
 			std::string valid_chars = "abcdefghijklmnopqrstuvwxyz0123456789!\"§$%&/()=?-. ";
