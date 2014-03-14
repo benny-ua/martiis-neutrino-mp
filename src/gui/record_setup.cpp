@@ -210,6 +210,10 @@ int CRecordSetup::showRecordSetup()
 	slow_warn->setHint("", LOCALE_MENU_HINT_RECORD_SLOW_WARN);
 	recordingSettings->addItem(slow_warn);
 
+	CMenuOptionChooser* startstop_msg = new CMenuOptionChooser(LOCALE_RECORDING_STARTSTOP_MSG, &g_settings.recording_startstop_msg, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	startstop_msg->setHint("", LOCALE_MENU_HINT_RECORD_STARTSTOP_MSG);
+	recordingSettings->addItem(startstop_msg);
+
 #if HAVE_SPARK_HARDWARE
 	CMenuOptionNumberChooser *ch;
 	ch = new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE, &g_settings.recording_bufsize, true, 1, 25, NULL);
