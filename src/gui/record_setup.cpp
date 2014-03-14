@@ -189,9 +189,11 @@ int CRecordSetup::showRecordSetup()
 	fRecDir->setHint("", LOCALE_MENU_HINT_RECORD_DIR);
 	recordingSettings->addItem(fRecDir);
 
-	CMenuOptionChooser* channel_rec_dir = new CMenuOptionChooser(LOCALE_RECORDINGMENU_SAVE_IN_CHANNELDIR, &g_settings.recording_save_in_channeldir, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
-	channel_rec_dir->setHint("", LOCALE_MENU_HINT_RECORD_CHANDIR);
-	recordingSettings->addItem(channel_rec_dir);
+	//filename template
+	CStringInputSMS* filename_template = new CStringInputSMS(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, &g_settings.recording_filename_template, 21, LOCALE_RECORDINGMENU_FILENAME_TEMPLATE_HINT, LOCALE_RECORDINGMENU_FILENAME_TEMPLATE_HINT2, "%/-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ");
+	CMenuForwarder* ft = new CMenuDForwarder(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, true, g_settings.recording_filename_template, filename_template);
+	ft->setHint("", LOCALE_MENU_HINT_RECORD_FILENAME_TEMPLATE);
+	recordingSettings->addItem(ft);
 
 	//rec hours
 	CMenuOptionNumberChooser * mc = new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_TIME, &g_settings.record_hours, true, 1, 24, NULL);
@@ -208,9 +210,6 @@ int CRecordSetup::showRecordSetup()
 	slow_warn->setHint("", LOCALE_MENU_HINT_RECORD_SLOW_WARN);
 	recordingSettings->addItem(slow_warn);
 
-	//template
-	//CStringInput recordingSettings_filenameTemplate(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, &g_settings.recording_filename_template[0], 21, LOCALE_RECORDINGMENU_FILENAME_TEMPLATE_HINT, LOCALE_IPSETUP_HINT_2, "%/-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ");
-	//CMenuForwarder* mf11 = new CMenuForwarder(LOCALE_RECORDINGMENU_FILENAME_TEMPLATE, true, g_settings.recording_filename_template[0], &recordingSettings_filenameTemplate);
 #if HAVE_SPARK_HARDWARE
 	CMenuOptionNumberChooser *ch;
 	ch = new CMenuOptionNumberChooser(LOCALE_EXTRA_RECORD_BUFSIZE, &g_settings.recording_bufsize, true, 1, 25, NULL);

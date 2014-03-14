@@ -675,10 +675,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.recording_bufsize_dmx	   = configfile.getInt32("recording_bufsize_dmx", 2);
 #endif
 
+	bool recording_save_in_channeldir    = configfile.getBool("recording_save_in_channeldir"         , false);
+	g_settings.recording_filename_template     = configfile.getString("recordingmenu.filename_template" , recording_save_in_channeldir ? "%C/%T%d_%t" : "%C_%T%d_%t");
 	g_settings.recording_choose_direct_rec_dir = configfile.getInt32( "recording_choose_direct_rec_dir", 0 );
 	g_settings.recording_epg_for_filename      = configfile.getBool("recording_epg_for_filename"         , true);
 	g_settings.recording_epg_for_end           = configfile.getBool("recording_epg_for_end"              , true);
-	g_settings.recording_save_in_channeldir    = configfile.getBool("recording_save_in_channeldir"         , false);
 	g_settings.recording_slow_warning	   = configfile.getBool("recording_slow_warning"     , true);
 	g_settings.recording_startstop_msg	   = configfile.getBool("recording_startstop_msg"     , true);
 
@@ -1229,10 +1230,10 @@ void CNeutrinoApp::saveSetup(const char * fname)
 #endif
 	configfile.setBool  ("recordingmenu.stream_subtitle_pids" , g_settings.recording_stream_subtitle_pids );
 	configfile.setBool  ("recordingmenu.stream_pmt_pid"       , g_settings.recording_stream_pmt_pid       );
+	configfile.setString("recordingmenu.filename_template"    , g_settings.recording_filename_template    );
 	configfile.setInt32 ("recording_choose_direct_rec_dir"    , g_settings.recording_choose_direct_rec_dir);
 	configfile.setBool  ("recording_epg_for_filename"         , g_settings.recording_epg_for_filename     );
 	configfile.setBool  ("recording_epg_for_end"              , g_settings.recording_epg_for_end          );
-	configfile.setBool  ("recording_save_in_channeldir"       , g_settings.recording_save_in_channeldir   );
 	configfile.setBool  ("recording_slow_warning"             , g_settings.recording_slow_warning         );
 	configfile.setBool  ("recording_startstop_msg"             , g_settings.recording_startstop_msg       );
 
@@ -1538,6 +1539,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 			tvi = 0, ri = 0;
 			CBouquet* tmp1 = TVsatList->addBouquet(sit->second.name.c_str());
 			CBouquet* tmp2 = RADIOsatList->addBouquet(sit->second.name.c_str());
+			tmp1->satellitePosition = tmp2->satellitePosition = sit->first;
 
 			for(zapit_list_it_t it = zapitList.begin(); it != zapitList.end(); it++) {
 				if ((*it)->getServiceType() == ST_DIGITAL_TELEVISION_SERVICE) {
@@ -1549,7 +1551,7 @@ void CNeutrinoApp::channelsInit(bool bOnly)
 					ri++;
 				}
 			}
-			printf("[neutrino] created %s bouquet with %d TV and %d RADIO channels\n", sit->second.name.c_str(), tvi, ri);
+			printf("[neutrino] created %s (%d) bouquet with %d TV and %d RADIO channels\n", sit->second.name.c_str(), sit->first, tvi, ri);
 			if(!tvi)
 				TVsatList->deleteBouquet(tmp1);
 			if(!ri)
@@ -2719,9 +2721,9 @@ _show:
 		nNewChannel = bouquetList->exec(true);
 	}
 _repeat:
-	CVFD::getInstance ()->showServicename(channelList->getActiveChannelName());
-	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 	printf("************************* ZAP RES: nNewChannel %d\n", nNewChannel);fflush(stdout);
+	//CVFD::getInstance ()->showServicename(channelList->getActiveChannelName());
+	CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 	if(nNewChannel == -1) { // restore orig. bouquet and selected channel on cancel
 		/* FIXME if mode was changed while browsing,
 		 * other modes selected bouquet not restored */

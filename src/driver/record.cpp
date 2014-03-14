@@ -678,6 +678,7 @@ void CRecordInstance::FillMovieInfo(CZapitChannel * channel, APIDList & apid_lis
 record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 {
 	std::string ext_channel_name;
+	unsigned int pos;
 
 	if(check_dir(Directory.c_str())) {
 		/* check if Directory and network_nfs_recordingdir the same */
@@ -693,61 +694,77 @@ record_error_msg_t CRecordInstance::MakeFileName(CZapitChannel * channel)
 	}
 
 	// Create filename for recording
+	pos = Directory.size();
 	filename = Directory;
-
-	if (filename.empty() || filename.at(filename.length() - 1) != '/')
+	if (pos && filename.at(pos - 1) != '/') {
 		filename += "/";
-
-	ext_channel_name = channel->getName();
-
-	if (!(ext_channel_name.empty())) {
-		std::string tmp = UTF8_TO_FILESYSTEM_ENCODING(ext_channel_name.c_str());
-		ZapitTools::replace_char(tmp);
-		filename += tmp;
-
-		if (!autoshift && g_settings.recording_save_in_channeldir) {
-			struct stat statInfo;
-			int res = stat(filename.c_str(),&statInfo);
-			if (res == -1) {
-				if (errno == ENOENT) {
-					res = safe_mkdir(filename.c_str());
-					if (res == 0)
-						filename += "/";
-					else
-						perror("[vcrcontrol] mkdir");
-				} else
-					perror("[vcrcontrol] stat");
-			} else
-				// directory exists
-				filename += "/";
-		} else
-			filename += "_";
+		pos++;
 	}
 
-	if (g_settings.recording_epg_for_filename) {
-		if(epgid != 0) {
-			CShortEPGData epgdata;
-			if(CEitManager::getInstance()->getEPGidShort(epgid, &epgdata)) {
-				if (!(epgdata.title.empty())) {
-					std::string tmp = epgdata.title;
-					ZapitTools::replace_char(tmp);
-					filename += tmp;
-				}
-			}
-		} else if (!epgTitle.empty()) {
-			std::string tmp = epgTitle;
-			ZapitTools::replace_char(tmp);
-			filename += tmp;
-		}
-	}
+	std::string ext_file_name = g_settings.recording_filename_template;
+	MakeExtFileName(channel, ext_file_name);
+	filename += ext_file_name;
 
-	time_t t = time(NULL);
-	filename += strftime("%Y%m%d_%H%M%S", localtime(&t));
-
-	if(autoshift)
+	if (autoshift)
 		filename += "_temp";
 
+	mkdirhier(filename.substr(0, filename.find_last_of('/')).c_str(), 0755);
+
 	return RECORD_OK;
+}
+
+void CRecordInstance::StringReplace(std::string &str, const std::string search, const std::string rstr)
+{
+	std::string::size_type ptr = 0;
+	std::string::size_type pos = 0;
+	while((ptr = str.find(search,pos)) != std::string::npos){
+		str.replace(ptr,search.length(),rstr);
+		pos = ptr + rstr.length();
+	}
+}
+
+void CRecordInstance::MakeExtFileName(CZapitChannel * channel, std::string &FilenameTemplate)
+{
+	char buf[256];
+
+	// %C == channel, %T == title, %I == info1, %d == date, %t == time_t
+	if (FilenameTemplate.empty())
+		FilenameTemplate = "%C_%T_%d_%t";
+
+	time_t t = time(NULL);
+	strftime(buf,sizeof(buf),"%Y%m%d",localtime(&t));
+	StringReplace(FilenameTemplate,"%d",buf);
+
+	strftime(buf,sizeof(buf),"%H%M%S",localtime(&t));
+	StringReplace(FilenameTemplate,"%t",buf);
+
+	std::string channel_name = channel->getName();
+	if (!(channel_name.empty())) {
+		std::string b = UTF8_TO_FILESYSTEM_ENCODING(channel_name);
+		ZapitTools::replace_char(b);
+		StringReplace(FilenameTemplate,"%C",b);
+	}
+	else
+		StringReplace(FilenameTemplate,"%C","no_channel");
+
+	CShortEPGData epgdata;
+	if(CEitManager::getInstance()->getEPGidShort(epgid, &epgdata)) {
+		if (!(epgdata.title.empty())) {
+			std::string b = epgdata.title;
+			ZapitTools::replace_char(b);
+			StringReplace(FilenameTemplate,"%T",b);
+		}
+		else
+			StringReplace(FilenameTemplate,"%T","no_title");
+
+		if (!(epgdata.info1.empty())) {
+			std::string b = epgdata.info1;
+			ZapitTools::replace_char(b);
+			StringReplace(FilenameTemplate,"%I",b);
+		}
+		else
+			StringReplace(FilenameTemplate,"%I","no_info");
+	}
 }
 
 void CRecordInstance::GetRecordString(std::string &str, std::string &dur)
@@ -1050,7 +1067,7 @@ void CRecordManager::StartNextRecording()
 	CTimerd::RecordingInfo * eventinfo = NULL;
 	printf("%s: pending count %d\n", __func__, (int)nextmap.size());
 
-	for(nextmap_iterator_t it = nextmap.begin(); it != nextmap.end(); it++) {
+	for(nextmap_iterator_t it = nextmap.begin(); it != nextmap.end();) {
 		eventinfo = *it;
 		CZapitChannel * channel = CServiceManager::getInstance()->FindChannel(eventinfo->channel_id);
 		if (channel && CFEManager::getInstance()->canTune(channel))
@@ -1060,10 +1077,10 @@ void CRecordManager::StartNextRecording()
 			if(ret) {
 				delete[] (unsigned char *) eventinfo;
 				it = nextmap.erase(it);
-				if (it == nextmap.end())
-					break;
+				continue;
 			}
 		}
+		it++;
 	}
 }
 

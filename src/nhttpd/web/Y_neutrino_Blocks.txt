@@ -44,13 +44,6 @@ start-block~neutrino_form-data_record
 				<td><input type="text" name="network_nfs_recordingdir" size="60" value="{=ini-get:/var/tuxbox/config/neutrino.conf;network_nfs_recordingdir~open=}" /></td>
 			</tr>
 			<tr>
-				<td>{=L:set.rec.channeldir=}</td>
-				<td>
-					<input type="radio" name="recording_save_in_channeldir" value="false"/>{=L:off=}&nbsp;
-					<input type="radio" name="recording_save_in_channeldir" value="true"/>{=L:on=}
-				</td>
-			</tr>
-			<tr>
 				<td>{=L:set.rec.epg_end=}</td>
 				<td>
 					<input type="radio" name="recording_epg_for_end" value="false"/>{=L:off=}&nbsp;
@@ -153,7 +146,6 @@ function form_init()
 
 	obj_set_radio_value('recording_zap_on_announce', "{=ini-get:/var/tuxbox/config/neutrino.conf;recording_zap_on_announce;false=}");
 	obj_set_radio_value('recording_epg_for_end', "{=ini-get:/var/tuxbox/config/neutrino.conf;recording_epg_for_end;false=}");
-	obj_set_radio_value('recording_save_in_channeldir', "{=ini-get:/var/tuxbox/config/neutrino.conf;recording_save_in_channeldir;false=}");
 	obj_set_radio_value('timeshift_pause', "{=ini-get:/var/tuxbox/config/neutrino.conf;timeshift_pause;0=}");
 	obj_set_radio_value('auto_delete', "{=ini-get:/var/tuxbox/config/neutrino.conf;auto_delete;true=}");
 	obj_set_radio_value('temp_timeshift', "{=ini-get:/var/tuxbox/config/neutrino.conf;temp_timeshift;0=}");
@@ -191,7 +183,6 @@ end-block~neutrino_form-data_record
 # ------- yWeb save Settings
 start-block~neutrino_record_save_settings
 {=ini-set:/var/tuxbox/config/neutrino.conf;network_nfs_recordingdir;{=network_nfs_recordingdir=}~open=}
-{=ini-set:/var/tuxbox/config/neutrino.conf;recording_save_in_channeldir;{=recording_save_in_channeldir=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;recording_zap_on_announce;{=recording_zap_on_announce=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;recording_epg_for_end;{=recording_epg_for_end=}~cache=}
 {=ini-set:/var/tuxbox/config/neutrino.conf;timeshiftdir;{=timeshiftdir=}~cache=}
