@@ -1013,7 +1013,7 @@ bool CFileBrowser::exec(const char * const dirname)
 								ChangeDir(filelist[selected].Name);
 							}
 						}
-						else if (!Multi_Select
+						else if (return_dir || !Multi_Select
 							|| (!S_ISDIR(filelist[selected].Mode) ||
 							    (!g_settings.filebrowser_multi_select_confirm_dir ||
 							     ShowMsg(LOCALE_MESSAGEBOX_INFO, LOCALE_FILEBROWSER_MULTI_SELECT_ADD_DIR, CMessageBox::mbrYes,
