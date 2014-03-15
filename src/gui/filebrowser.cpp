@@ -996,7 +996,9 @@ bool CFileBrowser::exec(const char * const dirname)
 							std::string bdmv = filename + "/BDMV/index.bdmv";
 							if (access(bdmv.c_str(), F_OK) == 0) {
 								return_dir = true;
+#if HAVE_SPARK_HARDWARE
 								filelist[selected].Name = "bluray://" + filename;
+#endif
 							}
 						}
 						if(!return_dir && (!Multi_Select) && S_ISDIR(filelist[selected].Mode) && !Dir_Mode)
