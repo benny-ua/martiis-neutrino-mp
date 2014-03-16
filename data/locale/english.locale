@@ -1231,7 +1231,7 @@ menu.hint_scan_fec Select transponder FEC
 menu.hint_scan_felink Select tuner to link tuner to
 menu.hint_scan_femode Select tuner connection type
 menu.hint_scan_fesetup Configure tuner(s)
-menu.hint_scan_fetimeout Time to wait for signal, in 1/10 of second
+menu.hint_scan_fetimeout Time to wait for signal
 menu.hint_scan_freq Enter transponder frequency
 menu.hint_scan_fta Add only free-to-air (not-scrambled) channels
 menu.hint_scan_ladirection Select latitude direction
@@ -1248,7 +1248,7 @@ menu.hint_scan_manual Manual transponder scan using\nselected parameters
 menu.hint_scan_mod Select transponder modulation
 menu.hint_scan_motor Rotor options, satellite finder
 menu.hint_scan_motor_18v Use 18V when moving rotor
-menu.hint_scan_motor_speed Rotor moving speed in 1/10 degree\nper second
+menu.hint_scan_motor_speed Rotor moving speed
 menu.hint_scan_motorpos Select stored position number for this satellite,\nignored, if USALS enabled
 menu.hint_scan_nid Enter decimal network ID
 menu.hint_scan_nit Add transpoders from network information
