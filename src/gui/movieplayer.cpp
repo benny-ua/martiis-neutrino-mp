@@ -1887,7 +1887,6 @@ void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring __attribute__((un
 #if HAVE_SPARK_HARDWARE
 	printf("[CMoviePlayerGui] %s\n", __FUNCTION__);
 	int ttx, ttxpid, ttxpage;
-	int dvbpid;
 
 	playback->SuspendSubtitle(true);
 	int current_sub = playback->GetSubtitlePid();
