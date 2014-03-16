@@ -2618,12 +2618,14 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					else if (g_settings.recording_type != CNeutrinoApp::RECORDING_OFF)
 						CRecordManager::getInstance()->exec(NULL, "Record");
 					StartSubtitles();
+					CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 				}
 			}
 			else if( msg == CRCInput::RC_stop ) {
 				StopSubtitles();
 				CRecordManager::getInstance()->exec(NULL, "Stop_record");
 				StartSubtitles();
+				CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 			}
 			else if (CRCInput::isNumeric(msg) && g_RemoteControl->director_mode ) {
 				g_RemoteControl->setSubChannel(CRCInput::getNumericValue(msg));
@@ -3213,7 +3215,6 @@ _repeat:
 			}
 #endif
 		}
-		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
 #if 0
 		//zap to rec channel if box start from deepstandby
 		if(timer_wakeup){
@@ -3238,16 +3239,17 @@ _repeat:
 		}
 
 		delete[] (unsigned char*) data;
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 		return messages_return::handled | messages_return::cancel_all;
 	}
 	else if( msg == NeutrinoMessages::RECORD_STOP) {
-		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
 		CTimerd::RecordingStopInfo* recinfo = (CTimerd::RecordingStopInfo*)data;
 		printf("NeutrinoMessages::RECORD_STOP: eventID %d channel_id %" PRIx64 "\n", recinfo->eventID, recinfo->channel_id);
 		CRecordManager::getInstance()->Stop(recinfo);
 		autoshift = CRecordManager::getInstance()->TimeshiftOnly();
 
 		delete[] (unsigned char*) data;
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 		return messages_return::handled;
 	}
 	else if( msg == NeutrinoMessages::EVT_PMT_CHANGED) {

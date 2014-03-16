@@ -54,9 +54,6 @@
 #ifdef ENABLE_GRAPHLCD
 #include <driver/nglcd.h>
 #endif
-#if HAVE_SPARK_HARDWARE
-#include <driver/display.h>
-#endif
 #include <driver/radiotext.h>
 #include <driver/streamts.h>
 #include <zapit/capmt.h>
@@ -148,11 +145,6 @@ void recordingFailureHelper(void *data)
 	sleep(3);
 	hintBox.hide();
 }
-
-#if HAVE_SPARK_HARDWARE
-static OpenThreads::Mutex led_mutex;
-static int led_count = 0;
-#endif
 
 int CRecordInstance::GetStatus()
 {
@@ -264,14 +256,6 @@ record_error_msg_t CRecordInstance::Start(CZapitChannel * channel)
 
 	CCamManager::getInstance()->Start(channel->getChannelID(), CCamManager::RECORD);
 
-#if HAVE_SPARK_HARDWARE
-	led_mutex.lock();
-	if (!led_count)
-		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, true);
-	led_count++;
-	led_mutex.unlock();
-#endif
-	//CVFD::getInstance()->ShowIcon(VFD_ICON_CAM1, true);
 	WaitRecMsg(msg_start_time, 2);
 	hintBox.hide();
 	return RECORD_OK;
@@ -301,16 +285,6 @@ bool CRecordInstance::Stop(bool remove_event)
 	printf("%s: file %s.ts\n", __FUNCTION__, filename.c_str());
 	SaveXml();
 	/* Stop do close fd - if started */
-#if HAVE_SPARK_HARDWARE
-	if (record->GetStatus() != REC_STATUS_STOPPED) {
-		led_mutex.lock();
-		if (led_count > 0)
-			led_count--;
-		if (!led_count)
-			CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, false);
-		led_mutex.unlock();
-	}
-#endif
 	record->Stop();
 
 	if(!autoshift)
@@ -329,7 +303,6 @@ bool CRecordInstance::Stop(bool remove_event)
 		g_Timerd->stopTimerEvent(recording_id);
 		recording_id = 0;
 	}
-        //CVFD::getInstance()->ShowIcon(VFD_ICON_CAM1, false);
 	WaitRecMsg(end_time, 2);
 	hintBox.hide();
 	return true;
