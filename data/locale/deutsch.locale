@@ -848,6 +848,9 @@ ledcontroller.on.both Grün und rot
 ledcontroller.on.green Grün
 ledcontroller.on.red Rot
 ledcontroller.title LEDs
+lua.function_deprecated1 Achtung!
+lua.function_deprecated2 Die Funktion
+lua.function_deprecated3 ist veraltet,\n                      bitte nutzen Sie
 mainmenu.audioplayer Audioplayer
 mainmenu.channels Kanalliste
 mainmenu.clearsectionsd Lösche EPG Cache

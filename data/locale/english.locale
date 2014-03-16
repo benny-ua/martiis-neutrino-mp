@@ -848,6 +848,9 @@ ledcontroller.on.both Green and red
 ledcontroller.on.green Green
 ledcontroller.on.red Red
 ledcontroller.title LEDs
+lua.function_deprecated1 Attention!
+lua.function_deprecated2 Function
+lua.function_deprecated3 is deprecated,\n                      please use
 mainmenu.audioplayer Audioplayer
 mainmenu.channels Channels
 mainmenu.clearsectionsd Clear EPG Cache
