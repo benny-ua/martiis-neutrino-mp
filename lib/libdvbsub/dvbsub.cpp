@@ -22,14 +22,12 @@
 #include "helpers.hpp"
 #include "dvbsubtitle.h"
 
-#define Log2File	printf
-#define RECVBUFFER_STEPSIZE 1024
-
 enum {NOERROR, NETWORK, DENIED, NOSERVICE, BOXTYPE, THREAD, ABOUT};
 enum {GET_VOLUME, SET_VOLUME, SET_MUTE, SET_CHANNEL};
 
 Debug sub_debug;
 static PacketQueue packet_queue;
+static PacketQueue bitmap_queue;
 //sem_t event_semaphore;
 
 static pthread_t threadReader;
@@ -48,7 +46,6 @@ static int dvbsub_stopped;
 static int pid_change_req;
 #if HAVE_SPARK_HARDWARE
 static bool isEplayer = false;
-static int eplayer_fd = -1;
 #endif
 
 cDvbSubtitleConverter *dvbSubtitleConverter;
@@ -150,6 +147,8 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 	return 1;
 }
 
+static int flagFd = -1;
+
 int dvbsub_stop()
 {
 	dvbsub_pid = 0;
@@ -157,6 +156,7 @@ int dvbsub_stop()
 		dvbsub_stopped = 1;
 		dvbsub_pause();
 		pid_change_req = 1;
+		write(flagFd, "", 1);
 	}
 
 	return 0;
@@ -196,6 +196,7 @@ int dvbsub_close()
 		dvbsub_pause();
 		reader_running = false;
 		dvbsub_stopped = 1;
+		write(flagFd, "", 1);
 
 		pthread_mutex_lock(&readerMutex);
 		pthread_cond_broadcast(&readerCond);
@@ -223,12 +224,6 @@ int dvbsub_close()
 
 static cDemux * dmx;
 
-static int64_t stc_offset = 0;
-
-void dvbsub_set_stc_offset(int64_t o) {
-	stc_offset = o;
-}
-
 extern void getPlayerPts(int64_t *);
 
 void dvbsub_get_stc(int64_t * STC)
@@ -236,13 +231,11 @@ void dvbsub_get_stc(int64_t * STC)
 #if HAVE_SPARK_HARDWARE // requires libeplayer3
 	if (isEplayer) {
 		getPlayerPts(STC);
-		*STC -= stc_offset;
 		return;
 	}
 #endif
 	if(dmx) {
 		dmx->getSTC(STC);
-		*STC -= stc_offset;
 		return;
 	}
 	*STC = 0;
@@ -279,40 +272,37 @@ static int64_t get_pts_stc_delta(int64_t pts)
 static void clear_queue()
 {
 	uint8_t* packet;
+	cDvbSubtitleBitmaps *Bitmaps;
 
 	pthread_mutex_lock(&packetMutex);
 	while(packet_queue.size()) {
 		packet = packet_queue.pop();
 		free(packet);
 	}
+	while(bitmap_queue.size()) {
+		Bitmaps = (cDvbSubtitleBitmaps *) bitmap_queue.pop();
+		delete Bitmaps;
+	}
 	pthread_mutex_unlock(&packetMutex);
 }
 
-#if HAVE_SPARK_HARDWARE
-static int eRead(uint8_t *buf, int len)
+void dvbsub_write(AVSubtitle *sub, int64_t pts)
 {
-	int count = 0;
-	struct pollfd fds;
-	fds.fd = eplayer_fd;
-	fds.events = POLLIN | POLLHUP | POLLERR;
-	do {
-		fds.revents = 0;
-		poll(&fds, 1, 1000);
-		if (fds.revents & (POLLHUP|POLLERR)) {
-			dvbsub_stop();
-			return -1;
-		}
-		int l = read(eplayer_fd, buf + count, len - count);
-		if (l < 0)
-			return -1;
-		count += l;
-	} while(count < len);
-	return count;
+	pthread_mutex_lock(&packetMutex);
+	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
+	Bitmaps->SetSub(sub); // Note: this will copy sub, including any references. DON'T call avsubtitle_free() from the caller.
+	bitmap_queue.push((unsigned char *) Bitmaps);
+	pthread_cond_broadcast(&packetCond);
+	pthread_mutex_unlock(&packetMutex);
 }
-#endif
 
 static void* reader_thread(void * /*arg*/)
 {
+	int fds[2];
+	pipe(fds);
+	fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+	fcntl(fds[1], F_SETFD, FD_CLOEXEC);
+	flagFd = fds[1];
 	uint8_t tmp[16];  /* actually 6 should be enough */
 	int count;
 	int len;
@@ -326,11 +316,6 @@ static void* reader_thread(void * /*arg*/)
 	dmx->Open(DMX_PES_CHANNEL, NULL, 16*1024);
 #else
         dmx->Open(DMX_PES_CHANNEL, NULL, 64*1024);
-#endif
-#if HAVE_SPARK_HARDWARE
-	static const char DVBSUBTITLEPIPE[] 	= "/tmp/.eplayer3_dvbsubtitle";
-	mkfifo(DVBSUBTITLEPIPE, 0644);
-	eplayer_fd = open (DVBSUBTITLEPIPE, O_RDONLY | O_NONBLOCK);
 #endif
 	while (reader_running) {
 		if(dvbsub_stopped /*dvbsub_paused*/) {
@@ -352,9 +337,6 @@ static void* reader_thread(void * /*arg*/)
 			dvbsub_stopped = 0;
 			sub_debug.print(Debug::VERBOSE, "%s (re)started with pid 0x%x\n", __FUNCTION__, dvbsub_pid);
 		}
-#if HAVE_SPARK_HARDWARE
-		if (!isEplayer)
-#endif
 		if(pid_change_req) {
 			pid_change_req = 0;
 			clear_queue();
@@ -364,15 +346,37 @@ static void* reader_thread(void * /*arg*/)
 			sub_debug.print(Debug::VERBOSE, "%s changed to pid 0x%x\n", __FUNCTION__, dvbsub_pid);
 		}
 
+		struct pollfd pfds[2];
+		pfds[0].fd = fds[1];
+		pfds[0].events = POLLIN;
+		char _tmp[64];
+
+#if HAVE_SPARK_HARDWARE
+		if (isEplayer) {
+			poll(pfds, 1, -1);
+			while (0 > read(pfds[0].fd, _tmp, sizeof(tmp)));
+			continue;
+		}
+#endif
 		len = 0;
 		count = 0;
 
-#if HAVE_SPARK_HARDWARE
-		if (isEplayer)
-			len = eRead(tmp, 6);
-		else
-#endif
-		len = dmx->Read(tmp, 6, 1000);
+		pfds[1].fd = dmx->getFD();
+		pfds[1].events = POLLIN;
+		switch (poll(pfds, 2, -1)) {
+			case 0:
+			case -1:
+				if (pfds[0].revents & POLLIN)
+					while (0 > read(pfds[0].fd, _tmp, sizeof(tmp)));
+				continue;
+			default:
+				if (pfds[0].revents & POLLIN)
+					while (0 > read(pfds[0].fd, _tmp, sizeof(tmp)));
+				if (!(pfds[1].revents & POLLIN))
+					continue;
+		}
+
+		len = dmx->Read(tmp, 6, 0);
 		if(len <= 0)
 			continue;
 
@@ -385,11 +389,6 @@ static void* reader_thread(void * /*arg*/)
 			memmove(buf, tmp, 6);
 			/* read rest of the packet */
 			while((count < packlen) && !dvbsub_stopped) {
-#if HAVE_SPARK_HARDWARE
-				if (isEplayer)
-					len = eRead(buf + count, packlen-count);
-				else
-#endif
 				len = dmx->Read(buf+count, packlen-count, 1000);
 				if (len < 0) {
 					break;
@@ -407,12 +406,6 @@ static void* reader_thread(void * /*arg*/)
 				sub_debug.print(Debug::VERBOSE, "[subtitles] bad start code: %02x%02x%02x%02x\n", tmp[0], tmp[1], tmp[2], tmp[3]);
 				bad_startcode = true;
 			}
-#if HAVE_SPARK_HARDWARE
-			if (isEplayer) {
-				char b[65536];
-				while (read(eplayer_fd, b, sizeof(b)) > 0);
-			}
-#endif
 			continue;
 		}
 		bad_startcode = false;
@@ -425,11 +418,6 @@ static void* reader_thread(void * /*arg*/)
 		memmove(buf, tmp, 6);
 		/* read rest of the packet */
 		while((count < packlen) && !dvbsub_stopped) {
-#if HAVE_SPARK_HARDWARE
-			if (isEplayer)
-				len = eRead(buf+count, packlen-count);
-			else
-#endif
 			len = dmx->Read(buf+count, packlen-count, 1000);
 			if (len < 0) {
 				break;
@@ -452,10 +440,10 @@ static void* reader_thread(void * /*arg*/)
 		if(!dvbsub_stopped /*!dvbsub_paused*/) {
 			sub_debug.print(Debug::VERBOSE, "[subtitles] *** new packet, len %d buf 0x%x pts-stc diff %lld ***\n", count, buf, get_pts_stc_delta(get_pts(buf)));
 			/* Packet now in memory */
+			pthread_mutex_lock(&packetMutex);
 			packet_queue.push(buf);
 			/* TODO: allocation exception */
 			// wake up dvb thread
-			pthread_mutex_lock(&packetMutex);
 			pthread_cond_broadcast(&packetCond);
 			pthread_mutex_unlock(&packetMutex);
 		} else {
@@ -467,12 +455,10 @@ static void* reader_thread(void * /*arg*/)
 	dmx->Stop();
 	delete dmx;
 	dmx = NULL;
-#if HAVE_SPARK_HARDWARE
-	if (eplayer_fd > -1) {
-		close(eplayer_fd);
-		eplayer_fd = -1;
-	}
-#endif
+
+	close(fds[0]);
+	close(fds[1]);
+	flagFd = -1;
 
 	sub_debug.print(Debug::VERBOSE, "%s shutdown\n", __FUNCTION__);
 	pthread_exit(NULL);
@@ -511,56 +497,64 @@ static void* dvbsub_thread(void* /*arg*/)
 
 		timeout = dvbSubtitleConverter->Action();
 
-		if(packet_queue.size() == 0) {
+		pthread_mutex_lock(&packetMutex);
+		if(packet_queue.size() == 0 && bitmap_queue.size() == 0) {
+			pthread_mutex_unlock(&packetMutex);
 			continue;
 		}
-		sub_debug.print(Debug::VERBOSE, "PES: Wakeup, queue size %d\n", packet_queue.size());
+		sub_debug.print(Debug::VERBOSE, "PES: Wakeup, packet queue size %u, bitmap queue size %u\n", packet_queue.size(), bitmap_queue.size());
 		if(dvbsub_stopped /*dvbsub_paused*/) {
+			pthread_mutex_unlock(&packetMutex);
 			clear_queue();
 			continue;
 		}
-		pthread_mutex_lock(&packetMutex);
-		packet = packet_queue.pop();
-		pthread_mutex_unlock(&packetMutex);
+		if (packet_queue.size()) {
+			packet = packet_queue.pop();
+			pthread_mutex_unlock(&packetMutex);
 
-		if (!packet) {
-			sub_debug.print(Debug::VERBOSE, "Error no packet found\n");
-			continue;
-		}
-		packlen = (packet[4] << 8 | packet[5]) + 6;
+			if (!packet) {
+				sub_debug.print(Debug::VERBOSE, "Error no packet found\n");
+				continue;
+			}
+			packlen = (packet[4] << 8 | packet[5]) + 6;
 
-		pts = get_pts(packet);
+			pts = get_pts(packet);
 
-		dataoffset = packet[8] + 8 + 1;
-		if (packet[dataoffset] != 0x20) {
-			sub_debug.print(Debug::VERBOSE, "Not a dvb subtitle packet, discard it (len %d)\n", packlen);
+			dataoffset = packet[8] + 8 + 1;
+			if (packet[dataoffset] != 0x20) {
+				sub_debug.print(Debug::VERBOSE, "Not a dvb subtitle packet, discard it (len %d)\n", packlen);
 #if 0
-			for(int i = 0; i < packlen; i++)
-				printf("%02X ", packet[i]);
-			printf("\n");
+				for(int i = 0; i < packlen; i++)
+					printf("%02X ", packet[i]);
+				printf("\n");
 #endif
-			goto next_round;
-		}
+				goto next_round;
+			}
 
-		sub_debug.print(Debug::VERBOSE, "PES packet: len %d data len %d PTS=%Ld (%02d:%02d:%02d.%d) diff %lld\n",
-				packlen, packlen - (dataoffset + 2), pts, (int)(pts/324000000), (int)((pts/5400000)%60),
-				(int)((pts/90000)%60), (int)(pts%90000), get_pts_stc_delta(pts));
+			sub_debug.print(Debug::VERBOSE, "PES packet: len %d data len %d PTS=%Ld (%02d:%02d:%02d.%d) diff %lld\n",
+					packlen, packlen - (dataoffset + 2), pts, (int)(pts/324000000), (int)((pts/5400000)%60),
+					(int)((pts/90000)%60), (int)(pts%90000), get_pts_stc_delta(pts));
 
-		if (packlen <= dataoffset + 3) {
-			sub_debug.print(Debug::INFO, "Packet too short, discard\n");
-			goto next_round;
-		}
+			if (packlen <= dataoffset + 3) {
+				sub_debug.print(Debug::INFO, "Packet too short, discard\n");
+				goto next_round;
+			}
 
-		if (packet[dataoffset + 2] == 0x0f) {
-			dvbSubtitleConverter->Convert(&packet[dataoffset + 2],
-					packlen - (dataoffset + 2), pts);
-		} else {
-			sub_debug.print(Debug::INFO, "End_of_PES is missing\n");
-		}
-		timeout = dvbSubtitleConverter->Action();
+			if (packet[dataoffset + 2] == 0x0f) {
+				dvbSubtitleConverter->Convert(&packet[dataoffset + 2],
+						packlen - (dataoffset + 2), pts);
+			} else {
+				sub_debug.print(Debug::INFO, "End_of_PES is missing\n");
+			}
+			timeout = dvbSubtitleConverter->Action();
 
 next_round:
-		free(packet);
+			free(packet);
+		} else {
+			cDvbSubtitleBitmaps *Bitmaps = (cDvbSubtitleBitmaps *) bitmap_queue.pop();
+			pthread_mutex_unlock(&packetMutex);
+			dvbSubtitleConverter->Convert(Bitmaps->GetSub(), Bitmaps->Pts());
+		}
 	}
 
 	delete dvbSubtitleConverter;

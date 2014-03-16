@@ -117,13 +117,6 @@ class CMoviePlayerGui : public CMenuTarget
 #endif
 	std::string    slanguage[REC_MAX_SPIDS];
 	int spids[REC_MAX_SPIDS];
-	// dvb subtitle data
-	unsigned int numpidd;
-#ifndef REC_MAX_DPIDS
-#define REC_MAX_DPIDS 20 // whatever
-#endif
-	std::string    dlanguage[REC_MAX_DPIDS];
-	int dpids[REC_MAX_DPIDS];
 	// teletext subtitle data
 	unsigned int numpidt;
 #ifndef REC_MAX_TPIDS
@@ -265,6 +258,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void setLastMode(int m) { m_LastMode = m; }
 	void Pause(bool b = true);
 	void RequestAbort(void);
+	bool SetPosition(int pos, bool absolute = false);
 };
 
 #endif

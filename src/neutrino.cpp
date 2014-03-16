@@ -534,11 +534,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.audio_AnalogMode = configfile.getInt32( "audio_AnalogMode", 0 );
 	g_settings.audio_DolbyDigital    = configfile.getBool("audio_DolbyDigital"   , false);
 
-	g_settings.dvb_subtitle_delay = configfile.getInt32("dvb_subtitle_delay", 0);
-#if HAVE_SPARK_HARDWARE
-	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
-#endif
-
 	g_settings.auto_lang = configfile.getInt32( "auto_lang", 0 );
 	g_settings.auto_subs = configfile.getInt32( "auto_subs", 0 );
 
@@ -1130,7 +1125,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 		configfile.setString("pref_lang_" + i_str, g_settings.pref_lang[i]);
 		configfile.setString("pref_subs_" + i_str, g_settings.pref_subs[i]);
 	}
-	configfile.setInt32( "dvb_subtitle_delay", g_settings.dvb_subtitle_delay );
 	configfile.setString("subs_charset", g_settings.subs_charset);
 
 	//vcr

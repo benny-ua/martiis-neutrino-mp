@@ -2116,7 +2116,6 @@ streaming.write_error The recording was aborted,\nsince an error occured during 
 stringinput.caps caps / no caps
 stringinput.clear clear all
 subtitles.charset Charset
-subtitles.delay DVB subtitles delay
 subtitles.head Subtitles
 subtitles.stop Stop subtitles
 terrestrialsetup.area Area

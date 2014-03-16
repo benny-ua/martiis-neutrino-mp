@@ -189,7 +189,6 @@ struct SNeutrinoSettings
 #endif
 	int audio_volume_percent_ac3;
 	int audio_volume_percent_pcm;
-	int dvb_subtitle_delay;
 	int auto_lang;
 	int auto_subs;
 	int srs_enable;

@@ -2116,7 +2116,6 @@ streaming.write_error Die Aufnahme wurde leider abgebrochen,\nda ein Fehler beim
 stringinput.caps Groß-/Kleinbuchstaben
 stringinput.clear Alles löschen
 subtitles.charset Zeichensatz
-subtitles.delay Verzögerung DVB-Untertitel
 subtitles.head Untertitel
 subtitles.stop Untertitel aus
 terrestrialsetup.area Region

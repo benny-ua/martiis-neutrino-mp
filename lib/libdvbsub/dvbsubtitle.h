@@ -28,7 +28,23 @@ extern "C" {
 
 #include "tools.h"
 
-class cDvbSubtitleBitmaps;
+class cDvbSubtitleBitmaps : public cListObject 
+{
+	private:
+		int64_t pts;
+		int timeout;
+		AVSubtitle sub;
+	public:
+		cDvbSubtitleBitmaps(int64_t Pts);
+		~cDvbSubtitleBitmaps();
+		int64_t Pts(void) { return pts; }
+		int Timeout(void) { return sub.end_display_time; }
+		void Draw(int &min_x, int &min_y, int &max_x, int &max_y);
+		int Count(void) { return sub.num_rects; }
+		AVSubtitle * GetSub(void) { return &sub; }
+		void SetSub(AVSubtitle *s) { sub = *s; }
+};
+
 
 class cDvbSubtitleConverter  /*: public cThread */{
 private:
@@ -52,6 +68,7 @@ public:
   void Lock();
   void Unlock();
   int Convert(const uchar *Data, int Length, int64_t pts);
+  int Convert(AVSubtitle *sub, int64_t pts);
   bool Running() { return running; };
 };
 

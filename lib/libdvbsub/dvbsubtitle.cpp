@@ -27,7 +27,7 @@ extern "C" {
 #include "Debug.hpp"
 
 // Set these to 'true' for debug output:
-static bool DebugConverter = false;
+static bool DebugConverter = true;
 
 #define dbgconverter(a...) if (DebugConverter) sub_debug.print(Debug::VERBOSE, a)
 
@@ -66,22 +66,6 @@ typedef struct DVBSubContext {
 
 // --- cDvbSubtitleBitmaps ---------------------------------------------------
 
-class cDvbSubtitleBitmaps : public cListObject 
-{
-	private:
-		int64_t pts;
-		int timeout;
-		AVSubtitle sub;
-	public:
-		cDvbSubtitleBitmaps(int64_t Pts);
-		~cDvbSubtitleBitmaps();
-		int64_t Pts(void) { return pts; }
-		int Timeout(void) { return sub.end_display_time; }
-		void Draw(int &min_x, int &min_y, int &max_x, int &max_y);
-		int Count(void) { return sub.num_rects; };
-		AVSubtitle * GetSub(void) { return &sub; };
-};
-
 cDvbSubtitleBitmaps::cDvbSubtitleBitmaps(int64_t pPts)
 {
 	//dbgconverter("cDvbSubtitleBitmaps::new: PTS: %lld\n", pts);
@@ -91,19 +75,7 @@ cDvbSubtitleBitmaps::cDvbSubtitleBitmaps(int64_t pPts)
 cDvbSubtitleBitmaps::~cDvbSubtitleBitmaps()
 {
 //    dbgconverter("cDvbSubtitleBitmaps::delete: PTS: %lld rects %d\n", pts, Count());
-    int i;
-
-    if(sub.rects) {
-	    for (i = 0; i < Count(); i++)
-	    {
-		    av_freep(&sub.rects[i]->pict.data[0]);
-		    av_freep(&sub.rects[i]->pict.data[1]);
-		    av_freep(&sub.rects[i]);
-	    }
-
-	    av_free(sub.rects);
-    }
-    memset(&sub, 0, sizeof(AVSubtitle));
+	avsubtitle_free(&sub);
 }
 
 fb_pixel_t * simple_resize32(uint8_t * orgin, uint32_t * colors, int nb_colors, int ox, int oy, int dx, int dy)
@@ -153,9 +125,17 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 	// HACK. When having just switched channels we may not yet have yet
 	// received valid authoring data. This check triggers for the most
 	// common HD subtitle format and sets our authoring display format
-	// accordingly.
-	if (max_x == 720 && max_y == 576 && sub.rects[0]->h == 48 && sub.rects[0]->w == 1280)
-		min_x = min_y = 0, max_x = 1280, max_y = 720;
+	// accordingly. Plus, me may not get the authoring data at all, e.g. for
+	// blu-ray playback.
+	if (max_x == 720 && max_y == 576)
+		switch (sub.rects[0]->w) {
+		case 1280:
+			min_x = min_y = 0, max_x = 1280, max_y = 720;
+			break;
+		case 1920:
+			min_x = min_y = 0, max_x = 1920, max_y = 1080;
+			break;
+		}
 
 	for (int i = 0; i < Count(); i++) {
 		uint32_t * colors = (uint32_t *) sub.rects[i]->pict.data[1];
@@ -385,22 +365,24 @@ void cDvbSubtitleConverter::Reset(void)
 	Timeout.Set(0xFFFF*1000);
 }
 
+int cDvbSubtitleConverter::Convert(AVSubtitle *sub, int64_t pts)
+{
+	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
+	Bitmaps->SetSub(sub);
+	bitmaps->Add(Bitmaps);
+	return 0;
+}
+
 int cDvbSubtitleConverter::Convert(const uchar *Data, int Length, int64_t pts)
 {
-	AVPacket avpkt;
-	int got_subtitle = 0;
-	static cDvbSubtitleBitmaps *Bitmaps = NULL;
-
 	if(!avctx) {
 		dbgconverter("cDvbSubtitleConverter::Convert: no context\n");
 		return -1;
 	}
 
-	if(Bitmaps == NULL)
-		Bitmaps = new cDvbSubtitleBitmaps(pts);
+	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
 
- 	AVSubtitle * sub = Bitmaps->GetSub();
-
+	AVPacket avpkt;
 	av_init_packet(&avpkt);
 	avpkt.data = (uint8_t*) Data;
 	avpkt.size = Length;
@@ -408,6 +390,8 @@ int cDvbSubtitleConverter::Convert(const uchar *Data, int Length, int64_t pts)
 //	dbgconverter("cDvbSubtitleConverter::Convert: sub %x pkt %x pts %lld\n", sub, &avpkt, pts);
 	//avctx->sub_id = (anc_page << 16) | comp_page; //FIXME not patched ffmpeg needs this !
 
+ 	AVSubtitle *sub = Bitmaps->GetSub();
+	int got_subtitle = 0;
 	avcodec_decode_subtitle2(avctx, sub, &got_subtitle, &avpkt);
 //	dbgconverter("cDvbSubtitleConverter::Convert: pts %lld subs ? %s, %d bitmaps\n", pts, got_subtitle? "yes" : "no", sub->num_rects);
 
@@ -420,8 +404,8 @@ int cDvbSubtitleConverter::Convert(const uchar *Data, int Length, int64_t pts)
 			}
 		}
 		bitmaps->Add(Bitmaps);
-		Bitmaps = NULL;
-	}
+	} else
+		delete Bitmaps;
 
 	return 0;
 }

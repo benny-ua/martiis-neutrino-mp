@@ -71,6 +71,10 @@
 #include <system/set_threadname.h>
 #include <OpenThreads/ScopedLock>
 
+#if HAVE_SPARK_HARDWARE
+#include <libavcodec/avcodec.h>
+#endif
+
 //extern CPlugins *g_PluginList;
 #ifndef HAVE_COOL_HARDWARE
 #define LCD_MODE CVFD::MODE_MOVIE
@@ -117,12 +121,17 @@ static void framebuffer_blit(void)
 	CFrameBuffer::getInstance()->blit();
 }
 
+#if HAVE_SPARK_HARDWARE
+void dvbsub_write(AVSubtitle *sub, int64_t pts);
+#endif
+
 static void framebuffer_callback(
 	uint32_t** destination,
 	unsigned int *screen_width,
 	unsigned int *screen_height,
 	unsigned int *destStride,
-	void (**framebufferBlit)(void))
+	void (**framebufferBlit)(void),
+	void (**dvbsubWrite)(void *sub, int64_t pts))
 {
 	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
 #if HAVE_SPARK_HARDWARE
@@ -130,6 +139,7 @@ static void framebuffer_callback(
 	*screen_width = DEFAULT_XRES;
 	*screen_height = DEFAULT_YRES;
 	*destStride = DEFAULT_XRES * sizeof(fb_pixel_t);
+	*dvbsubWrite = (void (*)(void *, int64_t)) dvbsub_write;
 #else
 	*destination = frameBuffer->getFrameBufferPointer(true);
 	fb_var_screeninfo s;
@@ -139,6 +149,7 @@ static void framebuffer_callback(
 	fb_fix_screeninfo fix;
 	ioctl(frameBuffer->getFileHandle(), FBIOGET_FSCREENINFO, &fix);
 	*destStride = fix.line_length;
+	*dvbsubWrite = NULL;
 #endif
 	*framebufferBlit = framebuffer_blit;
 }
@@ -213,7 +224,6 @@ void CMoviePlayerGui::Init(void)
 	speed = 1;
 	timeshift = 0;
 	numpida = 0;
-	numpidd = 0;
 	numpids = 0;
 	numpidt = 0;
 	showStartingHint = false;
@@ -459,7 +469,6 @@ void CMoviePlayerGui::fillPids()
 		return;
 
 	numpida = 0; currentapid = -1;
-	numpidd = 0;
 	numpids = 0;
 	numpidt = 0; currentttxsub = "";
 	if(!p_movie_info->audioPids.empty()) {
@@ -496,13 +505,7 @@ void CMoviePlayerGui::Cleanup()
 		slanguage[i].clear();
 	}
 	numpids = 0;
-	// clear dvbsubtitlepids
-	for (unsigned int i = 0; i < numpidd; i++) {
-		dpids[i] = 0;
-		dlanguage[i].clear();
-	}
-	numpidd = 0;
-	// clear dvbsubtitlepids
+	// clear teletextpids
 	for (unsigned int i = 0; i < numpidt; i++) {
 		tpids[i] = 0;
 		tlanguage[i].clear();
@@ -743,7 +746,6 @@ bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::st
 	p_movie_info = &mi;
 
 	numpida = 0; currentapid = -1;
-	numpidd = 0;
 	numpids = 0;
 	numpidt = 0; currentttxsub = "";
 
@@ -990,6 +992,14 @@ bool CMoviePlayerGui::PlayFileStart(void)
 	return res;
 }
 
+bool CMoviePlayerGui::SetPosition(int pos, bool absolute)
+{
+	StopSubtitles(true);
+	bool res = playback->SetPosition(pos, absolute);
+	StartSubtitles(true);
+	return res;
+}
+
 void CMoviePlayerGui::PlayFileLoop(void)
 {
 	time_forced = false;
@@ -1196,60 +1206,27 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				FileTime.show(position, true);
 
 		} else if (msg == CRCInput::RC_1) {	// Jump Backwards 1 minute
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(-60 * 1000);
+			SetPosition(-60 * 1000);
 		} else if (msg == CRCInput::RC_3) {	// Jump Forward 1 minute
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(60 * 1000);
+			SetPosition(60 * 1000);
 		} else if (msg == CRCInput::RC_4) {	// Jump Backwards 5 minutes
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(-5 * 60 * 1000);
+			SetPosition(-5 * 60 * 1000);
 		} else if (msg == CRCInput::RC_6) {	// Jump Forward 5 minutes
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(5 * 60 * 1000);
+			SetPosition(5 * 60 * 1000);
 		} else if (msg == CRCInput::RC_7) {	// Jump Backwards 10 minutes
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(-10 * 60 * 1000);
+			SetPosition(-10 * 60 * 1000);
 		} else if (msg == CRCInput::RC_9) {	// Jump Forward 10 minutes
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(10 * 60 * 1000);
+			SetPosition(10 * 60 * 1000);
 		} else if (msg == CRCInput::RC_2) {	// goto start
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(0, true);
+			SetPosition(0, true);
 		} else if (msg == CRCInput::RC_5) {	// goto middle
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(duration/2, true);
+			SetPosition(duration/2, true);
 		} else if (msg == CRCInput::RC_8) {	// goto end
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(duration - 60 * 1000, true);
+			SetPosition(duration - 60 * 1000, true);
 		} else if (msg == CRCInput::RC_page_up) {
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(10 * 1000);
+			SetPosition(10 * 1000);
 		} else if (msg == CRCInput::RC_page_down) {
-#if 0
-			clearSubtitle();
-#endif
-			playback->SetPosition(-10 * 1000);
+			SetPosition(-10 * 1000);
 		} else if (msg == CRCInput::RC_0) {	// cancel bookmark jump
 			handleMovieBrowser(CRCInput::RC_0, position);
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_goto) {
@@ -1265,7 +1242,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			jumpTime.exec(NULL, "");
 			jumpTime.hide();
 			if (!cancel && (3 == sscanf(Value.c_str(), "%d:%d:%d", &hh, &mm, &ss)))
-				playback->SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
+				SetPosition(1000 * (hh * 3600 + mm * 60 + ss), true);
 		} else if (msg == CRCInput::RC_help || msg == CRCInput::RC_info) {
 			callInfoViewer(/*duration, position*/);
 			update_lcd = true;
@@ -1699,13 +1676,13 @@ void CMoviePlayerGui::handleMovieBrowser(neutrino_msg_t msg, int /*position*/)
 						if (jumpseconds > -15)
 							jumpseconds = -15;
 
-						playback->SetPosition(jumpseconds * 1000);
+						SetPosition(jumpseconds * 1000);
 					} else if (p_movie_info->bookmarks.user[book_nr].length > 0) {
 						// jump at least 15 seconds
 						if (jumpseconds < 15)
 							jumpseconds = 15;
 
-						playback->SetPosition(jumpseconds * 1000);
+						SetPosition(jumpseconds * 1000);
 					}
 					TRACE("[mp]  do jump %d sec\r\n", jumpseconds);
 					break;	// do no further bookmark checks
@@ -1912,11 +1889,11 @@ void CMoviePlayerGui::StopSubtitles(bool enable_glcd_mirroring __attribute__((un
 	int ttx, ttxpid, ttxpage;
 	int dvbpid;
 
-	dvbpid = dvbsub_getpid();
-	tuxtx_subtitle_running(&ttxpid, &ttxpage, &ttx);
-	if(dvbpid)
-		dvbsub_pause();
 	playback->SuspendSubtitle(true);
+	int current_sub = playback->GetSubtitlePid();
+	if (current_sub > -1)
+		dvbsub_pause();
+	tuxtx_subtitle_running(&ttxpid, &ttxpage, &ttx);
 	if(ttx) {
 		tuxtx_pause_subtitle(true);
 		frameBuffer->paintBackground();
@@ -1939,7 +1916,9 @@ void CMoviePlayerGui::StartSubtitles(bool show __attribute__((unused)))
 	if(!show)
 		return;
 	playback->SuspendSubtitle(false);
-	dvbsub_start(0, true);
+	int current_sub = playback->GetSubtitlePid();
+	if (current_sub > -1)
+		dvbsub_start(current_sub, true);
 	tuxtx_pause_subtitle(false);
 #endif
 }
@@ -2018,25 +1997,14 @@ unsigned int CMoviePlayerGui::getSubtitleCount(void)
 	// these may change in-stream
 	numpids = REC_MAX_SPIDS;
 	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
-	numpidd = REC_MAX_DPIDS;
-	playback->FindAllDvbsubtitlePids(dpids, &numpidd, dlanguage);
 	numpidt = REC_MAX_TPIDS;
 	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
 
-	return numpidd + numpids + numpidt;
+	return numpids + numpidt;
 }
 
 CZapitAbsSub* CMoviePlayerGui::getChannelSub(unsigned int i, CZapitAbsSub **s)
 {
-	if (i < numpidd) {
-		CZapitDVBSub *_s = new CZapitDVBSub;
-		_s->thisSubType = CZapitAbsSub::DVB;
-		_s->pId = dpids[i];
-		_s->ISO639_language_code = dlanguage[i];
-		*s = _s;
-		return *s;
-	}
-	i -= numpidd;
 	if (i < numpidt) {
 		int mag, page;
 		char *lang = (char *) alloca(tlanguage[i].size() + 1);
@@ -2068,7 +2036,6 @@ int CMoviePlayerGui::getCurrentSubPid(CZapitAbsSub::ZapitSubtitleType st)
 {
 	switch(st) {
 		case CZapitAbsSub::DVB:
-			return playback->GetDvbsubtitlePid();
 		case CZapitAbsSub::SUB:
 			return playback->GetSubtitlePid();
 		case CZapitAbsSub::TTX:

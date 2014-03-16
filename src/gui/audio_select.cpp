@@ -62,9 +62,6 @@ CAudioSelectMenuHandler::CAudioSelectMenuHandler()
 	AudioSelector = NULL;
 	width = w_max (40, 10);
 	mp = &CMoviePlayerGui::getInstance();
-#if HAVE_SPARK_HARDWARE
-	dvb_delay_offset = -1;
-#endif
 }
 
 CAudioSelectMenuHandler::~CAudioSelectMenuHandler()
@@ -88,22 +85,6 @@ int CAudioSelectMenuHandler::exec(CMenuTarget* parent, const std::string &action
 	int sel = -1;
 	if (AudioSelector) {
 		sel = AudioSelector->getSelected();
-#if HAVE_SPARK_HARDWARE
-		if (dvb_delay_offset > -1 && sel == dvb_delay_offset) {
-			if (actionkey == "-") {
-				if (g_settings.dvb_subtitle_delay > -99)
-					g_settings.dvb_subtitle_delay -= 1;
-				else
-					return menu_return::RETURN_NONE;
-			} else if (actionkey == "+") {
-				if (g_settings.dvb_subtitle_delay < 99)
-					g_settings.dvb_subtitle_delay += 1;
-				else
-					return menu_return::RETURN_NONE;
-			}
-			return menu_return::RETURN_REPAINT;
-		}
-#endif
 		sel -= apid_offset;
 		if (sel < 0 || sel >= p_count)
 			return menu_return::RETURN_NONE;
@@ -241,9 +222,6 @@ int CAudioSelectMenuHandler::doMenu ()
 	bool sep_added = false;
 	if(subtitleCount > 0)
 	{
-#if HAVE_SPARK_HARDWARE
-		bool have_dvb_sub = false;
-#endif
 		bool sub_active = false;
 
 		for (int i = 0 ; i < subtitleCount ; ++i)
@@ -264,9 +242,6 @@ int CAudioSelectMenuHandler::doMenu ()
 			char item[64];
 
 			if (s->thisSubType == CZapitAbsSub::DVB) {
-#if HAVE_SPARK_HARDWARE
-				have_dvb_sub = true;
-#endif
 				CZapitDVBSub* sd = reinterpret_cast<CZapitDVBSub*>(s);
 				// printf("[neutrino] adding DVB subtitle %s pid %x\n", sd->ISO639_language_code.c_str(), sd->pId);
 				snprintf(spid,sizeof(spid), "DVB:%d", sd->pId);
@@ -302,14 +277,6 @@ int CAudioSelectMenuHandler::doMenu ()
 			item->setItemButton(NEUTRINO_ICON_BUTTON_STOP, false);
 			AudioSelector->addItem(item);
 		}
-#if HAVE_SPARK_HARDWARE
-		if (have_dvb_sub) {
-			dvb_delay_offset = AudioSelector->getItemsCount();
-			CMenuOptionNumberChooser *ch = new CMenuOptionNumberChooser(LOCALE_SUBTITLES_DELAY, (int *)&g_settings.dvb_subtitle_delay, true, -99, 99);
-			ch->setNumberFormat(std::string("%d ") + g_Locale->getText(LOCALE_UNIT_SHORT_SECOND));
-			AudioSelector->addItem(ch);
-		}
-#endif
 	}
 
 	int res = AudioSelector->exec(NULL, "");
@@ -317,8 +284,5 @@ int CAudioSelectMenuHandler::doMenu ()
 	delete AudioSelector;
 	AudioSelector = NULL;
 
-#if HAVE_SPARK_HARDWARE
-	dvbsub_set_stc_offset(g_settings.dvb_subtitle_delay * 90000);
-#endif
 	return res;
 }
