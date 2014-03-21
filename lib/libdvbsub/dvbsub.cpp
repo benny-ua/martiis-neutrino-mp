@@ -340,21 +340,24 @@ static int ass_size;
 
 // Thes functions below are based on ffmpeg-2.1.4/libavcodec/ass.c,
 // Copyright (c) 2010 Aurelien Jacobs <aurel@gnuage.org>
+
+// These are the FFMPEG defaults:
 #define ASS_DEFAULT_FONT		"Arial"
 #define ASS_DEFAULT_FONT_SIZE		16
 #define ASS_DEFAULT_COLOR		0xffffff
-#define ASS_DEFAULT_OUTLINE_COLOR	0xffffff
+#define ASS_DEFAULT_OUTLINE_COLOR	0
 #define ASS_DEFAULT_BACK_COLOR		0
 #define ASS_DEFAULT_BOLD		0
 #define ASS_DEFAULT_ITALIC		0
 #define ASS_DEFAULT_UNDERLINE		0
 #define ASS_DEFAULT_ALIGNMENT		2
 
+// And this is what we're going to use:
 #define ASS_CUSTOM_FONT			"Arial"
-#define ASS_CUSTOM_FONT_SIZE		32
+#define ASS_CUSTOM_FONT_SIZE		36
 #define ASS_CUSTOM_COLOR		0xffffff
 #define ASS_CUSTOM_OUTLINE_COLOR	0
-#define ASS_CUSTOM_BACK_COLOR		0x80808080
+#define ASS_CUSTOM_BACK_COLOR		0
 #define ASS_CUSTOM_BOLD			0
 #define ASS_CUSTOM_ITALIC		0
 #define ASS_CUSTOM_UNDERLINE		0
@@ -383,7 +386,7 @@ static std::string ass_subtitle_header_default(void) {
 		ASS_DEFAULT_FONT,
 		ASS_DEFAULT_FONT_SIZE,
 		ASS_DEFAULT_COLOR,
-		ASS_DEFAULT_COLOR,
+		ASS_DEFAULT_OUTLINE_COLOR,
 		ASS_DEFAULT_BACK_COLOR,
 		ASS_DEFAULT_BOLD,
 		ASS_DEFAULT_ITALIC,
@@ -396,7 +399,7 @@ static std::string ass_subtitle_header_custom(void) {
 		ASS_CUSTOM_FONT,
 		ASS_CUSTOM_FONT_SIZE,
 		ASS_CUSTOM_COLOR,
-		ASS_CUSTOM_COLOR,
+		ASS_CUSTOM_OUTLINE_COLOR,
 		ASS_CUSTOM_BACK_COLOR,
 		ASS_CUSTOM_BOLD,
 		ASS_CUSTOM_ITALIC,
@@ -678,24 +681,13 @@ static void* dvbsub_thread(void* /*arg*/)
 			ASS_Image *image = ass_render_frame(ass_renderer, ass_track, pts/90, &detect_change);
 			if (detect_change) {
 				if (clr_x1 && clr_y1) {
-					fb->paintBoxRel(clr_x0, clr_y0, clr_x1 - clr_x0 + 3, clr_y1 - clr_y0 + 3, 0);
+					fb->paintBox(clr_x0, clr_y0, clr_x1 + 1, clr_y1 + 1, 0);
 					clr_x0 = xres;
 					clr_y0 = yres;
 					clr_x1 = clr_y1 = 0;
 				}
 
 				while (image) {
-					if (image->w && image->h && image->dst_x > -1 && image->dst_x + image->w < xres && image->dst_y > -1 && image->dst_y + image->h < yres) {
-						if (image->dst_x < clr_x0)
-							clr_x0 = image->dst_x;
-						if (image->dst_y < clr_y0)
-							clr_y0 = image->dst_y;
-						if (image->dst_x + image->w > clr_x1)
-							clr_x1 = image->dst_x + image->w;
-						if (image->dst_y + image->w > clr_y1)
-							clr_y1 = image->dst_y + image->h;
-					}
-
 					if (last_color != image->color) {
 						last_color = image->color;
 						uint32_t c = last_color >> 8, a = 255 - (last_color & 0xff);
@@ -705,6 +697,15 @@ static void* dvbsub_thread(void* /*arg*/)
 						}
 					}
 					if (image->w && image->h && image->dst_x > -1 && image->dst_x + image->w < xres && image->dst_y > -1 && image->dst_y + image->h < yres) {
+						if (image->dst_x < clr_x0)
+							clr_x0 = image->dst_x;
+						if (image->dst_y < clr_y0)
+							clr_y0 = image->dst_y;
+						if (image->dst_x + image->w > clr_x1)
+							clr_x1 = image->dst_x + image->w;
+						if (image->dst_y + image->w > clr_y1)
+							clr_y1 = image->dst_y + image->h;
+
 						uint32_t *lfb = fb->getFrameBufferPointer() + image->dst_x + xres * image->dst_y;
 						unsigned char *bm = image->bitmap;
 						int bm_add = image->stride - image->w;
@@ -712,7 +713,7 @@ static void* dvbsub_thread(void* /*arg*/)
 						for (int y = 0; y < image->h; y++) {
 							for (int x = 0; x < image->w; x++) {
 								if (*bm)
-										*lfb = colortable[*bm];
+									*lfb = colortable[*bm];
 								lfb++, bm++;
 							}
 							lfb += lfb_add;
@@ -726,7 +727,7 @@ static void* dvbsub_thread(void* /*arg*/)
 			continue;
 		} else {
 			if (clr_x1 && clr_y1) {
-				fb->paintBoxRel(clr_x0, clr_y0, clr_x1 - clr_x0 + 3, clr_y1 - clr_y0 + 3, 0);
+				fb->paintBox(clr_x0, clr_y0, clr_x1 + 1, clr_y1 + 1, 0);
 				clr_x0 = xres;
 				clr_y0 = yres;
 				clr_x1 = clr_y1 = 0;
