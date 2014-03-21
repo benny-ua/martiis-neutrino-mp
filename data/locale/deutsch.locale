@@ -302,9 +302,9 @@ colormenu.background Hintergrundfarbe
 colormenu.clock_textcolor Ziffernfarbe
 colormenu.contrast_fonts Schriftkontrast
 colormenu.fade Ein-/Ausblenden
-colormenu.font Neutrino Schriftart
-colormenu.font_sub Untertitel-Schriftart
-colormenu.font_ttx Teletext-Schriftart
+colormenu.font Neutrino
+colormenu.font_sub Untertitel
+colormenu.font_ttx Teletext
 colormenu.hd_preset LCD
 colormenu.menucolors Farben
 colormenu.osd_preset Monitor Auswahl
@@ -611,6 +611,7 @@ flashupdate.wrongbase Abweichende Release-Information\nFortfahren?
 fontmenu.channellist Kanalliste
 fontmenu.epg EPG (Programmführer)
 fontmenu.eventlist Event-Liste
+fontmenu.fonts Schriftarten
 fontmenu.gamelist Spiele-Liste
 fontmenu.head Schrift
 fontmenu.infobar Infobar
@@ -619,7 +620,7 @@ fontmenu.other Andere
 fontmenu.scaling Schriftgrößenfaktor
 fontmenu.scaling_x Horizontal
 fontmenu.scaling_y Vertikal
-fontmenu.sizes Schriftgrössen
+fontmenu.sizes Schriftgrößen
 fontsize.channel_num_zap Direktauswahl
 fontsize.channellist Kanalliste
 fontsize.channellist_descr Beschreibung
@@ -1611,7 +1612,7 @@ moviebrowser.short_prodyear Jahr
 moviebrowser.short_quality Qualität
 moviebrowser.short_recorddate Datum
 moviebrowser.short_serie Serie
-moviebrowser.short_size Grösse
+moviebrowser.short_size Größe
 moviebrowser.short_title Titel
 moviebrowser.start_head Film starten von Position:
 moviebrowser.start_record_start Aufnahmestart

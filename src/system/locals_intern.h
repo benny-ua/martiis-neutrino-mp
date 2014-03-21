@@ -638,6 +638,7 @@ const char * locale_real_names[] =
 	"fontmenu.channellist",
 	"fontmenu.epg",
 	"fontmenu.eventlist",
+	"fontmenu.fonts",
 	"fontmenu.gamelist",
 	"fontmenu.head",
 	"fontmenu.infobar",

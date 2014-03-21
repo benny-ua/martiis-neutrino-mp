@@ -302,9 +302,9 @@ colormenu.background Background
 colormenu.clock_textcolor Digit color
 colormenu.contrast_fonts Contrast fonts
 colormenu.fade Fade GUI
-colormenu.font Select GUI font
-colormenu.font_sub Select Subtitle font
-colormenu.font_ttx Select Teletext font
+colormenu.font Neutrino GUI
+colormenu.font_sub Subtitles
+colormenu.font_ttx Teletext
 colormenu.hd_preset LCD
 colormenu.menucolors Colors
 colormenu.osd_preset TV preset
@@ -611,6 +611,7 @@ flashupdate.wrongbase Your Release cycle differs.\nTo continue?
 fontmenu.channellist Channellist
 fontmenu.epg EPG
 fontmenu.eventlist Eventlist
+fontmenu.fonts Fonts
 fontmenu.gamelist Gamelist
 fontmenu.head Font settings
 fontmenu.infobar Infobar
