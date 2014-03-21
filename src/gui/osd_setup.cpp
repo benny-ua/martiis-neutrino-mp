@@ -946,7 +946,7 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 	CMenuWidget *fontSettings = menu_fonts;
 	CMenuForwarder * mf;
 
-	fontSettings->addIntroItems(LOCALE_FONTMENU_HEAD);
+	fontSettings->addIntroItems(LOCALE_FONTMENU_HEAD, LOCALE_FONTMENU_FONTS);
 
 	// select gui font file
 	osdFontFile = g_settings.font_file;
@@ -968,6 +968,8 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 	mfSubFontFile = new CMenuForwarder(LOCALE_COLORMENU_FONT_SUB, true, osdSubFontFile.c_str(), this, "sub_font",  CRCInput::RC_yellow);
 	mfSubFontFile->setHint("", LOCALE_MENU_HINT_FONT_SUB);
 	fontSettings->addItem(mfSubFontFile);
+
+	fontSettings->addItem(GenericMenuSeparatorLine);
 
 	// contrast fonts
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_COLORMENU_CONTRAST_FONTS, &g_settings.contrast_fonts, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
