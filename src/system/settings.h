@@ -663,9 +663,7 @@ struct SNeutrinoSettings
 		FONT_TYPE_INFOBAR_SMALL,
 		FONT_TYPE_FILEBROWSER_ITEM,
 		FONT_TYPE_MENU_HINT,
-#if !HAVE_SPARK_HARDWARE
 		FONT_TYPE_SUBTITLES,
-#endif
 		FONT_TYPE_COUNT
 	};
 
@@ -767,6 +765,7 @@ struct SNeutrinoSettings
 	int	sms_channel;
 	std::string	font_file;
 	std::string	ttx_font_file;
+	std::string	sub_font_file;
 	std::string	update_dir;
 	int	adzap_zapBackPeriod;
 	int	menu_numbers_as_icons;

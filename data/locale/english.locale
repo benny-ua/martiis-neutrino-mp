@@ -303,6 +303,7 @@ colormenu.clock_textcolor Digit color
 colormenu.contrast_fonts Contrast fonts
 colormenu.fade Fade GUI
 colormenu.font Select GUI font
+colormenu.font_sub Select Subtitle font
 colormenu.font_ttx Select Teletext font
 colormenu.hd_preset LCD
 colormenu.menucolors Colors
@@ -979,6 +980,7 @@ menu.hint_font_gui Select font file to use for GUI
 menu.hint_font_scaling Set global vertical and horizontal GUI font scaling
 menu.hint_font_scaling_x Set global horizontal GUI font scaling factor (50% to 200%)
 menu.hint_font_scaling_y Set global vertical GUI font scaling factor (50% to 200%)
+menu.hint_font_sub Select font file to use for Movieplayer subtitles
 menu.hint_font_ttx Select font file to use for teletext
 menu.hint_fonts Configure GUI fonts and font sizes
 menu.hint_gamelist_fonts Change games and scripts list font sizes
@@ -1154,6 +1156,7 @@ menu.hint_osd Colors, fonts, screen size\nGUI look and feel options
 menu.hint_osd_language Select OSD language
 menu.hint_osd_preset Pre-configured screen margins for CRT and LCD TV
 menu.hint_osd_timing After this time the OSD will be faded out
+menu.hint_other_fonts Change other font sizes
 menu.hint_parentallock_changepin Change PIN code
 menu.hint_parentallock_lockage Select age allowed to watch
 menu.hint_parentallock_menu Lock menus with pin code

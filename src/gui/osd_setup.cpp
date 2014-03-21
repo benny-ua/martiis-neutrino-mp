@@ -69,6 +69,8 @@ extern CRemoteControl * g_RemoteControl;
 
 extern const char * locale_real_names[];
 extern std::string ttx_font_file;
+extern std::string sub_font_file;
+extern int sub_font_size;
 
 COsdSetup::COsdSetup(bool wizard_mode)
 {
@@ -79,6 +81,7 @@ COsdSetup::COsdSetup(bool wizard_mode)
 	submenu_menus = NULL;
 	mfFontFile = NULL;
 	mfTtxFontFile = NULL;
+	mfSubFontFile = NULL;
 	mfWindowSize = NULL;
 	win_demo = NULL;
 
@@ -145,33 +148,22 @@ const SNeutrinoSettings::FONT_TYPES menu_font_sizes[4] =
 	SNeutrinoSettings::FONT_TYPE_MENU_HINT
 };
 
-#if HAVE_SPARK_HARDWARE
-const SNeutrinoSettings::FONT_TYPES other_font_sizes[1] =
-{
-	SNeutrinoSettings::FONT_TYPE_FILEBROWSER_ITEM
-};
-#else
 const SNeutrinoSettings::FONT_TYPES other_font_sizes[2] =
 {
 	SNeutrinoSettings::FONT_TYPE_SUBTITLES,
 	SNeutrinoSettings::FONT_TYPE_FILEBROWSER_ITEM
 };
-#endif
 
 #define FONT_GROUP_COUNT 7
 font_sizes_groups font_sizes_groups[FONT_GROUP_COUNT] =
 {
-	{LOCALE_FONTMENU_MENU       , 4, menu_font_sizes       , "fontsize.doth", LOCALE_MENU_HINT_MENU_FONTS },
+	{LOCALE_FONTMENU_MENU       , 4, menu_font_sizes       , "fontsize.dmen", LOCALE_MENU_HINT_MENU_FONTS },
 	{LOCALE_FONTMENU_CHANNELLIST, 5, channellist_font_sizes, "fontsize.dcha", LOCALE_MENU_HINT_CHANNELLIST_FONTS },
 	{LOCALE_FONTMENU_EVENTLIST  , 5, eventlist_font_sizes  , "fontsize.deve", LOCALE_MENU_HINT_EVENTLIST_FONTS },
 	{LOCALE_FONTMENU_EPG        , 4, epg_font_sizes        , "fontsize.depg", LOCALE_MENU_HINT_EPG_FONTS },
 	{LOCALE_FONTMENU_INFOBAR    , 4, infobar_font_sizes    , "fontsize.dinf", LOCALE_MENU_HINT_INFOBAR_FONTS },
 	{LOCALE_FONTMENU_GAMELIST   , 2, gamelist_font_sizes   , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS },
-#if HAVE_SPARK_HARDWARE
-	{LOCALE_FONTMENU_OTHER      , 1, other_font_sizes      , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS }
-#else
-	{LOCALE_FONTMENU_OTHER      , 2, other_font_sizes      , "fontsize.dgam", LOCALE_MENU_HINT_GAMELIST_FONTS }
-#endif
+	{LOCALE_FONTMENU_OTHER      , 2, other_font_sizes      , "fontsize.doth", LOCALE_MENU_HINT_OTHER_FONTS }
 };
 
 font_sizes_struct neutrino_font[SNeutrinoSettings::FONT_TYPE_COUNT] =
@@ -201,9 +193,7 @@ font_sizes_struct neutrino_font[SNeutrinoSettings::FONT_TYPE_COUNT] =
 	{LOCALE_FONTSIZE_INFOBAR_SMALL      ,  14, CNeutrinoFonts::FONT_STYLE_REGULAR, 1},
 	{LOCALE_FONTSIZE_FILEBROWSER_ITEM   ,  16, CNeutrinoFonts::FONT_STYLE_BOLD   , 1},
 	{LOCALE_FONTSIZE_MENU_HINT          ,  16, CNeutrinoFonts::FONT_STYLE_REGULAR, 0},
-#if !HAVE_SPARK_HARDWARE
 	{LOCALE_FONTSIZE_SUBTITLES          ,  25, CNeutrinoFonts::FONT_STYLE_BOLD   , 0}
-#endif
 };
 
 int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
@@ -248,6 +238,22 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			CNeutrinoApp::getInstance()->SetupFonts(CNeutrinoFonts::FONTSETUP_NEUTRINO_FONT | CNeutrinoFonts::FONTSETUP_NEUTRINO_FONT_INST);
 			osdTtxFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
 			mfTtxFontFile->setOption(osdTtxFontFile);
+		}
+		return res;
+	}
+	else if(actionKey == "sub_font")
+	{
+		CFileBrowser fileBrowser;
+		CFileFilter fileFilter;
+		fileFilter.addFilter("ttf");
+		fileBrowser.Filter = &fileFilter;
+		if (fileBrowser.exec(FONTDIR) == true)
+		{
+			g_settings.sub_font_file = fileBrowser.getSelectedFile()->Name;
+			sub_font_file = fileBrowser.getSelectedFile()->Name;
+			printf("[neutrino] sub font file %s\n", fileBrowser.getSelectedFile()->Name.c_str());
+			osdSubFontFile = getBaseName(fileBrowser.getSelectedFile()->Name);
+			mfSubFontFile->setOption(osdSubFontFile);
 		}
 		return res;
 	}
@@ -790,6 +796,8 @@ int COsdSetup::showOsdSetup()
 	if (oldVolumeSize != g_settings.volume_size)
 		CVolumeHelper::getInstance()->refresh();
 
+	sub_font_size = CNeutrinoApp::getInstance()->getConfigFile()->getInt32("fontsize.subtitles", 24);
+
 	delete osd_menu;
 	return res;
 }
@@ -954,8 +962,15 @@ void COsdSetup::showOsdFontSizeSetup(CMenuWidget *menu_fonts)
 	mfTtxFontFile->setHint("", LOCALE_MENU_HINT_FONT_TTX);
 	fontSettings->addItem(mfTtxFontFile);
 
+	// select subtitle font file
+	osdSubFontFile = g_settings.sub_font_file;
+	osdSubFontFile = getBaseName(osdSubFontFile);
+	mfSubFontFile = new CMenuForwarder(LOCALE_COLORMENU_FONT_SUB, true, osdSubFontFile.c_str(), this, "sub_font",  CRCInput::RC_yellow);
+	mfSubFontFile->setHint("", LOCALE_MENU_HINT_FONT_SUB);
+	fontSettings->addItem(mfSubFontFile);
+
 	// contrast fonts
-	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_COLORMENU_CONTRAST_FONTS, &g_settings.contrast_fonts, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this, CRCInput::RC_yellow);
+	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_COLORMENU_CONTRAST_FONTS, &g_settings.contrast_fonts, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_CONTRAST_FONTS);
 	fontSettings->addItem(mc);
 

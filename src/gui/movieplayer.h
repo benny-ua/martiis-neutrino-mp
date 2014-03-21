@@ -46,7 +46,6 @@
 #include <zapit/channel.h>
 #include <playback.h>
 #if HAVE_COOL_HARDWARE
-#include <playback.h>
 #include <audio_cs.h>
 #else
 #include <audio_td.h>

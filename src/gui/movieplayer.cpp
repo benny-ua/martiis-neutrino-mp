@@ -114,50 +114,16 @@ CMoviePlayerGui::~CMoviePlayerGui()
 	instance_mp = NULL;
 }
 
-#if !HAVE_COOL_HARDWARE
-// for libeplayer3/libass subtitles
-static void framebuffer_blit(void)
-{
-	CFrameBuffer::getInstance()->blit();
-}
-
-#if HAVE_SPARK_HARDWARE
-void dvbsub_write(AVSubtitle *sub, int64_t pts);
-#endif
-
-static void framebuffer_callback(
-	uint32_t** destination,
-	unsigned int *screen_width,
-	unsigned int *screen_height,
-	unsigned int *destStride,
-	void (**framebufferBlit)(void),
-	void (**dvbsubWrite)(void *sub, int64_t pts))
-{
-	CFrameBuffer *frameBuffer = CFrameBuffer::getInstance();
-#if HAVE_SPARK_HARDWARE
-	*destination = frameBuffer->getFrameBufferPointer();
-	*screen_width = DEFAULT_XRES;
-	*screen_height = DEFAULT_YRES;
-	*destStride = DEFAULT_XRES * sizeof(fb_pixel_t);
-	*dvbsubWrite = (void (*)(void *, int64_t)) dvbsub_write;
-#else
-	*destination = frameBuffer->getFrameBufferPointer(true);
-	fb_var_screeninfo s;
-	ioctl(frameBuffer->getFileHandle(), FBIOGET_VSCREENINFO, &s);
-	*screen_width = s.xres;
-	*screen_height = s.yres;
-	fb_fix_screeninfo fix;
-	ioctl(frameBuffer->getFileHandle(), FBIOGET_FSCREENINFO, &fix);
-	*destStride = fix.line_length;
-	*dvbsubWrite = NULL;
-#endif
-	*framebufferBlit = framebuffer_blit;
-}
-#endif
-
 void getPlayerPts(int64_t *pts)
 {
-	*pts = CMoviePlayerGui::getInstance().GetPts();
+	//playback->GetPosition(position, duration)
+	//*pts = CMoviePlayerGui::getInstance().Pts();
+	cPlayback *playback = CMoviePlayerGui::getInstance().getPlayback();
+	if (playback) {
+		int position, duration;
+		playback->GetPosition(position, duration);
+		*pts = position * 90;
+	}
 }
 
 uint64_t CMoviePlayerGui::GetPts(void)
@@ -232,11 +198,7 @@ void CMoviePlayerGui::Init(void)
 
 	StreamType = AUDIO_FMT_AUTO;
 	hintBox = NULL;
-#if HAVE_COOL_HARDWARE
-	playback = new cPlayback(3/*, &framebuffer_callback*/);
-#else
-	playback = new cPlayback(3, &framebuffer_callback);
-#endif
+	playback = new cPlayback(3);
 	stopped = true;
 }
 

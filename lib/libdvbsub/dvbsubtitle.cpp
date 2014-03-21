@@ -159,20 +159,15 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 		dbgconverter("cDvbSubtitleBitmaps::Draw: scaled bitmap=%d x_new=%d y_new=%d, w_new=%d, h_new=%d\n",
 			i, x_new, y_new, width_new, height_new);
 		fb->blitArea(width, height, x_new, y_new, width_new, height_new);
-		fb->blit();
 	}
+	if (Count())
+		fb->blit();
 
 	dbgconverter("cDvbSubtitleBitmaps::%s: done\n", __func__);
 #else
 	int i;
 #if !HAVE_SPARK_HARDWARE
 	int stride = CFrameBuffer::getInstance()->getScreenWidth(true);
-#if 0
-	int wd = CFrameBuffer::getInstance()->getScreenWidth();
-	int xstart = CFrameBuffer::getInstance()->getScreenX();
-	int yend = CFrameBuffer::getInstance()->getScreenY() + CFrameBuffer::getInstance()->getScreenHeight();
-	int ystart = CFrameBuffer::getInstance()->getScreenY();
-#endif
 	uint32_t *sublfb = CFrameBuffer::getInstance()->getFrameBufferPointer();
 #endif
 
@@ -180,12 +175,6 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 
 	int sw = CFrameBuffer::getInstance()->getScreenWidth(true);
 	int sh = CFrameBuffer::getInstance()->getScreenHeight(true);
-#if 0
-	double xc = (double) CFrameBuffer::getInstance()->getScreenWidth(true)/(double) 720;
-	double yc = (double) CFrameBuffer::getInstance()->getScreenHeight(true)/(double) 576;
-	xc = yc; //FIXME should we scale also to full width ?
-	int xf = xc * (double) 720;
-#endif
 
 	for (i = 0; i < Count(); i++) {
 		uint32_t * colors = (uint32_t *) sub.rects[i]->pict.data[1];
@@ -193,20 +182,6 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 		int height = sub.rects[i]->h;
 		int xoff, yoff;
 
-#if 0
-		int nw = width == 1280 ? ((double) width / xc) : ((double) width * xc);
-		int nh = (double) height * yc;
-
-		int xdiff = (wd > xf) ? ((wd - xf) / 2) : 0;
-		xoff = sub.rects[i]->x*xc + xstart + xdiff;
-		if(sub.rects[i]->y < 576/2) {
-			yoff = ystart + sub.rects[i]->y*yc;
-		} else {
-			yoff = yend - ((width == 1280 ? 704:576) - (double) (sub.rects[i]->y + height))*yc - nh;
-			if(yoff < ystart)
-				yoff = ystart;
-		}
-#endif
 		int h2 = (width == 1280) ? 720 : 576;
 		xoff = sub.rects[i]->x * sw / width;
 		yoff = sub.rects[i]->y * sh / h2;
@@ -243,10 +218,6 @@ void cDvbSubtitleBitmaps::Draw(int &min_x, int &min_y, int &max_x, int &max_y)
 
 	if (Count())	/* sync framebuffer */
 		CFrameBuffer::getInstance()->blit();
-
-//	if(Count())
-//		dbgconverter("cDvbSubtitleBitmaps::Draw: finish, min/max screen: x=% d y= %d, w= %d, h= %d\n", min_x, min_y, max_x-min_x, max_y-min_y);
-//	dbgconverter("\n");
 #endif
 }
 

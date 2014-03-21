@@ -11,10 +11,21 @@
 #include <sys/time.h>
 
 #include <cerrno>
+#include <map>
 
 #include <zapit/include/dmx.h>
 #include <system/set_threadname.h>
+#include <driver/framebuffer.h>
+
 #include <poll.h>
+
+extern "C" {
+#include <ass/ass.h>
+}
+
+#include <OpenThreads/ScopedLock>
+#include <OpenThreads/Thread>
+#include <OpenThreads/Condition>
 
 #include "Debug.hpp"
 #include "PacketQueue.hpp"
@@ -37,6 +48,12 @@ static pthread_cond_t readerCond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t readerMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t packetCond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t packetMutex = PTHREAD_MUTEX_INITIALIZER;
+
+static OpenThreads::Mutex ass_mutex;
+static std::map<int,ASS_Track*> ass_map;
+static ASS_Library *ass_library;
+static ASS_Renderer *ass_renderer;
+static ASS_Track *ass_track = NULL;
 
 static int reader_running;
 static int dvbsub_running;
@@ -90,6 +107,8 @@ int dvbsub_pause()
 
 		printf("[dvb-sub] paused\n");
 	}
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+	ass_track = NULL;
 
 	return 0;
 }
@@ -134,6 +153,14 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 #else
 	if(dvbsub_pid > 0) {
 #endif
+		if (isEplayer) {
+			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+			std::map<int,ASS_Track*>::iterator it = ass_map.find(dvbsub_pid);
+			if (it != ass_map.end())
+				ass_track = it->second;
+			else
+				ass_track = NULL; //FIXME
+		}
 		dvbsub_stopped = 0;
 		dvbsub_paused = false;
 		if(dvbSubtitleConverter)
@@ -286,11 +313,157 @@ static void clear_queue()
 	pthread_mutex_unlock(&packetMutex);
 }
 
+extern "C" void dvbsub_ass_clear(void);
+void dvbsub_ass_clear(void)
+{
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+	ass_track = NULL;
+
+	for(std::map<int,ASS_Track*>::iterator it = ass_map.begin(); it != ass_map.end(); ++it)
+		ass_free_track(it->second);
+	ass_map.clear();
+	if (ass_renderer) {
+		ass_renderer_done(ass_renderer);
+		ass_renderer = NULL;
+	}
+	if (ass_library) {
+		ass_library_done(ass_library);
+		ass_library = NULL;
+	}
+}
+
+// from neutrino.cpp
+extern std::string *sub_font_file;
+extern int sub_font_size;
+static std::string ass_font;
+static int ass_size;
+
+// Thes functions below are based on ffmpeg-2.1.4/libavcodec/ass.c,
+// Copyright (c) 2010 Aurelien Jacobs <aurel@gnuage.org>
+#define ASS_DEFAULT_FONT		"Arial"
+#define ASS_DEFAULT_FONT_SIZE		16
+#define ASS_DEFAULT_COLOR		0xffffff
+#define ASS_DEFAULT_OUTLINE_COLOR	0xffffff
+#define ASS_DEFAULT_BACK_COLOR		0
+#define ASS_DEFAULT_BOLD		0
+#define ASS_DEFAULT_ITALIC		0
+#define ASS_DEFAULT_UNDERLINE		0
+#define ASS_DEFAULT_ALIGNMENT		2
+
+#define ASS_CUSTOM_FONT			"Arial"
+#define ASS_CUSTOM_FONT_SIZE		32
+#define ASS_CUSTOM_COLOR		0xffffff
+#define ASS_CUSTOM_OUTLINE_COLOR	0
+#define ASS_CUSTOM_BACK_COLOR		0x80808080
+#define ASS_CUSTOM_BOLD			0
+#define ASS_CUSTOM_ITALIC		0
+#define ASS_CUSTOM_UNDERLINE		0
+#define ASS_CUSTOM_ALIGNMENT		2
+
+static std::string ass_subtitle_header(const char *font, int font_size,
+		int color, int outline_color, int back_color, int bold, int italic, int underline, int alignment)
+{
+	char buf[8192];
+	snprintf(buf, sizeof(buf), 
+		"[Script Info]\r\n"
+		"ScriptType: v4.00+\r\n"
+		"\r\n"
+		"[V4+ Styles]\r\n"
+		"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, AlphaLevel, Encoding\r\n"
+		"Style: Default,%s,%d,&H%x,&H%x,&H%x,&H%x,%d,%d,%d,1,1,0,%d,10,10,10,0,0\r\n"
+		"\r\n"
+		"[Events]\r\n"
+		"Format: Layer, Start, End, Style, Text\r\n",
+		font, font_size, color, color, outline_color, back_color, -bold, -italic, -underline, alignment);
+	return std::string(buf);
+}
+
+static std::string ass_subtitle_header_default(void) {
+	return ass_subtitle_header(
+		ASS_DEFAULT_FONT,
+		ASS_DEFAULT_FONT_SIZE,
+		ASS_DEFAULT_COLOR,
+		ASS_DEFAULT_COLOR,
+		ASS_DEFAULT_BACK_COLOR,
+		ASS_DEFAULT_BOLD,
+		ASS_DEFAULT_ITALIC,
+		ASS_DEFAULT_UNDERLINE,
+		ASS_DEFAULT_ALIGNMENT);
+}
+
+static std::string ass_subtitle_header_custom(void) {
+	return ass_subtitle_header(
+		ASS_CUSTOM_FONT,
+		ASS_CUSTOM_FONT_SIZE,
+		ASS_CUSTOM_COLOR,
+		ASS_CUSTOM_COLOR,
+		ASS_CUSTOM_BACK_COLOR,
+		ASS_CUSTOM_BOLD,
+		ASS_CUSTOM_ITALIC,
+		ASS_CUSTOM_UNDERLINE,
+		ASS_CUSTOM_ALIGNMENT);
+}
+// The functions above are based on ffmpeg-2.1.4/libavcodec/ass.c,
+// Copyright (c) 2010 Aurelien Jacobs <aurel@gnuage.org>
+
+
+// FIXME -- separating reader and writer might reduce latency
+extern "C" void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid);
+void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid)
+{
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+	std::map<int,ASS_Track*>::iterator it = ass_map.find(pid);
+	ASS_Track *track;
+	if (it == ass_map.end()) {
+		CFrameBuffer *fb = CFrameBuffer::getInstance();
+		int xres = fb->getScreenWidth(true);
+		int yres = fb->getScreenHeight(true);
+		if (!ass_library) {
+			ass_library = ass_library_init();
+			ass_set_extract_fonts(ass_library, 1);
+			ass_set_style_overrides(ass_library, NULL);
+			ass_renderer = ass_renderer_init(ass_library);
+			ass_set_frame_size(ass_renderer, xres, yres);
+			ass_set_margins(ass_renderer, 3 * yres / 100, 3 * yres / 100, 3 * xres / 100, 3 * xres / 100);
+			ass_set_use_margins(ass_renderer, 1);
+			ass_set_hinting(ass_renderer, ASS_HINTING_LIGHT);
+			ass_set_aspect_ratio(ass_renderer, 1.0, 1.0);
+			ass_font = *sub_font_file;
+			ass_set_fonts(ass_renderer, ass_font.c_str(), "Arial", 0, NULL, 1);
+		}
+		track = ass_new_track(ass_library);
+		track->PlayResX = xres;
+		track->PlayResY = yres;
+		ass_size = sub_font_size;
+		ass_set_font_scale(ass_renderer, ((double) ass_size)/ASS_CUSTOM_FONT_SIZE);
+		if (c->subtitle_header) {
+			std::string ass_hdr = ass_subtitle_header_default();
+			if (ass_hdr.compare((char*) c->subtitle_header)) {
+				ass_process_codec_private(track, (char *) c->subtitle_header, c->subtitle_header_size);
+			} else {
+				// This is the FFMPEG default ASS header. Use something more suitable instead
+				ass_hdr = ass_subtitle_header_custom();
+				ass_process_codec_private(track, (char *) ass_hdr.c_str(), ass_hdr.length());
+			}
+		}
+		ass_map[pid] = track;
+		if (pid == dvbsub_pid)
+			ass_track = track;
+//fprintf(stderr, "### got subtitle track %d, subtitle header: \n---\n%s\n---\n", pid, c->subtitle_header);
+	} else
+		track = it->second;
+	for (unsigned int i = 0; i < sub->num_rects; i++)
+		if (sub->rects[i]->ass)
+			ass_process_data(track, sub->rects[i]->ass, strlen(sub->rects[i]->ass));
+	avsubtitle_free(sub);
+}
+
+extern "C" void dvbsub_write(AVSubtitle *sub, int64_t pts);
 void dvbsub_write(AVSubtitle *sub, int64_t pts)
 {
 	pthread_mutex_lock(&packetMutex);
 	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
-	Bitmaps->SetSub(sub); // Note: this will copy sub, including any references. DON'T call avsubtitle_free() from the caller.
+	Bitmaps->SetSub(sub); // Note: this will copy sub, including all references. DON'T call avsubtitle_free() from the caller.
 	bitmap_queue.push((unsigned char *) Bitmaps);
 	pthread_cond_broadcast(&packetCond);
 	pthread_mutex_unlock(&packetMutex);
@@ -301,7 +474,9 @@ static void* reader_thread(void * /*arg*/)
 	int fds[2];
 	pipe(fds);
 	fcntl(fds[0], F_SETFD, FD_CLOEXEC);
+	fcntl(fds[0], F_SETFL, O_NONBLOCK);
 	fcntl(fds[1], F_SETFD, FD_CLOEXEC);
+	fcntl(fds[1], F_SETFL, O_NONBLOCK);
 	flagFd = fds[1];
 	uint8_t tmp[16];  /* actually 6 should be enough */
 	int count;
@@ -473,9 +648,92 @@ static void* dvbsub_thread(void* /*arg*/)
 	sub_debug.print(Debug::VERBOSE, "%s started\n", __FUNCTION__);
 	if (!dvbSubtitleConverter)
 		dvbSubtitleConverter = new cDvbSubtitleConverter;
+	CFrameBuffer *fb = CFrameBuffer::getInstance();
+	int xres = fb->getScreenWidth(true);
+	int yres = fb->getScreenHeight(true);
 
 	int timeout = 1000000;
+	int clr_x0 = xres, clr_y0 = yres, clr_x1 = 0, clr_y1 = 0;
+	uint32_t colortable[256];
+	memset(colortable, 0, sizeof(colortable));
+	uint32_t last_color = 0;
+
 	while(dvbsub_running) {
+		if (ass_track) {
+			usleep(100000); // FIXME ... should poll instead
+
+			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+
+			if (!ass_track)
+				continue;
+
+			if (ass_size != sub_font_size) {
+				ass_size = sub_font_size;
+				ass_set_font_scale(ass_renderer, ((double) ass_size)/ASS_CUSTOM_FONT_SIZE);
+			}
+
+			int detect_change = 0;
+			int64_t pts;
+			getPlayerPts(&pts);
+			ASS_Image *image = ass_render_frame(ass_renderer, ass_track, pts/90, &detect_change);
+			if (detect_change) {
+				if (clr_x1 && clr_y1) {
+					fb->paintBoxRel(clr_x0, clr_y0, clr_x1 - clr_x0 + 3, clr_y1 - clr_y0 + 3, 0);
+					clr_x0 = xres;
+					clr_y0 = yres;
+					clr_x1 = clr_y1 = 0;
+				}
+
+				while (image) {
+					if (image->w && image->h && image->dst_x > -1 && image->dst_x + image->w < xres && image->dst_y > -1 && image->dst_y + image->h < yres) {
+						if (image->dst_x < clr_x0)
+							clr_x0 = image->dst_x;
+						if (image->dst_y < clr_y0)
+							clr_y0 = image->dst_y;
+						if (image->dst_x + image->w > clr_x1)
+							clr_x1 = image->dst_x + image->w;
+						if (image->dst_y + image->w > clr_y1)
+							clr_y1 = image->dst_y + image->h;
+					}
+
+					if (last_color != image->color) {
+						last_color = image->color;
+						uint32_t c = last_color >> 8, a = 255 - (last_color & 0xff);
+						for (int i = 0; i < 256; i++) {
+							uint32_t k = (a * i) >> 8;
+							colortable[i] = k ? (c | (k << 24)) : 0;
+						}
+					}
+					if (image->w && image->h && image->dst_x > -1 && image->dst_x + image->w < xres && image->dst_y > -1 && image->dst_y + image->h < yres) {
+						uint32_t *lfb = fb->getFrameBufferPointer() + image->dst_x + xres * image->dst_y;
+						unsigned char *bm = image->bitmap;
+						int bm_add = image->stride - image->w;
+						int lfb_add = xres - image->w;
+						for (int y = 0; y < image->h; y++) {
+							for (int x = 0; x < image->w; x++) {
+								if (*bm)
+										*lfb = colortable[*bm];
+								lfb++, bm++;
+							}
+							lfb += lfb_add;
+							bm += bm_add;
+						}
+					}
+					image = image->next;
+				}
+				fb->getInstance()->blit();
+			}
+			continue;
+		} else {
+			if (clr_x1 && clr_y1) {
+				fb->paintBoxRel(clr_x0, clr_y0, clr_x1 - clr_x0 + 3, clr_y1 - clr_y0 + 3, 0);
+				clr_x0 = xres;
+				clr_y0 = yres;
+				clr_x1 = clr_y1 = 0;
+				fb->getInstance()->blit();
+			}
+		}
+
 		uint8_t* packet;
 		int64_t pts;
 		int dataoffset;
@@ -546,15 +804,15 @@ static void* dvbsub_thread(void* /*arg*/)
 			} else {
 				sub_debug.print(Debug::INFO, "End_of_PES is missing\n");
 			}
-			timeout = dvbSubtitleConverter->Action();
-
 next_round:
-			free(packet);
+			if (packet)
+				free(packet);
 		} else {
 			cDvbSubtitleBitmaps *Bitmaps = (cDvbSubtitleBitmaps *) bitmap_queue.pop();
 			pthread_mutex_unlock(&packetMutex);
 			dvbSubtitleConverter->Convert(Bitmaps->GetSub(), Bitmaps->Pts());
 		}
+		timeout = dvbSubtitleConverter->Action();
 	}
 
 	delete dvbSubtitleConverter;
