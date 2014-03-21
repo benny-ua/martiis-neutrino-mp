@@ -19,9 +19,11 @@
 
 #include <poll.h>
 
+#if HAVE_SPARK_HARDWARE
 extern "C" {
 #include <ass/ass.h>
 }
+#endif
 
 #include <OpenThreads/ScopedLock>
 #include <OpenThreads/Thread>
@@ -49,11 +51,13 @@ static pthread_mutex_t readerMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t packetCond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t packetMutex = PTHREAD_MUTEX_INITIALIZER;
 
+#if HAVE_SPARK_HARDWARE
 static OpenThreads::Mutex ass_mutex;
 static std::map<int,ASS_Track*> ass_map;
 static ASS_Library *ass_library;
 static ASS_Renderer *ass_renderer;
 static ASS_Track *ass_track = NULL;
+#endif
 
 static int reader_running;
 static int dvbsub_running;
@@ -107,8 +111,10 @@ int dvbsub_pause()
 
 		printf("[dvb-sub] paused\n");
 	}
+#if HAVE_SPARK_HARDWARE
 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
 	ass_track = NULL;
+#endif
 
 	return 0;
 }
@@ -150,9 +156,6 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 #endif
 #if HAVE_SPARK_HARDWARE
 	if(isEplayer || dvbsub_pid > 0) {
-#else
-	if(dvbsub_pid > 0) {
-#endif
 		if (isEplayer) {
 			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
 			std::map<int,ASS_Track*>::iterator it = ass_map.find(dvbsub_pid);
@@ -161,6 +164,9 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 			else
 				ass_track = NULL; //FIXME
 		}
+#else
+	if(dvbsub_pid > 0) {
+#endif
 		dvbsub_stopped = 0;
 		dvbsub_paused = false;
 		if(dvbSubtitleConverter)
@@ -313,6 +319,7 @@ static void clear_queue()
 	pthread_mutex_unlock(&packetMutex);
 }
 
+#if HAVE_SPARK_HARDWARE
 extern "C" void dvbsub_ass_clear(void);
 void dvbsub_ass_clear(void)
 {
@@ -460,6 +467,7 @@ void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid)
 			ass_process_data(track, sub->rects[i]->ass, strlen(sub->rects[i]->ass));
 	avsubtitle_free(sub);
 }
+#endif
 
 extern "C" void dvbsub_write(AVSubtitle *sub, int64_t pts);
 void dvbsub_write(AVSubtitle *sub, int64_t pts)
@@ -651,17 +659,20 @@ static void* dvbsub_thread(void* /*arg*/)
 	sub_debug.print(Debug::VERBOSE, "%s started\n", __FUNCTION__);
 	if (!dvbSubtitleConverter)
 		dvbSubtitleConverter = new cDvbSubtitleConverter;
+
+	int timeout = 1000000;
+#if HAVE_SPARK_HARDWARE
 	CFrameBuffer *fb = CFrameBuffer::getInstance();
 	int xres = fb->getScreenWidth(true);
 	int yres = fb->getScreenHeight(true);
-
-	int timeout = 1000000;
 	int clr_x0 = xres, clr_y0 = yres, clr_x1 = 0, clr_y1 = 0;
 	uint32_t colortable[256];
 	memset(colortable, 0, sizeof(colortable));
 	uint32_t last_color = 0;
+#endif
 
 	while(dvbsub_running) {
+#if HAVE_SPARK_HARDWARE
 		if (ass_track) {
 			usleep(100000); // FIXME ... should poll instead
 
@@ -734,6 +745,7 @@ static void* dvbsub_thread(void* /*arg*/)
 				fb->getInstance()->blit();
 			}
 		}
+#endif
 
 		uint8_t* packet;
 		int64_t pts;

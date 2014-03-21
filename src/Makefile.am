@@ -85,7 +85,6 @@ neutrino_LDADD = \
 	@LIBCS_LIBS@ \
 	-ldvbsi++ \
 	-ljpeg \
-	-lass \
 	-lOpenThreads \
 	-lrt -lpthread \
 	-ldl
@@ -123,6 +122,10 @@ endif
 
 if BOXMODEL_APOLLO
 neutrino_LDADD += -liconv
+endif
+
+if BOXTYPE_SPARK
+neutrino_LDADD += -lass
 endif
 
 bin_PROGRAMS += drivertool
