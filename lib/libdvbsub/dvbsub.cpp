@@ -31,7 +31,6 @@ extern "C" {
 
 #include "Debug.hpp"
 #include "PacketQueue.hpp"
-#include "semaphore.h"
 #include "helpers.hpp"
 #include "dvbsubtitle.h"
 
@@ -41,10 +40,16 @@ enum {GET_VOLUME, SET_VOLUME, SET_MUTE, SET_CHANNEL};
 Debug sub_debug;
 static PacketQueue packet_queue;
 static PacketQueue bitmap_queue;
-//sem_t event_semaphore;
+#if HAVE_SPARK_HARDWARE
+static PacketQueue ass_queue;
+static sem_t ass_sem;
+#endif
 
 static pthread_t threadReader;
 static pthread_t threadDvbsub;
+#if HAVE_SPARK_HARDWARE
+static pthread_t threadAss = 0;
+#endif
 
 static pthread_cond_t readerCond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t readerMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -60,6 +65,9 @@ static ASS_Track *ass_track = NULL;
 #endif
 
 static int reader_running;
+#if HAVE_SPARK_HARDWARE
+static int ass_reader_running;
+#endif
 static int dvbsub_running;
 static int dvbsub_paused = true;
 static int dvbsub_pid;
@@ -71,7 +79,10 @@ static bool isEplayer = false;
 
 cDvbSubtitleConverter *dvbSubtitleConverter;
 static void* reader_thread(void *arg);
-static void* dvbsub_thread(void* arg);
+static void* dvbsub_thread(void *arg);
+#if HAVE_SPARK_HARDWARE
+static void* ass_reader_thread(void *arg);
+#endif
 static void clear_queue();
 
 int dvbsub_init() {
@@ -83,7 +94,7 @@ int dvbsub_init() {
 	dvbsub_stopped = 1;
 	pid_change_req = 1;
 	// reader-Thread starten
-	trc = pthread_create(&threadReader, 0, reader_thread, (void *) NULL);
+	trc = pthread_create(&threadReader, 0, reader_thread, NULL);
 	if (trc) {
 		fprintf(stderr, "[dvb-sub] failed to create reader-thread (rc=%d)\n", trc);
 		reader_running = false;
@@ -99,6 +110,17 @@ int dvbsub_init() {
 		return -1;
 	}
 
+#if HAVE_SPARK_HARDWARE
+	ass_reader_running = true;
+	sem_init(&ass_sem, 0, 0);
+	trc = pthread_create(&threadAss, 0, ass_reader_thread, NULL);
+	if (trc) {
+		fprintf(stderr, "[dvb-sub] failed to create ass-reader-thread (rc=%d)\n", trc);
+		ass_reader_running = false;
+		return -1;
+	}
+	pthread_detach(threadAss);
+#endif
 	return(0);
 }
 
@@ -250,6 +272,12 @@ int dvbsub_close()
 		pthread_detach(threadDvbsub);
 		threadDvbsub = 0;
 	}
+#if HAVE_SPARK_HARDWARE
+	if (ass_reader_running) {
+		ass_reader_running = false;
+		sem_post(&ass_sem);
+	}
+#endif
 	printf("[dvb-sub] stopped\n");
 
 	return 0;
@@ -320,12 +348,29 @@ static void clear_queue()
 }
 
 #if HAVE_SPARK_HARDWARE
+struct ass_data
+{
+	AVCodecContext *c;
+	AVSubtitle sub;
+	int pid;
+	ass_data(AVCodecContext *_c, AVSubtitle *_sub, int _pid) : c(_c),pid(_pid) { memcpy(&sub, _sub, sizeof(sub));}
+};
+
 extern "C" void dvbsub_ass_clear(void);
 void dvbsub_ass_clear(void)
 {
 	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
-	ass_track = NULL;
 
+	while(ass_queue.size()) {
+		ass_data *a = (ass_data *) ass_queue.pop();
+		if (a) {
+			avsubtitle_free(&a->sub);
+			delete a;
+		}
+	}
+	while(!sem_trywait(&ass_sem));
+
+	ass_track = NULL;
 	for(std::map<int,ASS_Track*>::iterator it = ass_map.begin(); it != ass_map.end(); ++it)
 		ass_free_track(it->second);
 	ass_map.clear();
@@ -416,57 +461,87 @@ static std::string ass_subtitle_header_custom(void) {
 // The functions above are based on ffmpeg-2.1.4/libavcodec/ass.c,
 // Copyright (c) 2010 Aurelien Jacobs <aurel@gnuage.org>
 
+static void *ass_reader_thread(void *)
+{
+fprintf(stderr, "%s %d\n", __func__,__LINE__);
+	while (!sem_wait(&ass_sem)) {
+		if (!ass_reader_running)
+			break;
 
-// FIXME -- separating reader and writer might reduce latency
+		ass_data *a = (ass_data *) ass_queue.pop();
+		if (!a) {
+			if (!ass_reader_running)
+				break;
+			continue;
+		}
+
+fprintf(stderr, "%s %d: trying to lock\n", __func__,__LINE__);
+		OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+fprintf(stderr, "%s %d: locked\n", __func__,__LINE__);
+		std::map<int,ASS_Track*>::iterator it = ass_map.find(a->pid);
+		ASS_Track *track;
+		if (it == ass_map.end()) {
+			CFrameBuffer *fb = CFrameBuffer::getInstance();
+			int xres = fb->getScreenWidth(true);
+			int yres = fb->getScreenHeight(true);
+			if (!ass_library) {
+				ass_library = ass_library_init();
+				ass_set_extract_fonts(ass_library, 1);
+				ass_set_style_overrides(ass_library, NULL);
+				ass_renderer = ass_renderer_init(ass_library);
+				ass_set_frame_size(ass_renderer, xres, yres);
+				ass_set_margins(ass_renderer, 3 * yres / 100, 3 * yres / 100, 3 * xres / 100, 3 * xres / 100);
+				ass_set_use_margins(ass_renderer, 1);
+				ass_set_hinting(ass_renderer, ASS_HINTING_LIGHT);
+				ass_set_aspect_ratio(ass_renderer, 1.0, 1.0);
+				ass_font = *sub_font_file;
+				ass_set_fonts(ass_renderer, ass_font.c_str(), "Arial", 0, NULL, 1);
+			}
+			track = ass_new_track(ass_library);
+			track->PlayResX = xres;
+			track->PlayResY = yres;
+			ass_size = sub_font_size;
+			ass_set_font_scale(ass_renderer, ((double) ass_size)/ASS_CUSTOM_FONT_SIZE);
+			if (a->c->subtitle_header) {
+				std::string ass_hdr = ass_subtitle_header_default();
+				if (ass_hdr.compare((char*) a->c->subtitle_header)) {
+					ass_process_codec_private(track, (char *) a->c->subtitle_header, a->c->subtitle_header_size);
+				} else {
+					// This is the FFMPEG default ASS header. Use something more suitable instead:
+					ass_hdr = ass_subtitle_header_custom();
+					ass_process_codec_private(track, (char *) ass_hdr.c_str(), ass_hdr.length());
+				}
+			}
+			ass_map[a->pid] = track;
+			if (a->pid == dvbsub_pid)
+				ass_track = track;
+//fprintf(stderr, "### got subtitle track %d, subtitle header: \n---\n%s\n---\n", pid, c->subtitle_header);
+		} else
+			track = it->second;
+		for (unsigned int i = 0; i < a->sub.num_rects; i++)
+			if (a->sub.rects[i]->ass)
+				ass_process_data(track, a->sub.rects[i]->ass, strlen(a->sub.rects[i]->ass));
+		avsubtitle_free(&a->sub);
+		delete a;
+fprintf(stderr, "%s %d: continuing to sem_wait\n", __func__,__LINE__);
+	}
+	ass_reader_running = false;
+	pthread_exit(NULL);
+}
+
 extern "C" void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid);
 void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
-	std::map<int,ASS_Track*>::iterator it = ass_map.find(pid);
-	ASS_Track *track;
-	if (it == ass_map.end()) {
-		CFrameBuffer *fb = CFrameBuffer::getInstance();
-		int xres = fb->getScreenWidth(true);
-		int yres = fb->getScreenHeight(true);
-		if (!ass_library) {
-			ass_library = ass_library_init();
-			ass_set_extract_fonts(ass_library, 1);
-			ass_set_style_overrides(ass_library, NULL);
-			ass_renderer = ass_renderer_init(ass_library);
-			ass_set_frame_size(ass_renderer, xres, yres);
-			ass_set_margins(ass_renderer, 3 * yres / 100, 3 * yres / 100, 3 * xres / 100, 3 * xres / 100);
-			ass_set_use_margins(ass_renderer, 1);
-			ass_set_hinting(ass_renderer, ASS_HINTING_LIGHT);
-			ass_set_aspect_ratio(ass_renderer, 1.0, 1.0);
-			ass_font = *sub_font_file;
-			ass_set_fonts(ass_renderer, ass_font.c_str(), "Arial", 0, NULL, 1);
-		}
-		track = ass_new_track(ass_library);
-		track->PlayResX = xres;
-		track->PlayResY = yres;
-		ass_size = sub_font_size;
-		ass_set_font_scale(ass_renderer, ((double) ass_size)/ASS_CUSTOM_FONT_SIZE);
-		if (c->subtitle_header) {
-			std::string ass_hdr = ass_subtitle_header_default();
-			if (ass_hdr.compare((char*) c->subtitle_header)) {
-				ass_process_codec_private(track, (char *) c->subtitle_header, c->subtitle_header_size);
-			} else {
-				// This is the FFMPEG default ASS header. Use something more suitable instead
-				ass_hdr = ass_subtitle_header_custom();
-				ass_process_codec_private(track, (char *) ass_hdr.c_str(), ass_hdr.length());
-			}
-		}
-		ass_map[pid] = track;
-		if (pid == dvbsub_pid)
-			ass_track = track;
-//fprintf(stderr, "### got subtitle track %d, subtitle header: \n---\n%s\n---\n", pid, c->subtitle_header);
+fprintf(stderr, "%s %d\n", __func__,__LINE__);
+	if (ass_reader_running) {
+		ass_queue.push((uint8_t *)new ass_data(c, sub, pid));
+		sem_post(&ass_sem);
+		memset(sub, 0, sizeof(sub));
+fprintf(stderr, "%s %d: queued\n", __func__,__LINE__);
 	} else
-		track = it->second;
-	for (unsigned int i = 0; i < sub->num_rects; i++)
-		if (sub->rects[i]->ass)
-			ass_process_data(track, sub->rects[i]->ass, strlen(sub->rects[i]->ass));
-	avsubtitle_free(sub);
+		avsubtitle_free(sub);
 }
+
 #endif
 
 extern "C" void dvbsub_write(AVSubtitle *sub, int64_t pts);
@@ -475,6 +550,7 @@ void dvbsub_write(AVSubtitle *sub, int64_t pts)
 	pthread_mutex_lock(&packetMutex);
 	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
 	Bitmaps->SetSub(sub); // Note: this will copy sub, including all references. DON'T call avsubtitle_free() from the caller.
+	memset(sub, 0, sizeof(sub));
 	bitmap_queue.push((unsigned char *) Bitmaps);
 	pthread_cond_broadcast(&packetCond);
 	pthread_mutex_unlock(&packetMutex);
@@ -676,7 +752,9 @@ static void* dvbsub_thread(void* /*arg*/)
 		if (ass_track) {
 			usleep(100000); // FIXME ... should poll instead
 
+fprintf(stderr, "%s %d: trying to lock\n", __func__,__LINE__);
 			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
+fprintf(stderr, "%s %d: locked (ass_track: %p\n", __func__,__LINE__, ass_track);
 
 			if (!ass_track)
 				continue;
