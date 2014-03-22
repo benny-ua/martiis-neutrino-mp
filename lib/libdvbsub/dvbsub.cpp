@@ -374,6 +374,7 @@ void dvbsub_ass_clear(void)
 		ass_library_done(ass_library);
 		ass_library = NULL;
 	}
+	clear_queue();
 }
 
 // from neutrino.cpp
