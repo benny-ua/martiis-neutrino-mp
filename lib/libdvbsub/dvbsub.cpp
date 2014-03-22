@@ -463,7 +463,7 @@ static std::string ass_subtitle_header_custom(void) {
 
 static void *ass_reader_thread(void *)
 {
-fprintf(stderr, "%s %d\n", __func__,__LINE__);
+	set_threadname("ass_reader_thread");
 	while (!sem_wait(&ass_sem)) {
 		if (!ass_reader_running)
 			break;
@@ -475,9 +475,7 @@ fprintf(stderr, "%s %d\n", __func__,__LINE__);
 			continue;
 		}
 
-fprintf(stderr, "%s %d: trying to lock\n", __func__,__LINE__);
 		OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
-fprintf(stderr, "%s %d: locked\n", __func__,__LINE__);
 		std::map<int,ASS_Track*>::iterator it = ass_map.find(a->pid);
 		ASS_Track *track;
 		if (it == ass_map.end()) {
@@ -523,7 +521,6 @@ fprintf(stderr, "%s %d: locked\n", __func__,__LINE__);
 				ass_process_data(track, a->sub.rects[i]->ass, strlen(a->sub.rects[i]->ass));
 		avsubtitle_free(&a->sub);
 		delete a;
-fprintf(stderr, "%s %d: continuing to sem_wait\n", __func__,__LINE__);
 	}
 	ass_reader_running = false;
 	pthread_exit(NULL);
@@ -532,12 +529,10 @@ fprintf(stderr, "%s %d: continuing to sem_wait\n", __func__,__LINE__);
 extern "C" void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid);
 void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid)
 {
-fprintf(stderr, "%s %d\n", __func__,__LINE__);
 	if (ass_reader_running) {
 		ass_queue.push((uint8_t *)new ass_data(c, sub, pid));
 		sem_post(&ass_sem);
 		memset(sub, 0, sizeof(sub));
-fprintf(stderr, "%s %d: queued\n", __func__,__LINE__);
 	} else
 		avsubtitle_free(sub);
 }
@@ -752,9 +747,7 @@ static void* dvbsub_thread(void* /*arg*/)
 		if (ass_track) {
 			usleep(100000); // FIXME ... should poll instead
 
-fprintf(stderr, "%s %d: trying to lock\n", __func__,__LINE__);
 			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
-fprintf(stderr, "%s %d: locked (ass_track: %p\n", __func__,__LINE__, ass_track);
 
 			if (!ass_track)
 				continue;
