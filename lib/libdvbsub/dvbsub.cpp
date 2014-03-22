@@ -151,33 +151,24 @@ int dvbsub_start(int pid)
 	isEplayer = _isEplayer;
 	if (isEplayer && !dvbsub_paused)
 		return 0;
-	else
-#endif
-	if(!dvbsub_paused && (pid == 0)) {
-		return 0;
-	}
-
-#if HAVE_SPARK_HARDWARE
-	if (isEplayer || pid) {
-		if(isEplayer || pid != dvbsub_pid) {
+	if (!isEplayer && !pid)
 #else
-	if(pid) {
-		if(pid != dvbsub_pid) {
+	if (!pid)
 #endif
-			dvbsub_pause();
-			if(dvbSubtitleConverter)
-				dvbSubtitleConverter->Reset();
-			dvbsub_pid = pid;
-			pid_change_req = 1;
-		}
+		pid = -1;
+	if(!dvbsub_paused && (pid < 0))
+		return 0;
+
+	if(pid > -1 && pid != dvbsub_pid) {
+		dvbsub_pause();
+		if(dvbSubtitleConverter)
+			dvbSubtitleConverter->Reset();
+		dvbsub_pid = pid;
+		pid_change_req = 1;
 	}
-printf("[dvb-sub] ***************************************** start, stopped %d pid %x\n", dvbsub_stopped, dvbsub_pid);
-#if 0
-	while(!dvbsub_stopped)
-		usleep(10);
-#endif
+printf("[dvb-sub] start, stopped %d pid %x\n", dvbsub_stopped, dvbsub_pid);
+	if(dvbsub_pid > -1) {
 #if HAVE_SPARK_HARDWARE
-	if(isEplayer || dvbsub_pid > 0) {
 		if (isEplayer) {
 			OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(ass_mutex);
 			std::map<int,ASS_Track*>::iterator it = ass_map.find(dvbsub_pid);
@@ -186,8 +177,6 @@ printf("[dvb-sub] ***************************************** start, stopped %d pi
 			else
 				ass_track = NULL; //FIXME
 		}
-#else
-	if(dvbsub_pid > 0) {
 #endif
 		dvbsub_stopped = 0;
 		dvbsub_paused = false;
@@ -206,7 +195,7 @@ static int flagFd = -1;
 
 int dvbsub_stop()
 {
-	dvbsub_pid = 0;
+	dvbsub_pid = -1;
 	if(reader_running) {
 		dvbsub_stopped = 1;
 		dvbsub_pause();
@@ -224,12 +213,15 @@ int dvbsub_getpid()
 
 void dvbsub_setpid(int pid)
 {
+#if HAVE_SPARK_HARDWARE
+	if (!isEplayer && !pid)
+#else
+	if (!pid)
+#endif
+		pid = -1;
 	dvbsub_pid = pid;
 
-#if HAVE_SPARK_HARDWARE
-	if (!isEplayer)
-#endif
-	if(dvbsub_pid == 0)
+	if(dvbsub_pid < 0)
 		return;
 
 	clear_queue();
