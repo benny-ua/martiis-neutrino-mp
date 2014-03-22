@@ -59,8 +59,8 @@ static pthread_mutex_t packetMutex = PTHREAD_MUTEX_INITIALIZER;
 #if HAVE_SPARK_HARDWARE
 static OpenThreads::Mutex ass_mutex;
 static std::map<int,ASS_Track*> ass_map;
-static ASS_Library *ass_library;
-static ASS_Renderer *ass_renderer;
+static ASS_Library *ass_library = NULL;
+static ASS_Renderer *ass_renderer = NULL;
 static ASS_Track *ass_track = NULL;
 #endif
 
