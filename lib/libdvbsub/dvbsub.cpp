@@ -714,7 +714,7 @@ static void* dvbsub_thread(void* /*arg*/)
 							clr_y0 = image->dst_y;
 						if (image->dst_x + image->w > clr_x1)
 							clr_x1 = image->dst_x + image->w;
-						if (image->dst_y + image->w > clr_y1)
+						if (image->dst_y + image->h > clr_y1)
 							clr_y1 = image->dst_y + image->h;
 
 						uint32_t *lfb = fb->getFrameBufferPointer() + image->dst_x + xres * image->dst_y;
