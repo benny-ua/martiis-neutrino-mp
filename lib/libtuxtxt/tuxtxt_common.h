@@ -15,10 +15,6 @@
 #include <zlib.h>
 #endif
 #include <system/set_threadname.h>
-#if HAVE_SPARK_HARDWARE
-#include <poll.h>
-#endif
-
 #include <zapit/include/dmx.h>
 
 tuxtxt_cache_struct tuxtxt_cache;
@@ -716,8 +712,8 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 				continue;
 			pes_packet_ptr = pes_packet_eplayer3;
 		}
-#endif
 		else
+#endif
 		{
 			readcnt = dmx->Read(pes_packet_dmx, sizeof(pes_packet_dmx), 1000);
 			pes_packet_ptr = pes_packet_dmx;
@@ -1182,8 +1178,10 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 		}
 		pthread_mutex_unlock(&tuxtxt_cache_biglock);
 	}
+#if HAVE_SPARK_HARDWARE
 	if (pes_packet_eplayer3)
 		free(pes_packet_eplayer3);
+#endif
 
 	pthread_exit(NULL);
 }
