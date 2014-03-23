@@ -833,7 +833,8 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		showStartingHint = true;
 		pthread_create(&thrStartHint, NULL, CMoviePlayerGui::ShowStartHint, this);
 	}
-	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
+	bool no_probe = p_movie_info && file_name.length() > 4 && file_name.substr(file_name.length() - 3) == ".ts";
+	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration, no_probe);
 	if (thrStartHint) {
 		showStartingHint = false;
 		pthread_join(thrStartHint, NULL);
