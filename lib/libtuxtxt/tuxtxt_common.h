@@ -594,7 +594,8 @@ static void clear_inject_queue(void)
 {
 	pthread_mutex_lock(&inject_mutex);
 	while (!sem_trywait(&inject_sem)) {
-		free(inject_queue[inject_queue_index_read].data);
+		if (inject_queue[inject_queue_index_read].data)
+			free(inject_queue[inject_queue_index_read].data);
 		inject_queue[inject_queue_index_read].data = NULL;
 		inject_queue_index_read++;
 		inject_queue_index_read %= INJECT_QUEUE_LIMIT;
@@ -612,13 +613,22 @@ void teletext_write(int pid, uint8_t *data, int size)
 	size -= 1;
 	data++;
 	pthread_mutex_lock(&inject_mutex);
+	bool do_sem_post = true;
+	if (inject_queue[inject_queue_index_write].data) {
+		if (inject_queue[inject_queue_index_write].size != size) {
+			free(inject_queue[inject_queue_index_write].data);
+			inject_queue[inject_queue_index_write].data = (uint8_t *) malloc(size);
+		}
+		do_sem_post = false;
+	} else
+		inject_queue[inject_queue_index_write].data = (uint8_t *) malloc(size);
 	inject_queue[inject_queue_index_write].size = size;
-	inject_queue[inject_queue_index_write].data = (uint8_t *) malloc(size);
 	if (inject_queue[inject_queue_index_write].data) {
 		memcpy(inject_queue[inject_queue_index_write].data, data, size);
 		inject_queue_index_write++;
 		inject_queue_index_write %= INJECT_QUEUE_LIMIT;
-		sem_post(&inject_sem);
+		if (do_sem_post)
+			sem_post(&inject_sem);
 	}
 	pthread_mutex_unlock(&inject_mutex);
 }
