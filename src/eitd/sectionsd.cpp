@@ -1485,7 +1485,7 @@ void CTimeThread::run()
 						rc = dmx->Read(static_buf, MAX_SECTION_LENGTH, 10);
 					DMX::unlock();
 				}
-			} while (running && rc == 0 && (time_monotonic_ms() - start) < timeoutInMSeconds);
+			} while (running && rc == 0 && (time_monotonic_ms() < timeoutInMSeconds + start));
 #endif
 			xprintf("%s: getting DVB time done : %d messaging_neutrino_sets_time %d\n", name.c_str(), rc, messaging_neutrino_sets_time);
 			if (rc > 0) {

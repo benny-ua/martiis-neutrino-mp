@@ -474,7 +474,7 @@ void CPersonalizeGui::ShowUserMenu()
 	customkey_offset = uMenu->getItemsCount();
 	unsigned int ums = g_settings.usermenu.size();
 	for (unsigned int i = USERMENU_ITEMS_COUNT; i < ums; i++)
-		if (g_settings.usermenu[i]->key != (int) CRCInput::RC_nokey) {
+		if (g_settings.usermenu[i]->key != CRCInput::RC_nokey) {
 			CUserMenuSetup *cms = new CUserMenuSetup(LOCALE_USERMENU_HEAD, i);
 			CMenuDForwarder *fw = new CMenuDForwarder(CRCInput::getKeyName(g_settings.usermenu[i]->key), true, g_settings.usermenu[i]->title, cms, to_string(i).c_str());
 			cms->setCaller(fw);

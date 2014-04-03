@@ -892,8 +892,10 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 	}
 	while ( msg!=CRCInput::RC_timeout );
 	hide();
-	delete[] background;
-	background = NULL;
+	if (background) {
+		delete[] background;
+		background = NULL;
+	}
 
 	fader.Stop();
 

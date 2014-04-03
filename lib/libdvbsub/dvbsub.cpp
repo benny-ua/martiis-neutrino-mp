@@ -525,7 +525,7 @@ void dvbsub_ass_write(AVCodecContext *c, AVSubtitle *sub, int pid)
 	if (ass_reader_running) {
 		ass_queue.push((uint8_t *)new ass_data(c, sub, pid));
 		sem_post(&ass_sem);
-		memset(sub, 0, sizeof(sub));
+		memset(sub, 0, sizeof(AVSubtitle));
 	} else
 		avsubtitle_free(sub);
 }
@@ -538,7 +538,7 @@ void dvbsub_write(AVSubtitle *sub, int64_t pts)
 	pthread_mutex_lock(&packetMutex);
 	cDvbSubtitleBitmaps *Bitmaps = new cDvbSubtitleBitmaps(pts);
 	Bitmaps->SetSub(sub); // Note: this will copy sub, including all references. DON'T call avsubtitle_free() from the caller.
-	memset(sub, 0, sizeof(sub));
+	memset(sub, 0, sizeof(AVSubtitle));
 	bitmap_queue.push((unsigned char *) Bitmaps);
 	pthread_cond_broadcast(&packetCond);
 	pthread_mutex_unlock(&packetMutex);

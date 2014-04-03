@@ -99,7 +99,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	int button = -1;
 	unsigned ums = g_settings.usermenu.size();
 	for (unsigned int i = 0; i < ums; i++)
-		if (g_settings.usermenu[i]->key == (int) msg) {
+		if (g_settings.usermenu[i]->key == msg) {
 			button = i;
 			break;
 		}
@@ -169,7 +169,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 	else
 		menu->addItem(GenericMenuSeparator);
 	
-	std::string itemstr_last = "1";
+	std::string itemstr_last("1");
 
 	std::vector<std::string> items = ::split(g_settings.usermenu[button]->items, ',');
 	for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
@@ -437,10 +437,9 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 
 	// show menu if there are more than 2 items only
 	// otherwise, we start the item directly (must be the last one)
-	if (menu_items > 1 ) {
-		menu->exec(NULL,"");
-	}
-	else if (last_menu_item != NULL)
+	if (menu_items > 1 )
+		menu->exec(NULL, "");
+	else if (last_menu_item)
 		last_menu_item->exec( NULL );
 	
 	InfoClock->enableInfoClock(true);

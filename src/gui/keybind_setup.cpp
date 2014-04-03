@@ -247,7 +247,7 @@ int CKeybindSetup::showKeySetup()
 
 	//keybindings
 	for (int i = 0; i < KEYBINDS_COUNT; i++)
-		keychooser[i] = new CKeyChooser(key_settings[i].keyvalue_p, key_settings[i].keydescription/*as head caption*/, NEUTRINO_ICON_SETTINGS);
+		keychooser[i] = new CKeyChooser((unsigned int *) key_settings[i].keyvalue_p, key_settings[i].keydescription/*as head caption*/, NEUTRINO_ICON_SETTINGS);
 
 	showKeyBindSetup(&bindSettings);
 	CMenuForwarder * mf;

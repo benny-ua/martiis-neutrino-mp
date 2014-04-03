@@ -821,7 +821,7 @@ struct SNeutrinoSettings
 	} USER_ITEM;
 
 	typedef struct {
-		int key;
+		unsigned int key;
 		std::string items;
 		std::string title;
 		std::string name;

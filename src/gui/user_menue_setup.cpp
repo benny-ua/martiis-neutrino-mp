@@ -247,7 +247,7 @@ int CUserMenuSetup::showSetup()
 
 	delete ums;
 
-	if (forwarder && (old_key != g_settings.usermenu[button]->key))
+	if (forwarder && (old_key != (int) g_settings.usermenu[button]->key))
 		forwarder->setName(CRCInput::getKeyName(g_settings.usermenu[button]->key));
 
 	return res;

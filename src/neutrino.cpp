@@ -905,7 +905,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	    configfile.getString("usermenu_key_green", "").empty() ||
 	    configfile.getString("usermenu_key_yellow", "").empty() ||
 	    configfile.getString("usermenu_key_blue", "").empty()) {
-		for(SNeutrinoSettings::usermenu_t *um = usermenu_default; um->key != (int) CRCInput::RC_nokey; um++) {
+		for(SNeutrinoSettings::usermenu_t *um = usermenu_default; um->key != CRCInput::RC_nokey; um++) {
 			SNeutrinoSettings::usermenu_t *u = new SNeutrinoSettings::usermenu_t;
 			*u = *um;
 			g_settings.usermenu.push_back(u);
@@ -1395,7 +1395,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	// USERMENU
 	//---------------------------------------
 	for (unsigned int i = 0, count = 4; i < g_settings.usermenu.size(); i++) {
-		if (g_settings.usermenu[i]->key != (int)CRCInput::RC_nokey) {
+		if (g_settings.usermenu[i]->key != CRCInput::RC_nokey) {
 			std::string name;
 			if (i < 4)
 				name = usermenu_default[i].name;
@@ -2264,7 +2264,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	//load Pluginlist before main menu (only show script menu if at least one script is available
 	g_PluginList->loadPlugins();
 
-	MoviePluginChanger        = new CMoviePluginChangeExec;
 	AdZapChanger              = NULL;
 	batchEPGSettings	  = new CBatchEPG_Menu;
 #if HAVE_SPARK_HARDWARE
@@ -4345,25 +4344,6 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 
 		chooserDir(g_settings.network_nfs_moviedir, false, NULL);
 
-		return menu_return::RETURN_REPAINT;
-	}
-	else if(actionKey == "movieplugin") {
-		parent->hide();
-		CMenuWidget MoviePluginSelector(LOCALE_MOVIEPLAYER_DEFPLUGIN, NEUTRINO_ICON_FEATURES);
-		MoviePluginSelector.addItem(GenericMenuSeparator);
-
-		char id[5];
-		int cnt = 0;
-		for(unsigned int count=0;count < (unsigned int) g_PluginList->getNumberOfPlugins();count++) {
-			if (g_PluginList->getType(count)== CPlugins::P_TYPE_TOOL && !g_PluginList->isHidden(count)) {
-				// zB vtxt-plugins
-				sprintf(id, "%d", count);
-				MoviePluginSelector.addItem(new CMenuForwarder(g_PluginList->getName(count), true, NULL, MoviePluginChanger, id, CRCInput::convertDigitToKey(count)), (cnt == 0));
-				cnt++;
-			}
-		}
-
-		MoviePluginSelector.exec(NULL, "");
 		return menu_return::RETURN_REPAINT;
 	}
 	else if(actionKey == "clearSectionsd")
