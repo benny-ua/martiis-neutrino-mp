@@ -481,17 +481,6 @@ int CStreamFeaturesChangeExec::exec(CMenuTarget* parent, const std::string & act
 	return menu_return::RETURN_EXIT;
 }
 
-int CMoviePluginChangeExec::exec(CMenuTarget* parent, const std::string & actionKey)
-{
-	int sel= atoi(actionKey);
-	parent->hide();
-	if (sel>=0)
-	{
-			g_settings.movieplayer_plugin=g_PluginList->getName(sel);
-	}
-	return menu_return::RETURN_EXIT;
-}
-
 long CNetAdapter::mac_addr_sys ( u_char *addr) //only for function getMacAddr()
 {
 	struct ifreq ifr;
