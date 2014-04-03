@@ -156,7 +156,9 @@ int allow_flash = 1;
 Zapit_config zapitCfg;
 bool autoshift = false;
 uint32_t scrambled_timer;
+#if ENABLE_FASTSCAN
 uint32_t fst_timer;
+#endif
 t_channel_id standby_channel_id = 0;
 
 //NEW
@@ -2152,7 +2154,9 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	InitZapitClient();
 	g_Zapit->setStandby(false);
 
+#if ENABLE_FASTSCAN
 	CheckFastScan();
+#endif
 
 	//timer start
 #if !HAVE_SPARK_HARDWARE
@@ -2899,6 +2903,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			}
 			return messages_return::handled;
 		}
+#if ENABLE_FASTSCAN
 		if(data == fst_timer) {
 			g_RCInput->killTimer(fst_timer);
 			if (wakeupFromStandby()) {
@@ -2909,6 +2914,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			}
 			return messages_return::handled;
 		}
+#endif
 	}
 	if(msg == NeutrinoMessages::SHOW_MAINSETTINGS) {
 		if(g_settings.mode_clock)
@@ -3586,7 +3592,7 @@ _repeat:
 		return messages_return::handled;
 	}
 	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000)) {
-		INFO("###################################### DELETED msg %x data %x\n", msg, data);
+		INFO("###################################### DELETED msg %lx data %lx\n", msg, data);
 		delete [] (unsigned char*) data;
 		return messages_return::handled;
 	}
@@ -3638,9 +3644,11 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			delete hintBox;
 		}
 
+#if ENABLE_FASTSCAN
 		/* on shutdown force load new fst */
 		if (retcode)
 			CheckFastScan(true, false);
+#endif
 
 		CVFD::getInstance()->setMode(CVFD::MODE_SHUTDOWN);
 
@@ -4022,8 +4030,10 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		// Active standby on
 		powerManager->SetStandby(false, false);
 		CEpgScan::getInstance()->Start(true);
+#if ENABLE_FASTSCAN
 		if (scansettings.fst_version)
 			fst_timer = g_RCInput->addTimer(30*1000*1000, true);
+#endif
 	} else {
 		// Active standby off
 		powerManager->SetStandby(false, false);
@@ -4036,7 +4046,9 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		videoDecoder->Standby(false);
 		CEpgScan::getInstance()->Stop();
+#if ENABLE_FASTSCAN
 		g_RCInput->killTimer(fst_timer);
+#endif
 
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(false);
@@ -5123,6 +5135,7 @@ void CNeutrinoApp::Cleanup()
 #endif
 }
 
+#if ENABLE_FASTSCAN
 void CNeutrinoApp::CheckFastScan(bool standby, bool reload)
 {
 	if (scansettings.fst_version) {
@@ -5152,3 +5165,4 @@ void CNeutrinoApp::CheckFastScan(bool standby, bool reload)
 		}
 	}
 }
+#endif

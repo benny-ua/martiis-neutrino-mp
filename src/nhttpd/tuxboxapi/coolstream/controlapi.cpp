@@ -702,6 +702,7 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 
 	boxname += (g_info.delivery_system == DVB_S || (system_rev == 1)) ? " SAT":" CABLE";
 	hh->printf("%s (%s)\nMAC:%s\n", boxname.c_str(), boxmodel.c_str(), eth_id.c_str());
+#endif
 }
 //-----------------------------------------------------------------------------
 void CControlAPI::ShutdownCGI(CyhookHandler *hh)

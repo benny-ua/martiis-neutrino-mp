@@ -62,7 +62,9 @@ CServiceScan::CServiceScan()
 	running = false;
 
 	cable_nid = 0;
+#if HAVE_COOL_HARDWARE
 	fst_version = 0;
+#endif
 
 	frontend = CFEManager::getInstance()->getFE(0);
 }
@@ -113,11 +115,15 @@ void CServiceScan::run()
 
 	switch(scan_mode) {
 		case SCAN_PROVIDER:
+#if HAVE_COOL_HARDWARE
 			fst_version = 0;
+#endif
 			ScanProviders();
 			break;
 		case SCAN_TRANSPONDER:
+#if HAVE_COOL_HARDWARE
 			fst_version = 0;
+#endif
 			ScanTransponder();
 			break;
 #if 0

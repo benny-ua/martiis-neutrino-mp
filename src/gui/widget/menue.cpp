@@ -1611,6 +1611,32 @@ CMenuOptionChooser::~CMenuOptionChooser()
 	options.clear();
 }
 
+void CMenuOptionChooser::setOptions(const struct keyval * const Options, const unsigned Number_Of_Options)
+{
+	options.clear();
+	number_of_options = Number_Of_Options;
+	for (unsigned int i = 0; i < number_of_options; i++)
+	{
+		struct keyval_ext opt;
+		opt.key = Options[i].key;
+		opt.value = Options[i].value;
+		opt.valname = NULL;
+		options.push_back(opt);
+	}
+	if (used && x != -1)
+		paint(false);
+}
+
+void CMenuOptionChooser::setOptions(const struct keyval_ext * const Options, const unsigned Number_Of_Options)
+{
+	options.clear();
+	number_of_options = Number_Of_Options;
+	for (unsigned int i = 0; i < number_of_options; i++)
+		options.push_back(Options[i]);
+	if (used && x != -1)
+		paint(false);
+}
+
 void CMenuOptionChooser::setOption(const int newvalue)
 {
 	*optionValue = newvalue;

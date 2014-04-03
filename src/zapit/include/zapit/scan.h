@@ -101,7 +101,7 @@ class CServiceScan : public OpenThreads::Thread
 		void CleanAllMaps();
 		bool ReplaceTransponderParams(freq_id_t freq, t_satellite_position satellitePosition, struct dvb_frontend_parameters * feparams, uint8_t polarization);
 
-#if 0
+#if ENABLE_FASTSCAN
 		/* fast scan */
 		std::map <t_channel_id, t_satellite_position> fast_services_sat;
 		std::map <t_channel_id, freq_id_t> fast_services_freq;

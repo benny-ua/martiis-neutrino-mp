@@ -323,10 +323,12 @@ int CScanSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 			return menu_return::RETURN_EXIT_ALL;
 		return res;
 	}
+#if HAVE_COOL_HARDWARE
 	if (actionKey == "fastdiseqc") {
 		printf("[neutrino] CScanSetup::%s: showFastscanDiseqcSetup()\n", __FUNCTION__);
 		return showFastscanDiseqcSetup();
 	}
+#endif
 	std::string scants_key[] = {"all", "manual", "test", "fast", "auto"/*doesn't exists in CScanTs!*/};
 
 	if (actionKey.size() > 1) {
@@ -348,11 +350,13 @@ int CScanSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 				//...then start scan
 				CScanTs scanTs(delsys);
 				scanTs.exec(NULL, scants_key[i]);
+#if ENABLE_FASTSCAN
 				/* FIXME save fst version. other than fast scan will reset it to 0
 				   to disable fast scan updates */
 				scansettings.fst_version = CServiceScan::getInstance()->GetFstVersion();
 				if (is_wizard && as == "fast")
 					return menu_return::RETURN_EXIT_ALL;
+#endif
 				return res;
 			}
 		}

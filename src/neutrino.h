@@ -136,7 +136,9 @@ private:
 	void SetupFrameBuffer();
 	void CmdParser(int argc, char **argv);
 	void Cleanup();
+#if ENABLE_FASTSCAN
 	void CheckFastScan(bool standby = false, bool reload = true);
+#endif
 	CNeutrinoApp();
 
 public:
