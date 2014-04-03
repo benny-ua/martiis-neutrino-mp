@@ -37,12 +37,13 @@ class CZapitBouquet
 	bool        bUser;
 	bool        bFav;
 	bool        bOther;
+	int         bScanEpg;
 	t_satellite_position satellitePosition;
 
 	ZapitChannelList radioChannels;
 	ZapitChannelList tvChannels;
 
-	inline CZapitBouquet(const std::string name) { Name = name; lName = name; bHidden = false; bLocked = false; bUser = true; }
+	inline CZapitBouquet(const std::string name) { Name = name; lName = name; bHidden = false; bLocked = false; bUser = false; bOther = false; bScanEpg = false; }
 	inline void updateLocalizedName(const std::string name) { lName = name; }
 
 	void addService(CZapitChannel* newChannel);

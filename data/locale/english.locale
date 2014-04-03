@@ -347,6 +347,11 @@ date.Sun  Sun
 date.Thu  Thu
 date.Tue  Tue
 date.Wed  Wed
+debug Debug Output
+debug.level Level
+debug.level_1 normal
+debug.level_2 informative
+debug.level_3 verbose
 epg.saving Saving EPG
 epgextended.actors Actors
 epgextended.director Director
@@ -964,6 +969,7 @@ menu.hint_epg_old_events Hours after event end time to consider\nevent old and r
 menu.hint_epg_save Save cached EPG to harddisk or usb flash\nand load it after boot
 menu.hint_epg_save_standby Save EPG on soft standby mode
 menu.hint_epg_scan Enable background epg scan using free tuner,\ncurrent bouquet or all favorites
+menu.hint_epg_scan_mode Select box state to run epg scan
 menu.hint_event_textcolor Change event color for colored-event options\nin channel list and infobar
 menu.hint_eventlist_additional Show additional informations\nin main box
 menu.hint_eventlist_fonts Change event list font sizes
@@ -1409,8 +1415,12 @@ miscsettings.epg_save Save/Restore epg on reboot
 miscsettings.epg_save_standby Save epg on soft standby
 miscsettings.epg_saving Saving EPG data ...
 miscsettings.epg_scan EPG scan
+miscsettings.epg_scan_always Always
 miscsettings.epg_scan_bq bouquet
 miscsettings.epg_scan_fav favorites
+miscsettings.epg_scan_live Live
+miscsettings.epg_scan_sel Selected
+miscsettings.epg_scan_standby Standby
 miscsettings.general General
 miscsettings.head Extended settings
 miscsettings.infobar Infobar
@@ -1955,12 +1965,21 @@ satsetup.diseqcrepeat DiSEqC-repeats
 satsetup.extended DiSEqC-Settings
 satsetup.extended_motor Motor-Settings
 satsetup.fastscan_all SD and HD
+satsetup.fastscan_auto_diseqc Start auto-diseqc configuration
+satsetup.fastscan_auto_diseqc_wait Auto-diseqc configuration in progress
 satsetup.fastscan_hd HD only
-satsetup.fastscan_head Fast scan (Astra 1, 19.2E, 12.515Mhz)
+satsetup.fastscan_head Fast scan
 satsetup.fastscan_prov Provider
-satsetup.fastscan_prov_cd CanalDigitaal
-satsetup.fastscan_prov_telesat TéléSAT
-satsetup.fastscan_prov_tvv TV Vlaanderen
+satsetup.fastscan_prov_cd_hd CanalDigitaal (HD)
+satsetup.fastscan_prov_cd_sd CanalDigitaal (SD)
+satsetup.fastscan_prov_hda HD Austria
+satsetup.fastscan_prov_hello Hello
+satsetup.fastscan_prov_skylink_c Skylink Czech
+satsetup.fastscan_prov_skylink_s Skylink Slovak
+satsetup.fastscan_prov_telesat_b TéléSAT Belgium
+satsetup.fastscan_prov_telesat_l TéléSAT Luxemburg
+satsetup.fastscan_prov_tvv_hd TV Vlaanderen (HD)
+satsetup.fastscan_prov_tvv_sd TV Vlaanderen (SD)
 satsetup.fastscan_sd SD only
 satsetup.fastscan_type Scan type
 satsetup.fe_mode Tuner mode
@@ -2015,7 +2034,7 @@ scants.channel Channel:
 scants.failed Transponderscan failed!
 scants.finished Transponderscan finished successfully!
 scants.freqdata Frequency:
-scants.head Scan transponder
+scants.head Service scan
 scants.numberofdataservices Data
 scants.numberofradioservices Radio
 scants.numberoftotalservices Total

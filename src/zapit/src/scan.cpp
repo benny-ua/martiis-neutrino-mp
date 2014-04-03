@@ -62,6 +62,7 @@ CServiceScan::CServiceScan()
 	running = false;
 
 	cable_nid = 0;
+	fst_version = 0;
 
 	frontend = CFEManager::getInstance()->getFE(0);
 }
@@ -112,9 +113,11 @@ void CServiceScan::run()
 
 	switch(scan_mode) {
 		case SCAN_PROVIDER:
+			fst_version = 0;
 			ScanProviders();
 			break;
 		case SCAN_TRANSPONDER:
+			fst_version = 0;
 			ScanTransponder();
 			break;
 #if 0

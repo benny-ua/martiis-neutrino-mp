@@ -651,13 +651,16 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 #else
 	unsigned int system_rev = cs_get_revision();
 	std::string boxname = NeutrinoAPI->NeutrinoYParser->func_get_boxtype(hh, "");
+	std::string boxmodel = NeutrinoAPI->NeutrinoYParser->func_get_boxmodel(hh, "");
 #endif
 
 	static CNetAdapter netadapter; 
 	std::string eth_id = netadapter.getMacAddr();
 	std::transform(eth_id.begin(), eth_id.end(), eth_id.begin(), ::tolower);
 
-#if !HAVE_HARDWARE_SPARK
+#if HAVE_HARDWARE_SPARK
+	hh->printf("%s\nMAC:%s\n", boxname.c_str(),eth_id.c_str());
+#else
 #if HAVE_TRIPLEDRAGON
 	boxname = "Armas ";
 #endif
@@ -698,8 +701,7 @@ void CControlAPI::HWInfoCGI(CyhookHandler *hh)
 	}
 
 	boxname += (g_info.delivery_system == DVB_S || (system_rev == 1)) ? " SAT":" CABLE";
-#endif
-	hh->printf("%s\nMAC:%s\n", boxname.c_str(),eth_id.c_str());
+	hh->printf("%s (%s)\nMAC:%s\n", boxname.c_str(), boxmodel.c_str(), eth_id.c_str());
 }
 //-----------------------------------------------------------------------------
 void CControlAPI::ShutdownCGI(CyhookHandler *hh)

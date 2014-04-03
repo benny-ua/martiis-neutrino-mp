@@ -95,6 +95,7 @@ install_DATA += \
 	dummy.png \
 	dummy_small.png \
 	error.png \
+	epg.png \
 	features.png \
 	file.png \
 	folder.png \

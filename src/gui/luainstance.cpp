@@ -385,6 +385,7 @@ const luaL_Reg CLuaInstance::methods[] =
 	{ "DisplayImage", CLuaInstance::DisplayImage },
 	{ "Blit", CLuaInstance::Blit },
 	{ "GetLanguage", CLuaInstance::GetLanguage },
+	{ "runScript", CLuaInstance::runScriptExt },
 	{ NULL, NULL }
 };
 
@@ -722,6 +723,12 @@ int CLuaInstance::GetLanguage(lua_State *L)
 	lua_pushstring(L, g_settings.language.c_str());
 
 	return 1;
+}
+
+int CLuaInstance::runScriptExt(lua_State *)
+{
+	fprintf(stderr, "[CLuaInstance::%s] runScript is not an implemented extension. Please fix your Lua code to use one of the native mechanisms instead.\n", __func__);
+	return 0;
 }
 
 bool CLuaInstance::tableLookup(lua_State *L, const char *what, std::string &value)

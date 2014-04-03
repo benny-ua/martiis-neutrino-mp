@@ -136,6 +136,7 @@
 #include <zapit/zapit.h>
 #include <zapit/getservices.h>
 #include <zapit/satconfig.h>
+#include <zapit/scan.h>
 #include <zapit/client/zapitclient.h>
 
 #include <linux/reboot.h>
@@ -155,6 +156,7 @@ int allow_flash = 1;
 Zapit_config zapitCfg;
 bool autoshift = false;
 uint32_t scrambled_timer;
+uint32_t fst_timer;
 t_channel_id standby_channel_id = 0;
 
 //NEW
@@ -575,6 +577,7 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.epg_save = configfile.getBool("epg_save", false);
 	g_settings.epg_save_standby = configfile.getBool("epg_save_standby", true);
 	g_settings.epg_scan = configfile.getInt32("epg_scan", 0);
+	g_settings.epg_scan_mode = configfile.getInt32("epg_scan_mode", CEpgScan::MODE_ALWAYS);
 	//widget settings
 	g_settings.widget_fade = false;
 	g_settings.widget_fade           = configfile.getBool("widget_fade"          , false );
@@ -1143,6 +1146,7 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("epg_save", g_settings.epg_save);
 	configfile.setBool("epg_save_standby", g_settings.epg_save_standby);
 	configfile.setInt32("epg_scan", g_settings.epg_scan);
+	configfile.setInt32("epg_scan_mode", g_settings.epg_scan_mode);
 	configfile.setInt32("epg_cache_time"           ,g_settings.epg_cache );
 	configfile.setInt32("epg_extendedcache_time"   ,g_settings.epg_extendedcache);
 	configfile.setInt32("epg_old_events"           ,g_settings.epg_old_events );
@@ -2099,6 +2103,9 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 #ifdef ENABLE_GRAPHLCD
 	nGLCD::getInstance();
 #endif
+	if (!scanSettings.loadSettings(NEUTRINO_SCAN_SETTINGS_FILE))
+		dprintf(DEBUG_NORMAL, "Loading of scan settings failed. Using defaults.\n");
+
 	/* set service manager options before starting zapit */
 	CServiceManager::getInstance()->KeepNumbers(g_settings.keep_channel_numbers);
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
@@ -2144,6 +2151,8 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 
 	InitZapitClient();
 	g_Zapit->setStandby(false);
+
+	CheckFastScan();
 
 	//timer start
 #if !HAVE_SPARK_HARDWARE
@@ -2197,7 +2206,7 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	}
 #if HAVE_COOL_HARDWARE
 	/* only SAT-hd1 before rev 8 has fan */
-	g_info.has_fan = (cs_get_revision()  < 8 && g_info.delivery_system == DVB_S);
+	g_info.has_fan = (cs_get_revision()  < 8 && CFEManager::getInstance()->getFE(0)->getInfo()->type == FE_QPSK);
 #endif
 	dprintf(DEBUG_NORMAL, "g_info.has_fan: %d\n", g_info.has_fan);
 	//fan speed
@@ -2232,10 +2241,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	CEitManager::getInstance()->SetConfig(config);
 	CEitManager::getInstance()->Start();
 #endif
-
-	if (!scanSettings.loadSettings(NEUTRINO_SCAN_SETTINGS_FILE, g_info.delivery_system)) {
-		dprintf(DEBUG_NORMAL, "Loading of scan settings failed. Using defaults.\n");
-	}
 
 	CVFD::getInstance()->showVolume(g_settings.current_volume);
 	CVFD::getInstance()->setMuted(current_muted);
@@ -2477,11 +2482,12 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					InfoClock->enableInfoClock(false);
 					int old_ttx = g_settings.cacheTXT;
 					int old_epg = g_settings.epg_scan;
+					int old_mode = g_settings.epg_scan_mode;
 					mainMenu->exec(NULL, "");
 					InfoClock->enableInfoClock(true);
 					StartSubtitles();
 					saveSetup(NEUTRINO_SETTINGS_FILE);
-					if (old_epg != g_settings.epg_scan) {
+					if (old_epg != g_settings.epg_scan || old_mode != g_settings.epg_scan_mode) {
 						if (g_settings.epg_scan)
 							CEpgScan::getInstance()->Start();
 						else
@@ -2662,7 +2668,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				if (msg == CRCInput::RC_home) {
 					CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 				}
-				handleMsg(msg, data);
+				if (msg != CRCInput::RC_timeout)
+					handleMsg(msg, data);
 			}
 		}
 		else {
@@ -2674,7 +2681,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				}
 			}
 			else {
-				handleMsg(msg, data);
+				if (msg != CRCInput::RC_timeout)
+					handleMsg(msg, data);
 			}
 		}
 	}
@@ -2786,6 +2794,44 @@ void CNeutrinoApp::zapTo(t_channel_id channel_id)
 	}
 }
 
+bool CNeutrinoApp::wakeupFromStandby(void)
+{
+	bool alive = recordingstatus || CEpgScan::getInstance()->Running() ||
+		CStreamManager::getInstance()->StreamStatus();
+
+	if ((mode == mode_standby) && !alive) {
+		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
+#if !HAVE_SPARK_HARDWARE
+		if(g_settings.ci_standby_reset) {
+			g_CamHandler->exec(NULL, "ca_ci_reset0");
+			g_CamHandler->exec(NULL, "ca_ci_reset1");
+		}
+#endif
+		g_Zapit->setStandby(false);
+		g_Zapit->getMode();
+		return true;
+	}
+	return false;
+}
+
+void CNeutrinoApp::standbyToStandby(void)
+{
+	bool alive = recordingstatus || CEpgScan::getInstance()->Running() ||
+		CStreamManager::getInstance()->StreamStatus();
+
+	if ((mode == mode_standby) && !alive) {
+		// zap back to pre-recording channel if necessary
+		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
+		if (standby_channel_id && (live_channel_id != standby_channel_id)) {
+			live_channel_id = standby_channel_id;
+			channelList->zapTo_ChannelID(live_channel_id);
+		}
+		g_Zapit->setStandby(true);
+		g_Sectionsd->setPauseScanning(true);
+		cpuFreq->SetCpuFreq(g_settings.standby_cpufreq * 1000 * 1000);
+	}
+}
+
 int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 {
 	int res = 0;
@@ -2850,6 +2896,16 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			if(g_settings.scrambled_message && videoDecoder->getBlank() && videoDecoder->getPlayState()) {
 				const char * text = g_Locale->getText(LOCALE_SCRAMBLED_CHANNEL);
 				ShowHint (LOCALE_MESSAGEBOX_INFO, text, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (text, true) + 10, 5);
+			}
+			return messages_return::handled;
+		}
+		if(data == fst_timer) {
+			g_RCInput->killTimer(fst_timer);
+			if (wakeupFromStandby()) {
+				CheckFastScan(true);
+				standbyToStandby();
+			} else if (mode == mode_standby) {
+				fst_timer = g_RCInput->addTimer(30*1000*1000, true);
 			}
 			return messages_return::handled;
 		}
@@ -3180,27 +3236,9 @@ _repeat:
 		/* sent by rcinput, when got msg from zapit about record activated/deactivated */
 		/* should be sent when no record running */
 		printf("NeutrinoMessages::EVT_RECORDMODE: %s\n", ( data ) ? "on" : "off");
-		//if(!CRecordManager::getInstance()->RecordingStatus() && was_record && (!data))
-
-		/* no records left and record mode off FIXME check !*/
-		if(!CRecordManager::getInstance()->RecordingStatus() && (!data))
-		{
-			if(mode == mode_standby) {
-				// zap back to pre-recording channel if necessary
-				t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
-				if (standby_channel_id && (live_channel_id != standby_channel_id)) {
-					live_channel_id = standby_channel_id;
-					channelList->zapTo_ChannelID(live_channel_id);
-				}
-				/* do not put zapit to standby, if epg scan not finished */
-				if (!CEpgScan::getInstance()->Running())
-					g_Zapit->setStandby(true);
-				cpuFreq->SetCpuFreq(g_settings.standby_cpufreq * 1000 * 1000);
-			}
-			/* try to wakeup epg scan */
-			CEpgScan::getInstance()->Next();
-		}
 		recordingstatus = data;
+		CEpgScan::getInstance()->Next();
+		standbyToStandby();
 		autoshift = CRecordManager::getInstance()->TimeshiftOnly();
 		CVFD::getInstance()->ShowIcon(FP_ICON_CAM1, recordingstatus != 0);
 
@@ -3210,17 +3248,8 @@ _repeat:
 		return messages_return::handled;
 	}
 	else if (msg == NeutrinoMessages::RECORD_START) {
-
 		//FIXME better at announce ?
-		if( mode == mode_standby ) {
-			cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
-#if !HAVE_SPARK_HARDWARE
-			if(!recordingstatus && g_settings.ci_standby_reset) {
-				g_CamHandler->exec(NULL, "ca_ci_reset0");
-				g_CamHandler->exec(NULL, "ca_ci_reset1");
-			}
-#endif
-		}
+		wakeupFromStandby();
 #if 0
 		//zap to rec channel if box start from deepstandby
 		if(timer_wakeup){
@@ -3258,11 +3287,25 @@ _repeat:
 		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 		return messages_return::handled;
 	}
+	else if (msg == NeutrinoMessages::EVT_STREAM_START) {
+		int fd = (int) data;
+		printf("NeutrinoMessages::EVT_STREAM_START: fd %d\n", fd);
+		wakeupFromStandby();
+
+		if (!CStreamManager::getInstance()->AddClient(fd))
+			close(fd);
+		return messages_return::handled;
+	}
+	else if (msg == NeutrinoMessages::EVT_STREAM_STOP) {
+		printf("NeutrinoMessages::EVT_STREAM_STOP\n");
+		CEpgScan::getInstance()->Next();
+		standbyToStandby();
+		return messages_return::handled;
+	}
 	else if( msg == NeutrinoMessages::EVT_PMT_CHANGED) {
-		res = messages_return::handled;
 		t_channel_id channel_id = *(t_channel_id*) data;
 		CRecordManager::getInstance()->Update(channel_id);
-		return res;
+		return messages_return::handled;
 	}
 
 	else if( msg == NeutrinoMessages::ZAPTO) {
@@ -3542,9 +3585,11 @@ _repeat:
 		g_volume->setVolumeExt((int)data);
 		return messages_return::handled;
 	}
-	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000))
+	if ((msg >= CRCInput::RC_WithData) && (msg < CRCInput::RC_WithData + 0x10000000)) {
+		INFO("###################################### DELETED msg %x data %x\n", msg, data);
 		delete [] (unsigned char*) data;
-	
+		return messages_return::handled;
+	}
 	return messages_return::unhandled;
 }
 
@@ -3592,6 +3637,11 @@ void CNeutrinoApp::ExitRun(const bool /*write_si*/, int retcode)
 			hintBox->hide();
 			delete hintBox;
 		}
+
+		/* on shutdown force load new fst */
+		if (retcode)
+			CheckFastScan(true, false);
+
 		CVFD::getInstance()->setMode(CVFD::MODE_SHUTDOWN);
 
 		stop_daemons(true /*retcode*/);//need here for timer_is_rec before saveSetup
@@ -3972,6 +4022,8 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		// Active standby on
 		powerManager->SetStandby(false, false);
 		CEpgScan::getInstance()->Start(true);
+		if (scansettings.fst_version)
+			fst_timer = g_RCInput->addTimer(30*1000*1000, true);
 	} else {
 		// Active standby off
 		powerManager->SetStandby(false, false);
@@ -3984,6 +4036,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		cpuFreq->SetCpuFreq(g_settings.cpufreq * 1000 * 1000);
 		videoDecoder->Standby(false);
 		CEpgScan::getInstance()->Stop();
+		g_RCInput->killTimer(fst_timer);
 
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(false);
@@ -4421,7 +4474,9 @@ void stop_daemons(bool stopall, bool for_flash)
 		pthread_join(nhttpd_thread, NULL);
 	}
 	printf("httpd shutdown done\n");
+	printf("streaming shutdown\n");
 	CStreamManager::getInstance()->Stop();
+	printf("streaming shutdown done\n");
 	if(stopall || for_flash) {
 		printf("timerd shutdown\n");
 		if (g_Timerd)
@@ -5066,4 +5121,34 @@ void CNeutrinoApp::Cleanup()
 #endif
 #endif
 #endif
+}
+
+void CNeutrinoApp::CheckFastScan(bool standby, bool reload)
+{
+	if (scansettings.fst_version) {
+		g_Zapit->getMode();
+		INFO("fst version %02x (%s)", scansettings.fst_version, standby ? "force" : "check");
+		CServiceScan::getInstance()->QuietFastScan(true);
+		int new_fst = scansettings.fst_version;
+		if (!standby) {
+			if (CServiceScan::getInstance()->ReadFstVersion(scansettings.fast_op))
+				new_fst = CServiceScan::getInstance()->GetFstVersion();
+		}
+		if (standby || (new_fst != scansettings.fst_version)) {
+			CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
+			CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_SATSETUP_FASTSCAN_HEAD));
+			CHintBox * fhintbox = NULL;
+			if (!standby) {
+				fhintbox = new CHintBox(LOCALE_MESSAGEBOX_INFO, g_Locale->getText(LOCALE_SATSETUP_FASTSCAN_HEAD));
+				fhintbox->paint();
+			}
+			if (CServiceScan::getInstance()->ScanFast(scansettings.fast_op, reload)) {
+				scanSettings.fst_version = CServiceScan::getInstance()->GetFstVersion();
+				scanSettings.saveSettings(NEUTRINO_SCAN_SETTINGS_FILE);
+			}
+			delete fhintbox;
+			if (standby)
+				CVFD::getInstance()->setMode(CVFD::MODE_STANDBY);
+		}
+	}
 }

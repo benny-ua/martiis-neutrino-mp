@@ -145,6 +145,10 @@ void CMoviePlayerGui::Init(void)
 
 	frameBuffer = CFrameBuffer::getInstance();
 
+<<<<<<< HEAD
+=======
+	playback = new cPlayback(0);
+>>>>>>> origin/next-cc
 	moviebrowser = new CMovieBrowser();
 	bookmarkmanager = new CBookmarkManager();
 

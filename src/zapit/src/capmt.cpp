@@ -42,10 +42,16 @@
 CCam::CCam()
 {
 	camask = 0;
-	for(int i = 0; i < MAX_DMX_UNITS; i++)
+	demuxes = new int[MAX_DMX_UNITS];
+	for(unsigned i = 0; i < MAX_DMX_UNITS; i++)
 		demuxes[i] = 0;
 	source_demux = -1;
 	calen = 0;
+}
+
+CCam::~CCam()
+{
+	delete []demuxes;
 }
 
 unsigned char CCam::getVersion(void) const
@@ -154,7 +160,7 @@ int CCam::makeMask(int demux, bool add)
 	else if(demuxes[demux] > 0)
 		demuxes[demux]--;
 
-	for(int i = 0; i < MAX_DMX_UNITS; i++) {
+	for(unsigned i = 0; i < MAX_DMX_UNITS; i++) {
 		if(demuxes[i] > 0)
 			mask |= 1 << i;
 	}
@@ -245,12 +251,6 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 			source = channel->getRecordDemux();
 			demux = channel->getRecordDemux();
 			break;
-#if 0
-		case STREAM:
-			source = DEMUX_SOURCE_0;
-			demux = STREAM_DEMUX;
-			break;
-#endif
 		case PIP:
 			source = channel->getRecordDemux();
 			demux = channel->getPipDemux();

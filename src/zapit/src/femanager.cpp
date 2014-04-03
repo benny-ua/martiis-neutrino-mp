@@ -110,7 +110,7 @@ bool CFEManager::Init()
 				delete fe;
 		}
 	}
-	for (int i = 0; i < MAX_DMX_UNITS; i++)
+	for (unsigned i = 0; i < MAX_DMX_UNITS; i++)
 		dmap.push_back(CFeDmx(i));
 
 	INFO("found %d frontends, %d demuxes\n", (int)femap.size(), (int)dmap.size());
@@ -405,6 +405,10 @@ void CFEManager::linkFrontends(bool init)
 	enabled_count = 0;
 	have_sat = have_cable = have_terr = false;
 	unused_demux = 0;
+	int demuxes[MAX_DMX_UNITS];
+	for(unsigned i = 0; i < MAX_DMX_UNITS; i++)
+		demuxes[i] = 0;
+	demuxes[0] = 1;
 	for(fe_map_iterator_t it = femap.begin(); it != femap.end(); it++) {
 		CFrontend * fe = it->second;
 		int femode = fe->getMode();
@@ -461,12 +465,16 @@ void CFEManager::linkFrontends(bool init)
 				have_cable = true;
 			else if (fe->isTerr())
 				have_terr = true;
+
+			if ((fe->fenumber + 1) < (int) MAX_DMX_UNITS)
+				demuxes[fe->fenumber + 1] = 1;
 		}
-		else {	/* unused -> no need to keep open */
-			fe->Close();
-			if (!unused_demux) {
-				unused_demux = fe->fenumber + 1;
-			}
+	}
+	for(unsigned i = 0; i < MAX_DMX_UNITS; i++) {
+		if (demuxes[i] == 0) {
+			unused_demux = i;
+			INFO("pip demux: %d\n", unused_demux);
+			break;
 		}
 	}
 }
@@ -676,10 +684,8 @@ CFrontend * CFEManager::allocateFE(CZapitChannel * channel, bool forrecord)
 			cDemux::SetSource(frontend->fenumber+1, frontend->fenumber);
 #ifdef ENABLE_PIP
 		/* FIXME until proper demux management */
-		if (enabled_count < 4) {
-			channel->setPipDemux(unused_demux ? unused_demux : PIP_DEMUX);
-			//cDemux::SetSource(PIP_DEMUX, frontend->fenumber);
-		}
+		if (unused_demux)
+			channel->setPipDemux(unused_demux);
 		INFO("pip demux: %d", channel->getPipDemux());
 #endif
 #endif
