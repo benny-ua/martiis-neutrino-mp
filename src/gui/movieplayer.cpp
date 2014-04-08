@@ -1971,8 +1971,8 @@ CZapitAbsSub* CMoviePlayerGui::getChannelSub(unsigned int i, CZapitAbsSub **s)
 {
 	if (i < numpidt) {
 		int mag, page;
-		char *lang = (char *) alloca(tlanguage[i].size() + 1);
-		if (3 != sscanf(tlanguage[i].c_str(), "%*d %s %*d %d %d", lang, &mag, &page))
+		char *lang = [tlanguage[i].length()];
+		if (3 != sscanf(tlanguage[i].c_str(), "%s %*d %d %d", lang, &mag, &page))
 			return NULL;
 		CZapitTTXSub *_s = new CZapitTTXSub;
 		_s->thisSubType = CZapitAbsSub::TTX;
