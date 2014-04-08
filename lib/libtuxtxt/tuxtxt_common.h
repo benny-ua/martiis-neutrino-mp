@@ -603,7 +603,6 @@ static void clear_inject_queue(void)
 	pthread_mutex_unlock(&inject_mutex);
 }
 
-extern "C" void teletext_write(int pid, uint8_t *data, int size);
 void teletext_write(int pid, uint8_t *data, int size)
 {
 	if (last_injected_pid != pid) {
