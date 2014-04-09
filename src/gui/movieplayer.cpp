@@ -1977,9 +1977,8 @@ CZapitAbsSub* CMoviePlayerGui::getChannelSub(unsigned int i, CZapitAbsSub **s)
 		CZapitTTXSub *_s = new CZapitTTXSub;
 		_s->thisSubType = CZapitAbsSub::TTX;
 		_s->pId = tpids[i];
-		_s->ISO639_language_code = tlanguage[i];
 		_s->ISO639_language_code = std::string(lang);
-		_s->teletext_magazine_number =  mag;
+		_s->teletext_magazine_number = mag;
 		_s->teletext_page_number = page;
 		*s = _s;
 		return *s;
