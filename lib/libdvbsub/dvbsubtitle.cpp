@@ -31,39 +31,6 @@ static bool DebugConverter = true;
 
 #define dbgconverter(a...) if (DebugConverter) sub_debug.print(Debug::VERBOSE, a)
 
-// CAVEAT EMPTOR
-// THIS IS COPIED FROM ffmpeg/libavcodec/dvbsubdec.c
-//
-// WE'RE ACCESSING PRIVATE DATA HERE. THIS WILL BREAK RATHER SOONER THAN LATER.
-//
-//   --martii
-//
-typedef struct DVBSubDisplayDefinition {
-    int version;
-
-    int x;
-    int y;
-    int width;
-    int height;
-} DVBSubDisplayDefinition;
-
-typedef struct DVBSubContext {
-    int composition_id;
-    int ancillary_id;
-
-#if (LIBAVCODEC_VERSION_MAJOR > 54) || (LIBAVCODEC_VERSION_MINOR > 8) // FIXME, needs adjustment
-    int version;
-#endif
-    int time_out;
-    void /*DVBSubRegion*/ *region_list;
-    void /*DVBSubCLUT*/   *clut_list;
-    void /*DVBSubObject*/ *object_list;
-
-    int display_list_size;
-    void /*DVBSubRegionDisplay*/ *display_list;
-    DVBSubDisplayDefinition *display_definition;
-} DVBSubContext;
-
 // --- cDvbSubtitleBitmaps ---------------------------------------------------
 
 cDvbSubtitleBitmaps::cDvbSubtitleBitmaps(int64_t pPts)
@@ -295,11 +262,8 @@ void cDvbSubtitleConverter::Pause(bool pause)
 		//Reset();
 	} else {
 		// Assume that we've switched channel. Drop the existing display_definition.
-		DVBSubContext *ctx = (DVBSubContext *) avctx->priv_data;
-		if (ctx) {
-			if (ctx->display_definition)
-				av_freep(&ctx->display_definition);
-		}
+		avctx->width = 0;
+		avctx->height = 0;
 		//Reset();
 		running = true;
 	}
@@ -408,16 +372,12 @@ int cDvbSubtitleConverter::Action(void)
 	max_x = 720;
 	max_y = 576;
 
-	DVBSubContext *ctx = (DVBSubContext *) avctx->priv_data;
-	if (ctx) {
-		DVBSubDisplayDefinition *display_def = ctx->display_definition;
-		if (display_def && display_def->width && display_def->height) {
-			min_x = display_def->x;
-			min_y = display_def->y;
-			max_x = display_def->width;
-			max_y = display_def->height;
-			dbgconverter("cDvbSubtitleConverter::Action: Display Definition: min_x=%d min_y=%d max_x=%d max_y=%d\n", min_x, min_y, max_x, max_y);
-		}
+	if (avctx->width && avctx->height) {
+		min_x = 0;
+		min_y = 0;
+		max_x = avctx->width;
+		max_y = avctx->height;
+		dbgconverter("cDvbSubtitleConverter::Action: Display Definition: min_x=%d min_y=%d max_x=%d max_y=%d\n", min_x, min_y, max_x, max_y);
 	}
 
 	Lock();
