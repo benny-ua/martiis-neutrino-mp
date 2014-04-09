@@ -905,34 +905,28 @@ bool CFileBrowser::exec(const char * const dirname)
 			if (!(filelist.empty())) {
 				unsigned int last = filelist.size() - 1;
 				if (selected != last && selected + listmaxshow >= filelist.size()) {
-					unsigned int prevselected = selected;
 					selected = last;
-					paintItem(prevselected - liststart);
-					paintItem(selected - liststart);
 				}
 				else
 				{
 					selected = (selected == last) ? 0 : selected + listmaxshow;
 					liststart = (selected / listmaxshow) * listmaxshow;
-					paint();
 				}
+				paint();
 			}
 		}
 		else if (msg == CRCInput::RC_green || msg == (neutrino_msg_t) g_settings.key_pageup)
 		{
 			if (!(filelist.empty())) {
 				if (selected && selected < listmaxshow) {
-					unsigned int prevselected = selected;
 					selected = 0;
-					paintItem(prevselected - liststart);
-					paintItem(selected - liststart);
 				}
 				else
 				{
 					selected = selected ? selected - listmaxshow : filelist.size() - 1;
 					liststart = (selected/listmaxshow)*listmaxshow;
-					paint();
 				}
+				paint();
 			}
 		}
 		else if ( msg == CRCInput::RC_blue )
