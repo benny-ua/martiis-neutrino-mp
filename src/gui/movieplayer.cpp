@@ -455,20 +455,20 @@ void CMoviePlayerGui::fillPids()
 void CMoviePlayerGui::Cleanup()
 {
 	/*clear audiopids */
-	for (unsigned int i = 0; i < numpida; i++) {
+	for (unsigned int i = 0; i < REC_MAX_APIDS; i++) {
 		apids[i] = 0;
 		ac3flags[i] = 0;
 		language[i].clear();
 	}
 	numpida = 0; currentapid = -1;
 	// clear subtitlepids
-	for (unsigned int i = 0; i < numpids; i++) {
+	for (unsigned int i = 0; i < REC_MAX_SPIDS; i++) {
 		spids[i] = 0;
 		slanguage[i].clear();
 	}
 	numpids = 0;
 	// clear teletextpids
-	for (unsigned int i = 0; i < numpidt; i++) {
+	for (unsigned int i = 0; i < REC_MAX_TPIDS; i++) {
 		tpids[i] = 0;
 		tlanguage[i].clear();
 	}
@@ -833,12 +833,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		showStartingHint = true;
 		pthread_create(&thrStartHint, NULL, CMoviePlayerGui::ShowStartHint, this);
 	}
-#if HAVE_SPARK_HARDWARE
-	bool no_probe = p_movie_info && file_name.length() > 4 && file_name.substr(file_name.length() - 3) == ".ts";
-	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration, no_probe);
-#else
 	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
-#endif
 	if (thrStartHint) {
 		showStartingHint = false;
 		pthread_join(thrStartHint, NULL);
@@ -880,8 +875,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			}
 		}
 		stopped = false;
-		numpida = REC_MAX_APIDS;
-		playback->FindAllPids(apids, ac3flags, &numpida, language);
+		getAPIDCount();
 		if (p_movie_info)
 			for (unsigned int i = 0; i < numpida; i++) {
 				EPG_AUDIO_PIDS pids;
@@ -1219,9 +1213,9 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			//showHelpTS();
 #if HAVE_SPARK_HARDWARE
 		} else if((msg == CRCInput::RC_text || msg == (neutrino_msg_t) g_settings.mpkey_vtxt)) {
-			int pid = playback->GetTeletextPid();
+			int pid = playback->GetFirstTeletextPid();
 			if (pid > -1) {
-				playback->SetTeletextPid(-1);
+				playback->SetTeletextPid(0);
 				StopSubtitles(true);
 				if(g_settings.cacheTXT)
 					tuxtxt_stop();
@@ -1229,7 +1223,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				tuxtx_stop_subtitle();
 				tuxtx_main(pid, 0, 2, true);
 				tuxtxt_stop();
-				playback->SetTeletextPid(-1);
+				playback->SetTeletextPid(0);
 				if (currentttxsub != "") {
 					CSubtitleChangeExec SubtitleChanger(playback);
 					SubtitleChanger.exec(NULL, currentttxsub);
@@ -1408,7 +1402,7 @@ void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 				CNeutrinoApp::getInstance()->channelList->getActiveChannel_ChannelID());
 		return;
 	}
-	currentaudioname = "Unk";
+	currentaudioname = "Unknown";
 	getCurrentAudioName(currentaudioname);
 
 	if (p_movie_info) {
@@ -1492,33 +1486,13 @@ void CMoviePlayerGui::getCurrentAudioName(std::string &audioname)
 	playback->FindAllPids(apids, ac3flags, &numpida, language);
 	if(numpida)
 		currentapid = apids[0];
-	bool ena = true;
-#if HAVE_COOL_HARDWARE
-	for (unsigned short count = 0; count < numpida; count++) {
-#else
-	for (unsigned int count = 0; count < numpida; count++) {
-#endif
+	for (unsigned int count = 0; count < numpida; count++)
 		if(currentapid == apids[count]){
 			if (getAudioName(apids[count], audioname))
 				return;
-			if (!language[count].empty()) {
-				audioname = language[count];
-				addAudioFormat(count, audioname, ena);
-				if(!ena && (count < numpida)){
-					currentapid = apids[count+1];
-					continue;
-				}
-				return;
-			}
-			audioname = "Stream " + to_string(count);
-			addAudioFormat(count, audioname, ena);
-			if(!ena && (count < numpida - 1)){
-				currentapid = apids[count+1];
-				continue;
-			}
+			audioname = language[count];
 			return;
 		}
-	}
 }
 
 void CMoviePlayerGui::selectAudioPid()
@@ -1951,8 +1925,25 @@ unsigned int CMoviePlayerGui::getAPID(void)
 
 unsigned int CMoviePlayerGui::getAPIDCount(void)
 {
+	unsigned int count = 0;
 	numpida = REC_MAX_APIDS;
 	playback->FindAllPids(apids, ac3flags, &numpida, language);
+	for (unsigned int i = 0; i < numpida; i++) {
+		if (i != count) {
+			apids[count] = apids[i];
+			ac3flags[count] = ac3flags[i];
+			language[count] = language[i];
+		}
+		if (language[i].empty()) {
+			language[i] = "Stream ";
+			language[i] += to_string(count);
+		}
+		bool ena = false;
+		addAudioFormat(i, language[i], ena);
+		if (ena)
+			count++;
+	}
+	numpida = count;
 	return numpida;
 }
 
@@ -1962,7 +1953,7 @@ unsigned int CMoviePlayerGui::getSubtitleCount(void)
 	numpids = REC_MAX_SPIDS;
 	playback->FindAllSubtitlePids(spids, &numpids, slanguage);
 	numpidt = REC_MAX_TPIDS;
-	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage);
+	playback->FindAllTeletextsubtitlePids(tpids, &numpidt, tlanguage, tmag, tpage);
 
 	return numpids + numpidt;
 }
@@ -1970,16 +1961,12 @@ unsigned int CMoviePlayerGui::getSubtitleCount(void)
 CZapitAbsSub* CMoviePlayerGui::getChannelSub(unsigned int i, CZapitAbsSub **s)
 {
 	if (i < numpidt) {
-		int mag, page;
-		char lang[tlanguage[i].length()];
-		if (3 != sscanf(tlanguage[i].c_str(), "%s %*d %d %d", lang, &mag, &page))
-			return NULL;
 		CZapitTTXSub *_s = new CZapitTTXSub;
 		_s->thisSubType = CZapitAbsSub::TTX;
 		_s->pId = tpids[i];
-		_s->ISO639_language_code = std::string(lang);
-		_s->teletext_magazine_number = mag;
-		_s->teletext_page_number = page;
+		_s->ISO639_language_code = tlanguage[i];
+		_s->teletext_magazine_number = tmag[i];
+		_s->teletext_page_number = tpage[i];
 		*s = _s;
 		return *s;
 	}
@@ -2030,9 +2017,9 @@ bool CMoviePlayerGui::getAPID(unsigned int i, int &apid, unsigned int &is_ac3)
 size_t CMoviePlayerGui::GetReadCount()
 {
 #if HAVE_SPARK_HARDWARE
-	unsigned long long this_read = 0;
+	uint64_t this_read = 0;
 	this_read = playback->GetReadCount();
-	unsigned long long res;
+	uint64_t res;
 	if (this_read < last_read)
 		res = 0;
 	else

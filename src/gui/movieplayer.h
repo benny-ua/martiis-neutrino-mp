@@ -93,11 +93,8 @@ class CMoviePlayerGui : public CMenuTarget
 	int duration;
 	CTimeOSD FileTime;
 
-#if HAVE_COOL_HARDWARE
-	uint16_t numpida;
-#else
 	unsigned int numpida;
-#endif
+
 	int vpid;
 	int vtype;
 	std::string    language[REC_MAX_APIDS];
@@ -123,6 +120,8 @@ class CMoviePlayerGui : public CMenuTarget
 #endif
 	std::string    tlanguage[REC_MAX_TPIDS];
 	int tpids[REC_MAX_TPIDS];
+	int tmag[REC_MAX_TPIDS];
+	int tpage[REC_MAX_TPIDS];
 	std::string currentttxsub;
 
 	bool probePids;
