@@ -240,7 +240,7 @@ void CZapit::LoadAudioMap()
 	while (fgets(s, sizeof(s), audio_config_file)) {
 		sscanf(s, "%" SCNx64 " %d %d %d %d %d %d", &chan, &apid, &mode, &volume, &subpid, &ttxpid, &ttxpage);
 		audio_map[chan].apid = apid;
-		audio_map[chan].subpid = subpid;
+		audio_map[chan].subpid = subpid < 0 ? 0 : subpid; // workaround negative values used in earlier versions
 		audio_map[chan].mode = mode;
 		audio_map[chan].volume = volume;
 		audio_map[chan].ttxpid = ttxpid;

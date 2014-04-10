@@ -430,7 +430,7 @@ void CMoviePlayerGui::fillPids()
 	if(p_movie_info == NULL)
 		return;
 
-	numpida = 0; currentapid = -1;
+	numpida = 0; currentapid = 0;
 	numpids = 0;
 	numpidt = 0; currentttxsub = "";
 	if(!p_movie_info->audioPids.empty()) {
@@ -460,7 +460,7 @@ void CMoviePlayerGui::Cleanup()
 		ac3flags[i] = 0;
 		language[i].clear();
 	}
-	numpida = 0; currentapid = -1;
+	numpida = 0; currentapid = 0;
 	// clear subtitlepids
 	for (unsigned int i = 0; i < REC_MAX_SPIDS; i++) {
 		spids[i] = 0;
@@ -707,7 +707,7 @@ bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::st
 	mi.epgId = chan;
 	p_movie_info = &mi;
 
-	numpida = 0; currentapid = -1;
+	numpida = 0; currentapid = 0;
 	numpids = 0;
 	numpidt = 0; currentttxsub = "";
 
@@ -886,7 +886,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 				p_movie_info->audioPids.push_back(pids);
 			}
 
-		if (currentapid < 0 && numpida > 0) {
+		if (!currentapid && numpida > 0) {
 			currentapid = apids[0];
 			currentac3 = ac3flags[0];
 			SetStreamType();

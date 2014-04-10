@@ -362,7 +362,7 @@ void tuxtxt_clear_cache(void)
 	tuxtxt_cache.bttok      = 0;
 	tuxtxt_cache.cached_pages  = 0;
 	tuxtxt_cache.page_receiving = -1;
-	tuxtxt_cache.vtxtpid = -1;
+	tuxtxt_cache.vtxtpid = 0;
 	memset(&tuxtxt_cache.subpagetable, 0xFF, sizeof(tuxtxt_cache.subpagetable));
 	memset(&tuxtxt_cache.basictop, 0, sizeof(tuxtxt_cache.basictop));
 	memset(&tuxtxt_cache.adip, 0, sizeof(tuxtxt_cache.adip));
@@ -663,7 +663,6 @@ static bool read_injected_packet(unsigned char * &packet, int &size, int timeout
  * CacheThread                                                                *
  ******************************************************************************/
 #if HAVE_SPARK_HARDWARE
-int eplayer_fd = -1;
 extern bool isTtxEplayer;
 #endif
 static int stop_cache = 0;
@@ -1200,7 +1199,7 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 int tuxtxt_start_thread(int source = 0);
 int tuxtxt_start_thread(int source)
 {
-	if (tuxtxt_cache.vtxtpid == -1)
+	if (!tuxtxt_cache.vtxtpid)
 		return 0;
 
 	tuxtxt_cache.thread_starting = 1;

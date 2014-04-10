@@ -151,15 +151,11 @@ int dvbsub_start(int pid)
 	isEplayer = _isEplayer;
 	if (isEplayer && !dvbsub_paused)
 		return 0;
-	if (!isEplayer && !pid)
-#else
-	if (!pid)
 #endif
-		pid = -1;
-	if(!dvbsub_paused && (pid < 0))
+	if(!dvbsub_paused && !pid)
 		return 0;
 
-	if(pid > -1 && pid != dvbsub_pid) {
+	if(pid > 0 && pid != dvbsub_pid) {
 		dvbsub_pause();
 		if(dvbSubtitleConverter)
 			dvbSubtitleConverter->Reset();
@@ -195,7 +191,7 @@ static int flagFd = -1;
 
 int dvbsub_stop()
 {
-	dvbsub_pid = -1;
+	dvbsub_pid = 0;
 	if(reader_running) {
 		dvbsub_stopped = 1;
 		dvbsub_pause();
@@ -213,16 +209,10 @@ int dvbsub_getpid()
 
 void dvbsub_setpid(int pid)
 {
-#if HAVE_SPARK_HARDWARE
-	if (!isEplayer && !pid)
-#else
-	if (!pid)
-#endif
-		pid = -1;
-	dvbsub_pid = pid;
-
-	if(dvbsub_pid < 0)
+	if(!dvbsub_pid)
 		return;
+
+	dvbsub_pid = pid;
 
 	clear_queue();
 

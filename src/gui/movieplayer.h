@@ -97,6 +97,7 @@ class CMoviePlayerGui : public CMenuTarget
 
 	int vpid;
 	int vtype;
+
 	std::string    language[REC_MAX_APIDS];
 #if HAVE_COOL_HARDWARE
 	uint16_t apids[REC_MAX_APIDS];
@@ -106,6 +107,7 @@ class CMoviePlayerGui : public CMenuTarget
 	unsigned int ac3flags[REC_MAX_APIDS];
 #endif
 	int currentapid, currentac3;
+
 	// subtitle data
 	unsigned int numpids;
 #ifndef REC_MAX_SPIDS
@@ -113,6 +115,7 @@ class CMoviePlayerGui : public CMenuTarget
 #endif
 	std::string    slanguage[REC_MAX_SPIDS];
 	int spids[REC_MAX_SPIDS];
+
 	// teletext subtitle data
 	unsigned int numpidt;
 #ifndef REC_MAX_TPIDS

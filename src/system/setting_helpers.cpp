@@ -386,8 +386,8 @@ int CSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actio
 		if (!is_mp && dvbsub_getpid() > 0)
 			dvbsub_stop();
 		if (is_mp && playback) {
-			playback->SetSubtitlePid(-1);
-			playback->SetTeletextPid(-1);
+			playback->SetSubtitlePid(0);
+			playback->SetTeletextPid(0);
 			mp->setCurrentTTXSub("");
 		}
 		return menu_return::RETURN_EXIT;
@@ -411,7 +411,7 @@ int CSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actio
 		tuxtx_stop_subtitle();
 		dvbsub_stop();
 		if (is_mp) {
-			playback->SetSubtitlePid(-1);
+			playback->SetSubtitlePid(0);
 			playback->SetTeletextPid(pid);
 			tuxtx_set_pid(pid, page, ptr);
 #if HAVE_SPARK_HARDWARE
@@ -427,8 +427,8 @@ int CSubtitleChangeExec::exec(CMenuTarget* /*parent*/, const std::string & actio
 	} else if(is_mp && !strncmp(actionKey.c_str(), "SUB", 3)){
 		tuxtx_stop_subtitle();
 		dvbsub_stop();
-		playback->SetSubtitlePid(-1);
-		playback->SetTeletextPid(-1);
+		playback->SetSubtitlePid(0);
+		playback->SetTeletextPid(0);
 		mp->setCurrentTTXSub("");
 		char const * pidptr = strchr(actionKey.c_str(), ':');
 		int pid = atoi(pidptr+1);
