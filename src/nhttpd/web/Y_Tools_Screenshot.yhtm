@@ -22,13 +22,6 @@ function checkEnable() {
 function rcsim(_key) {
 	if(!checkEnable()) return;
 
-	if(_key == "KEY_POWER"){
-		var __result = trim(loadSyncURL("/control/standby"));
-		if (__result == "off")	{
-			if(confirm("{=L:bc.control.shutdown.ask=}") != true)
-			return;
-		}
-	}
 	loadSyncURL("/control/rcem?" + _key);
 	if (enableOSD == 1 && enableVideo == 0) {
 		do_snapshot();
