@@ -197,7 +197,7 @@ void COPKGManager::updateMenu()
 	getPkgData(OM_LIST_INSTALLED);
 	getPkgData(OM_LIST_UPGRADEABLE);
 	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++) {
-		it->second.forwarder->iconName_Info_right = "";
+		it->second.forwarder->iconName_Info_right = NULL;
 		it->second.forwarder->setActive(true);
 		if (it->second.upgradable) {
 			it->second.forwarder->iconName_Info_right = NEUTRINO_ICON_WARNING;
