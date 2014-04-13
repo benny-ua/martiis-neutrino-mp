@@ -1627,7 +1627,6 @@ moviebrowser.short_title Titel
 moviebrowser.start_head Film starten von Position:
 moviebrowser.start_record_start Aufnahmestart
 moviebrowser.ts_only Nur Aufnahmen zeigen
-moviebrowser.ts_probe Analyse von TS-Dateien
 moviebrowser.unlimited unbegrenzt
 moviebrowser.update_if_dest_empty_only Übernehmen nur wenn Ziel leer
 moviebrowser.use_dir Verzeichnis verwenden

@@ -212,7 +212,6 @@ typedef struct
 	int reload;
 	int remount;
 	int ts_only;
-	int ts_probe;
 
 	int browser_serie_mode;
 	int serie_auto_create;
@@ -397,7 +396,6 @@ class CMovieBrowser : public CMenuTarget
 		bool delFile_vlc(CFile& file);
 		bool delFile_std(CFile& file);
 		int  getMenuRet() { return menu_ret; }
-		bool doProbe(void);
 		int  getMode() { return show_mode; }
 		void  setMode(int mode) { show_mode = mode; }
 

@@ -613,7 +613,6 @@ void CMovieBrowser::initGlobalSettings(void)
 	m_settings.browserRowWidth[5] = m_defaultRowWidth[m_settings.browserRowItem[5]]; 		//30;
 
 	m_settings.ts_only = 0;
-	m_settings.ts_probe = 0;
 	m_settings.ytmode = cYTFeedParser::MOST_POPULAR;
 	m_settings.ytorderby = cYTFeedParser::ORDERBY_PUBLISHED;
 	m_settings.ytresults = 10;
@@ -752,7 +751,6 @@ bool CMovieBrowser::loadSettings(MB_SETTINGS* settings)
 	settings->browser_serie_mode = configfile.getInt32("mb_browser_serie_mode", 0);
 	settings->serie_auto_create = configfile.getInt32("mb_serie_auto_create", 0);
 	settings->ts_only = configfile.getInt32("mb_ts_only", 0);
-	settings->ts_probe = configfile.getInt32("mb_ts_probe", 0);
 
 	settings->sorting.item = (MB_INFO_ITEM)configfile.getInt32("mb_sorting_item", MB_INFO_RECORDDATE);
 	settings->sorting.direction = (MB_DIRECTION)configfile.getInt32("mb_sorting_direction", MB_DIRECTION_UP);
@@ -837,7 +835,6 @@ bool CMovieBrowser::saveSettings(MB_SETTINGS* settings)
 	configfile.setInt32("mb_browser_serie_mode", settings->browser_serie_mode);
 	configfile.setInt32("mb_serie_auto_create", settings->serie_auto_create);
 	configfile.setInt32("mb_ts_only", settings->ts_only);
-	configfile.setInt32("mb_ts_probe", settings->ts_probe);
 
 	configfile.setInt32("mb_gui", settings->gui);
 
@@ -3332,7 +3329,6 @@ bool CMovieBrowser::showMenu(MI_MOVIE_INFO* movie_info)
     optionsMenu.addItem(GenericMenuSeparatorLine);
     int ts_only = m_settings.ts_only;
     optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_TS_ONLY,           (int*)(&m_settings.ts_only), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
-    optionsMenu.addItem( new CMenuOptionChooser(LOCALE_MOVIEBROWSER_TS_PROBE,          (int*)(&m_settings.ts_probe), MESSAGEBOX_YES_NO_OPTIONS, MESSAGEBOX_YES_NO_OPTIONS_COUNT, true ));
 
 /********************************************************************/
 /**  main menu ******************************************************/
@@ -5370,8 +5366,4 @@ ret_err:
 	if(was_cancel)
 		g_RCInput->postMsg(CRCInput::RC_home, 0);
 	return retval;
-}
-bool CMovieBrowser::doProbe()
-{
-	return m_settings.ts_probe;
 }
