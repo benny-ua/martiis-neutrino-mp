@@ -44,6 +44,8 @@
 #include <driver/framebuffer.h>
 
 #include <string>
+#include <vector>
+#include <map>
 
 class COPKGManager : public CMenuTarget
 {
@@ -52,16 +54,10 @@ class COPKGManager : public CMenuTarget
 		
 		CFrameBuffer *frameBuffer;
 
-		struct pkg {
-			std::string name;
-			std::string description;
-			bool installed;
-			bool upgradable;
-			int index;
-			CMenuForwarder *forwarder;
-		};
-		std::map<std::string,struct pkg> pkg_map;
-		struct pkg **pkg_arr;
+		struct pkg;
+
+		std::map<std::string,pkg> pkg_map;
+		std::vector<pkg*> pkg_vec;
 
 		CMenuWidget *menu;
 		CMenuForwarder *upgrade_forwarder;
@@ -76,11 +72,21 @@ class COPKGManager : public CMenuTarget
 			return execCmd(cmdstr.c_str(), verbose, acknowledge);
 		};
 		void getPkgData(const int pkg_content_id);
-		std::string getBlankPkgName(const std::string& line);
+		static std::string getBlankPkgName(const std::string& line);
 		int showMenu();
 		void updateMenu();
 		void refreshMenu();
 
+		struct pkg {
+			std::string name;
+			std::string desc;
+			bool installed;
+			bool upgradable;
+			CMenuForwarder *forwarder;
+			pkg() { }
+			pkg(std::string &_name, std::string &_desc)
+				: name(_name), desc(_desc), installed(false), upgradable(false) { }
+		};
 	public:	
 		COPKGManager();
 		~COPKGManager();

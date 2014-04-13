@@ -110,24 +110,24 @@ int COPKGManager::exec(CMenuTarget* parent, const std::string &actionKey)
 	}
 	int selected = menu->getSelected() - menu_offset;
 	if (expert_mode && actionKey == "rc_spkr") {
-		if (selected < 0 || !pkg_arr[selected]->installed)
+		if (selected < 0 || selected >= (int) pkg_vec.size() || !pkg_vec[selected]->installed)
 			return menu_return::RETURN_NONE;
 		char loc[200];
-		snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), pkg_arr[selected]->name.c_str());
+		snprintf(loc, sizeof(loc), g_Locale->getText(LOCALE_OPKG_MESSAGEBOX_REMOVE), pkg_vec[selected]->name.c_str());
 		if (ShowMsg(LOCALE_OPKG_TITLE, loc, CMessageBox::mbrCancel, CMessageBox::mbYes | CMessageBox::mbCancel) != CMessageBox::mbrCancel) {
 			if (parent)
 				parent->hide();
-			execCmd(pkg_types[OM_REMOVE] + pkg_arr[selected]->name, true, true);
+			execCmd(pkg_types[OM_REMOVE] + pkg_vec[selected]->name, true, true);
 			refreshMenu();
 		}
 		return res;
 	}
 	if (actionKey == "rc_info") {
-		if (selected < 0)
+		if (selected < 0 || selected >= (int) pkg_vec.size())
 			return menu_return::RETURN_NONE;
 		if (parent)
 			parent->hide();
-		execCmd(pkg_types[OM_INFO] + pkg_arr[selected]->name, true, true);
+		execCmd(pkg_types[OM_INFO] + pkg_vec[selected]->name, true, true);
 		return res;
 	}
 	if (actionKey == "rc_setup") {
@@ -222,7 +222,6 @@ void COPKGManager::refreshMenu() {
 	updateMenu();
 }
 
-//show items
 int COPKGManager::showMenu()
 {
 	installed = false;
@@ -256,25 +255,26 @@ int COPKGManager::showMenu()
 	menu->addKey(CRCInput::RC_spkr, this, "rc_spkr");
 	menu->addKey(CRCInput::RC_setup, this, "rc_setup");
 
-	pkg_arr = (struct pkg **) alloca(pkg_map.size() * sizeof(struct pkg *));
-	int i = 0;
-	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++, i++) {
+	pkg_vec.clear();
+	for (std::map<string, struct pkg>::iterator it = pkg_map.begin(); it != pkg_map.end(); it++) {
+		it->second.forwarder = new CMenuForwarder(it->second.desc, true, NULL , this, it->second.name.c_str());
+		it->second.forwarder->setHint("", it->second.desc);
 		menu->addItem(it->second.forwarder);
-		pkg_arr[i] = &it->second;
+		pkg_vec.push_back(&it->second);
 	}
 
 	updateMenu();
 
-	int res = menu->exec (NULL, "");
+	int res = menu->exec(NULL, "");
 
 	menu->hide ();
+
 	if (installed)
 		DisplayInfoMessage(g_Locale->getText(LOCALE_OPKG_SUCCESS_INSTALL));
 	delete menu;
 	return res;
 }
 
-//returns true if opkg support is available
 bool COPKGManager::hasOpkgSupport()
 {
 	const char *deps[] = {"opkg-cl", "opkg-key", "/etc/opkg/opkg.conf", "/var/lib/opkg", NULL};
@@ -298,7 +298,6 @@ bool COPKGManager::hasOpkgSupport()
 
 void COPKGManager::getPkgData(const int pkg_content_id)
 {
-	
 	printf("COPKGManager: executing %s\n", pkg_types[pkg_content_id].c_str());
 	
 	switch (pkg_content_id) {
@@ -330,67 +329,34 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 	}
 	
 	char buf[256];
-	setbuf(f, NULL);
-	int in, pos = 0;
 
-	while (true)
+	while (fgets(buf, sizeof(buf), f))
 	{
-		in = fgetc(f);
-		if (in == EOF)
-			break;
+		std::string line(buf);
+		trim(line);
 
-		buf[pos++] = (char)in;
-		buf[pos] = 0;
-		
-		if (in == '\b' || in == '\n')
-		{
-			pos = 0; /* start a new line */
-			if (in == '\n')
-			{
-				//clean up string
-				int ipos = -1;
-				std::string line = buf;
-				while( (ipos = line.find('\n')) != -1 )
-					line = line.erase(ipos,1);
-								
-				//add to lists
-				switch (pkg_content_id) 
-				{
-					case OM_LIST: //list of pkgs
-					{
-						struct pkg p;
-						p.description = line;
-						p.name = getBlankPkgName(line);
-						p.installed = false;
-						p.upgradable = false;
-						pkg_map[p.name] = p;
-						std::map<string, struct pkg>::iterator it = pkg_map.find(p.name); // don't use variables defined in local scope only
-						it->second.forwarder = new CMenuForwarder(it->second.description, true, NULL , this, it->second.name.c_str());
-						it->second.forwarder->setHint("", it->second.description);
-						break;
-					}
-					case OM_LIST_INSTALLED: //installed pkgs
-					{
-						std::string name = getBlankPkgName(line);
-						std::map<string, struct pkg>::iterator it = pkg_map.find(name);
-						if (it != pkg_map.end())
-							it->second.installed = true;
-						break;
-					}
-					case OM_LIST_UPGRADEABLE: //upgradable pkgs
-					{
-						std::string name = getBlankPkgName(line);
-						std::map<string, struct pkg>::iterator it = pkg_map.find(name);
-						if (it != pkg_map.end())
-							it->second.upgradable = true;
-						break;
-					}
-					default:
-						printf("unknown output! \n\t");
-						printf("%s\n", buf);
-						break;
-				}
+		std::string name = getBlankPkgName(line);
+						
+		switch (pkg_content_id) {
+			case OM_LIST: {
+				pkg_map[name] = pkg(name, line);
+				break;
 			}
+			case OM_LIST_INSTALLED: {
+				std::map<string, struct pkg>::iterator it = pkg_map.find(name);
+				if (it != pkg_map.end())
+					it->second.installed = true;
+				break;
+			}
+			case OM_LIST_UPGRADEABLE: {
+				std::map<string, struct pkg>::iterator it = pkg_map.find(name);
+				if (it != pkg_map.end())
+					it->second.upgradable = true;
+				break;
+			}
+			default:
+				fprintf(stderr, "%s %s %d: unrecognized content id %d\n", __FILE__, __func__, __LINE__, pkg_content_id);
+				break;
 		}
 	}
 
@@ -399,9 +365,10 @@ void COPKGManager::getPkgData(const int pkg_content_id)
 
 std::string COPKGManager::getBlankPkgName(const std::string& line)
 {
-	int l_pos = line.find(" ");
-	std::string name = line.substr(0, l_pos);
-	return name;
+	size_t l_pos = line.find(" ");
+	if (l_pos != string::npos)
+		return line.substr(0, l_pos);
+	return line;
 }
 
 int COPKGManager::execCmd(const char *cmdstr, bool verbose, bool acknowledge)
