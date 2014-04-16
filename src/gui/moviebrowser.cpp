@@ -3509,8 +3509,7 @@ bool CMovieBrowser::isFiltered(MI_MOVIE_INFO& movie_info)
 
 bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM item, std::string* item_string)
 {
-	#define MAX_STR_TMP 100
-	char str_tmp[MAX_STR_TMP];
+	char str_tmp[100];
 	bool result = true;
 	*item_string="";
 	tm* tm_tmp;
@@ -3542,18 +3541,18 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 			*item_string = movie_info.epgInfo1;
 			break;
 		case MB_INFO_MAJOR_GENRE: 			// 		= 5,
-			snprintf(str_tmp,MAX_STR_TMP,"%2d",movie_info.genreMajor);
+			snprintf(str_tmp,sizeof(str_tmp),"%2d",movie_info.genreMajor);
 			*item_string = str_tmp;
 			break;
 		case MB_INFO_MINOR_GENRE: 			// 		= 6,
-			snprintf(str_tmp,MAX_STR_TMP,"%2d",movie_info.genreMinor);
+			snprintf(str_tmp,sizeof(str_tmp),"%2d",movie_info.genreMinor);
 			*item_string = str_tmp;
 			break;
 		case MB_INFO_INFO2: 					// 		= 7,
 			*item_string = movie_info.epgInfo2;
 			break;
 		case MB_INFO_PARENTAL_LOCKAGE: 					// 		= 8,
-			snprintf(str_tmp,MAX_STR_TMP,"%2d",movie_info.parentalLockAge);
+			snprintf(str_tmp,sizeof(str_tmp),"%2d",movie_info.parentalLockAge);
 			*item_string = str_tmp;
 			break;
 		case MB_INFO_CHANNEL: 				// 		= 9,
@@ -3566,17 +3565,14 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 				if(movie_info.bookmarks.user[i].pos != 0)
 					counter++;
 			}
-			snprintf(text, 8,"%d",counter);
-			text[9] = 0; // just to make sure string is terminated
-			*item_string = text;
+			*item_string = to_string(counter);
 			break;
 		case MB_INFO_QUALITY: 				// 		= 11,
-			snprintf(str_tmp,MAX_STR_TMP,"%d",movie_info.quality);
-			*item_string = str_tmp;
+			*item_string = to_string(movie_info.quality);
 			break;
 		case MB_INFO_PREVPLAYDATE: 			// 		= 12,
 			tm_tmp = localtime(&movie_info.dateOfLastPlay);
-			snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%04d",tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
+			snprintf(str_tmp,sizeof(str_tmp),"%02d.%02d.%04d",tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
 			*item_string = str_tmp;
 			break;
 
@@ -3587,18 +3583,17 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 				// YYYY-MM-DD hh:mm:ss
 				int day, month, year;
 				if (3 == sscanf(movie_info.ytdate.c_str(), "%d-%d-%d", &year, &month, &day)) {
-					snprintf(str_tmp,MAX_STR_TMP,"%02d.%02d.%04d", day, month, year);
+					snprintf(str_tmp,sizeof(str_tmp),"%02d.%02d.%04d", day, month, year);
 					*item_string = str_tmp;
 				}
 			} else {
 				tm_tmp = localtime(&movie_info.file.Time);
-				snprintf(str_tmp,MAX_STR_TMP, "%02d.%02d.%04d", tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
+				snprintf(str_tmp,sizeof(str_tmp), "%02d.%02d.%04d", tm_tmp->tm_mday, tm_tmp->tm_mon + 1, tm_tmp->tm_year + 1900);
 				*item_string = str_tmp;
 			}
 			break;
 		case MB_INFO_PRODDATE: 				// 		= 14,
-			snprintf(str_tmp,MAX_STR_TMP,"%d",movie_info.productionDate);
-			*item_string = str_tmp;
+			*item_string = to_string(movie_info.productionDate);
 			break;
 		case MB_INFO_COUNTRY: 				// 		= 15,
 			*item_string = movie_info.productionCountry;
@@ -3607,88 +3602,16 @@ bool CMovieBrowser::getMovieInfoItem(MI_MOVIE_INFO& movie_info, MB_INFO_ITEM ite
 			result = false;
 			break;
 		case MB_INFO_AUDIO: 				// 		= 17,
-#if 1  // MB_INFO_AUDIO test
 			// we just return the number of audiopids
-			char ltext[10];
-			snprintf(ltext, 8,"%d", (int)movie_info.audioPids.size());
-			ltext[9] = 0; // just to make sure string is terminated
-			*item_string = ltext;
-#else // MB_INFO_AUDIO test
-			for(i=0; i < movie_info.audioPids.size() && i < 10; i++)
-			{
-				if(movie_info.audioPids[i].epgAudioPidName[0].size() < 2)
-				{
-					text[counter++] = '?'; // two chars ??? -> strange name
-					continue;
-				}
-
-				// check for Dolby Digital / AC3 Audio audiopids (less than 5.1 is not remarkable)
-				if(	(movie_info.audioPids[i].epgAudioPidName.find("AC3") != -1 ) ||
-					(movie_info.audioPids[i].epgAudioPidName.find("5.1") != -1 ))
-				{
-					ac3_found = true;
-				}
-				// Check for german audio pids
-				if( movie_info.audioPids[i].epgAudioPidName[0] == 'D' || // Deutsch
-					movie_info.audioPids[i].epgAudioPidName[0] == 'd' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'G' || // German
-					movie_info.audioPids[i].epgAudioPidName[0] == 'g' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'M' || // for Mono, mono and Stereo, stereo we assume German ;)
-					movie_info.audioPids[i].epgAudioPidName[0] == 'n' ||
-					(movie_info.audioPids[i].epgAudioPidName[0] == 'S' && movie_info.audioPids[i].epgAudioPidName[1] == 't' ) ||
-					(movie_info.audioPids[i].epgAudioPidName[0] == 's' && movie_info.audioPids[i].epgAudioPidName[1] == 't' ))
-				{
-					text[counter++] = 'D';
-					continue;
-				}
-				// Check for english audio pids
-				if( movie_info.audioPids[i].epgAudioPidName[0] == 'E' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'e')
-				{
-					text[counter++] = 'E';
-					continue;
-				}
-				// Check for french audio pids
-				if( movie_info.audioPids[i].epgAudioPidName[0] == 'F' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'f')
-				{
-					text[counter++] = 'F';
-					continue;
-				}
-				// Check for italian audio pids
-				if( movie_info.audioPids[i].epgAudioPidName[0] == 'I' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'i')
-				{
-					text[counter++] = 'I';
-					continue;
-				}
-				// Check for spanish audio pids
-				if( movie_info.audioPids[i].epgAudioPidName[0] == 'E' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'e' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 'S' ||
-					movie_info.audioPids[i].epgAudioPidName[0] == 's')
-				{
-					text[counter++] = 'S';
-					continue;
-				}
-				text[counter++] = '?'; // We have not found any language for this pid
-			}
-			if(ac3_found == true)
-			{
-				text[counter++] = '5';
-				text[counter++] = '.';
-				text[counter++] = '1';
-			}
-			text[counter] = 0; // terminate string
-#endif	// MB_INFO_AUDIO test
+			*item_string = to_string(movie_info.audioPids.size());
 			break;
 		case MB_INFO_LENGTH: 				// 		= 18,
-			//snprintf(str_tmp,MAX_STR_TMP,"%4d",movie_info.length);
-			snprintf(str_tmp,MAX_STR_TMP,"%dh %dm", movie_info.length/60, movie_info.length%60);
+			//snprintf(str_tmp,sizeof(str_tmp),"%4d",movie_info.length);
+			snprintf(str_tmp,sizeof(str_tmp),"%dh %dm", movie_info.length/60, movie_info.length%60);
 			*item_string = str_tmp;
 			break;
 		case MB_INFO_SIZE: 					// 		= 19,
-			snprintf(str_tmp,MAX_STR_TMP,"%4" PRIu64 "",movie_info.file.Size>>20);
+			snprintf(str_tmp,sizeof(str_tmp),"%4" PRIu64 "",movie_info.file.Size>>20);
 			*item_string = str_tmp;
 			break;
 		case MB_INFO_MAX_NUMBER: 			//		= 20
