@@ -47,6 +47,7 @@
 #include <driver/volume.h>
 #include <driver/display.h>
 #include <driver/abstime.h>
+#include <driver/record.h>
 #include <eitd/edvbstring.h>
 #include <system/helpers.h>
 
@@ -188,7 +189,7 @@ void CMoviePlayerGui::Init(void)
 	filebrowser->Hide_records = true;
 
 	speed = 1;
-	timeshift = 0;
+	timeshift = TSHIFT_MODE_OFF;
 	numpida = 0;
 	numpids = 0;
 	numpidt = 0;
@@ -282,7 +283,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	isYT = false;
 	isNK = false;
 	isBookmark = false;
-	timeshift = 0;
+	timeshift = TSHIFT_MODE_OFF;
 	isHTTP = false;
 	isUPNP = false;
 
@@ -308,13 +309,13 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 	else if (actionKey == "fileplayback") {
 	}
 	else if (actionKey == "timeshift") {
-		timeshift = 1;
+		timeshift = TSHIFT_MODE_TEMPORARY;
 	}
 	else if (actionKey == "ptimeshift") {
-		timeshift = 2;
+		timeshift = TSHIFT_MODE_PERMANENT;
 	}
 	else if (actionKey == "rtimeshift") {
-		timeshift = 3;
+		timeshift = TSHIFT_MODE_PAUSE;
 	}
 #if 0 // TODO ?
 	else if (actionKey == "bookmarkplayback") {
@@ -346,7 +347,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 			CVFD::getInstance()->showServicename(pretty_name.c_str());
 		else
 			CVFD::getInstance()->showServicename(file_name.c_str());
-		if(timeshift) {
+		if(timeshift != TSHIFT_MODE_OFF) {
 			CVFD::getInstance()->ShowIcon(FP_ICON_TIMESHIFT, true);
 			PlayFile();
 			CVFD::getInstance()->ShowIcon(FP_ICON_TIMESHIFT, false);
@@ -375,8 +376,8 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		InfoClock->enableInfoClock(true);
 	}
 
-	if (timeshift){
-		timeshift = 0;
+	if (timeshift != TSHIFT_MODE_OFF){
+		timeshift = TSHIFT_MODE_OFF;
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	return menu_ret; //menu_return::RETURN_REPAINT;
@@ -496,7 +497,7 @@ bool CMoviePlayerGui::SelectFile()
 	printf("CMoviePlayerGui::SelectFile: isBookmark %d timeshift %d isMovieBrowser %d\n", isBookmark, timeshift, isMovieBrowser);
 	wakeup_hdd(g_settings.network_nfs_recordingdir.c_str());
 
-	if (timeshift) {
+	if (timeshift != TSHIFT_MODE_OFF) {
 		t_channel_id live_channel_id = CZapit::getInstance()->GetCurrentChannelID();
 		p_movie_info = CRecordManager::getInstance()->GetMovieInfo(live_channel_id);
 		file_name = CRecordManager::getInstance()->GetFileName(live_channel_id) + ".ts";
@@ -698,7 +699,7 @@ bool CMoviePlayerGui::PlayBackgroundStart(const std::string &file, const std::st
 	isYT = false;
 	isNK = false;
 	isBookmark = false;
-	timeshift = 0;
+	timeshift = TSHIFT_MODE_OFF;
 	isHTTP = true;
 	isUPNP = false;
 	isHTTP = true;
@@ -804,7 +805,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 	playback->SetTeletextPid(-1);
 
-	playback->Open(timeshift ? PLAYMODE_TS : PLAYMODE_FILE);
+	playback->Open(timeshift == TSHIFT_MODE_OFF ? PLAYMODE_FILE : PLAYMODE_TS);
 
 	if(p_movie_info) {
 		// p_movie_info may be invalidated by CRecordManager while we're still using it. Create and use a copy.
@@ -909,10 +910,10 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		}
 		playstate = CMoviePlayerGui::PLAY;
 		CVFD::getInstance()->ShowIcon(FP_ICON_PLAY, true);
-		if(timeshift) {
+		if(timeshift != TSHIFT_MODE_OFF) {
 			first_start_timeshift = true;
 			startposition = -1;
-			int towait = (timeshift == 1) ? TIMESHIFT_SECONDS+1 : TIMESHIFT_SECONDS;
+			int towait = (timeshift == TSHIFT_MODE_TEMPORARY) ? TIMESHIFT_SECONDS+1 : TIMESHIFT_SECONDS;
 			for(unsigned int i = 0; i < 500; i++) {
 				playback->GetPosition(position, duration);
 				startposition = (duration - position);
@@ -923,12 +924,12 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 				usleep(20000);
 			}
-			if(timeshift == 3) {
+			if(timeshift == TSHIFT_MODE_PAUSE) {
 				startposition = duration;
 			} else {
 				if(g_settings.timeshift_pause)
 					playstate = CMoviePlayerGui::PAUSE;
-				if(timeshift == 1)
+				if(timeshift == TSHIFT_MODE_TEMPORARY)
 					startposition = 0;
 				else
 					startposition = duration - TIMESHIFT_SECONDS*1000;
@@ -936,14 +937,14 @@ bool CMoviePlayerGui::PlayFileStart(void)
 			printf("******************* Timeshift %d, position %d, seek to %d seconds\n", timeshift, position, startposition/1000);
 		}
 #if HAVE_COOL_HARDWARE
-		if(!(timeshift == PLAYMODE_TS) && startposition >= 0)//FIXME no jump for file at start yet
+		if(timeshift != TSHIFT_MODE_OFF && startposition >= 0)//FIXME no jump for file at start yet
 #else
 		if(!isWebTV && startposition > -1)
 #endif
 			playback->SetPosition(startposition, true);
 
 		/* playback->Start() starts paused */
-		if(timeshift == 3) {
+		if(timeshift == TSHIFT_MODE_PAUSE) {
 			speed = -1;
 			playback->SetSpeed(-1);
 			playstate = CMoviePlayerGui::REW;
@@ -951,7 +952,7 @@ bool CMoviePlayerGui::PlayFileStart(void)
 				FileTime.switchMode(position, duration);
 				time_forced = true;
 			}
-		} else if(!timeshift || !g_settings.timeshift_pause) {
+		} else if(timeshift == TSHIFT_MODE_OFF || !g_settings.timeshift_pause) {
 			playback->SetSpeed(1);
 		}
 	}
@@ -999,7 +1000,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 		neutrino_msg_data_t data;
 		g_RCInput->getMsg(&msg, &data, 10);	// 1 secs..
 
-		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift || (playstate != CMoviePlayerGui::PAUSE))) {
+		if ((playstate >= CMoviePlayerGui::PLAY) && (timeshift != TSHIFT_MODE_OFF || (playstate != CMoviePlayerGui::PAUSE))) {
 			if(playback->GetPosition(position, duration)) {
 				if (time_forced)
 					FileTime.show(position, true);
@@ -1024,7 +1025,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			{
 				/* in case ffmpeg report incorrect values */
 				int posdiff = duration - position;
-				if ((posdiff > 0) && (posdiff < 1000) && !timeshift)
+				if ((posdiff > 0) && (posdiff < 1000) && timeshift == TSHIFT_MODE_OFF)
 				{
 					/* 10 seconds after end-of-file, stop */
 					if (++eof > 10)
@@ -1082,7 +1083,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			playstate = CMoviePlayerGui::STOPPED;
 			ShowAbortHintBox();
 			playback->RequestAbort();
-		} else if(!timeshift && !isWebTV && !isYT && !isNK && (msg == (neutrino_msg_t) g_settings.mpkey_next_repeat_mode)) {
+		} else if(timeshift == TSHIFT_MODE_OFF && !isWebTV && !isYT && !isNK && (msg == (neutrino_msg_t) g_settings.mpkey_next_repeat_mode)) {
 			repeat_mode = (repeat_mode_enum)((int)repeat_mode + 1);
 			if (repeat_mode > (int) REPEAT_ALL)
 				repeat_mode = REPEAT_OFF;
@@ -1107,7 +1108,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				}
 				//update_lcd = true;
 				updateLcd();
-				if (!timeshift)
+				if (timeshift == TSHIFT_MODE_OFF)
 					callInfoViewer(/*duration, position*/);
 			}
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_pause) {
@@ -1124,7 +1125,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			}
 			//update_lcd = true;
 			updateLcd();
-			if (!timeshift)
+			if (timeshift == TSHIFT_MODE_OFF)
 				callInfoViewer(/*duration, position*/);
 
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
@@ -1169,7 +1170,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				time_forced = true;
 			}
 
-			if (!timeshift)
+			if (timeshift == TSHIFT_MODE_OFF)
 				callInfoViewer(/*duration, position*/);
 			else if (time_forced)
 				FileTime.show(position, true);
@@ -1254,7 +1255,7 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				while (msg != CRCInput::RC_timeout);
 			}
 #endif
-		} else if(timeshift && (msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
+		} else if(timeshift != TSHIFT_MODE_OFF && (msg == CRCInput::RC_epg || msg == NeutrinoMessages::SHOW_EPG)) {
 			bool restore = FileTime.IsVisible();
 			FileTime.kill(time_forced);
 
@@ -1403,7 +1404,7 @@ void CMoviePlayerGui::PlayFileEnd(bool restore)
 
 void CMoviePlayerGui::callInfoViewer(/*const int duration, const int curr_pos*/)
 {
-	if(timeshift) {
+	if(timeshift != TSHIFT_MODE_OFF ) {
 		g_InfoViewer->showTitle(CNeutrinoApp::getInstance()->channelList->getActiveChannelNumber(),
 				CNeutrinoApp::getInstance()->channelList->getActiveChannelName(),
 				CNeutrinoApp::getInstance()->channelList->getActiveSatellitePosition(),
