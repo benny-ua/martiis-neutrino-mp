@@ -4039,7 +4039,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 		powerManager->SetStandby(false, false);
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 #if HAVE_SPARK_HARDWARE
-		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, true);
+		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, false);
 #else
 		CVFD::getInstance()->ShowText("resume...        ");
 #endif
