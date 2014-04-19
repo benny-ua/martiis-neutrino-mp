@@ -149,31 +149,21 @@ void CMoviePlayerGui::Init(void)
 	moviebrowser = new CMovieBrowser();
 	bookmarkmanager = new CBookmarkManager();
 
-	tsfilefilter.addFilter("ts");
+	const char *filters[] = {
+		"ts", "mpg", "mpeg", "m2p", "mpv", "vob", "m2ts", "mp4", "mov", "m3u", "pls",
 #if HAVE_TRIPLEDRAGON
-	tsfilefilter.addFilter("vdr");
+		"vdr",
 #else
-	tsfilefilter.addFilter("avi");
-	tsfilefilter.addFilter("mkv");
-	tsfilefilter.addFilter("wav");
-	tsfilefilter.addFilter("asf");
-	tsfilefilter.addFilter("aiff");
+		"avi", "mkv", "wav", "asf", "aiff",
 #endif
-	tsfilefilter.addFilter("mpg");
-	tsfilefilter.addFilter("mpeg");
-	tsfilefilter.addFilter("m2p");
-	tsfilefilter.addFilter("mpv");
-	tsfilefilter.addFilter("vob");
-	tsfilefilter.addFilter("m2ts");
-	tsfilefilter.addFilter("mp4");
-	tsfilefilter.addFilter("mov");
-	tsfilefilter.addFilter("m3u");
-	tsfilefilter.addFilter("pls");
 #if HAVE_SPARK_HARDWARE
-	tsfilefilter.addFilter("vdr");
-	tsfilefilter.addFilter("flv");
-	tsfilefilter.addFilter("wmv");
+		"vdr", "flv", "wmv",
 #endif
+		NULL
+	};
+
+	for (const char **f = filters; *f; f++)
+		tsfilefilter.addFilter(*f);
 
 	if (g_settings.network_nfs_moviedir.empty())
 		Path_local = "/";
@@ -1176,15 +1166,15 @@ void CMoviePlayerGui::PlayFileLoop(void)
 			else if (time_forced)
 				FileTime.show(position, true);
 
-		} else if (msg == CRCInput::RC_1) {	// Jump Backwards 1 minute
+		} else if (msg == CRCInput::RC_1) {	// Jump Backward 1 minute
 			SetPosition(-60 * 1000);
 		} else if (msg == CRCInput::RC_3) {	// Jump Forward 1 minute
 			SetPosition(60 * 1000);
-		} else if (msg == CRCInput::RC_4) {	// Jump Backwards 5 minutes
+		} else if (msg == CRCInput::RC_4) {	// Jump Backward 5 minutes
 			SetPosition(-5 * 60 * 1000);
 		} else if (msg == CRCInput::RC_6) {	// Jump Forward 5 minutes
 			SetPosition(5 * 60 * 1000);
-		} else if (msg == CRCInput::RC_7) {	// Jump Backwards 10 minutes
+		} else if (msg == CRCInput::RC_7) {	// Jump Backward 10 minutes
 			SetPosition(-10 * 60 * 1000);
 		} else if (msg == CRCInput::RC_9) {	// Jump Forward 10 minutes
 			SetPosition(10 * 60 * 1000);
