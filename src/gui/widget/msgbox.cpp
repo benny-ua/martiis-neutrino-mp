@@ -644,13 +644,14 @@ int CMsgBox::exec( int timeout, int returnDefaultOnTimeout)
 	int return_button = m_nFootButtons;
 	int res = menu_return::RETURN_REPAINT;
 
+	// show message box
+	paint();
+
 	if (m_pcWindow == NULL)
 	{
 		return res; /* out of memory */
 	}
 
-	// show message box
-	paint();
 	if ( timeout == -1 )
 		timeout = g_settings.timing[SNeutrinoSettings::TIMING_EPG];
 
@@ -867,3 +868,4 @@ int ShowMsg2UTF(	const char * const Title,
 
 	return res;
 }
+// vim:ts=4
