@@ -16,7 +16,8 @@ function goUrl(_url){
 	$("out").update(res);
 }
 function standby(_standby){
-	var _cec = (document.getElementById('checkCEC').checked == true) ? "on" : "off";
+	var _checkCEC = document.getElementById('checkCEC');
+	var _cec = (_checkCEC && _checkCEC.checked) ? "on" : "off";
 	goUrl("/control/standby?"+_standby+"&cec="+_cec);
 }
 //]]>
