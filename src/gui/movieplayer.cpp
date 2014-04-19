@@ -2095,15 +2095,6 @@ void CMoviePlayerGui::SetStreamType(void)
 
 void CMoviePlayerGui::selectAutoLang()
 {
-	if (ext_subs) {
-		playback->FindAllSubs(spids, sub_supported, &numsubs, slanguage);
-		for (unsigned count = 0; count < numsubs; count++) {
-			if (spids[count] == 0x1FFF) {
-				currentspid = spids[count];
-				playback->SelectSubtitles(currentspid);
-			}
-		}
-	}
 	if(g_settings.auto_lang &&  (numpida > 1)) {
 		int pref_idx = -1;
 
