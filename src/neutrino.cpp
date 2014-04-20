@@ -3324,10 +3324,10 @@ _repeat:
 				dvbsub_stop();
 
 				if ((!isTVMode) && (mode != mode_radio)) {
-					radioMode(false);
+					radioMode(true);
 				}
 				else if (isTVMode && mode != mode_tv && mode != mode_webtv) {
-					tvMode(false);
+					tvMode(true);
 				}
 				channelList->zapTo_ChannelID(eventinfo->channel_id);
 			}
