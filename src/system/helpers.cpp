@@ -842,3 +842,45 @@ std::vector<std::string> split(const std::string &s, char delim)
 		vec.push_back(item);
 	return vec;
 }
+
+std::string to_string(int i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+std::string to_string(unsigned int i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+std::string to_string(long i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+std::string to_string(unsigned long i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+std::string to_string(long long i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}
+
+std::string to_string(unsigned long long i)
+{
+	std::stringstream s;
+	s << i;
+	return s.str();
+}

@@ -81,12 +81,12 @@ class CFileHelpers
 		bool removeDir(const char *Dir);
 };
 
-template<class C> std::string to_string(C i)
-{
-	std::stringstream s;
-	s << i;
-	return s.str();
-}
+std::string to_string(int);
+std::string to_string(unsigned int);
+std::string to_string(long);
+std::string to_string(unsigned long);
+std::string to_string(long long);
+std::string to_string(unsigned long long);
 
 inline int atoi(std::string &s) { return atoi(s.c_str()); }
 inline int atoi(const std::string &s) { return atoi(s.c_str()); }
