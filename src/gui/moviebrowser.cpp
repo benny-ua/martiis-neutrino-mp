@@ -5289,3 +5289,5 @@ ret_err:
 		g_RCInput->postMsg(CRCInput::RC_home, 0);
 	return retval;
 }
+
+// vim:ts=4
