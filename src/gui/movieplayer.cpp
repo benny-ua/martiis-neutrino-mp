@@ -797,8 +797,8 @@ bool CMoviePlayerGui::PlayFileStart(void)
 
 	playback->Open(timeshift == TSHIFT_MODE_OFF ? PLAYMODE_FILE : PLAYMODE_TS);
 
-	if(p_movie_info) {
-		if(timeshift){
+	if (p_movie_info) {
+		if (timeshift != TSHIFT_MODE_OFF) {
 		// p_movie_info may be invalidated by CRecordManager while we're still using it. Create and use a copy.
 			mi = *p_movie_info;
 			p_movie_info = &mi;
