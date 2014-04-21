@@ -243,35 +243,35 @@ bool CPlugins::parseCfg(plugin *plugin_data)
 		}
 		else if (cmd == "needfb")
 		{
-			plugin_data->fb = ((parm == "1")?true:false);
+			plugin_data->fb = atoi(parm);
 		}
 		else if (cmd == "needrc")
 		{
-			plugin_data->rc = ((parm == "1")?true:false);
+			plugin_data->rc = atoi(parm);
 		}
 		else if (cmd == "needlcd")
 		{
-			plugin_data->lcd = ((parm == "1")?true:false);
+			plugin_data->lcd = atoi(parm);
 		}
 		else if (cmd == "needvtxtpid")
 		{
-			plugin_data->vtxtpid = ((parm == "1")?true:false);
+			plugin_data->vtxtpid = atoi(parm);
 		}
 		else if (cmd == "pigon")
 		{
-			plugin_data->showpig = ((parm == "1")?true:false);
+			plugin_data->showpig = atoi(parm);
 		}
 		else if (cmd == "needoffsets")
 		{
-			plugin_data->needoffset = ((parm == "1")?true:false);
+			plugin_data->needoffset = atoi(parm);
 		}
 		else if (cmd == "hide")
 		{
-			plugin_data->hide = ((parm == "1")?true:false);
+			plugin_data->hide = atoi(parm);
 		}
 		else if (cmd == "needenigma")
 		{
-			reject = ((parm == "1")?true:false);
+			reject = atoi(parm);
 		}
 
 	}
