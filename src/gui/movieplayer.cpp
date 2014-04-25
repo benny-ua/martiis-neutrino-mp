@@ -631,6 +631,9 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 			caller->playback->RequestAbort();
 		} else if (caller->isWebTV)
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
+		} else if (msg != CRCInput::RC_timeout && msg > CRCInput::RC_MaxRC) {
+			CNeutrinoApp::getInstance()->handleMsg(msg, data);
+		}
 	}
 	if(hb){
 		hb->hide();
