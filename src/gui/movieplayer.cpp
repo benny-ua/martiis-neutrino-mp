@@ -1099,8 +1099,6 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				}
 				//update_lcd = true;
 				updateLcd();
-				if (timeshift == TSHIFT_MODE_OFF)
-					callInfoViewer(/*duration, position*/);
 			}
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_pause) {
 			if (playstate == CMoviePlayerGui::PAUSE) {
@@ -1113,11 +1111,11 @@ void CMoviePlayerGui::PlayFileLoop(void)
 				//CVFD::getInstance()->ShowIcon(VFD_ICON_PAUSE, true);
 				speed = 0;
 				playback->SetSpeed(speed);
+				if (timeshift == TSHIFT_MODE_OFF)
+					callInfoViewer(/*duration, position*/);
 			}
 			//update_lcd = true;
 			updateLcd();
-			if (timeshift == TSHIFT_MODE_OFF)
-				callInfoViewer(/*duration, position*/);
 
 		} else if (msg == (neutrino_msg_t) g_settings.mpkey_bookmark) {
 			handleMovieBrowser((neutrino_msg_t) g_settings.mpkey_bookmark, position);
