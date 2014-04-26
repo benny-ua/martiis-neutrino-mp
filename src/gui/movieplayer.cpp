@@ -629,7 +629,7 @@ void *CMoviePlayerGui::ShowStartHint(void *arg)
 		g_RCInput->getMsg(&msg, &data, 1);
 		if (msg == CRCInput::RC_home || msg == CRCInput::RC_stop) {
 			caller->playback->RequestAbort();
-		} else if (caller->isWebTV)
+		} else if (caller->isWebTV) {
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
 		} else if (msg != CRCInput::RC_timeout && msg > CRCInput::RC_MaxRC) {
 			CNeutrinoApp::getInstance()->handleMsg(msg, data);
