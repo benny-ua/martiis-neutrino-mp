@@ -117,14 +117,9 @@ CMoviePlayerGui::~CMoviePlayerGui()
 
 void getPlayerPts(int64_t *pts)
 {
-	//playback->GetPosition(position, duration)
-	//*pts = CMoviePlayerGui::getInstance().Pts();
 	cPlayback *playback = CMoviePlayerGui::getInstance().getPlayback();
-	if (playback) {
-		int position, duration;
-		playback->GetPosition(position, duration);
-		*pts = position * 90;
-	}
+	if (playback)
+		playback->GetPts((uint64_t &) *pts);
 }
 
 uint64_t CMoviePlayerGui::GetPts(void)
