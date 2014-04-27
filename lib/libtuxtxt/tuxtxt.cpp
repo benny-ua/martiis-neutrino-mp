@@ -25,11 +25,6 @@
 #include <sys/time.h>
 #include <system/set_threadname.h>
 
-/* same as in rcinput.h... */
-#define KEY_TTTV	KEY_FN_1
-#define KEY_TTZOOM	KEY_FN_2
-#define KEY_REVEAL	KEY_FN_D
-
 extern cVideo * videoDecoder;
 
 static pthread_t ttx_sub_thread;
@@ -48,18 +43,18 @@ static int screen_x, screen_y, screen_w, screen_h;
 
 //#define USE_FBPAN // FBIOPAN_DISPLAY seems to be working in current driver
 
-fb_pixel_t *getFBp(int *y)
+fb_pixel_t *getFBp(int &y)
 {
-	if (*y < (int)var_screeninfo.yres)
+	if (y < (int)var_screeninfo.yres)
 		return lfb;
 
-	*y -= var_screeninfo.yres;
+	y -= var_screeninfo.yres;
 	return lbb;
 }
 
 static void FillRect(int x, int y, int w, int h, int color)
 {
-	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t *p = getFBp(y);
 	p += x + y * var_screeninfo.xres;
 	fb_pixel_t col = argb[color];
 	if (w > 0)
@@ -225,10 +220,9 @@ static int toptext_getnext(int startpage, int up, int findgroup)
 
 	if (nextgrp)
 		return nextgrp;
-	else if (nextblk)
+	if (nextblk)
 		return nextblk;
-	else
-		return startpage;
+	return startpage;
 }
 
 static void RenderClearMenuLineBB(char *p, tstPageAttr *attrcol, tstPageAttr *attr)
@@ -257,7 +251,7 @@ static void RenderClearMenuLineBB(char *p, tstPageAttr *attrcol, tstPageAttr *at
 
 static void ClearBB(int color)
 {
-	FillRect(0, (var_screeninfo.yres - var_screeninfo.yoffset), var_screeninfo.xres, var_screeninfo.yres, color);
+	FillRect(0, var_screeninfo.yres - var_screeninfo.yoffset, var_screeninfo.xres, var_screeninfo.yres, color);
 }
 
 static void ClearFB(int /*color*/)
@@ -1310,9 +1304,8 @@ static void eval_l25()
 			int o = 2 * (((tuxtxt_cache.page & 0xf0) >> 4) * 10 + (tuxtxt_cache.page & 0x0f));	/* offset of links for current page */
 			int opop = p[o] & 0x07;	/* index of POP link */
 			int odrcs = p[o+1] & 0x07;	/* index of DRCS link */
-			unsigned char obj[3*4*4]; // types* objects * (triplet,packet,subp,high)
+			unsigned char obj[3*4*4] = { 0 }; // types* objects * (triplet,packet,subp,high)
 			unsigned char type,ct, tstart = 4*4;
-			memset(obj,0,sizeof(obj));
 
 
 			if (p[o] & 0x08) /* GPOP data used */
@@ -1767,15 +1760,9 @@ int tuxtx_main(int pid, int page, int source)
 					transpmode[boxed] = 1; /* switch to normal mode */
 					SwitchTranspMode();
 					break;		/* and evaluate key */
-
 				case RC_MUTE:		/* regular toggle to transparent */
 				case RC_TEXT:
 					break;
-
-				case RC_HELP: /* switch to scart input and back */
-				{
-					continue; /* otherwise ignore exit key */
-				}
 				default:
 					continue; /* ignore all other keys */
 				}
@@ -1930,13 +1917,13 @@ static int Init(int source)
 	}
 #if TUXTXT_CFG_STANDALONE
 	/* init data */
-	memset(&tuxtxt_cache.astCachetable, 0, sizeof(tuxtxt_cache.astCachetable));
-	memset(&tuxtxt_cache.subpagetable, 0xFF, sizeof(tuxtxt_cache.subpagetable));
-	memset(&tuxtxt_cache.astP29, 0, sizeof(tuxtxt_cache.astP29));
+	memset(tuxtxt_cache.astCachetable, 0, sizeof(tuxtxt_cache.astCachetable));
+	memset(tuxtxt_cache.subpagetable, 0xFF, sizeof(tuxtxt_cache.subpagetable));
+	memset(tuxtxt_cache.astP29, 0, sizeof(tuxtxt_cache.astP29));
 
-	memset(&tuxtxt_cache.basictop, 0, sizeof(tuxtxt_cache.basictop));
-	memset(&tuxtxt_cache.adip, 0, sizeof(tuxtxt_cache.adip));
-	memset(&tuxtxt_cache.flofpages, 0 , sizeof(tuxtxt_cache.flofpages));
+	memset(tuxtxt_cache.basictop, 0, sizeof(tuxtxt_cache.basictop));
+	memset(tuxtxt_cache.adip, 0, sizeof(tuxtxt_cache.adip));
+	memset(tuxtxt_cache.flofpages, 0 , sizeof(tuxtxt_cache.flofpages));
 	tuxtxt_cache.maxadippg  = -1;
 	tuxtxt_cache.bttok      = 0;
 	maxhotlist = -1;
@@ -1963,9 +1950,6 @@ static int Init(int source)
 
 	subtitledelay = 0;
 	delaystarted = 0;
-
-	/* init lcd */
-	UpdateLCD();
 
 	/* create TUXTXTDIR if necessary */
 	if (!access(TUXTXTDIR, F_OK) == 0)
@@ -2134,7 +2118,7 @@ static int Init(int source)
 		/* init fontlibrary */
 		if ((error = FT_Init_FreeType(&library)))
 		{
-			printf("TuxTxt <FT_Init_FreeType: 0x%.2X>", error);
+			printf("TuxTxt <FT_Init_FreeType: 0x%.2X>\n", error);
 			return 0;
 		}
 
@@ -2358,8 +2342,8 @@ static int GetTeletextPIDs()
 	/* show infobar */
 	RenderMessage(ShowInfoBar);
 
-        unsigned char filter[DMX_FILTER_SIZE];
-        unsigned char mask[DMX_FILTER_SIZE];
+        unsigned char filter[DMX_FILTER_SIZE] = { 0 };
+        unsigned char mask[DMX_FILTER_SIZE] = { 0 };
 	int res;
 
 #if HAVE_SPARK_HARDWARE
@@ -2369,11 +2353,6 @@ static int GetTeletextPIDs()
 #endif
 	dmx->Open(DMX_PSI_CHANNEL);
 
-        memset(filter, 0x00, DMX_FILTER_SIZE);
-        memset(mask, 0x00, DMX_FILTER_SIZE);
-
-        //filter[0] = 0x00;
-        //mask[0] = 0xFF;
         mask[0] = 0xFF;
         mask[4] = 0xFF;
 
@@ -3441,7 +3420,6 @@ static void ConfigMenu(int Init)
 #else
 		CFrameBuffer::getInstance()->blit();
 #endif
-		UpdateLCD(); /* update number of cached pages */
 	} while ((RCCode != RC_HOME) && (RCCode != RC_DBOX) && (RCCode != RC_MUTE));
 
 	ClearBB(transp);
@@ -3745,7 +3723,6 @@ static void PageCatching()
 #else
 		CFrameBuffer::getInstance()->blit();
 #endif
-		UpdateLCD();
 	} while (RCCode != RC_OK);
 
 	/* set new page */
@@ -3994,7 +3971,7 @@ static void SwitchScreenMode(int newscreenmode)
 		screenmode[boxed] = 0;
 
 #if TUXTXT_DEBUG
-	printf("TuxTxt <SwitchScreenMode: %d>\n", screenmode);
+	printf("TuxTxt <SwitchScreenMode: %d>\n", (int)screenmode);
 #endif
 
 	/* update page */
@@ -4138,7 +4115,7 @@ static void SwitchTranspMode()
 		transpmode[boxed] = 0;
 
 #if TUXTXT_DEBUG
-	printf("TuxTxt <SwitchTranspMode: %d, boxed: %d>\n", transpmode, boxed);
+	printf("TuxTxt <SwitchTranspMode: %d, boxed: %d>\n", (int)transpmode, (int)boxed);
 #endif
 
 	/* set mode */
@@ -4210,12 +4187,10 @@ static void RenderDRCS( // FIXME
 			  bit;
 			  bit >>= 1, x++)	/* bit mask (MSB left), column counter */
 		{
-			int i, f1, f2;
+			unsigned int f1 = (c1 & bit) ? fgcolor : bgcolor;
+			unsigned int f2 = (c2 & bit) ? fgcolor : bgcolor;
 
-			f1 = (c1 & bit) ? fgcolor : bgcolor;
-			f2 = (c2 & bit) ? fgcolor : bgcolor;
-
-			for (i = 0; i < h; i++)
+			for (unsigned int i = 0; i < h; i++)
 			{
 				if (ax[x+1] > ax[x])
 				{
@@ -4245,7 +4220,7 @@ static void RenderDRCS( // FIXME
 
 static void DrawVLine(int x, int y, int l, int color)
 {
-	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t *p = getFBp(y);
 	fb_pixel_t col = argb[color];
 	p += x + y * var_screeninfo.xres;
 
@@ -4258,7 +4233,7 @@ static void DrawVLine(int x, int y, int l, int color)
 
 static void DrawHLine(int x, int y, int l, int color)
 {
-	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t *p = getFBp(y);
 	fb_pixel_t col = argb[color];
 	p += x + y * var_screeninfo.xres;
 	while (l > 0)
@@ -4272,9 +4247,7 @@ static void FillRectMosaicSeparated(int x, int y, int w, int h, int fgcolor, int
 {
 	FillRect(x, y, w, h, bgcolor);
 	if (set)
-	{
 		FillRect(x+1, y+1, w-2, h-2, fgcolor);
-	}
 }
 
 static void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int color)
@@ -4290,7 +4263,7 @@ static void FillTrapez(int x0, int y0, int l0, int xoffset1, int h, int l1, int 
 static void FlipHorz(int x, int y, int w, int h)
 {
 	uint32_t buf[w];
-	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t *p = getFBp(y);
 	p += x + y * var_screeninfo.xres;
 
 	for (int h1 = 0 ; h1 < h ; h1++) {
@@ -4308,7 +4281,7 @@ static void FlipVert(int x, int y, int w, int h)
 {
 	fb_pixel_t buf[w];
 	fb_pixel_t *p1, *p2;
-	fb_pixel_t *p = getFBp(&y);
+	fb_pixel_t *p = getFBp(y);
 	p += x + y * var_screeninfo.xres;
 
 	w *= 4;
@@ -4327,26 +4300,26 @@ static int ShapeCoord(int param, int curfontwidth, int curfontheight)
 {
 	switch (param)
 	{
-	case S_W13:
-		return curfontwidth/3;
-	case S_W12:
-		return curfontwidth/2;
-	case S_W23:
-		return curfontwidth*2/3;
-	case S_W11:
-		return curfontwidth;
-	case S_WM3:
-		return curfontwidth-3;
-	case S_H13:
-		return curfontheight/3;
-	case S_H12:
-		return curfontheight/2;
-	case S_H23:
-		return curfontheight*2/3;
-	case S_H11:
-		return curfontheight;
-	default:
-		return param;
+		case S_W13:
+			return curfontwidth/3;
+		case S_W12:
+			return curfontwidth/2;
+		case S_W23:
+			return curfontwidth*2/3;
+		case S_W11:
+			return curfontwidth;
+		case S_WM3:
+			return curfontwidth-3;
+		case S_H13:
+			return curfontheight/3;
+		case S_H12:
+			return curfontheight/2;
+		case S_H23:
+			return curfontheight*2/3;
+		case S_H11:
+			return curfontheight;
+		default:
+			return param;
 	}
 }
 
@@ -4370,63 +4343,63 @@ static void DrawShape(int x, int y, int shapenumber, int curfontwidth, int curfo
 	while (*p != S_END)
 		switch (*p++)
 		{
-		case S_FHL:
-		{
-			int offset = ShapeCoord(*p++, curfontwidth, curfontheight);
-			DrawHLine(x, y + offset, curfontwidth, fgcolor);
-			break;
-		}
-		case S_FVL:
-		{
-			int offset = ShapeCoord(*p++, curfontwidth, curfontheight);
-			DrawVLine(x + offset, y, fontheight, fgcolor);
-			break;
-		}
-		case S_FLH:
-			FlipHorz(x,y,curfontwidth, fontheight);
-			break;
-		case S_FLV:
-			FlipVert(x,y,curfontwidth, fontheight);
-			break;
-		case S_BOX:
-		{
-			int xo = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int yo = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int w = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int h = ShapeCoord(*p++, curfontwidth, curfontheight);
-			FillRect(x + xo, y + yo, w, h, fgcolor);
-			break;
-		}
-		case S_TRA:
-		{
-			int x0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int y0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int l0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int x1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int y1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int l1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			FillTrapez(x + x0, y + y0, l0, x1-x0, y1-y0, l1, fgcolor);
-			break;
-		}
-		case S_BTR:
-		{
-			int x0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int y0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int l0 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int x1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int y1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			int l1 = ShapeCoord(*p++, curfontwidth, curfontheight);
-			FillTrapez(x + x0, y + y0, l0, x1-x0, y1-y0, l1, bgcolor);
-			break;
-		}
-		case S_LNK:
-		{
-			DrawShape(x, y, ShapeCoord(*p, curfontwidth, curfontheight), curfontwidth, curfontheight, fgcolor, bgcolor, 0);
-			//p = aShapes[ShapeCoord(*p, curfontwidth, curfontheight) - 0x20];
-			break;
-		}
-		default:
-			break;
+			case S_FHL:
+			{
+				int offset = ShapeCoord(*p++, curfontwidth, curfontheight);
+				DrawHLine(x, y + offset, curfontwidth, fgcolor);
+				break;
+			}
+			case S_FVL:
+			{
+				int offset = ShapeCoord(*p++, curfontwidth, curfontheight);
+				DrawVLine(x + offset, y, fontheight, fgcolor);
+				break;
+			}
+			case S_FLH:
+				FlipHorz(x,y,curfontwidth, fontheight);
+				break;
+			case S_FLV:
+				FlipVert(x,y,curfontwidth, fontheight);
+				break;
+			case S_BOX:
+			{
+				int xo = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int yo = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int w = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int h = ShapeCoord(*p++, curfontwidth, curfontheight);
+				FillRect(x + xo, y + yo, w, h, fgcolor);
+				break;
+			}
+			case S_TRA:
+			{
+				int x0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int y0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int l0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int x1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int y1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int l1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				FillTrapez(x + x0, y + y0, l0, x1-x0, y1-y0, l1, fgcolor);
+				break;
+			}
+			case S_BTR:
+			{
+				int x0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int y0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int l0 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int x1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int y1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				int l1 = ShapeCoord(*p++, curfontwidth, curfontheight);
+				FillTrapez(x + x0, y + y0, l0, x1-x0, y1-y0, l1, bgcolor);
+				break;
+			}
+			case S_LNK:
+			{
+				DrawShape(x, y, ShapeCoord(*p, curfontwidth, curfontheight), curfontwidth, curfontheight, fgcolor, bgcolor, 0);
+				//p = aShapes[ShapeCoord(*p, curfontwidth, curfontheight) - 0x20];
+				break;
+			}
+			default:
+				break;
 		}
 }
 
@@ -4626,7 +4599,7 @@ static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 			{
 				int x,y,f,c;
 				y = yoffset;
-				fb_pixel_t *p = getFBp(&y);
+				fb_pixel_t *p = getFBp(y);
 				p += PosX + PosY * var_screeninfo.xres;
 
 				for (y=0; y<fontheight;y++)
@@ -4673,7 +4646,7 @@ static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 			}
 			axdrcs[12] = curfontwidth; /* adjust last x-offset according to position, FIXME: double width */
 			int y = yoffset;
-			fb_pixel_t *q = getFBp(&y);
+			fb_pixel_t *q = getFBp(y);
 			RenderDRCS(p,
 					q + PosX + PosY * var_screeninfo.xres,
 					axdrcs, fgcolor, bgcolor);
@@ -4861,7 +4834,7 @@ static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 	}
 	if (Char <= 0x20)
 	{
-#if 0//TUXTXT_DEBUG
+#if TUXTXT_DEBUG
 		printf("TuxTxt found control char: %x \"%c\" \n", Char, Char);
 #endif
 		FillRect(PosX, PosY + yoffset, curfontwidth, factor*fontheight, bgcolor);
@@ -4887,7 +4860,7 @@ static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 		printf("TuxTxt <FTC_SBitCache_Lookup: 0x%x> c%x a%x g%x w%d h%d x%d y%d\n",
 				error, Char, (int) Attribute, glyph, curfontwidth, fontheight, PosX, PosY);
 #endif
-		FillRect(PosX, PosY + yoffset, curfontwidth, fontheight, bgcolor);
+		FillRect(PosX, PosY + yoffset, curfontwidth, factor*fontheight, bgcolor);
 		PosX += curfontwidth;
 		return;
 	}
@@ -4950,7 +4923,7 @@ static void RenderChar(int Char, tstPageAttr *Attribute, int zoom, int yoffset)
 		sbit->height = fontheight - ascender + sbit->top - TTFShiftY; /* limit char height to defined/calculated fontheight */
 
 	int y = yoffset;
-	p = getFBp(&y);
+	p = getFBp(y);
 	p += PosX + (PosY + Row) * var_screeninfo.xres; /* running pointer into framebuffer */
 
 	uint32_t *colors = lookup_colors(argb[fgcolor], argb[bgcolor]);
@@ -5306,9 +5279,6 @@ static void RenderPage()
 	int row, col, byte, startrow = 0;;
 	int national_subset_bak = national_subset;
 
-	/* update lcd */
-	UpdateLCD();
-
 	if (transpmode[boxed] != 2 && delaystarted)
 	{
 	    struct timeval tv;
@@ -5316,7 +5286,6 @@ static void RenderPage()
 	    if (tv.tv_sec - tv_delay.tv_sec < subtitledelay)
 		return;
 	}
-
 
 	/* update page or timestring */
 	if (transpmode[boxed] != 2 && tuxtxt_cache.pageupdate && tuxtxt_cache.page_receiving != tuxtxt_cache.page && inputcounter == 2)
@@ -5343,17 +5312,10 @@ static void RenderPage()
 		else
 			startrow = 1;
 
-		if (boxed)
-		{
-			if (oldboxed != boxed)
-				SwitchScreenMode(screenmode[boxed]);
+		if (oldboxed != boxed) {
+			SwitchScreenMode(screenmode[boxed]);
+			oldboxed = boxed;
 		}
-		else
-		{
-			if (oldboxed != boxed)
-				SwitchScreenMode(screenmode[boxed]);
-		}
-		oldboxed = boxed;
 
  		/* display first column?  */
 		nofirst = show39;
@@ -5900,174 +5862,6 @@ static void CopyBB2FB()
 }
 
 /******************************************************************************
- * UpdateLCD                                                                  *
- ******************************************************************************/
-
-static void UpdateLCD()
-{
-#if 0
-	static int init_lcd = 1, old_cached_pages = -1, old_page = -1, old_subpage = -1, old_subpage_max = -1, old_hintmode = -1;
-	int  x, y, subpage_max = 0, update_lcd = 0;
-
-	if (lcd == -1) return; // for Dreamboxes without LCD-Display (5xxx)
-	/* init or update lcd */
-	if (init_lcd)
-	{
-		init_lcd = 0;
-
-		for (y = 0; y < 64; y++)
-		{
-			int lcdbase = (y/8)*120;
-			int lcdmask = 1 << (y%8);
-
-			for (x = 0; x < 120; )
-			{
-				int rommask;
-				int rombyte = lcd_layout[x/8 + y*120/8];
-
-				for (rommask = 0x80; rommask; rommask >>= 1)
-				{
-					if (rombyte & rommask)
-						lcd_backbuffer[x + lcdbase] |= lcdmask;
-					else
-						lcd_backbuffer[x + lcdbase] &= ~lcdmask;
-					x++;
-				}
-			}
-		}
-
-		write(lcd, &lcd_backbuffer, sizeof(lcd_backbuffer));
-
-		for (y = 16; y < 56; y += 8)	/* clear rectangle in backbuffer */
-			for (x = 1; x < 118; x++)
-				lcd_backbuffer[x + (y/8)*120] = 0;
-
-		for (x = 3; x <= 116; x++)
-			lcd_backbuffer[x + (39/8)*120] |= 1 << (39%8);
-
-		for (y = 42; y <= 60; y++)
-			lcd_backbuffer[35 + (y/8)*120] |= 1 << (y%8);
-
-		for (y = 42; y <= 60; y++)
-			lcd_backbuffer[60 + (y/8)*120] |= 1 << (y%8);
-
-		RenderCharLCD(10, 43, 20);
-		RenderCharLCD(11, 79, 20);
-
-		return;
-	}
-	else
-	{
-		int p;
-
-		if (inputcounter == 2)
-			p = tuxtxt_cache.page;
-		else
-			p = temp_page + (0xDD >> 4*(1-inputcounter)); /* partial pageinput (filled with spaces) */
-
-		/* page */
-		if (old_page != p)
-		{
-			RenderCharLCD(p>>8,  7, 20);
-			RenderCharLCD((p&0x0F0)>>4, 19, 20);
-			RenderCharLCD(p&0x00F, 31, 20);
-
-			old_page = p;
-			update_lcd = 1;
-		}
-
-		/* current subpage */
-		if (old_subpage != tuxtxt_cache.subpage)
-		{
-			if (!tuxtxt_cache.subpage)
-			{
-				RenderCharLCD(0, 55, 20);
-				RenderCharLCD(1, 67, 20);
-			}
-			else
-			{
-				if (tuxtxt_cache.subpage >= 0xFF)
-					tuxtxt_cache.subpage = 1;
-				else if (tuxtxt_cache.subpage > 99)
-					tuxtxt_cache.subpage = 0;
-
-				RenderCharLCD(tuxtxt_cache.subpage>>4, 55, 20);
-				RenderCharLCD(tuxtxt_cache.subpage&0x0F, 67, 20);
-			}
-
-			old_subpage = tuxtxt_cache.subpage;
-			update_lcd = 1;
-		}
-
-		/* max subpage */
-		for (x = 0; x <= 0x79; x++)
-		{
-			if (tuxtxt_cache.astCachetable[tuxtxt_cache.page][x])
-				subpage_max = x;
-		}
-
-		if (old_subpage_max != subpage_max)
-		{
-			if (!subpage_max)
-			{
-				RenderCharLCD(0,  91, 20);
-				RenderCharLCD(1, 103, 20);
-			}
-			else
-			{
-				RenderCharLCD(subpage_max>>4,  91, 20);
-				RenderCharLCD(subpage_max&0x0F, 103, 20);
-			}
-
-			old_subpage_max = subpage_max;
-			update_lcd = 1;
-		}
-
-		/* cachestatus */
-		if (old_cached_pages != tuxtxt_cache.cached_pages)
-		{
-			#if 0
-			int s;
-			int p = tuxtxt_cache.cached_pages;
-			for (s=107; s >= 107-4*fontwidth_small_lcd; s -= fontwidth_small_lcd)
-			{
-				int c = p % 10;
-				if (p)
-					RenderCharLCDsmall('0'+c, s, 44);
-				else
-					RenderCharLCDsmall(' ', s, 44);
-				p /= 10;
-			}
-			#else
-			RenderCharLCD(tuxtxt_cache.cached_pages/1000, 67, 44);
-			RenderCharLCD(tuxtxt_cache.cached_pages%1000/100, 79, 44);
-			RenderCharLCD(tuxtxt_cache.cached_pages%100/10, 91, 44);
-			RenderCharLCD(tuxtxt_cache.cached_pages%10, 103, 44);
-			#endif
-
-			old_cached_pages = tuxtxt_cache.cached_pages;
-			update_lcd = 1;
-		}
-
-		/* mode */
-		if (old_hintmode != hintmode)
-		{
-			if (hintmode)
-				RenderCharLCD(12, 43, 44);
-			else
-				RenderCharLCD(13, 43, 44);
-
-			old_hintmode = hintmode;
-			update_lcd = 1;
-		}
-	}
-
-	if (update_lcd)
-		write(lcd, &lcd_backbuffer, sizeof(lcd_backbuffer));
-#endif
-}
-
-/******************************************************************************
  * DecodePage                                                                 *
  ******************************************************************************/
 
@@ -6107,7 +5901,7 @@ static void DecodePage()
 
 	/* modify header */
 	if (boxed)
-		memset(&page_char, ' ', 40);
+		memset(page_char, ' ', 40);
 	else
 	{
 		memset(page_char, ' ', 8);
@@ -6224,14 +6018,14 @@ static void DecodePage()
 		}
 		else
 		{
-			int i;
+			int unsigned i;
 			int h, parityerror = 0;
 
 			for (i = 0; i < 8; i++)
 				page_atrb[i] = atrtable[ATR_WB];
 
 			/* decode parity/hamming */
-			for (i = 40; i < (int) sizeof(page_char); i++)
+			for (i = 40; i < sizeof(page_char); i++)
 			{
 				page_atrb[i] = atrtable[ATR_WB];
 				p = page_char + i;
@@ -6527,8 +6321,6 @@ static void DecodePage()
 		int r, c;
 		int o = 0;
 		char bitmask ;
-
-
 
 		for (r = 0; r < 25; r++)
 		{
