@@ -230,7 +230,6 @@ class CMoviePlayerGui : public CMenuTarget
 	bool osdTimeVisible() { return FileTime.IsVisible(); };
 	std::string CurrentAudioName() { return currentaudioname; };
 	int GetSpeed() { return speed; }
-	uint64_t GetPts();
 	int GetPosition() { return position; }
 	int GetDuration() { return duration; }
 	size_t GetReadCount();

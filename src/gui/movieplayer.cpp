@@ -115,24 +115,15 @@ CMoviePlayerGui::~CMoviePlayerGui()
 	instance_mp = NULL;
 }
 
+#if !HAVE_COOL_HARDWARE
+// used by libdvbsub/dvbsub.cpp
 void getPlayerPts(int64_t *pts)
 {
 	cPlayback *playback = CMoviePlayerGui::getInstance().getPlayback();
 	if (playback)
 		playback->GetPts((uint64_t &) *pts);
 }
-
-uint64_t CMoviePlayerGui::GetPts(void)
-{
-#ifndef INVALID_PTS_VALUE
-#define INVALID_PTS_VALUE 0x200000000ull
 #endif
-	uint64_t pts = INVALID_PTS_VALUE;
-#if !HAVE_COOL_HARDWARE
-	playback->GetPts(pts);
-#endif
-	return pts;
-}
 
 void CMoviePlayerGui::Init(void)
 {
