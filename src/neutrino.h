@@ -50,8 +50,6 @@
 #include "gui/timerlist.h"
 
 // Forward declarations instead of includes:
-class CPSISetup;
-class C3DSetup;
 class CShairPlay;
 
 #define ANNOUNCETIME (1 * 60)
