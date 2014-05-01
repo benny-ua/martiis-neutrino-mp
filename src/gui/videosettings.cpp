@@ -480,16 +480,16 @@ int CVideoSettings::showVideoSetup()
 	CMenuForwarder *mf;
 	CMenuOptionNumberChooser *mc;
 
+	CPSISetup *psiSetup = CPSISetup::getInstance();
+
 	videosetup->addItem(GenericMenuSeparatorLine);
-	mf = new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, CNeutrinoApp::getInstance()->chPSISetup, NULL, CRCInput::RC_red);
+	mf = new CMenuForwarder(LOCALE_VIDEOMENU_PSI, true, NULL, psiSetup, NULL, CRCInput::RC_red);
 	mf->setHint("", LOCALE_MENU_HINT_VIDEO_PSI);
 	videosetup->addItem(mf);
 
 	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_STEP, (int *)&g_settings.psi_step, true, 1, 100, NULL);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_PSI_STEP);
 	videosetup->addItem(mc);
-
-	CPSISetup *psiSetup = CNeutrinoApp::getInstance()->chPSISetup;
 
 	mc = new CMenuOptionNumberChooser(LOCALE_VIDEOMENU_PSI_CONTRAST, (int *)&g_settings.psi_contrast, true, 0, 255, psiSetup);
 	mc->setHint("", LOCALE_MENU_HINT_VIDEO_CONTRAST);
@@ -509,7 +509,7 @@ int CVideoSettings::showVideoSetup()
 
 	videosetup->addItem(GenericMenuSeparatorLine);
 
-	mf = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance()->threeDSetup, NULL, CRCInput::RC_green);
+	mf = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, CNeutrinoApp::getInstance(), "3dmode", CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_VIDEO_THREE_D);
 	videosetup->addItem(mf);
 

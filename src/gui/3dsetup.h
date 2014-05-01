@@ -55,10 +55,11 @@ private:
 	std::map<t_channel_id, CFrameBuffer::Mode3D> threeDMap;
 	void load();
 	void save();
-public:
 	C3DSetup ();
 	~C3DSetup ();
+public:
 	int exec (CMenuTarget * parent, const std::string & actionKey);
+	static C3DSetup *getInstance();
 };
 
 #endif

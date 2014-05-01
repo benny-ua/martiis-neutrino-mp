@@ -199,3 +199,11 @@ int C3DSetup::show3DSetup()
 	return res;
 }
 
+static C3DSetup *inst = NULL;
+
+C3DSetup *C3DSetup::getInstance()
+{
+	if (!inst)
+		inst = new C3DSetup();
+	return inst;
+}

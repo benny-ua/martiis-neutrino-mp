@@ -34,50 +34,34 @@
 
 class CPSISetup : public CMenuTarget, public CChangeObserver
 {
-private:
-  CFrameBuffer * frameBuffer;
-  int x;
-  int y;
-  int dx;
-  int dy;
-  int width;
-  int locWidth;
-  int locHeight;
-  int lineHeight;
-  int sliderOffset;
-  int selected;
-  bool needsBlit;
-  neutrino_locale_t name;
+	private:
+		CFrameBuffer * frameBuffer;
+		int x;
+		int y;
+		int dx;
+		int dy;
+		int width;
+		int locWidth;
+		int locHeight;
+		int lineHeight;
+		int sliderOffset;
+		int selected;
+		bool needsBlit;
+		neutrino_locale_t name;
 
-  void paint ();
-  void setPSI ();
-  void paintSlider (int i);
-  // unsigned char readProcPSI(int);
+		void paint ();
+		void setPSI ();
+		void paintSlider (int i);
+		// unsigned char readProcPSI(int);
+		CPSISetup (const neutrino_locale_t Name);
+		void writeProcPSI ();
+		void writeProcPSI (int);
 
-public:
-  struct PSI_list
-  {
-    int control;
-    const neutrino_locale_t loc;
-    bool selected;
-    CProgressBar *scale;
-    unsigned char value;
-    unsigned char value_old;
-    int x;
-    int y;
-    int xLoc;
-    int yLoc;
-    int xBox;
-    int yBox;
-  };
-
-    CPSISetup (const neutrino_locale_t Name);
-
-  int exec (CMenuTarget * parent, const std::string & actionKey);
-  void hide ();
-  void writeProcPSI ();
-  void writeProcPSI (int);
-  void blankScreen (bool b = true);
-  bool changeNotify(const neutrino_locale_t, void *);
+	public:
+		int exec (CMenuTarget * parent, const std::string & actionKey);
+		void hide ();
+		void blankScreen (bool b = true);
+		bool changeNotify(const neutrino_locale_t, void *);
+		static CPSISetup *getInstance();
 };
 #endif

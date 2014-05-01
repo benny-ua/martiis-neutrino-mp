@@ -46,7 +46,6 @@
 #include "user_menue_setup.h"
 #include "subchannel_select.h"
 #include "favorites.h"
-#include "3dsetup.h"
 #include "audio_select.h"
 #include "streaminfo2.h"
 #include "epgplus.h"
@@ -351,7 +350,7 @@ bool CUserMenu::showUserMenu(neutrino_msg_t msg)
 #if HAVE_SPARK_HARDWARE
 		case SNeutrinoSettings::ITEM_THREE_D_MODE:
 			keyhelper.get(&key,&icon);
-			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, neutrino->threeDSetup, "3dmode", key, icon);
+			menu_item = new CMenuForwarder(LOCALE_THREE_D_SETTINGS, true, NULL, neutrino, "3dmode", key, icon);
 			menu_item->setHint("", LOCALE_MENU_HINT_VIDEO_THREE_D);
 			break;
 #endif

@@ -2274,9 +2274,6 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_PluginList->loadPlugins();
 
 	batchEPGSettings	  = new CBatchEPG_Menu;
-#if HAVE_SPARK_HARDWARE
-	threeDSetup		  = new C3DSetup;
-#endif
 
 	// setup recording device
 	setupRecordingDevice();
@@ -2332,9 +2329,8 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	g_audioMute->AudioMute(current_muted, true);
 	CZapit::getInstance()->SetVolumePercent(g_settings.audio_volume_percent_ac3, g_settings.audio_volume_percent_pcm);
 #if HAVE_SPARK_HARDWARE
-	threeDSetup->exec(NULL, "zapped");
-	chPSISetup = new CPSISetup(LOCALE_VIDEOMENU_PSI);
-	chPSISetup->blankScreen(false);
+	C3DSetup::getInstance()->exec(NULL, "zapped");
+	CPSISetup::getInstance()->blankScreen(false);
 #endif
 	if (!access("/etc/init.d/cam", X_OK))
 		safe_system("/etc/init.d/cam init >/dev/null 2>/dev/null&");
@@ -2866,7 +2862,7 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		CVFD::getInstance()->setCA(chan ? chan->scrambled : false);
 
 #if HAVE_SPARK_HARDWARE
-		threeDSetup->exec(NULL, "zapped");
+		C3DSetup::getInstance()->exec(NULL, "zapped");
 #endif
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::Update();
@@ -4399,6 +4395,10 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 	}
 	else if(actionKey == "adzap") {
 		CAdZapMenu::getInstance()->exec(parent, "adzap");
+		return menu_return::RETURN_EXIT_ALL;
+	}
+	else if(actionKey == "3dmode") {
+		C3DSetup::getInstance()->exec(parent, "");
 		return menu_return::RETURN_EXIT_ALL;
 	}
 	else if(actionKey == "moviedir") {

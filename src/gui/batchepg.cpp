@@ -247,7 +247,7 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (actionKey != "run") {
 			Load();
 #if HAVE_SPARK_HARDWARE
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen();
+			CPSISetup::getInstance()->blankScreen();
 #else
 			videoDecoder->setBlank(true);
 #endif
@@ -270,7 +270,7 @@ int CBatchEPG_Menu::exec(CMenuTarget* parent, const std::string & actionKey)
 		if (!wakeup) {
 #if HAVE_SPARK_HARDWARE
 			// restore PSI settings
-			CNeutrinoApp::getInstance()->chPSISetup->blankScreen(false);
+			CPSISetup::getInstance()->blankScreen(false);
 #else
 			videoDecoder->setBlank(false);
 #endif

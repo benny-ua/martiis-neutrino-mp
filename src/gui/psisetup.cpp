@@ -52,9 +52,24 @@
 
 extern cVideo * videoDecoder;
 
+struct PSI_list
+{
+	int control;
+	const neutrino_locale_t loc;
+	bool selected;
+	CProgressBar *scale;
+	unsigned char value;
+	unsigned char value_old;
+	int x;
+	int y;
+	int xLoc;
+	int yLoc;
+	int xBox;
+	int yBox;
+};
+
 #define PSI_SCALE_COUNT 5
-static
-  CPSISetup::PSI_list
+static PSI_list
   psi_list[PSI_SCALE_COUNT] = {
 #define PSI_CONTRAST 0
     { VIDEO_CONTROL_CONTRAST, LOCALE_VIDEOMENU_PSI_CONTRAST, true, NULL, 0, 0, 0, 0, 0, 0, 0, 0 }
@@ -279,7 +294,7 @@ CPSISetup::paintSlider (int i)
     {
       int fh = f->getHeight();
       f->RenderString (psi_list[i].x + 2 + fh + fh/8, psi_list[i].yLoc, dx - 2 - fh, g_Locale->getText(psi_list[i].loc), fg_col[psi_list[i].selected], 0, true);
-      frameBuffer->paintIcon (NEUTRINO_ICON_BUTTON_RED, psi_list[i].x + 2, psi_list[i].yLoc - fh + fh/8, 0, (6 * fh)/8);
+      frameBuffer->paintIcon (NEUTRINO_ICON_BUTTON_RED, psi_list[i].x + 2, psi_list[i].yLoc - fh + fh/4, 0, (6 * fh)/8);
     }
 
   needsBlit = true;
@@ -296,4 +311,13 @@ CPSISetup::changeNotify (const neutrino_locale_t OptionName, void *Data)
 	return true;
       }
   return false;
+}
+
+static CPSISetup *inst = NULL;
+
+CPSISetup *CPSISetup::getInstance()
+{
+	if (!inst)
+		inst = new CPSISetup(LOCALE_VIDEOMENU_PSI);
+	return inst;
 }

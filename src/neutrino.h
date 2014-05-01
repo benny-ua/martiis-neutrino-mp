@@ -173,10 +173,6 @@ public:
 	CChannelList			*TVchannelList;
 	CChannelList			*RADIOchannelList;
 	CChannelList			*channelList;
-#if HAVE_SPARK_HARDWARE
-	CPSISetup			*chPSISetup;
-	C3DSetup			*threeDSetup;
-#endif
 #if ENABLE_SHAIRPLAY
 	CShairPlay			*shairPlay;
 	bool				shairplay_active;
