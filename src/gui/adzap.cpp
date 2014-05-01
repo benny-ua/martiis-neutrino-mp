@@ -47,123 +47,125 @@
 #define ZAPBACK_ALERT_PERIOD 15	// seconds. Keep this in sync with the locales.
 
 static CAdZapMenu *azm = NULL;
-static pthread_t thrAdZap;
+
+CAdZapMenu *CAdZapMenu::getInstance()
+{
+    if (!azm)
+	azm = new CAdZapMenu();
+    return azm;
+}
 
 CAdZapMenu::CAdZapMenu()
 {
-    if (azm)
-	return;
-
-    azm = this;
     frameBuffer = CFrameBuffer::getInstance();
     width = w_max(40, 10);
     hheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU_TITLE]->getHeight();
     mheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
     height = hheight + 13 * mheight + 10;
 
-    x = (((g_settings.screen_EndX - g_settings.screen_StartX) -
-	  width) / 2) + g_settings.screen_StartX;
-    y = (((g_settings.screen_EndY - g_settings.screen_StartY) -
-	  height) / 2) + g_settings.screen_StartY;
+    x = (((g_settings.screen_EndX - g_settings.screen_StartX) - width) / 2) + g_settings.screen_StartX;
+    y = (((g_settings.screen_EndY - g_settings.screen_StartY) - height) / 2) + g_settings.screen_StartY;
 
     sem_init(&sem, 0, 0);
-    if (pthread_create(&thrAdZap, 0, CAdZapMenu::Run, NULL) != 0) {
+
+    pthread_t thr;
+    if (pthread_create(&thr, 0, CAdZapMenu::Run, this))
 	fprintf(stderr, "ERROR: pthread_create(CAdZapMenu::CAdZapMenu)\n");
-	running = false;
-    } else
-	running = true;
+    else
+	pthread_detach(thr);
     channelId = -1;
     armed = false;
     monitor = false;
     alerted = false;
 }
 
-static bool
-sortByDateTime(const CChannelEvent & a, const CChannelEvent & b)
+static bool sortByDateTime(const CChannelEvent & a, const CChannelEvent & b)
 {
     return a.startTime < b.startTime;
 }
 
-void
- CAdZapMenu::Update()
+void CAdZapMenu::Update()
 {
     clock_gettime(CLOCK_REALTIME, &zapBackTime);
-
-    zapBackTime.tv_sec +=
-	g_settings.adzap_zapBackPeriod - ZAPBACK_ALERT_PERIOD;
-
-    sem_post(&azm->sem);
+    zapBackTime.tv_sec += g_settings.adzap_zapBackPeriod - ZAPBACK_ALERT_PERIOD;
+    sem_post(&sem);
 }
 
-void *CAdZapMenu::Run(void *)
+void *CAdZapMenu::Run(void *arg)
+{
+    CAdZapMenu *me = (CAdZapMenu *) arg;
+    me->Run();
+    pthread_exit(NULL);
+}
+
+void CAdZapMenu::Run()
 {
     set_threadname("CAdZapMenu::Run");
-    while (azm->running) {
+    while (true) {
 	CChannelList *channelList = NULL;
 	t_channel_id curChannelId = -1;
 
-	if (azm->monitor) {
+	if (monitor) {
 	    struct timespec ts;
 	    clock_gettime(CLOCK_REALTIME, &ts);
 	    ts.tv_sec += 1;
 
-	    sem_timedwait(&azm->sem, &ts);
+	    sem_timedwait(&sem, &ts);
 
-	    if (azm->monitor && (azm->monitorLifeTime.tv_sec > ts.tv_sec)) {
+	    if (monitor && (monitorLifeTime.tv_sec > ts.tv_sec)) {
 		channelList = CNeutrinoApp::getInstance()->channelList;
 		curChannelId =
 		    channelList ? channelList->getActiveChannel_ChannelID()
 		    : -1;
-		if (!azm->armed && (azm->channelId != curChannelId)) {
-		    azm->armed = true;
-		    clock_gettime(CLOCK_REALTIME, &azm->zapBackTime);
-		    azm->zapBackTime.tv_sec +=
+		if (!armed && (channelId != curChannelId)) {
+		    armed = true;
+		    clock_gettime(CLOCK_REALTIME, &zapBackTime);
+		    zapBackTime.tv_sec +=
 			g_settings.adzap_zapBackPeriod -
 			ZAPBACK_ALERT_PERIOD;
-		    azm->alerted = false;
-		} else if (azm->channelId == curChannelId) {
-		    azm->armed = false;
-		    azm->alerted = false;
+		    alerted = false;
+		} else if (channelId == curChannelId) {
+		    armed = false;
+		    alerted = false;
 		}
 	    } else {
-		azm->monitor = false;
-		azm->armed = false;
-		azm->alerted = false;
+		monitor = false;
+		armed = false;
+		alerted = false;
 	    }
-	} else if (azm->armed)
-	    sem_timedwait(&azm->sem, &azm->zapBackTime);
+	} else if (armed)
+	    sem_timedwait(&sem, &zapBackTime);
 	else
-	    sem_wait(&azm->sem);
+	    sem_wait(&sem);
 
-	if (azm->armed) {
+	if (armed) {
 	    struct timespec ts;
 	    clock_gettime(CLOCK_REALTIME, &ts);
-	    if (ts.tv_sec >= azm->zapBackTime.tv_sec) {
+	    if (ts.tv_sec >= zapBackTime.tv_sec) {
 		if (!channelList) {
 		    channelList = CNeutrinoApp::getInstance()->channelList;
 		    curChannelId =
 			channelList ?
 			channelList->getActiveChannel_ChannelID() : -1;
 		}
-		if (!azm->alerted) {
-		    if (azm->channelId != curChannelId) {
+		if (!alerted) {
+		    if (channelId != curChannelId) {
 			std::string name =
 			    g_Locale->getText(LOCALE_ADZAP_ANNOUNCE);
-			name += "\n" + azm->channelName;
+			name += "\n" + channelName;
 			ShowHint(LOCALE_ADZAP, name.c_str());
 		    }
-		    azm->alerted = true;
-		    azm->zapBackTime.tv_sec += ZAPBACK_ALERT_PERIOD;
+		    alerted = true;
+		    zapBackTime.tv_sec += ZAPBACK_ALERT_PERIOD;
 		} else {
-		    azm->alerted = false;
+		    alerted = false;
 		    if (channelList)
-			channelList->zapTo_ChannelID(azm->channelId);
-		    azm->armed = false;
+			channelList->zapTo_ChannelID(channelId);
+		    armed = false;
 		}
 	    }
 	}
     }
-    return NULL;
 }
 
 int CAdZapMenu::exec(CMenuTarget *parent, const std::string & actionKey)
@@ -185,8 +187,8 @@ int CAdZapMenu::exec(CMenuTarget *parent, const std::string & actionKey)
 	return res;
     }
     if (actionKey == "monitor") {
-	azm->armed = false;
-	azm->monitor = true;
+	armed = false;
+	monitor = true;
 	alerted = false;
 	Update();
 	return res;
@@ -256,11 +258,10 @@ void CAdZapMenu::Settings()
 				 NEUTRINO_ICON_BUTTON_GREEN));
 
     CChannelEventList evtlist;
-    CEitManager::getInstance()->getEventsServiceKey(azm->
-						    channelId &
+    CEitManager::getInstance()->getEventsServiceKey(channelId &
 						    0xFFFFFFFFFFFFULL,
 						    evtlist);
-    azm->monitorLifeTime.tv_sec = 0;
+    monitorLifeTime.tv_sec = 0;
     if (!evtlist.empty()) {
 	sort(evtlist.begin(), evtlist.end(), sortByDateTime);
 	CChannelEventList::iterator eli;
@@ -269,9 +270,8 @@ void CAdZapMenu::Settings()
 	for (eli = evtlist.begin(); eli != evtlist.end(); ++eli) {
 	    if ((u_int) eli->startTime + (u_int) eli->duration >
 		(u_int) ts.tv_sec) {
-		azm->monitorLifeTime.tv_sec =
-		    (uint) eli->startTime + eli->duration;
-		azm->Update();
+		monitorLifeTime.tv_sec = (uint) eli->startTime + eli->duration;
+		Update();
 		break;
 	    }
 	}
@@ -279,7 +279,7 @@ void CAdZapMenu::Settings()
 
     menu->addItem(new
 		  CMenuForwarder(LOCALE_ADZAP_MONITOR,
-				 azm->monitorLifeTime.tv_sec, NULL, this,
+				 monitorLifeTime.tv_sec, NULL, this,
 				 "monitor", CRCInput::RC_blue,
 				 NEUTRINO_ICON_BUTTON_BLUE));
 

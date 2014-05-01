@@ -30,29 +30,32 @@
 #include <string>
 #include <semaphore.h>
 
-class CAdZapMenu:public CMenuTarget {
-  private:
-    CFrameBuffer * frameBuffer;
-    int x;
-    int y;
-    int width;
-    int height;
-    int hheight, mheight;	// head/menu font height
-    bool running;
-    bool armed;
-    bool alerted;
-    struct timespec zapBackTime;
-    std::string channelName;
-    CMenuForwarder *forwarders[9];
-  public:
-    bool monitor;
-    struct timespec monitorLifeTime;
-    t_channel_id channelId;
-    CAdZapMenu();
-    int exec(CMenuTarget * parent, const std::string & actionKey);
-    void Settings();
-    void Update();
-    static void *Run(void *);
-    sem_t sem;
+class CAdZapMenu: public CMenuTarget
+{
+	private:
+		CFrameBuffer * frameBuffer;
+		int x;
+		int y;
+		int width;
+		int height;
+		int hheight, mheight;	// head/menu font height
+		bool running;
+		bool armed;
+		bool alerted;
+		bool monitor;
+		struct timespec zapBackTime;
+		std::string channelName;
+		CMenuForwarder *forwarders[9];
+		struct timespec monitorLifeTime;
+		t_channel_id channelId;
+		sem_t sem;
+		CAdZapMenu();
+		void Settings();
+		void Update();
+		void Run(void);
+		static void *Run(void *arg);
+	public:
+		static CAdZapMenu *getInstance();
+		int exec(CMenuTarget * parent, const std::string & actionKey);
 };
 #endif				// __adzap__

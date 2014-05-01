@@ -50,7 +50,6 @@
 #include "gui/timerlist.h"
 
 // Forward declarations instead of includes:
-class CAdZapMenu;
 class CPSISetup;
 class C3DSetup;
 class CShairPlay;
@@ -88,7 +87,6 @@ private:
 	int                             network_dhcp;
 	int                             network_automatic_start;
 	CMenuWidget			*mainMenu;
-	CAdZapMenu			*AdZapChanger;
 
 	int				mode;
 	int				lastMode;
