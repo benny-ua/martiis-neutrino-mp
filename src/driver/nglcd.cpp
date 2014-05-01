@@ -1,7 +1,7 @@
 /*
 	Neutrino graphlcd daemon thread
 
-	(c) 2012 by martii
+	(C) 2012-2014 by martii
 
 
 	License: GPL
@@ -52,8 +52,6 @@ nGLCD::nGLCD() {
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
 	pthread_mutex_init(&mutex, &attr);
 
-	stagingChannel = "";
-	stagingEpg = "";
 	channelLocked = false;
 	doRescan = false;
 	doStandby = false;
@@ -85,7 +83,7 @@ nGLCD::nGLCD() {
 	if (!g_settings.glcd_enable)
 		doSuspend = true;
 
-	if (pthread_create (&thrGLCD, 0, nGLCD::Run, NULL) != 0 )
+	if (pthread_create (&thrGLCD, 0, nGLCD::Run, this) != 0 )
 		fprintf(stderr, "ERROR: pthread_create(nGLCD::Init)\n");
 
 	Update();
@@ -404,28 +402,35 @@ bool nGLCD::getBoundingBox(uint32_t *buffer, int width, int height, int &bb_x, i
 	return true;
 }
 
-void* nGLCD::Run(void *)
+void* nGLCD::Run(void *arg)
+{
+	nGLCD *me = (nGLCD *) arg;
+	me->Run();
+	pthread_exit(NULL);
+}
+
+void nGLCD::Run(void)
 {
 	set_threadname("nGLCD::Run");
 
 	if (GLCD::Config.Load(kDefaultConfigFile) == false) {
 		fprintf(stderr, "Error loading config file!\n");
-		return NULL;
+		return;
 	}
 	if ((GLCD::Config.driverConfigs.size() < 1)) {
 		fprintf(stderr, "No driver config found!\n");
-		return NULL;
+		return;
 	}
 
 	struct timespec ts;
 
 	CSectionsdClient::CurrentNextInfo info_CurrentNext;                                 
-	nglcd->channel_id = -1;
+	channel_id = -1;
 	info_CurrentNext.current_zeit.startzeit = 0;
 	info_CurrentNext.current_zeit.dauer = 0;
 	info_CurrentNext.flags = 0;
 
-	nglcd->fonts_initialized = false;
+	fonts_initialized = false;
 	bool broken = false;
 
 	do {
@@ -435,22 +440,22 @@ void* nGLCD::Run(void *)
 #endif
 			clock_gettime(CLOCK_REALTIME, &ts);
 			ts.tv_sec += 30;
-			sem_timedwait(&nglcd->sem, &ts);
+			sem_timedwait(&sem, &ts);
 			broken = false;
-			if (nglcd->doExit)
+			if (doExit)
 				break;
 			if (!g_settings.glcd_enable)
 				continue;
 		} else
-				while ((nglcd->doSuspend || nglcd->doStandby || !g_settings.glcd_enable) && !nglcd->doExit)
-					sem_wait(&nglcd->sem);
+				while ((doSuspend || doStandby || !g_settings.glcd_enable) && !doExit)
+					sem_wait(&sem);
 
-		if (nglcd->doExit)
+		if (doExit)
 			break;
 
 		int warmUp = 10;
-		nglcd->lcd = GLCD::CreateDriver(GLCD::Config.driverConfigs[0].id, &GLCD::Config.driverConfigs[0]);
-		if (!nglcd->lcd) {
+		lcd = GLCD::CreateDriver(GLCD::Config.driverConfigs[0].id, &GLCD::Config.driverConfigs[0]);
+		if (!lcd) {
 #ifdef GLCD_DEBUG
 			fprintf(stderr, "CreateDriver failed.\n");
 #endif
@@ -460,9 +465,9 @@ void* nGLCD::Run(void *)
 #ifdef GLCD_DEBUG
 		fprintf(stderr, "CreateDriver succeeded.\n");
 #endif
-		if (nglcd->lcd->Init()) {
-			delete nglcd->lcd;
-			nglcd->lcd = NULL;
+		if (lcd->Init()) {
+			delete lcd;
+			lcd = NULL;
 #ifdef GLCD_DEBUG
 			fprintf(stderr, "LCD init failed.\n");
 #endif
@@ -472,53 +477,53 @@ void* nGLCD::Run(void *)
 #ifdef GLCD_DEBUG
 		fprintf(stderr, "LCD init succeeded.\n");
 #endif
-		nglcd->lcd->SetBrightness(0);
+		lcd->SetBrightness(0);
 
-		if (!nglcd->bitmap)
-			nglcd->bitmap = new GLCD::cBitmap(nglcd->lcd->Width(), nglcd->lcd->Height(), g_settings.glcd_color_bg);
+		if (!bitmap)
+			bitmap = new GLCD::cBitmap(lcd->Width(), lcd->Height(), g_settings.glcd_color_bg);
 
-		nglcd->UpdateBrightness();
-		nglcd->Update();
+		UpdateBrightness();
+		Update();
 
-		nglcd->doMirrorOSD = false;
+		doMirrorOSD = false;
 
-		while ((!nglcd->doSuspend && !nglcd->doStandby) && !nglcd->doExit && g_settings.glcd_enable) {
-			if (nglcd->doMirrorOSD && !nglcd->doStandbyTime) {
-				if (nglcd->blitFlag) {
-					nglcd->blitFlag = false;
-					nglcd->bitmap->Clear(GLCD::cColor::Black);
+		while ((!doSuspend && !doStandby) && !doExit && g_settings.glcd_enable) {
+			if (doMirrorOSD && !doStandbyTime) {
+				if (blitFlag) {
+					blitFlag = false;
+					bitmap->Clear(GLCD::cColor::Black);
 					ts.tv_sec = 0; // don't wait
 					static CFrameBuffer* fb = CFrameBuffer::getInstance();
 					static int fb_width = fb->getScreenWidth(true);
 					static int fb_height = fb->getScreenHeight(true);
 					static uint32_t *fbp = fb->getFrameBufferPointer();
-					int lcd_width = nglcd->bitmap->Width();
-					int lcd_height = nglcd->bitmap->Height();
-					if (!nglcd->showImage(fbp, fb_width, fb_height, 0, 0, lcd_width, lcd_height, false)) {
+					int lcd_width = bitmap->Width();
+					int lcd_height = bitmap->Height();
+					if (!showImage(fbp, fb_width, fb_height, 0, 0, lcd_width, lcd_height, false)) {
 						usleep(500000);
 					} else {
-						nglcd->lcd->SetScreen(nglcd->bitmap->Data(), lcd_width, lcd_height);
-						nglcd->lcd->Refresh(false);
+						lcd->SetScreen(bitmap->Data(), lcd_width, lcd_height);
+						lcd->Refresh(false);
 					}
 				} else
 					usleep(100000);
 				continue;
 			}
-			if (g_settings.glcd_mirror_video && !nglcd->doStandbyTime) {
+			if (g_settings.glcd_mirror_video && !doStandbyTime) {
 				char ws[10];
-				snprintf(ws, sizeof(ws), "%d", nglcd->bitmap->Width());
+				snprintf(ws, sizeof(ws), "%d", bitmap->Width());
 				const char *bmpShot = "/tmp/nglcd-video.bmp";
 				my_system(4, "/bin/grab", "-vr", ws, bmpShot);
 				int bw = 0, bh = 0;
 				g_PicViewer->getSize(bmpShot, &bw, &bh);
 				if (bw > 0 && bh > 0) {
-					int lcd_width = nglcd->bitmap->Width();
-				    int lcd_height = nglcd->bitmap->Height();
-					if (!nglcd->showImage(bmpShot, (uint32_t) bw, (uint32_t) bh, 0, 0, (uint32_t) lcd_width, lcd_height, false, true))
+					int lcd_width = bitmap->Width();
+				    int lcd_height = bitmap->Height();
+					if (!showImage(bmpShot, (uint32_t) bw, (uint32_t) bh, 0, 0, (uint32_t) lcd_width, lcd_height, false, true))
 						usleep(1000000);
 					else {
-						nglcd->lcd->SetScreen(nglcd->bitmap->Data(), lcd_width, lcd_height);
-							nglcd->lcd->Refresh(false);
+						lcd->SetScreen(bitmap->Data(), lcd_width, lcd_height);
+							lcd->Refresh(false);
 					}
 				}
 				else
@@ -527,74 +532,74 @@ void* nGLCD::Run(void *)
 			}
 
 			clock_gettime(CLOCK_REALTIME, &ts);
-			nglcd->tm = localtime(&ts.tv_sec);
-			nglcd->updateFonts();
-			nglcd->Exec();
+			tm = localtime(&ts.tv_sec);
+			updateFonts();
+			Exec();
 			clock_gettime(CLOCK_REALTIME, &ts);
-			nglcd->tm = localtime(&ts.tv_sec);
+			tm = localtime(&ts.tv_sec);
 			if (warmUp > 0) {
 				ts.tv_sec += 1;
 				warmUp--;
 			} else {
-				ts.tv_sec += 60 - nglcd->tm->tm_sec;
+				ts.tv_sec += 60 - tm->tm_sec;
 				ts.tv_nsec = 0;
 			}
 
-			if (!nglcd->doScrollChannel && !nglcd->doScrollEpg)
-				sem_timedwait(&nglcd->sem, &ts);
+			if (!doScrollChannel && !doScrollEpg)
+				sem_timedwait(&sem, &ts);
 
-			while(!sem_trywait(&nglcd->sem));
+			while(!sem_trywait(&sem));
 
-			if(nglcd->doRescan || nglcd->doSuspend || nglcd->doStandby || nglcd->doExit)
+			if(doRescan || doSuspend || doStandby || doExit)
 				break;
 
-			if (nglcd->doShowVolume) {
-				nglcd->Epg = "";
-				if (nglcd->Channel.compare(g_Locale->getText(LOCALE_GLCD_VOLUME))) {
-					nglcd->Channel = g_Locale->getText(LOCALE_GLCD_VOLUME);
-					nglcd->ChannelWidth = nglcd->font_channel.Width(nglcd->Channel);
-					nglcd->doScrollChannel = nglcd->ChannelWidth > nglcd->bitmap->Width() - 4;
-					nglcd->scrollChannelSkip = 0;
-					nglcd->scrollChannelForward = true;
-					if (nglcd->doScrollChannel) {
-						nglcd->scrollChannelOffset = nglcd->bitmap->Width()/g_settings.glcd_scroll_speed;
-						nglcd->ChannelWidth += nglcd->scrollChannelOffset;
+			if (doShowVolume) {
+				Epg = "";
+				if (Channel.compare(g_Locale->getText(LOCALE_GLCD_VOLUME))) {
+					Channel = g_Locale->getText(LOCALE_GLCD_VOLUME);
+					ChannelWidth = font_channel.Width(Channel);
+					doScrollChannel = ChannelWidth > bitmap->Width() - 4;
+					scrollChannelSkip = 0;
+					scrollChannelForward = true;
+					if (doScrollChannel) {
+						scrollChannelOffset = bitmap->Width()/g_settings.glcd_scroll_speed;
+						ChannelWidth += scrollChannelOffset;
 					} else
-						nglcd->scrollChannelOffset = 0;
+						scrollChannelOffset = 0;
 				}
-				nglcd->EpgWidth = 0;
-				nglcd->scrollEpgSkip = 0;
-				nglcd->scrollEpgForward = true;
-				nglcd->Scale = g_settings.current_volume;
-				nglcd->channel_id = -1;
-			} else if (nglcd->channelLocked) {
-				nglcd->Lock();
-				if (nglcd->Epg.compare(nglcd->stagingEpg)) {
-					nglcd->Epg = nglcd->stagingEpg;
-					nglcd->EpgWidth = nglcd->font_epg.Width(nglcd->Epg);
-					nglcd->doScrollEpg = nglcd->EpgWidth > nglcd->bitmap->Width() - 4;
-					nglcd->scrollEpgSkip = 0;
-					nglcd->scrollEpgForward = true;
-					if (nglcd->doScrollEpg) {
-						nglcd->scrollEpgOffset = nglcd->bitmap->Width()/g_settings.glcd_scroll_speed;
-						nglcd->EpgWidth += nglcd->scrollEpgOffset;
+				EpgWidth = 0;
+				scrollEpgSkip = 0;
+				scrollEpgForward = true;
+				Scale = g_settings.current_volume;
+				channel_id = -1;
+			} else if (channelLocked) {
+				Lock();
+				if (Epg.compare(stagingEpg)) {
+					Epg = stagingEpg;
+					EpgWidth = font_epg.Width(Epg);
+					doScrollEpg = EpgWidth > bitmap->Width() - 4;
+					scrollEpgSkip = 0;
+					scrollEpgForward = true;
+					if (doScrollEpg) {
+						scrollEpgOffset = bitmap->Width()/g_settings.glcd_scroll_speed;
+						EpgWidth += scrollEpgOffset;
 					} else
-						nglcd->scrollChannelOffset = 0;
+						scrollChannelOffset = 0;
 				}
-				if (nglcd->Channel.compare(nglcd->stagingChannel)) {
-					nglcd->Channel = nglcd->stagingChannel;
-					nglcd->ChannelWidth = nglcd->font_channel.Width(nglcd->Channel);
-					nglcd->doScrollChannel = nglcd->ChannelWidth > nglcd->bitmap->Width() - 4;
-					nglcd->scrollChannelSkip = 0;
-					nglcd->scrollChannelForward = true;
-					if (nglcd->doScrollChannel) {
-						nglcd->scrollChannelOffset = nglcd->bitmap->Width()/g_settings.glcd_scroll_speed;
-						nglcd->ChannelWidth += nglcd->scrollChannelOffset;
+				if (Channel.compare(stagingChannel)) {
+					Channel = stagingChannel;
+					ChannelWidth = font_channel.Width(Channel);
+					doScrollChannel = ChannelWidth > bitmap->Width() - 4;
+					scrollChannelSkip = 0;
+					scrollChannelForward = true;
+					if (doScrollChannel) {
+						scrollChannelOffset = bitmap->Width()/g_settings.glcd_scroll_speed;
+						ChannelWidth += scrollChannelOffset;
 					} else
-						nglcd->scrollChannelOffset = 0;
+						scrollChannelOffset = 0;
 				}
-				nglcd->channel_id = -1;
-				nglcd->Unlock();
+				channel_id = -1;
+				Unlock();
 			} else {
 				CChannelList *channelList = CNeutrinoApp::getInstance ()->channelList;
 				if (!channelList)
@@ -603,67 +608,65 @@ void* nGLCD::Run(void *)
 				if (!new_channel_id)
 					continue;
 
-				if ((new_channel_id != nglcd->channel_id)) {
-					nglcd->Channel = channelList->getActiveChannelName ();
-					nglcd->ChannelWidth = nglcd->font_channel.Width(nglcd->Channel);
-					nglcd->Epg = "";
-					nglcd->EpgWidth = 0;
-					nglcd->Scale = 0;
-					nglcd->doScrollEpg = false;
-					nglcd->doScrollChannel = nglcd->ChannelWidth > nglcd->bitmap->Width() - 4;
-					nglcd->scrollChannelForward = true;
-					nglcd->scrollChannelSkip = 0;
-					if (nglcd->doScrollChannel) {
-						nglcd->scrollChannelOffset = nglcd->bitmap->Width()/g_settings.glcd_scroll_speed;
-						nglcd->ChannelWidth += nglcd->scrollChannelOffset;
+				if ((new_channel_id != channel_id)) {
+					Channel = channelList->getActiveChannelName ();
+					ChannelWidth = font_channel.Width(Channel);
+					Epg = "";
+					EpgWidth = 0;
+					Scale = 0;
+					doScrollEpg = false;
+					doScrollChannel = ChannelWidth > bitmap->Width() - 4;
+					scrollChannelForward = true;
+					scrollChannelSkip = 0;
+					if (doScrollChannel) {
+						scrollChannelOffset = bitmap->Width()/g_settings.glcd_scroll_speed;
+						ChannelWidth += scrollChannelOffset;
 					} else
-						nglcd->scrollChannelOffset = 0;
+						scrollChannelOffset = 0;
 					warmUp = 10;
 					info_CurrentNext.current_name = "";
 					info_CurrentNext.current_zeit.dauer = 0;
 				}
 
-				CEitManager::getInstance()->getCurrentNextServiceKey(nglcd->channel_id & 0xFFFFFFFFFFFFULL, info_CurrentNext);
-				nglcd->channel_id = new_channel_id;
+				CEitManager::getInstance()->getCurrentNextServiceKey(channel_id & 0xFFFFFFFFFFFFULL, info_CurrentNext);
+				channel_id = new_channel_id;
 
-				if (info_CurrentNext.current_name.compare(nglcd->Epg)) {
-					nglcd->Epg = info_CurrentNext.current_name;
-					nglcd->EpgWidth = nglcd->font_epg.Width(nglcd->Epg);
-					nglcd->doScrollEpg = nglcd->EpgWidth > nglcd->bitmap->Width() - 4;
-					nglcd->scrollEpgForward = true;
-					nglcd->scrollEpgSkip = 0;
-					if (nglcd->doScrollEpg) {
-						nglcd->scrollEpgOffset = nglcd->bitmap->Width()/g_settings.glcd_scroll_speed;
-						nglcd->EpgWidth += nglcd->scrollEpgOffset;
+				if (info_CurrentNext.current_name.compare(Epg)) {
+					Epg = info_CurrentNext.current_name;
+					EpgWidth = font_epg.Width(Epg);
+					doScrollEpg = EpgWidth > bitmap->Width() - 4;
+					scrollEpgForward = true;
+					scrollEpgSkip = 0;
+					if (doScrollEpg) {
+						scrollEpgOffset = bitmap->Width()/g_settings.glcd_scroll_speed;
+						EpgWidth += scrollEpgOffset;
 					} else
-						nglcd->scrollEpgOffset = 0;
+						scrollEpgOffset = 0;
 				}
 				if (info_CurrentNext.current_zeit.dauer > 0)
-					nglcd->Scale = (ts.tv_sec - info_CurrentNext.current_zeit.startzeit) * 100 / info_CurrentNext.current_zeit.dauer;
-				if (nglcd->Scale > 100)
-					nglcd->Scale = 100;
-				else if (nglcd->Scale < 0)
-					nglcd->Scale = 0;
+					Scale = (ts.tv_sec - info_CurrentNext.current_zeit.startzeit) * 100 / info_CurrentNext.current_zeit.dauer;
+				if (Scale > 100)
+					Scale = 100;
+				else if (Scale < 0)
+					Scale = 0;
 			}
 		}
 
-		if(!g_settings.glcd_enable || nglcd->doSuspend || nglcd->doStandby || nglcd->doExit) {
+		if(!g_settings.glcd_enable || doSuspend || doStandby || doExit) {
 			// for restart, don't blacken screen
-			nglcd->bitmap->Clear(GLCD::cColor::Black);
-			nglcd->lcd->SetBrightness(0);
-			nglcd->lcd->SetScreen(nglcd->bitmap->Data(), nglcd->bitmap->Width(), nglcd->bitmap->Height());
-			nglcd->lcd->Refresh(false);
+			bitmap->Clear(GLCD::cColor::Black);
+			lcd->SetBrightness(0);
+			lcd->SetScreen(bitmap->Data(), bitmap->Width(), bitmap->Height());
+			lcd->Refresh(false);
 		}
-		if (nglcd->doRescan) {
-		    nglcd->doRescan = false;
-			nglcd->Update();
+		if (doRescan) {
+		    doRescan = false;
+			Update();
 	    }
-		nglcd->lcd->DeInit();
-		delete nglcd->lcd;
-		nglcd->lcd = NULL;
-	} while(!nglcd->doExit);
-
-	return NULL;
+		lcd->DeInit();
+		delete lcd;
+		lcd = NULL;
+	} while(!doExit);
 }
 
 void nGLCD::Update() {
@@ -710,12 +713,6 @@ void nGLCD::Exit() {
 		pthread_join(nglcd->thrGLCD, &res);
 		delete nglcd;
 		nglcd = NULL;
-	}
-}
-
-void nglcd_update() {
-	if (nglcd) {
-		nglcd->Update();
 	}
 }
 

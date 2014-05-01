@@ -1,7 +1,7 @@
 /*
 	nglcd.h -- Neutrino GraphLCD driver
 
-	Copyright (C) 2012 martii
+	Copyright (C) 2012-2014 martii
 
 	License: GPL
 
@@ -86,28 +86,39 @@ class nGLCD
 		bool doScrollChannel;
 		bool doScrollEpg;
 		bool doShowVolume;
+		bool doMirrorOSD;
+		bool fonts_initialized;
 		pthread_t thrGLCD;
 		pthread_mutex_t mutex;
-		bool fonts_initialized;
 		sem_t sem;
 		void updateFonts();
+		bool showImage(fb_pixel_t *s,
+			uint32_t sw, uint32_t sh,
+			uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh,
+			bool transp = false, bool maximize = false);
+		bool showImage(const std::string & filename,
+			uint32_t sw, uint32_t sh,
+			uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh,
+			bool transp = false, bool maximize = false);
+		bool showImage(uint64_t channel_id, std::string ChannelName,
+			uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh,
+			bool transp = false, bool maximize = false);
+		bool getBoundingBox(uint32_t *buffer,
+			int width, int height,
+			int &bb_x, int &bb_y, int &bb_width, int &bb_height);
 		void Exec();
-		bool showImage(fb_pixel_t *s, uint32_t sw, uint32_t sh, uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh, bool transp = false, bool maximize = false);
-		bool showImage(const std::string & filename, uint32_t sw, uint32_t sh, uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh, bool transp = false, bool maximize = false);
-		bool showImage(uint64_t channel_id, std::string ChannelName, uint32_t dx, uint32_t dy, uint32_t dw, uint32_t dh, bool transp = false, bool maximize = false);
-		bool getBoundingBox(uint32_t *buffer, int width, int height, int &bb_x, int &bb_y, int &bb_width, int &bb_height);
-		bool doMirrorOSD;
+		void Run(void);
+		static void* Run(void *);
+		static void Lock();
+		static void Unlock();
 	public:
 		nGLCD();
 		~nGLCD();
 		void DeInit();
 		void Rescan();
 		static nGLCD *getInstance();
-		static void Lock();
-		static void Unlock();
 		static void lockChannel(std::string txt, std::string epg = "", int scale = 0);
 		static void unlockChannel();
-		static void* Run(void *);
 		static void MirrorOSD(bool b = true);
 		static void Update();
 		static void Suspend();
