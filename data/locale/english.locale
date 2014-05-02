@@ -617,7 +617,6 @@ fontmenu.channellist Channellist
 fontmenu.epg EPG
 fontmenu.eventlist Eventlist
 fontmenu.fonts Fonts
-fontmenu.gamelist Gamelist
 fontmenu.head Font settings
 fontmenu.infobar Infobar
 fontmenu.menu Menu
@@ -641,8 +640,6 @@ fontsize.eventlist_itemlarge Large
 fontsize.eventlist_itemsmall Small
 fontsize.eventlist_title Title
 fontsize.filebrowser_item Filebrowser items
-fontsize.gamelist_itemlarge Large
-fontsize.gamelist_itemsmall Small
 fontsize.hint Initialising font,\nplease wait...
 fontsize.infobar_channame Channel name
 fontsize.infobar_info info
@@ -990,7 +987,6 @@ menu.hint_font_scaling_y Set global vertical GUI font scaling factor (50% to 200
 menu.hint_font_sub Select font file to use for Movieplayer subtitles
 menu.hint_font_ttx Select font file to use for teletext
 menu.hint_fonts Configure GUI fonts and font sizes
-menu.hint_gamelist_fonts Change games and scripts list font sizes
 menu.hint_games Show list of installed games
 menu.hint_hdd Format / check hard disk drive
 menu.hint_hdd_apply Apply sleep/noise parameters
