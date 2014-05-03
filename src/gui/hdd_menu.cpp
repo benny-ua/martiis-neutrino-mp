@@ -811,23 +811,14 @@ _remount:
 #ifndef ASSUME_MDEV
 	f = fopen("/proc/sys/kernel/hotplug", "w");
 	if(f) {
-#ifdef ASSUME_MDEV
-		fprintf(f, "/sbin/mdev\n");
-#else
 		fprintf(f, "/sbin/hotplug\n");
-#endif
 		fclose(f);
 	}
 #else
 	/* mounting is asynchronous via mdev, so wait for the directory to appear */
 	for (int i = 0; i < 20; i++) {
-		struct statfs s;
-		if (::statfs(dst, &s) == 0) {
-			if (s.f_type == 0xEF53)		/* EXT3_SUPER_MAGIC */
-				break;
-			if (s.f_type == 0x52654973)	/* REISERFS_SUPER_MAGIC */
-				break;
-		}
+		if (check_dir(dst))
+			break;
 		if (i == 0)
 			printf("CHDDFmtExec: waiting for %s to be mounted\n", dst);
 		sleep(1);
