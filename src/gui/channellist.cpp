@@ -2399,6 +2399,7 @@ void CChannelList::paint_events()
 		}
 		i++;
 	}
+	frameBuffer->blit();
 }
 
 static bool sortByDateTime (const CChannelEvent& a, const CChannelEvent& b)
