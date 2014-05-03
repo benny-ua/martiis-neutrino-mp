@@ -348,6 +348,7 @@ int CHDDMenuHandler::doMenu ()
 	if(!hdd_found)
 		hddmenu->addItem(new CMenuForwarder(LOCALE_HDD_NOT_FOUND, false));
 	else {
+		hdd_list.clear();
 		FILE *b = popen("/sbin/blkid", "r");
 		if (b) {
 			char buf[255];
