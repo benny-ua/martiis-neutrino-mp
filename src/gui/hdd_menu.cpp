@@ -92,14 +92,6 @@ const CMenuOptionChooser::keyval HDD_SLEEP_OPTIONS[HDD_SLEEP_OPTION_COUNT] =
 	{ 242, LOCALE_HDD_60MIN }
 };
 
-#define HDD_STATFS_OPTION_COUNT 3
-const CMenuOptionChooser::keyval HDD_STATFS_OPTIONS[HDD_STATFS_OPTION_COUNT] =
-{
-	{ SNeutrinoSettings::HDD_STATFS_OFF,		LOCALE_OPTIONS_OFF },
-	{ SNeutrinoSettings::HDD_STATFS_ALWAYS,		LOCALE_HDD_STATFS_ALWAYS },
-	{ SNeutrinoSettings::HDD_STATFS_RECORDING,	LOCALE_HDD_STATFS_RECORDING }
-};
-
 static int my_filter(const struct dirent *d)
 {
 	if ((d->d_name[0] == 's' || d->d_name[0] == 'h') && d->d_name[1] == 'd')
@@ -230,10 +222,6 @@ int CHDDMenuHandler::doMenu ()
 		mc->setHint("", LOCALE_MENU_HINT_HDD_NOISE);
 		hddmenu->addItem(mc);
 	}
-
-	mc = new CMenuOptionChooser(LOCALE_HDD_STATFS, &g_settings.hdd_statfs_mode, HDD_STATFS_OPTIONS, HDD_STATFS_OPTION_COUNT, true);
-	mc->setHint("", LOCALE_MENU_HINT_HDD_STATFS);
-	hddmenu->addItem(mc);
 
 	//if(n > 0)
 	hddmenu->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_HDD_MANAGE));
