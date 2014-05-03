@@ -34,9 +34,6 @@ extern "C" {
 #include "helpers.hpp"
 #include "dvbsubtitle.h"
 
-enum {NOERROR, NETWORK, DENIED, NOSERVICE, BOXTYPE, THREAD, ABOUT};
-enum {GET_VOLUME, SET_VOLUME, SET_MUTE, SET_CHANNEL};
-
 Debug sub_debug;
 static PacketQueue packet_queue;
 static PacketQueue bitmap_queue;
@@ -96,7 +93,7 @@ int dvbsub_init() {
 	// reader-Thread starten
 	trc = pthread_create(&threadReader, 0, reader_thread, NULL);
 	if (trc) {
-		fprintf(stderr, "[dvb-sub] failed to create reader-thread (rc=%d)\n", trc);
+		fprintf(stderr, "[dvb-sub] failed to create %s-thread (rc=%d)\n", "reader", trc);
 		reader_running = false;
 		return -1;
 	}
@@ -105,7 +102,7 @@ int dvbsub_init() {
 	// subtitle decoder-Thread starten
 	trc = pthread_create(&threadDvbsub, 0, dvbsub_thread, NULL);
 	if (trc) {
-		fprintf(stderr, "[dvb-sub] failed to create dvbsub-thread (rc=%d)\n", trc);
+		fprintf(stderr, "[dvb-sub] failed to create %s-thread (rc=%d)\n", "dvbsub", trc);
 		dvbsub_running = false;
 		return -1;
 	}
@@ -115,7 +112,7 @@ int dvbsub_init() {
 	sem_init(&ass_sem, 0, 0);
 	trc = pthread_create(&threadAss, 0, ass_reader_thread, NULL);
 	if (trc) {
-		fprintf(stderr, "[dvb-sub] failed to create ass-reader-thread (rc=%d)\n", trc);
+		fprintf(stderr, "[dvb-sub] failed to create %s-thread (rc=%d)\n", "ass-reader", trc);
 		ass_reader_running = false;
 		return -1;
 	}
@@ -265,7 +262,7 @@ int dvbsub_close()
 	return 0;
 }
 
-static cDemux * dmx;
+static cDemux * dmx = NULL;
 
 extern void getPlayerPts(int64_t *);
 
