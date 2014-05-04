@@ -99,6 +99,8 @@ private:
 	pthread_t		paint_events_thr;
 	pthread_mutex_t		paint_events_mutex;
 
+	const char *		unit_short_minute;
+
 	CEPGData		epgData;
 	bool historyMode;
 	bool vlist; // "virtual" list, not bouquet
