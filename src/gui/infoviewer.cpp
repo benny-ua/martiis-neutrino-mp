@@ -1797,7 +1797,7 @@ void CInfoViewer::show_Data (bool calledFromEvent)
 		if (!gotTime)
 			snprintf(runningRest, sizeof(runningRest), "%d %s", info_CurrentNext.current_zeit.dauer / 60, unit_short_minute);
 		else if (jetzt < info_CurrentNext.current_zeit.startzeit)
-			snprintf (runningRest, sizeof(runningRest), "%s %d %s", g_Locale->getText(LOCALE_IN), seit, unit_short_minute);
+			snprintf (runningRest, sizeof(runningRest), "%s %d %s", g_Locale->getText(LOCALE_WORD_IN), seit, unit_short_minute);
 		else {
 			runningPercent = (jetzt - info_CurrentNext.current_zeit.startzeit) * 100 / info_CurrentNext.current_zeit.dauer;
 			if (runningPercent > 100)
