@@ -982,8 +982,7 @@ int CChannelList::show()
 		frameBuffer->blit();
 	}
 
-	if (displayList)
-		paint_events(-2); // cancel paint_events thread
+	paint_events(-2); // cancel paint_events thread
 
 	if (bouquet_changed)
 		res = -5; /* in neutrino.cpp: -5 == "don't change bouquet after adding a channel to fav" */
@@ -2308,6 +2307,8 @@ void CChannelList::paint_events(int index)
 		sem_destroy(&paint_events_sem);
 		pthread_mutex_unlock(&paint_events_mutex);
 	} else if (paint_events_index == -2) {
+		if (index == -2)
+			return;
 		// First paint_event. No need to lock.
 		pthread_mutexattr_t attr;
 		pthread_mutexattr_init(&attr);
