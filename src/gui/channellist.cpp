@@ -75,6 +75,7 @@
 
 #include <eitd/sectionsd.h>
 
+#include <semaphore.h>
 #include <OpenThreads/Thread>
 #include <OpenThreads/Condition>
 #include <OpenThreads/ScopedLock>
@@ -128,7 +129,7 @@ CChannelList::CChannelList(const char * const pName, bool phistoryMode, bool _vl
 	logo_off = 0;
 	pig_on_win = false;
 
-	paint_events_index = -1;
+	paint_events_index = -2;
 //printf("************ NEW LIST %s : %x\n", name.c_str(), (int) this);fflush(stdout);
 }
 
@@ -985,7 +986,7 @@ int CChannelList::show()
 	}
 
 	if (displayList)
-		paint_events(-1); // cancel pending
+		paint_events(-2); // cancel paint_events thread
 
 	if (bouquet_changed)
 		res = -5; /* in neutrino.cpp: -5 == "don't change bouquet after adding a channel to fav" */
@@ -2300,19 +2301,28 @@ void CChannelList::paintPig (int _x, int _y, int w, int h)
 	cc_minitv->paint(false);
 }
 
-static OpenThreads::Mutex mutex;
+static OpenThreads::Mutex paint_events_mutex;
+static sem_t paint_events_sem;
+static pthread_t paint_events_thr;
 
 void CChannelList::paint_events(int index)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
-	int old_index = paint_events_index;
-	paint_events_index = index;
-	if (index == old_index || index < 0)
-		return;
-
-	pthread_t thr;
-	if (!pthread_create(&thr, NULL, paint_events, (void *) this))
-		pthread_detach(thr);
+	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(paint_events_mutex);
+	if (index == -2 && paint_events_index > -2) {
+		paint_events_index = index;
+		sem_post(&paint_events_sem);
+		pthread_join(paint_events_thr, NULL);
+		sem_destroy(&paint_events_sem);
+	} else if (paint_events_index == -2) {
+		sem_init(&paint_events_sem, 0, 0);
+		if (!pthread_create(&paint_events_thr, NULL, paint_events, (void *) this)) {
+			paint_events_index = index;
+			sem_post(&paint_events_sem);
+		}
+	} else {
+		paint_events_index = index;
+		sem_post(&paint_events_sem);
+	}
 }
 
 void *CChannelList::paint_events(void *arg)
@@ -2324,24 +2334,30 @@ void *CChannelList::paint_events(void *arg)
 
 void CChannelList::paint_events()
 {
-	// slight race condition, but unlikely and not worth locking
-	int index = paint_events_index;
-
 	set_threadname(__func__);
 
-	usleep(200000);
-	if (index != paint_events_index)
-		return;
+	while (paint_events_index != -2) {
+		sem_wait(&paint_events_sem);
+		if (paint_events_index < 0)
+			continue;
+		while(!sem_trywait(&paint_events_sem));
+		int current_index = paint_events_index;
 
+		CChannelEventList evtlist;
+		readEvents(chanlist[current_index]->channel_id, evtlist);
+		if (current_index == paint_events_index) {
+			paint_events_mutex.lock();
+			if (current_index == paint_events_index)
+				paint_events_index = -1;
+			paint_events_mutex.unlock();
+			paint_events(evtlist);
+		}
+	}
+}
+
+void CChannelList::paint_events(CChannelEventList &evtlist)
+{
 	ffheight = g_Font[eventFont]->getHeight();
-
-	CChannelEventList evtlist;
-	readEvents(chanlist[index]->channel_id, evtlist);
-
-	OpenThreads::ScopedLock<OpenThreads::Mutex> m_lock(mutex);
-	if (index != paint_events_index)
-		return;
-	paint_events_index = -1;
 	frameBuffer->paintBoxRel(x+ width,y+ theight+pig_height, infozone_width, infozone_height,COL_MENUCONTENT_PLUS_0);
 
 	char startTime[10];
