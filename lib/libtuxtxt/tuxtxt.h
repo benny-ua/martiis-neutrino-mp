@@ -1748,7 +1748,6 @@ static void RenderCharLCD(int Digit, int XPos, int YPos);
 static void RenderMessage(int Message);
 static void RenderPage();
 static void DecodePage();
-static void UpdateLCD();
 static int  Init(int source);
 static int  GetNationalSubset(const char *country_code);
 static int  GetTeletextPIDs();

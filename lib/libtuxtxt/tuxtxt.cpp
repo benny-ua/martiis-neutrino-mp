@@ -4190,7 +4190,7 @@ static void RenderDRCS( // FIXME
 			unsigned int f1 = (c1 & bit) ? fgcolor : bgcolor;
 			unsigned int f2 = (c2 & bit) ? fgcolor : bgcolor;
 
-			for (unsigned int i = 0; i < h; i++)
+			for (int i = 0; i < h; i++)
 			{
 				if (ax[x+1] > ax[x])
 				{
