@@ -176,6 +176,7 @@ install_DATA += \
 	local.png \
 	lock.png \
 	lock_passive.png \
+	longpress.png \
 	mainmenue.png \
 	menu.png \
 	menu_small.png \
