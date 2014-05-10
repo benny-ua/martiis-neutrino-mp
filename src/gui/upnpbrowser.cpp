@@ -66,6 +66,9 @@
 #include <zapit/zapit.h>
 #include <video.h>
 
+//#define dprintf printf
+#define dprintf(...)
+
 extern cVideo * videoDecoder;
 extern CPictureViewer * g_PicViewer;
 
@@ -191,7 +194,7 @@ void CUpnpBrowserGui::splitProtocol(std::string &protocol, std::string &prot, st
 			}
 		}
 	}
-//printf("%s -> %s - %s - %s - %s\n", protocol.c_str(), prot.c_str(), network.c_str(), mime.c_str(), additional.c_str());
+dprintf("%s -> %s - %s - %s - %s\n", protocol.c_str(), prot.c_str(), network.c_str(), mime.c_str(), additional.c_str());
 }
 
 bool CUpnpBrowserGui::discoverDevices()
@@ -550,7 +553,7 @@ void CUpnpBrowserGui::selectDevice()
 #endif
 		else
 		{
-printf("msg: %x\n", (int) msg);
+dprintf("msg: %x\n", (int) msg);
 			if (CNeutrinoApp::getInstance()->handleMsg(msg, data) & messages_return::cancel_all)
 				loop = false;
 		}
@@ -568,7 +571,7 @@ void CUpnpBrowserGui::playnext(void)
 		std::list<UPnPAttribute>results;
 		std::list<UPnPAttribute>::iterator i;
 
-		printf("playnext: getResults m_playfolder %s m_playid %d\n", m_playfolder.c_str(), m_playid);
+		dprintf("playnext: getResults m_playfolder %s m_playid %d\n", m_playfolder.c_str(), m_playid);
 		if (!getResults(m_playfolder, m_playid, 1, results)) {
 			m_folderplay = false;
 			return;
@@ -649,7 +652,7 @@ bool CUpnpBrowserGui::getItems(std::string id, unsigned int index, std::vector<U
 	delete entries;
 	entries = NULL;
 
-	printf("getItems: getResults: index %d count %d\n", index, m_listmaxshow);
+	dprintf("getItems: getResults: index %d count %d\n", index, m_listmaxshow);
 	if (!getResults(id, index, m_listmaxshow, results))
 		return false;
 
@@ -679,7 +682,7 @@ bool CUpnpBrowserGui::updateItemSelection(std::string id, std::vector<UPnPEntry>
 
 		selected = newpos;
 		liststart = (selected/m_listmaxshow)*m_listmaxshow;
-		printf("updateItemSelection: list start old %d new %d selected old %d new %d\n", oldliststart, liststart, prev_selected, selected);
+		dprintf("updateItemSelection: list start old %d new %d selected old %d new %d\n", oldliststart, liststart, prev_selected, selected);
 		if (oldliststart != liststart) {
 			unsigned int total;
 			if (!getItems(id, liststart, entries, total))
@@ -706,7 +709,7 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 	unsigned int selected = 0;
 	unsigned int total = 0;
 
-	printf("selectItem: [%s]\n", id.c_str());
+	dprintf("selectItem: [%s]\n", id.c_str());
 	if (!getItems(id, liststart, entries, total))
 		return endall;
 
@@ -714,7 +717,7 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 		updateTimes();
 
 		if (refresh) {
-			printf("selectItem: refresh, timeout = %d\n", (int) timeout);
+			dprintf("selectItem: refresh, timeout = %d\n", (int) timeout);
 			if (!timeout)
 				paintItems(entries, selected - liststart, total - liststart, liststart);
 			refresh=false;
@@ -1157,7 +1160,7 @@ void CUpnpBrowserGui::paintItemInfo(std::vector<UPnPEntry> *entry, unsigned int 
 
 void CUpnpBrowserGui::paintItems(std::vector<UPnPEntry> *entry, unsigned int selected, unsigned int max, unsigned int offset)
 {
-printf("CUpnpBrowserGui::paintItem:s selected %d max %d offset %d\n", selected, max, offset);
+dprintf("CUpnpBrowserGui::paintItem:s selected %d max %d offset %d\n", selected, max, offset);
 	int ypos, top;
 
 	// LCD
@@ -1199,7 +1202,7 @@ void CUpnpBrowserGui::paintDetails(std::vector<UPnPEntry> *entry, unsigned int i
 	// Foot info
 	int top = m_y + (m_height - m_info_height - 1 * m_buttonHeight) + 2;
 	int text_start = m_x + 10;
-printf("paintDetails: index %d use_playing %d shown %d\n", index, use_playing, m_playing_entry_is_shown);
+dprintf("paintDetails: index %d use_playing %d shown %d\n", index, use_playing, m_playing_entry_is_shown);
 	if ((!use_playing) && ((*entry)[index].isdir))
 	{
 		m_frameBuffer->paintBackgroundBoxRel(m_x+2, top + 2, m_width-4, 2 * m_buttonHeight+8);
@@ -1271,7 +1274,7 @@ void CUpnpBrowserGui::updateTimes(const bool force)
 			updatePlayed = true;
 		}
 
-printf("updateTimes: force %d updatePlayed %d\n", force, updatePlayed);
+dprintf("updateTimes: force %d updatePlayed %d\n", force, updatePlayed);
 		char play_time[8];
 		snprintf(play_time, 7, "%ld:%02ld", m_time_played / 60, m_time_played % 60);
 		char tmp_time[] = "000:00";
