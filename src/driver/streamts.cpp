@@ -64,7 +64,6 @@
 /* defined in neutrino.cpp */
 extern cCpuFreqManager * cpuFreq;
 
-#if 0
 /* experimental mode:
  * stream not possible, if record running
  * pids in url ignored, and added from channel, with fake PAT/PMT
@@ -72,7 +71,6 @@ extern cCpuFreqManager * cpuFreq;
  * with url like http://coolstream:31339/id=c32400030070283e (channel id)
  */
 #define ENABLE_MULTI_CHANNEL
-#endif
 
 #define TS_SIZE 188
 #define DMX_BUFFER_SIZE (2048*TS_SIZE)
@@ -366,10 +364,10 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid, CFro
 		return false;
 	}
 	cbuf[0] = 0;
-	bp = &cbuf[0];
+	bp = cbuf;
 
 	/* read one line */
-	while (bp - &cbuf[0] < (int) sizeof(cbuf)) {
+	while (bp - cbuf < (int) sizeof(cbuf)) {
 		unsigned char c;
 		int res = read(fd, &c, 1);
 		if (res < 0) {
@@ -381,7 +379,7 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid, CFro
 	}
 
 	*bp++ = 0;
-	bp = &cbuf[0];
+	bp = cbuf;
 
 	printf("CStreamManager::Parse: got %s\n", cbuf);
 
@@ -398,27 +396,24 @@ bool CStreamManager::Parse(int fd, stream_pids_t &pids, t_channel_id &chid, CFro
 	chid = CZapit::getInstance()->GetCurrentChannelID();
 	CZapitChannel * channel = CZapit::getInstance()->GetCurrentChannel();
 
-#ifndef ENABLE_MULTI_CHANNEL
-	char *obp;
-	/* parse stdin / url path, start dmx filters */
-	do {
-		int pid;
-		int res = sscanf(bp, "%x", &pid);
-		if (res == 1) {
-			printf("CStreamManager::Parse: pid: 0x%x\n", pid);
-			pids.insert(pid);
-		}
-		obp = bp;
-	}
-	while (((bp = strchr(obp, ',')) || (bp = strchr(obp, ':'))) && (bp++));
-#else
 	t_channel_id tmpid;
-	bp = &cbuf[5];
 	if (sscanf(bp, "id=%llx", &tmpid) == 1) {
 		channel = CServiceManager::getInstance()->FindChannel(tmpid);
 		chid = tmpid;
+	} else {
+		char *obp;
+		/* parse stdin / url path, start dmx filters */
+		do {
+			int pid;
+			int res = sscanf(bp, "%x", &pid);
+			if (res == 1) {
+				printf("CStreamManager::Parse: pid: 0x%x\n", pid);
+				pids.insert(pid);
+			}
+			obp = bp;
+		}
+		while (((bp = strchr(obp, ',')) || (bp = strchr(obp, ':'))) && (bp++));
 	}
-#endif
 	if (!channel)
 		return false;
 
