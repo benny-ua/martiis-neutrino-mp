@@ -277,7 +277,7 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 	bool isNumeric = CRCInput::isNumeric(directKey);
 	if (isNumeric) {
 		if (g_settings.menu_numbers_as_icons)
-			icon_name = to_string(CRCInput::getNumericValue(directKey)).c_str();
+			icon_name = to_string(CRCInput::getNumericValue(directKey & ~CRCInput::RC_Repeat)).c_str();
 		else if (icon_name && icon_name[0] >= '0' && icon_name[0] <= '9' && !icon_name[1])
 			icon_name = NULL;
 	}
@@ -291,7 +291,6 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 			icon_name = icon_Name;
 	}
 	
-	int icon_x = 0;
 	int icon_start_x = x+icon_frame_w; //start of icon space
 	int icon_space_x = name_start_x - icon_frame_w - icon_start_x; //size of space where to paint icon
 	int icon_space_mid = icon_start_x + icon_space_x/2;
@@ -303,9 +302,17 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 
 		if (active  && icon_w>0 && icon_h>0 && icon_space_x >= icon_w)
 		{
-			icon_x = icon_space_mid - (icon_w/2); 
-
-			icon_painted = frameBuffer->paintIcon(icon_name, icon_x, y+ ((item_height/2- icon_h/2)) );
+			int icon_x = icon_space_mid - icon_w/2;
+			int icon_y = y + item_height/2 - icon_h/2;
+			icon_painted = frameBuffer->paintIcon(icon_name, icon_x, icon_y);
+			if (icon_painted && (directKey != CRCInput::RC_nokey) && (directKey & CRCInput::RC_Repeat)) {
+				static int longpress_icon_w = 0, longpress_icon_h = 0;
+				if (!longpress_icon_w)
+					frameBuffer->getIconSize(NEUTRINO_ICON_BUTTON_LONGPRESS, &longpress_icon_w, &longpress_icon_h);
+				frameBuffer->paintIcon(NEUTRINO_ICON_BUTTON_LONGPRESS,
+					std::min(icon_x + icon_w - longpress_icon_w/2, name_start_x - longpress_icon_w),
+					std::min(icon_y + icon_h - longpress_icon_h/2, y + item_height - longpress_icon_h));
+			}
 		}
 	}
 
@@ -335,7 +342,7 @@ void CMenuItem::setIconName()
 {
 	iconName = NULL;
 
-	switch (directKey) {
+	switch (directKey & ~CRCInput::RC_Repeat) {
 		case CRCInput::RC_red:
 			iconName = NEUTRINO_ICON_BUTTON_RED;
 			break;
