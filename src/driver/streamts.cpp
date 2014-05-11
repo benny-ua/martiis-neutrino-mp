@@ -439,6 +439,9 @@ void CStreamManager::AddPids(int fd, CZapitChannel *channel, stream_pids_t &pids
 		for (int i = 0; i <  channel->getAudioChannelCount(); i++)
 			pids.insert(channel->getAudioChannel(i)->pid);
 
+	} else {
+		for (stream_pids_t::iterator it = pids.begin(); it != pids.end(); ++it)
+			pids.insert(*it);
 	}
 
 	CGenPsi psi;
