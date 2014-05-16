@@ -92,7 +92,6 @@ private:
 //	bool				fromflash;
 	bool 				init_cec_setting;
 	int				lastChannelMode;
-	struct timeval                  standby_pressed_at;
 
 	int				current_muted;
 
