@@ -233,6 +233,8 @@ extern const char * locale_real_names[]; /* #include <system/locals_intern.h> */
 CNeutrinoApp::CNeutrinoApp()
 : configfile('\t')
 {
+	standby_pressed_at.tv_sec = 0;
+
 	frameBuffer = CFrameBuffer::getInstance();
 	frameBuffer->setIconBasePath(DATADIR "/neutrino/icons/");
 #if HAVE_TRIPLEDRAGON || USE_STB_HAL
@@ -3062,23 +3064,79 @@ _repeat:
 		g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
 		return messages_return::cancel_all | messages_return::handled;
 	}
-	else if (msg == (neutrino_msg_t) (g_settings.key_power_off & ~CRCInput::RC_Repeat)) {
+	else if (msg == (neutrino_msg_t) g_settings.key_power_off /*CRCInput::RC_standby*/) {
 		if (data == 0) {
 			neutrino_msg_t new_msg;
 
-			if ((mode != mode_standby) && g_settings.shutdown_real && !recordingstatus)
+			/* Note: pressing the power button on the dbox (not the remote control) over 1 second */
+			/*       shuts down the system even if !g_settings.shutdown_real_rcdelay (see below)  */
+			gettimeofday(&standby_pressed_at, NULL);
+
+			if ((mode != mode_standby) && (g_settings.shutdown_real) && !recordingstatus) {
 				new_msg = NeutrinoMessages::SHUTDOWN;
+			}
 			else {
-				if((mode != mode_standby) && g_settings.shutdown_real && recordingstatus)
+#ifdef MARTI
+				if((mode != mode_standby) && (g_settings.shutdown_real) && recordingstatus)
 					timer_wakeup = true;
+#endif
 				new_msg = (mode == mode_standby) ? NeutrinoMessages::STANDBY_OFF : NeutrinoMessages::STANDBY_ON;
-				if (g_settings.shutdown_real_rcdelay && (msg & CRCInput::RC_Repeat))
-					new_msg = NeutrinoMessages::SHUTDOWN;
+				//printf("standby: new msg %X\n", new_msg);
+				if ((g_settings.shutdown_real_rcdelay)) {
+					neutrino_msg_t      _msg_;
+					neutrino_msg_data_t mdata;
+					struct timeval      endtime;
+					time_t              seconds;
+
+					int timeout = g_settings.repeat_blocker;
+					int timeout1 = g_settings.repeat_genericblocker;
+
+					if (timeout1 > timeout)
+						timeout = timeout1;
+
+					timeout += 500;
+					//printf("standby: timeout %d\n", timeout);
+
+					while(true) {
+						g_RCInput->getMsg_ms(&_msg_, &mdata, timeout);
+
+						//printf("standby: input msg %X\n", msg);
+						if (_msg_ == CRCInput::RC_timeout)
+							break;
+
+						gettimeofday(&endtime, NULL);
+						seconds = endtime.tv_sec - standby_pressed_at.tv_sec;
+						if (endtime.tv_usec < standby_pressed_at.tv_usec)
+							seconds--;
+						//printf("standby: input seconds %d\n", seconds);
+						if (seconds >= 1) {
+							if (_msg_ == CRCInput::RC_standby)
+								new_msg = NeutrinoMessages::SHUTDOWN;
+							break;
+						}
+					}
+				}
 			}
 			g_RCInput->postMsg(new_msg, 0);
 			return messages_return::cancel_all | messages_return::handled;
 		}
 		return messages_return::handled;
+#if 0
+		else  /* data == 1: KEY_POWER released                         */
+			if (standby_pressed_at.tv_sec != 0) /* check if we received a KEY_POWER pressed event before */
+			{                                   /* required for correct handling of KEY_POWER events of  */
+				/* the power button on the dbox (not the remote control) */
+				struct timeval endtime;
+				gettimeofday(&endtime, NULL);
+				time_t seconds = endtime.tv_sec - standby_pressed_at.tv_sec;
+				if (endtime.tv_usec < standby_pressed_at.tv_usec)
+					seconds--;
+				if (seconds >= 1) {
+					g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
+					return messages_return::cancel_all | messages_return::handled;
+				}
+			}
+#endif
 	}
 	else if ((msg == CRCInput::RC_plus) || (msg == CRCInput::RC_minus))
 	{
