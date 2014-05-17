@@ -3064,7 +3064,8 @@ _repeat:
 		g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
 		return messages_return::cancel_all | messages_return::handled;
 	}
-	else if ((msg & ~CRCInput::RC_Repeat) == (neutrino_msg_t) (g_settings.key_power_off & ~CRCInput::RC_Repeat)) {
+	else if (( (g_settings.key_power_off & CRCInput::RC_Repeat) && ( msg                        == (neutrino_msg_t)  g_settings.key_power_off                       ))
+	      || (!(g_settings.key_power_off & CRCInput::RC_Repeat) && ((msg | CRCInput::RC_Repeat) == (neutrino_msg_t) (g_settings.key_power_off | CRCInput::RC_Repeat)))) {
 		if (data == 0) {
 			neutrino_msg_t new_msg;
 
@@ -3106,7 +3107,7 @@ _repeat:
 							seconds--;
 						//printf("standby: input seconds %d\n", seconds);
 						if (seconds >= 1) {
-							if ((_msg_ & ~CRCInput::RC_Repeat) == CRCInput::RC_standby)
+							if ((_msg_ | CRCInput::RC_Repeat) == (g_settings.key_power_off | CRCInput::RC_Repeat))
 								new_msg = NeutrinoMessages::SHUTDOWN;
 							break;
 						}
