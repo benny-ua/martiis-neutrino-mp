@@ -3068,8 +3068,6 @@ _repeat:
 		if (data == 0) {
 			neutrino_msg_t new_msg;
 
-			/* Note: pressing the power button on the dbox (not the remote control) over 1 second */
-			/*       shuts down the system even if !g_settings.shutdown_real_rcdelay (see below)  */
 			gettimeofday(&standby_pressed_at, NULL);
 
 			if ((mode != mode_standby) && (g_settings.shutdown_real) && !recordingstatus) {
@@ -3119,22 +3117,6 @@ _repeat:
 			return messages_return::cancel_all | messages_return::handled;
 		}
 		return messages_return::handled;
-#if 0
-		else  /* data == 1: KEY_POWER released                         */
-			if (standby_pressed_at.tv_sec != 0) /* check if we received a KEY_POWER pressed event before */
-			{                                   /* required for correct handling of KEY_POWER events of  */
-				/* the power button on the dbox (not the remote control) */
-				struct timeval endtime;
-				gettimeofday(&endtime, NULL);
-				time_t seconds = endtime.tv_sec - standby_pressed_at.tv_sec;
-				if (endtime.tv_usec < standby_pressed_at.tv_usec)
-					seconds--;
-				if (seconds >= 1) {
-					g_RCInput->postMsg(NeutrinoMessages::SHUTDOWN, 0);
-					return messages_return::cancel_all | messages_return::handled;
-				}
-			}
-#endif
 	}
 	else if ((msg == CRCInput::RC_plus) || (msg == CRCInput::RC_minus))
 	{
