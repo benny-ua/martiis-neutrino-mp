@@ -790,7 +790,6 @@ keybindingmenu.remotecontrol_hardware_philips Philips
 keybindingmenu.remotecontrol_hardware_tripledragon Triple Dragon
 keybindingmenu.repeatblock generic delay
 keybindingmenu.repeatblockgeneric repeat delay
-keybindingmenu.restart Restart Neutrino
 keybindingmenu.sort change sort order
 keybindingmenu.special_active Special Keys
 keybindingmenu.subchanneldown subchannel down
@@ -1067,7 +1066,6 @@ menu.hint_key_quickzap Configure keybindings for quick\nchannel switch
 menu.hint_key_record Assign button to start a recording
 menu.hint_key_repeatblock Delay after button press and before\nfirst key repeat
 menu.hint_key_repeatblockgeneric Delay between key repeats\nwhile button pressed
-menu.hint_key_restart Assign button to restart Neutrino
 menu.hint_key_right Select 'right' function in live TV/Radio mode
 menu.hint_key_save Save keybindings to file
 menu.hint_key_screenshot Assign button to save GUI and/or TV screenshot

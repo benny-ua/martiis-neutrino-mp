@@ -46,7 +46,6 @@ class CKeybindSetup : public CMenuTarget, public CChangeObserver
 		{
 			NKEY_TV_RADIO_MODE,
 			NKEY_POWER_OFF,
-			NKEY_RESTART,
 			NKEY_PAGE_UP,
 			NKEY_PAGE_DOWN,
 			NKEY_VOLUME_UP,

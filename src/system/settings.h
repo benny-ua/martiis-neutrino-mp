@@ -486,7 +486,6 @@ struct SNeutrinoSettings
 	int key_list_start;
 	int key_list_end;
 	int key_power_off;
-	int key_restart;
 	int menu_left_exit;
 	int key_click;
 	int timeshift_pause;
