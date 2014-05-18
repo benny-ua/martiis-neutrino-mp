@@ -190,6 +190,7 @@ void CZapit::SaveSettings(bool write)
 #endif
 		configfile.setBool("makeRemainingChannelsBouquet", config.makeRemainingChannelsBouquet);
 		configfile.setInt32("feTimeout", config.feTimeout);
+		configfile.setInt32("feRetries", config.feRetries);
 
 		configfile.setInt32("rezapTimeout", config.rezapTimeout);
 		configfile.setBool("scanPids", config.scanPids);
@@ -339,6 +340,7 @@ void CZapit::LoadSettings()
 	config.rezapTimeout			= configfile.getInt32("rezapTimeout", 1);
 
 	config.feTimeout			= configfile.getInt32("feTimeout", 40);
+	config.feRetries			= configfile.getInt32("feRetries", 1);
 	config.highVoltage			= configfile.getBool("highVoltage", 0);
 
 	config.gotoXXLatitude 			= strtod(configfile.getString("gotoXXLatitude", "0.0").c_str(), NULL);
@@ -578,8 +580,8 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 	SaveSettings(false);
 	srand(time(NULL));
 
-	/* retry tuning twice when using unicable, TODO: EN50494 sect.8 specifies 4 retries... */
-	int retry = (live_fe->getDiseqcType() == DISEQC_UNICABLE) * 2;
+	/* retry tuning, at least twice when using unicable, TODO: EN50494 sect.8 specifies 4 retries... */
+	int retry = std::max(config.feRetries, (live_fe->getDiseqcType() == DISEQC_UNICABLE) * 2);
  again:
 	if(!TuneChannel(live_fe, newchannel, transponder_change)) {
 		if (retry < 1) {
@@ -747,8 +749,8 @@ bool CZapit::ZapForRecord(const t_channel_id channel_id)
 {
 	CZapitChannel* newchannel;
 	bool transponder_change;
-	/* retry tuning twice when using unicable */
-	int retry = (live_fe->getDiseqcType() == DISEQC_UNICABLE) * 2;
+	/* retry tuning, at least twice when using unicable */
+	int retry = std::max(config.feRetries, (live_fe->getDiseqcType() == DISEQC_UNICABLE) * 2);
 
 	if((newchannel = CServiceManager::getInstance()->FindChannel(channel_id)) == NULL) {
 		INFO("channel_id " PRINTF_CHANNEL_ID_TYPE " not found", channel_id);

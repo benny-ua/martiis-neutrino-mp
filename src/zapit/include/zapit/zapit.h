@@ -60,6 +60,7 @@ typedef struct Zapit_config {
         int useGotoXX;
         /* FE common */
         int feTimeout;
+        int feRetries;
         int gotoXXLaDirection;
         int gotoXXLoDirection;
         double gotoXXLatitude;
