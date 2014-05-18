@@ -643,8 +643,10 @@ bool CZapit::ZapIt(const t_channel_id channel_id, bool forupdate, bool startplay
 
 	RestoreChannelPids(current_channel);
 
-	if (startplayback /* && !we_playing*/)
+	if (startplayback /* && !we_playing*/) {
+		playbackStopForced = false;
 		StartPlayBack(current_channel);
+	}
 
 	printf("[zapit] sending capmt....\n");
 
