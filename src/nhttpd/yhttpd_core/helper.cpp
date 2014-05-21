@@ -217,6 +217,7 @@ std::string decodeString(std::string encodedString) {
 // HTMLEncode std::string
 //-----------------------------------------------------------------------------
 std::string encodeString(std::string decodedString) {
+#if 0
 	unsigned int len = sizeof(char) * decodedString.length() * 5 + 1;
 	std::string result(len, '\0');
 	char *newString = (char *) result.c_str();
@@ -239,6 +240,19 @@ std::string encodeString(std::string decodedString) {
 	} else {
 		return "";
 	}
+#else
+	std::string result;
+	for (const char *p = decodedString.c_str(); *p; p++) {
+		if (isalnum(*p))
+			result.push_back(*p);
+		else {
+			char tmp[40];
+			snprintf(tmp, sizeof(tmp), "&#%d;", *p);
+			result.append(tmp);
+		}
+	}
+	return result;
+#endif
 }
 
 //-----------------------------------------------------------------------------
