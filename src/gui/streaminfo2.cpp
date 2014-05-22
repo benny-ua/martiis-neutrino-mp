@@ -836,7 +836,7 @@ int CStreamInfo2::ts_setup ()
 			dmx = NULL;
 			return ret;
 		}
-		dmx->Open(DMX_TP_CHANNEL, NULL, 3 * 3008 * 62);
+		dmx->Open(DMX_TP_CHANNEL, NULL, 8 * 3 * 3008 * 62);
 
 		if(vpid > 0) {
 			dmx->pesFilter(vpid);
