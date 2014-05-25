@@ -1090,6 +1090,7 @@ int CChannelList::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data)
 		goto out;
 
 	/* OK, let's ask for a PIN */
+	g_RemoteControl->is_video_started = true;
 	g_RemoteControl->stopvideo();
 	//printf("stopped video\n");
 	zapProtection = new CZapProtection(g_settings.parentallock_pincode, data);
