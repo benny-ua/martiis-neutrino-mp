@@ -2192,7 +2192,7 @@ bool CZapit::StartPlayBack(CZapitChannel *thisChannel)
 	if (!audio_pid && !video_pid && !teletext_pid)
 		return false;
 #if 1
-	if(video_pid && (thisChannel->getPcrPid() == 0x1FFF)) { //FIXME
+	if(video_pid && (pcr_pid == 0x1FFF)) { //FIXME
 		thisChannel->setPcrPid(video_pid);
 		pcr_pid = video_pid;
 	}
