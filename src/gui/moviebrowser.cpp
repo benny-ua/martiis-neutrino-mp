@@ -1774,16 +1774,16 @@ int CMovieBrowser::refreshFoot(bool show)
 	//TRACE("[mb]->refreshButtonLine \r\n");
 	int offset = (m_settings.gui != MB_GUI_LAST_PLAY && m_settings.gui != MB_GUI_LAST_RECORD) ? 0 : 2;
 	neutrino_locale_t ok_loc = (m_settings.gui == MB_GUI_FILTER && m_windowFocus == MB_FOCUS_FILTER) ?  LOCALE_BOOKMARKMANAGER_SELECT : LOCALE_MOVIEBROWSER_FOOT_PLAY;
-	int ok_loc_len = std::max(g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_BOOKMARKMANAGER_SELECT), true),
-				  g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_PLAY), true));
+	int ok_loc_len = std::max(g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_BOOKMARKMANAGER_SELECT)),
+				  g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_PLAY)));
 	std::string filter_text = g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_FILTER);
 	filter_text += m_settings.filter.optionString;
 	std::string sort_text = g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_SORT);
 	sort_text += g_Locale->getText(m_localizedItemName[m_settings.sorting.item]);
-	int sort_text_len = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_SORT), true);
+	int sort_text_len = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(LOCALE_MOVIEBROWSER_FOOT_SORT));
 	int len = 0;
 	for (int i = 0; m_localizedItemName[i] != NONEXISTANT_LOCALE; i++)
-		len = std::max(len, g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(m_localizedItemName[i]), true));
+		len = std::max(len, g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(g_Locale->getText(m_localizedItemName[i])));
 	sort_text_len += len;
 
 	button_label_ext footerButtons[7] = {
@@ -4393,7 +4393,7 @@ int CMenuSelector::paint(bool selected)
 	frameBuffer->paintBoxRel(x, y, dx, height, bgcolor);
 
 	int stringstartposName = x + offx + 10;
-	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(stringstartposName,   y+height,dx- (stringstartposName - x), optionName, color, 0, true); // UTF-8
+	g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(stringstartposName,   y+height,dx- (stringstartposName - x), optionName, color);
 
 	if (selected)
 		CVFD::getInstance()->showMenuText(0, optionName, -1, true); // UTF-8

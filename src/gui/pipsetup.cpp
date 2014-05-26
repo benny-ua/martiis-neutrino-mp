@@ -187,10 +187,10 @@ void CPipSetup::paint()
 	char wpos[30];
 	char hpos[30];
 
-	sprintf(xpos, "X: %d", x_coord );
-	sprintf(ypos, "Y: %d", y_coord );
-	sprintf(wpos, "W: %d", width );
-	sprintf(hpos, "H: %d", height );
+	snprintf(xpos, sizeof(xpos), "X: %d", x_coord );
+	snprintf(ypos, sizeof(ypos), "Y: %d", y_coord );
+	snprintf(wpos, sizeof(wpos), "W: %d", width );
+	snprintf(hpos, sizeof(hpos), "H: %d", height );
 
 	int mheight = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight();
 	int mwidth = 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth("W: 9999");

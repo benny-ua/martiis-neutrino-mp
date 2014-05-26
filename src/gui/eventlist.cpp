@@ -755,8 +755,8 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 		int fwidth1a=g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->getRenderWidth(datetime1_str);
 //		int fwidth1b=g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->getRenderWidth(datetime2_str);
 
-		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5,          ypos+ fheight1+3, fwidth1a, datetime1_str, color, 0, true); // UTF-8
-//		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5+fwidth1a/2, ypos+ fheight1+3, fwidth1b, datetime2_str, color, 0, true); // UTF-8
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5,          ypos+ fheight1+3, fwidth1a, datetime1_str, color);
+//		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5+fwidth1a/2, ypos+ fheight1+3, fwidth1b, datetime2_str, color);
 
 		int seit = ( evtlist[curpos].startTime - time(NULL) ) / 60;
 		if ( (seit> 0) && (seit<100) && (duration_str.length()!=0) )
@@ -765,9 +765,9 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 			snprintf(beginnt, sizeof(beginnt), "%s %d %s", g_Locale->getText(LOCALE_WORD_IN), seit, unit_short_minute);
 			int w = g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL]->getRenderWidth(beginnt) + 10;
 
-			g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL]->RenderString(x+width-fwidth2-5- 20- w, ypos+ fheight1+3, fwidth2, beginnt, color, 0, true); // UTF-8
+			g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL]->RenderString(x+width-fwidth2-5- 20- w, ypos+ fheight1+3, fwidth2, beginnt, color);
 		}
-		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL]->RenderString(x+width-fwidth2-5- 20, ypos+ fheight1+3, fwidth2, duration_str, color, 0, true); // UTF-8
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMSMALL]->RenderString(x+width-fwidth2-5- 20, ypos+ fheight1+3, fwidth2, duration_str, color);
 		
 		// 2nd line
 		// set status icons
@@ -795,7 +795,7 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 		}
 		
 		// paint 2nd line text
-		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMLARGE]->RenderString(x+10+iw, ypos+ fheight, width- 25- 20 -iw, evtlist[curpos].description, color, 0, true);
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_ITEMLARGE]->RenderString(x+10+iw, ypos+ fheight, width- 25- 20 -iw, evtlist[curpos].description, color);
 	}
 }
 
@@ -842,9 +842,9 @@ void CNeutrinoEventList::paintHead(std::string _channelname, std::string _channe
 
 	const short font_h = 8 /* FONT_TYPE_EVENTLIST_ITEMLARGE */;
 	short pn_y_off = std::max((theight - g_Font[font_h]->getHeight()) / 2, 0);
-	short prev_len = g_Font[font_h]->getRenderWidth(_channelname_prev.c_str(),true);
-	short next_len = g_Font[font_h]->getRenderWidth(_channelname_next.c_str(),true);
-	short middle_len = g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->getRenderWidth(_channelname.c_str(),true);
+	short prev_len = g_Font[font_h]->getRenderWidth(_channelname_prev);
+	short next_len = g_Font[font_h]->getRenderWidth(_channelname_next);
+	short middle_len = g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->getRenderWidth(_channelname);
 	short middle_offset = (full_width- next_len- prev_len- middle_len)/2;
 	if(middle_offset < 0){
 		int fw_h = g_Font[font_h]->getWidth();
@@ -857,9 +857,9 @@ void CNeutrinoEventList::paintHead(std::string _channelname, std::string _channe
 		middle_offset = 0;
 	}
 
-	g_Font[font_h]->RenderString(x+10,y+theight-pn_y_off+1, prev_len, _channelname_prev, COL_INFOBAR_TEXT, 0, true); // UTF-8
-	g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->RenderString(x+prev_len+middle_offset,y+theight+1, middle_len, _channelname, COL_MENUHEAD_TEXT, 0, true); // UTF-8
-	g_Font[font_h]->RenderString(x+full_width-next_len-10,y+theight-pn_y_off+1, next_len, _channelname_next, COL_INFOBAR_TEXT, 0, true); // UTF-8
+	g_Font[font_h]->RenderString(x+10,y+theight-pn_y_off+1, prev_len, _channelname_prev, COL_INFOBAR_TEXT);
+	g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->RenderString(x+prev_len+middle_offset,y+theight+1, middle_len, _channelname, COL_MENUHEAD_TEXT);
+	g_Font[font_h]->RenderString(x+full_width-next_len-10,y+theight-pn_y_off+1, next_len, _channelname_next, COL_INFOBAR_TEXT);
 
 }
 
@@ -878,7 +878,7 @@ void CNeutrinoEventList::paintHead(t_channel_id _channel_id, std::string _channe
 		logo_ok = g_PicViewer->DisplayImage(lname, x+10, y+(theight-logo_h)/2, logo_w, logo_h);
 	}
 	else 
-		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->RenderString(x+15+(logo_ok? 5+logo_w:0),y+theight+1, full_width, _channelname, COL_MENUHEAD_TEXT, 0, true); // UTF-8
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_TITLE]->RenderString(x+15+(logo_ok? 5+logo_w:0),y+theight+1, full_width, _channelname, COL_MENUHEAD_TEXT);
 }
 
 void CNeutrinoEventList::paint(t_channel_id channel_id)

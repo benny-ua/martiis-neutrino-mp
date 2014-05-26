@@ -120,7 +120,7 @@ void CComponentsFrmClock::initCCLockItems()
 	string s_time = cl_timestr;
 	
 	//get minimal required height, width from raw text
-	int min_text_w = (*getClockFont())->getRenderWidth(s_time, true);;
+	int min_text_w = (*getClockFont())->getRenderWidth(s_time);
 	int min_text_h = (*getClockFont())->getHeight();
 	height = max(height, min_text_h);
 	width = max(width, min_text_w);
@@ -159,7 +159,7 @@ void CComponentsFrmClock::initCCLockItems()
 		char b[2];
 		b[0] = *sep++;
 		b[1] = 0;
-		minSepWidth = max((*getClockFont())->getRenderWidth(b, true), minSepWidth);
+		minSepWidth = max((*getClockFont())->getRenderWidth(b), minSepWidth);
 	}
 
 	//modify available label items with current segment chars
@@ -186,7 +186,7 @@ void CComponentsFrmClock::initCCLockItems()
 		if (isdigit(stmp.at(0)) ) //check for digits, if true, we use digit width
 			wtmp = (*getClockFont())->getMaxDigitWidth();
 		else //not digit found, we use render width or minimal width
-			wtmp = max((*getClockFont())->getRenderWidth(stmp, true), minSepWidth);
+			wtmp = max((*getClockFont())->getRenderWidth(stmp), minSepWidth);
 
 		//set size, text, color of current item
 		lbl->setDimensionsAll(cl_x, cl_y, wtmp, cl_h);

@@ -123,7 +123,7 @@ CPSISetup::exec (CMenuTarget * parent, const std::string &)
   locWidth = 0;
   for (int i = 0; i < PSI_RESET; i++)
     {
-      int w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (g_Locale->getText (psi_list[i].loc), true) + 3;	// UTF-8
+      int w = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth (g_Locale->getText(psi_list[i].loc)) + 3;	// UTF-8
       if (w > locWidth)
 	locWidth = w;
     }
@@ -288,12 +288,12 @@ CPSISetup::paintSlider (int i)
     {
       psi_list[i].scale->setProgress(psi_list[i].x, psi_list[i].y + sliderOffset, SLIDERWIDTH, SLIDERHEIGHT, psi_list[i].value, 255);
       psi_list[i].scale->paint();
-      f->RenderString (psi_list[i].xLoc, psi_list[i].yLoc, locWidth, g_Locale->getText(psi_list[i].loc), fg_col[psi_list[i].selected], 0, true);
+      f->RenderString (psi_list[i].xLoc, psi_list[i].yLoc, locWidth, g_Locale->getText(psi_list[i].loc), fg_col[psi_list[i].selected]);
     }
   else
     {
       int fh = f->getHeight();
-      f->RenderString (psi_list[i].x + 2 + fh + fh/8, psi_list[i].yLoc, dx - 2 - fh, g_Locale->getText(psi_list[i].loc), fg_col[psi_list[i].selected], 0, true);
+      f->RenderString (psi_list[i].x + 2 + fh + fh/8, psi_list[i].yLoc, dx - 2 - fh, g_Locale->getText(psi_list[i].loc), fg_col[psi_list[i].selected]);
       frameBuffer->paintIcon (NEUTRINO_ICON_BUTTON_RED, psi_list[i].x + 2, psi_list[i].yLoc - fh + fh/4, 0, (6 * fh)/8);
     }
 

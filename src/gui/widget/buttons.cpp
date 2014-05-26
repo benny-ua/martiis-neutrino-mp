@@ -163,12 +163,12 @@ int paintButtons(	const button_label_ext * const content,
 
 		if (content[i].text) {
 			buttontext[i] = content[i].text;
-			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i], true));
+			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i]));
 			w_text += fwidth[i];
 			count_labels++;
 		} else if (content[i].locale) {
 			buttontext[i] = g_Locale->getText(content[i].locale);
-			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i], true));
+			fwidth[i] = std::max(content[i].width, font->getRenderWidth(buttontext[i]));
 			w_text += fwidth[i];
 			count_labels++;
 		} else {
@@ -247,7 +247,7 @@ int paintButtons(	const button_label_ext * const content,
 		// paint icon and text
 		frameBuffer->paintIcon(icon, x_button , y_base - iconh[j]/2);
 		x_caption = x_button + iconw[j] + h_space;
-		font->RenderString(x_caption, y_caption, fwidth[j], caption, COL_INFOBAR_SHADOW_TEXT, 0, true);
+		font->RenderString(x_caption, y_caption, fwidth[j], caption, COL_INFOBAR_SHADOW_TEXT);
  		
  		/* 	set next startposition x, if text is length=0 then offset is =renderwidth of icon, 
   		* 	for generating buttons without captions, 
