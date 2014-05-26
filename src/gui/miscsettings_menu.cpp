@@ -346,11 +346,13 @@ void CMiscMenue::showMiscSettingsMenuGeneral(CMenuWidget *ms_general)
 	mf->setHint("", LOCALE_MENU_HINT_PLUGINS_HDD_DIR);
 	ms_general->addItem(mf);
 
+#if 0
 	//set debug level
 	ms_general->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_DEBUG));
 	CMenuOptionChooser * md = new CMenuOptionChooser(LOCALE_DEBUG_LEVEL, &debug, DEBUG_MODE_OPTIONS, DEBUG_MODES, true);
-// 	mc->setHint("", LOCALE_MENU_HINT_START_TOSTANDBY);
+// 	md->setHint("", LOCALE_MENU_HINT_START_TOSTANDBY);
 	ms_general->addItem(md);
+#endif
 }
 
 //energy and shutdown settings
