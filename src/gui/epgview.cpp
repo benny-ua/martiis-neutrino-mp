@@ -245,7 +245,7 @@ void CEpgData::showText( int startPos, int ypos )
 					offset += max_wday_w;
 					break;
 					case 3:
-					offset += max_mon_w/2;
+					offset += max_mon_w;
 					break;
 					default:
 					offset += digi;
