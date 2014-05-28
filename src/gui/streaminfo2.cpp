@@ -474,11 +474,13 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		      g_Font[font_info]->getRenderWidth(g_Locale->getText (LOCALE_STREAMINFO_URL)),
 		      g_Font[font_info]->getRenderWidth(g_Locale->getText (LOCALE_SCANTS_FREQDATA))};
 
-	for(int i=0 ; i<6; i++) {
+	for(int i=0 ; i<6; i++)
 		if(spaceoffset < array[i])
 			spaceoffset = array[i];
-	}
-	average_bitrate_offset = spaceoffset+=4;
+
+	spaceoffset += g_Font[font_info]->getRenderWidth(" ");
+
+	average_bitrate_offset = spaceoffset;
 
 	if((mp || channel->getVideoPid()) && !(videoDecoder->getBlank())){
 		 videoDecoder->getPictureInfo(xres, yres, framerate);
@@ -522,12 +524,15 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	average_bitrate_pos = ypos += iheight;
 	//AUDIOTYPE
 	ypos += iheight;
+#if 0
 	int type, layer, freq, mode, lbitrate;
 	audioDecoder->getAudioInfo(type, layer, freq, lbitrate, mode);
+#endif
 
 	snprintf (buf, sizeof(buf), "%s:", g_Locale->getText (LOCALE_STREAMINFO_AUDIOTYPE));
 	g_Font[font_info]->RenderString (xpos, ypos, box_width, buf, COL_INFOBAR_TEXT);
 
+#if 0
 	if(type == 0) {
 		const char *mpegmodes[4] = { "stereo", "joint_st", "dual_ch", "single_ch" };
 		snprintf (buf, sizeof(buf), "MPEG %s (%d)", mpegmodes[mode], freq);
@@ -536,6 +541,12 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		snprintf (buf, sizeof(buf), "DD %s (%d)", ddmodes[mode], freq);
 	}
 	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width, buf, COL_INFOBAR_TEXT);
+#else
+	g_Font[font_info]->RenderString (xpos+spaceoffset, ypos, box_width,
+		mp ? mp->getAPIDDesc(mp->getAPID()).c_str()
+		   : g_RemoteControl->current_PIDs.APIDs[g_RemoteControl->current_PIDs.PIDs.selected_apid].desc,
+		COL_INFOBAR_TEXT);
+#endif
 
 	//satellite
 	transponder t;

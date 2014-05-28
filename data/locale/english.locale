@@ -2133,7 +2133,7 @@ sleeptimerbox.title Sleeptimer
 sleeptimerbox.title2 Inactivity shutdown timer
 streaminfo.aratio Aspect Ratio
 streaminfo.aratio_unknown unknown
-streaminfo.audiotype Audiotype
+streaminfo.audiotype Audio
 streaminfo.average_bitrate Average
 streaminfo.bitrate Bitrate
 streaminfo.casystems Conditional access systems
