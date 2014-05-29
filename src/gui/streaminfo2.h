@@ -29,7 +29,10 @@
 #include <gui/components/cc.h>
 #include <gui/movieplayer.h>
 #include <zapit/femanager.h>
+#include <vector>
+#include <map>
 
+struct AVFormatContext;
 
 class CStreamInfo2 : public CMenuTarget
 {
@@ -66,7 +69,7 @@ class CStreamInfo2 : public CMenuTarget
 		int   sig_text_snr_x;
 		int   sig_text_rate_x;
 		int   average_bitrate_pos;
-		int   average_bitrate_offset;
+		int   spaceoffset;
 		unsigned int scaling;
 		unsigned int pmt_version;
 		int box_h,box_h2;
@@ -80,6 +83,8 @@ class CStreamInfo2 : public CMenuTarget
 			unsigned int short_average, max_short_average, min_short_average;
 		} rate;
 
+		std::vector<std::map<std::string,std::string> > streamdata;
+
 		int  doSignalStrengthLoop();
 
 		int dvrfd, dmxfd;
@@ -88,9 +93,20 @@ class CStreamInfo2 : public CMenuTarget
 		uint64_t abit_s;
 		uint64_t b_total;
 		unsigned char *dmxbuf;
-		int update_rate();
-		int ts_setup();
+		unsigned char *probebuf;
+		unsigned int probebuf_off;
+		unsigned int probebuf_size;
+		OpenThreads::Mutex probe_mutex;
+		pthread_t probe_thread;
+		bool probed;
+
+		bool update_rate();
+		bool ts_setup();
 		int ts_close();
+		static void *probeStreams(void *arg);
+		void probeStreams();
+		void analyzeStreams(AVFormatContext *avfc);
+		void analyzeStream(AVFormatContext *avfc, unsigned int i);
 
 		void paint(int mode);
 		void paint_techinfo(int x, int y);
@@ -103,6 +119,7 @@ class CStreamInfo2 : public CMenuTarget
 
 		void showSNR ();
 	public:
+		bool abort_probing;
 
 		CStreamInfo2();
 		~CStreamInfo2();
@@ -110,6 +127,7 @@ class CStreamInfo2 : public CMenuTarget
 		void hide();
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 
+		int readPacket(uint8_t *buf, int buf_size);
 };
 #endif
 
