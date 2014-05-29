@@ -430,12 +430,12 @@ int CStreamInfo2::doSignalStrengthLoop ()
 		if ((signal.min_snr == 0) || (signal.min_snr > signal.snr))
 			signal.min_snr = signal.snr;
 
-		if (got_rate)
+		if (got_rate) {
 			paint_signal_fe(rate, signal);
-
-		signal.old_sig = signal.sig;
-		signal.old_snr = signal.snr;
-		signal.old_ber = signal.ber;
+			signal.old_sig = signal.sig;
+			signal.old_snr = signal.snr;
+			signal.old_ber = signal.ber;
+		}
 
 		// switch paint mode
 		if (msg == CRCInput::RC_red || msg == CRCInput::RC_blue || msg == CRCInput::RC_green || msg == CRCInput::RC_yellow) {
