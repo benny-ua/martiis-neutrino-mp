@@ -685,7 +685,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 
 			std::map<neutrino_msg_t, keyAction>::iterator it = keyActionMap.find(msg);
 			if (it != keyActionMap.end()) {
-				fader.Stop();
+				fader.StopFade();
 				int rv = it->second.menue->exec(this, it->second.action);
 				switch ( rv ) {
 					case menu_return::RETURN_EXIT_ALL:
@@ -734,8 +734,8 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 
 		switch (msg) {
 			case (NeutrinoMessages::EVT_TIMER):
-				if(data == fader.GetTimer()) {
-					if(fader.Fade())
+				if(data == fader.GetFadeTimer()) {
+					if(fader.FadeDone())
 						msg = CRCInput::RC_timeout;
 				} else {
 					if ( CNeutrinoApp::getInstance()->handleMsg( msg, data ) & messages_return::cancel_all ) {
@@ -827,7 +827,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 						if (!item->isSelectable())
 							break;
 						item->msg = msg;
-						fader.Stop();
+						fader.StopFade();
 						int rv = item->exec( this );
 						switch ( rv ) {
 							case menu_return::RETURN_EXIT_ALL:
@@ -904,7 +904,7 @@ int CMenuWidget::exec(CMenuTarget* parent, const std::string &)
 		background = NULL;
 	}
 
-	fader.Stop();
+	fader.StopFade();
 
 	if(!parent)
 		if(oldLcdMode != CVFD::getInstance()->getMode())
