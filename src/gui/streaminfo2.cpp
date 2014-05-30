@@ -406,8 +406,6 @@ int CStreamInfo2::doSignalStrengthLoop ()
 				g_Font[font_small]->RenderString (dx1 + spaceoffset + sw , average_bitrate_pos, sw *2, tmp_str, COL_INFOBAR_TEXT);
 
 			}
-			if (!mp)
-				showSNR ();
 			if((!mp && pmt_version != current_pmt_version && delay_counter > delay) || probed){
 				if (probed) {
 					maxb = minb = lastb = tmp_rate = 0;
@@ -415,8 +413,12 @@ int CStreamInfo2::doSignalStrengthLoop ()
 					probed = false;
 				}
 				current_pmt_version = pmt_version;
-				paint_techinfo (x + 10, y+ hheight +5);
+				delete signalbox;
+				signalbox = NULL;
+				paint(paint_mode);
 			}
+			if (!mp)
+				showSNR ();
 			delay_counter++;
 		}
 		rate.short_average = abit_s;
