@@ -200,8 +200,8 @@ void CStreamInfo2::analyzeStream(AVFormatContext *avfc, unsigned int idx)
 	if (!m["disposition"].empty())
 		m["disposition"].erase(0, 1);
 
-	for (std::map<std::string,std::string>::iterator it = m.begin(); it != m.end(); ++it)
-		fprintf(stderr, "%s -> %s\n", it->first.c_str(), it->second.c_str());
+	//for (std::map<std::string,std::string>::iterator it = m.begin(); it != m.end(); ++it)
+	//	fprintf(stderr, "%s -> %s\n", it->first.c_str(), it->second.c_str());
 }
 
 void CStreamInfo2::analyzeStreams(AVFormatContext *avfc)
@@ -244,10 +244,13 @@ int CStreamInfo2::readPacket(uint8_t *buf, int buf_size)
 	return -1;
 }
 
+//#define ENABLE_FFMPEG_LOGGING
+#ifdef ENABLE_FFMPEG_LOGGING
 static void log_callback(void *, int, const char *format, va_list ap)
 {
 	vfprintf(stderr, format, ap);
 }
+#endif
 
 static int interrupt_cb(void *arg)
 {
@@ -265,7 +268,9 @@ void CStreamInfo2::probeStreams()
 		}
 		probed = true;
 	} else {
+#ifdef ENABLE_FFMPEG_LOGGING
 		av_log_set_callback(log_callback);
+#endif
 		avcodec_register_all();
 		av_register_all();
 
@@ -368,6 +373,13 @@ int CStreamInfo2::doSignalStrengthLoop ()
 
 		bool got_rate = update_rate();
 
+		if (got_rate && (lastb != bit_s)) {
+			if (maxb < bit_s)
+				rate.max_short_average = maxb = bit_s;
+			if ((cnt > 10) && ((minb == 0) || (minb > bit_s)))
+				rate.min_short_average = minb = bit_s;
+		}
+
 		if (paint_mode == 0) {
 			if (cnt < 12)
 				cnt++;
@@ -382,13 +394,6 @@ int CStreamInfo2::doSignalStrengthLoop ()
 				}
 			}
 			if (got_rate && (lastb != bit_s)) {
-				lastb = bit_s;
-
-				if (maxb < bit_s)
-					rate.max_short_average = maxb = bit_s;
-				if ((cnt > 10) && ((minb == 0) || (minb > bit_s)))
-					rate.min_short_average = minb = bit_s;
-
 				frameBuffer->paintBoxRel (dx1, average_bitrate_pos - sheight, sw + spaceoffset, sheight, COL_MENUHEAD_PLUS_0);
 				char currate[150];
 				snprintf(tmp_str, sizeof(tmp_str), "%s:",g_Locale->getText(LOCALE_STREAMINFO_BITRATE));
@@ -404,7 +409,11 @@ int CStreamInfo2::doSignalStrengthLoop ()
 			if (!mp)
 				showSNR ();
 			if((!mp && pmt_version != current_pmt_version && delay_counter > delay) || probed){
-				probed = false;
+				if (probed) {
+					maxb = minb = lastb = tmp_rate = 0;
+					rate.short_average = rate.max_short_average = rate.min_short_average = 0;
+					probed = false;
+				}
 				current_pmt_version = pmt_version;
 				paint_techinfo (x + 10, y+ hheight +5);
 			}
@@ -655,6 +664,9 @@ void CStreamInfo2::paint (int /*mode*/)
 		paint_techinfo (xpos, ypos);
 		paint_signal_fe_box (width - width/3 - 10, (y + 10 + height/3 + hheight), width/3, height/3 + hheight);
 	} else {
+		delete signalbox;
+		signalbox = NULL;
+
 		// --  small PIG, small signal graph
 		// -- paint backround, title pig, etc.
 		frameBuffer->paintBoxRel (0, 0, max_width, max_height, COL_MENUHEAD_PLUS_0);
@@ -686,6 +698,8 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	CZapitChannel * channel = CZapit::getInstance()->GetCurrentChannel();
 	if(!channel)
 		return;
+
+	ypos += sheight;
 
 	std::vector<row> v;
 	row r;
@@ -730,7 +744,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	v.push_back(r);
 
 	// place for average bitrate
-	average_bitrate_pos = ypos + sheight * (v.size() + 1);
+	average_bitrate_pos = ypos + sheight * v.size();
 	r.key = r.val = "";
 	v.push_back(r);
 
@@ -740,8 +754,6 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	r.val = mp ? mp->getAPIDDesc(mp->getAPID()).c_str() : g_RemoteControl->current_PIDs.APIDs[g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
 	r.col = COL_INFOBAR_TEXT;
 	v.push_back(r);
-
-	// paint labels
 
 	if (mp) {
 		// url
@@ -834,13 +846,18 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 				r.key = li ? "" : "Apid(s): ";
 				i = g_RemoteControl->current_PIDs.APIDs[li].pid;
 				std::string strpid = to_string(i);
-				std::string codec = "";
+				std::string details(" ");
 				for (std::vector<std::map<std::string,std::string> >::iterator it = streamdata.begin(); it != streamdata.end(); ++it)
 					if ((*it)["pid"] == strpid) {
-						codec = std::string(" ") + (*it)["codec"];
+						details = (*it)["language"];
+						if (details != " ")
+							details += ", ";
+						details += (*it)["codec"];
 						break;
 					}
-				snprintf(buf, sizeof(buf), "0x%04X (%i)%s", i, i, codec.c_str());
+				if (details == " ")
+					details.clear();
+				snprintf(buf, sizeof(buf), "0x%04X (%i)%s", i, i, details.c_str());
 				r.val = buf;
 				r.col = (li == g_RemoteControl->current_PIDs.PIDs.selected_apid) ? COL_MENUHEAD_TEXT : COL_INFOBAR_TEXT;
 				v.push_back(r);
@@ -848,7 +865,6 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		}
 
 		//vtxtpid
-		ypos += sheight;
 		if (g_RemoteControl->current_PIDs.PIDs.vtxtpid) {
 			r.key = "VTXTpid: ";
 			i = g_RemoteControl->current_PIDs.PIDs.vtxtpid;
