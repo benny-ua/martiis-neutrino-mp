@@ -3871,9 +3871,6 @@ void CNeutrinoApp::tvMode( bool rezap )
 		else
 			channelList->zapTo(0, true);
 	}
-#ifdef USEACTIONLOG
-	g_ActionLog->println("mode: tv");
-#endif
 }
 
 void CNeutrinoApp::scartMode( bool bOnOff )
