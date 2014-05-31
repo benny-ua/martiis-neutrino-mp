@@ -410,8 +410,10 @@ void CFileBrowser::ChangeDir(const std::string & filename, int selection)
 	selected = 0;
 	if ((selection != -1) && (selection < (int)filelist.size()))
 		selected = selection;
+
 	paintHead();
 	paint();
+	paintFoot();
 }
 
 //------------------------------------------------------------------------
@@ -773,10 +775,6 @@ bool CFileBrowser::exec(const char * const dirname)
 		selection = selected;
 		
 	ChangeDir(name, selection);
-	//paint();
-
-	paintFoot();
-	frameBuffer->blit();
 
 	unsigned int oldselected = selected;
 
@@ -785,6 +783,7 @@ bool CFileBrowser::exec(const char * const dirname)
 	bool loop=true;
 	while (loop)
 	{
+		frameBuffer->blit();
 		g_RCInput->getMsgAbsoluteTimeout( &msg, &data, &timeoutEnd );
 		neutrino_msg_t msg_repeatok = msg & ~CRCInput::RC_Repeat;
 
@@ -934,7 +933,6 @@ bool CFileBrowser::exec(const char * const dirname)
 			if(Filter != NULL)
 			{
 				g_settings.filebrowser_use_filter = !g_settings.filebrowser_use_filter;
-				paintFoot();
 				ChangeDir(Path);
 			}
 		}
