@@ -732,13 +732,13 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 
 			datetime1_str = g_Locale->getText(CLocaleManager::getWeekday(tmStartZeit));
 
-			datetime1_str += strftime(", %H:%M,", tmStartZeit );
-//
-			datetime1_str += strftime(" %d", tmStartZeit );
+			datetime1_str += strftime(". %H:%M, ", tmStartZeit );
 
-			datetime1_str += g_Locale->getText(CLocaleManager::getMonth(tmStartZeit));
+			datetime2_str = strftime(" %d. ", tmStartZeit );
 
-//			datetime2_str += '.';
+			datetime2_str += g_Locale->getText(CLocaleManager::getMonth(tmStartZeit));
+
+			datetime2_str += '.';
 
 			if ( m_showChannel ) // show the channel if we made a event search only (which could be made through all channels ).
 			{
@@ -752,11 +752,16 @@ void CNeutrinoEventList::paintItem(unsigned int pos, t_channel_id channel_idI)
 		}
 
 		// 1st line
+<<<<<<< HEAD
 		int fwidth1a=g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->getRenderWidth(datetime1_str);
 //		int fwidth1b=g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->getRenderWidth(datetime2_str);
 
 		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5,          ypos+ fheight1+3, fwidth1a, datetime1_str, color);
 //		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5+fwidth1a/2, ypos+ fheight1+3, fwidth1b, datetime2_str, color);
+=======
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5,         ypos+ fheight1+3, fwidth1+5,            datetime1_str, color, 0, true); // UTF-8
+		g_Font[SNeutrinoSettings::FONT_TYPE_EVENTLIST_DATETIME]->RenderString(x+5+fwidth1, ypos+ fheight1+3, width-fwidth1-10- 20, datetime2_str, color, 0, true); // UTF-8
+>>>>>>> parent of a9343de... styling for EPG view/eventlist (patch from Benny, thanks!)
 
 		int seit = ( evtlist[curpos].startTime - time(NULL) ) / 60;
 		if ( (seit> 0) && (seit<100) && (duration_str.length()!=0) )
