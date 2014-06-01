@@ -515,10 +515,27 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	frameBuffer->paintBoxRel(sigBox_x,sigBox_y,sigBox_w+2,sigBox_h, COL_BLACK);
 	sig_text_y = sigBox_y + sigBox_h;
 
-	int xd = w/5;
 	int y1 = sig_text_y + sheight+4;
 	int fw = g_Font[font_small]->getWidth();
-	int col = 1;
+
+	int maxmin_x; // x-position of min and max
+	int fontW = g_Font[font_small]->getWidth();
+	int xd;
+	int col = 0;
+
+	if (paint_mode == 0) {
+		maxmin_x = _x;
+		xd = (w - 5 * fontW)/4;
+		_x += 5 * fontW;
+	} else {
+		maxmin_x = _x + 40;
+		xd = (w - 5 * fontW + 40)/5;
+		col = 1;
+	}
+
+	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight + 1) +5, fw*3, "max", COL_INFOBAR_TEXT);
+	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 2) +5, fw*3, "now", COL_INFOBAR_TEXT);
+	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 3) +5, fw*3, "min", COL_INFOBAR_TEXT);
 
 	if (!mp) {
 		g_Font[font_small]->RenderString(_x+xd*col, y1, fw*8, "BER [%]", COL_RED);
@@ -536,19 +553,6 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 
 	g_Font[font_small]->RenderString(_x+xd*col, y1, fw*10, "BR [kbps]", COL_YELLOW);
 	sig_text_rate_x = _x + 5 + xd * col;
-
-	int maxmin_x; // x-position of min and max
-	int fontW = g_Font[font_small]->getWidth();
-
-	if (paint_mode == 0)
-		maxmin_x = (mp ? sig_text_rate_x : sig_text_ber_x)-(fontW*4);
-	else
-		maxmin_x = _x + 40;
-
-	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight + 1) +5, fw*3, "max", COL_INFOBAR_TEXT);
-	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 2) +5, fw*3, "now", COL_INFOBAR_TEXT);
-	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 3) +5, fw*3, "min", COL_INFOBAR_TEXT);
-
 
 	sigBox_pos = 0;
 
