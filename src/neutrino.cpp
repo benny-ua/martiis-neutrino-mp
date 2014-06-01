@@ -4674,6 +4674,13 @@ void CNeutrinoApp::loadKeys(const char * fname)
 		g_settings.repeat_genericblocker = 100;
 	}
 	g_settings.longkeypress_duration = tconfig.getInt32("longkeypress_duration", LONGKEYPRESS_OFF + 1);
+	// longkeypress_duration now defaults to 500ms, and a value of 0 disables it.
+	// Force-enable it if it's set to the previously used LONGKEYPRESS_OFF from an older config file.
+	if (g_settings.longkeypress_duration < LONGKEYPRESS_OFF)
+		g_settings.longkeypress_duration = LONGKEYPRESS_OFF;
+	else if (g_settings.longkeypress_duration == LONGKEYPRESS_OFF)
+		g_settings.longkeypress_duration = LONGKEYPRESS_OFF + 1;
+
 #if HAVE_SPARK_HARDWARE
 	g_settings.accept_other_remotes = tconfig.getInt32( "accept_other_remotes", 1);
 #endif
@@ -4754,7 +4761,7 @@ void CNeutrinoApp::saveKeys(const char * fname)
 	tconfig.setInt32( "key_click", g_settings.key_click );
 	tconfig.setInt32( "repeat_blocker", g_settings.repeat_blocker );
 	tconfig.setInt32( "repeat_genericblocker", g_settings.repeat_genericblocker );
-	tconfig.setInt32( "longkeypress_duration", g_settings.longkeypress_duration );
+	tconfig.setInt32( "longkeypress_duration", g_settings.longkeypress_duration == LONGKEYPRESS_OFF ? 0 : g_settings.longkeypress_duration);
 #if HAVE_SPARK_HARDWARE
 	tconfig.setInt32("accept_other_remotes", g_settings.accept_other_remotes);
 #endif
