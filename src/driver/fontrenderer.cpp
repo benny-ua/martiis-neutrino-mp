@@ -395,7 +395,7 @@ void Font::paintFontPixel(fb_pixel_t *td, uint8_t fg_trans, uint8_t fg_red, uint
 		 ((fg_blue  + ((korr_b*faktor)/F_MUL))        & 0x000000FF);
 }
 
-void Font::RenderString(int x, int y, const int width, const char *text, const fb_pixel_t color, const int boxheight, const unsigned int flags)
+const char *Font::RenderString(int x, int y, const int width, const char *text, const fb_pixel_t color, const int boxheight, const unsigned int flags)
 {
 	const bool utf8_encoded = flags & IS_UTF8;
 	const bool useFullBg = flags & FULLBG;
@@ -412,7 +412,12 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 */
 
 	if (!frameBuffer->getActive())
-		return;
+		return "";
+
+#if HAVE_SPARK_HARDWARE
+	if (x + width + y * DEFAULT_XRES >= DEFAULT_XRES * DEFAULT_YRES)
+		return "";
+#endif
 
 	frameBuffer->checkFbArea(x, y-height, width, height, true);
 
@@ -423,7 +428,7 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 	{
 		dprintf(DEBUG_NORMAL, "%s:FTC_Manager_LookupSize failed (0x%x)\n", __FUNCTION__, err);
 		pthread_mutex_unlock(&renderer->render_mutex);
-		return;
+		return "";
 	}
 	face = size->face;
 
@@ -656,11 +661,12 @@ void Font::RenderString(int x, int y, const int width, const char *text, const f
 	//printf("RenderStat: %d %d %d \n", renderer->cacheManager->num_nodes, renderer->cacheManager->num_bytes, renderer->cacheManager->max_bytes);
 	pthread_mutex_unlock( &renderer->render_mutex );
 	frameBuffer->checkFbArea(x, y-height, width, height, false);
+	return text;
 }
 
-void Font::RenderString(int x, int y, const int width, const std::string & text, const fb_pixel_t color, const int boxheight, const unsigned int flags)
+const char *Font::RenderString(int x, int y, const int width, const std::string & text, const fb_pixel_t color, const int boxheight, const unsigned int flags)
 {
-	RenderString(x, y, width, text.c_str(), color, boxheight, flags);
+	return RenderString(x, y, width, text.c_str(), color, boxheight, flags);
 }
 
 int Font::getRenderWidth(const char *text, const bool utf8_encoded)
