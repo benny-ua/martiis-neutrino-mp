@@ -260,6 +260,7 @@ class CMoviePlayerGui : public CMenuTarget
 	void Pause(bool b = true);
 	void RequestAbort(void);
 	bool SetPosition(int pos, bool absolute = false);
+	std::string GetFile() { return file_name; }
 };
 
 #endif
