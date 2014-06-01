@@ -691,7 +691,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	int xres = 0, yres = 0, aspectRatio = 0, framerate = -1;
 	// paint labels
 	int ypos1 = ypos;
-	int box_width = width*2/3 - 10;
+	int box_width = width*2/3 - 10 - xpos;
 
 	yypos = ypos;
 	if(box_h > 0)
@@ -758,10 +758,16 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	v.push_back(r);
 
 	if (mp) {
-		// url
-		r.key = g_Locale->getText (LOCALE_STREAMINFO_URL);
+		if (CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_webtv) {
+			// url
+			r.key = g_Locale->getText (LOCALE_STREAMINFO_URL);
+			r.val = channel->getUrl();
+		} else {
+			// file
+			r.key = g_Locale->getText (LOCALE_MOVIEBROWSER_INFO_FILE);
+			r.val = mp->GetFile();
+		}
 		r.key += ": ";
-		r.val =channel->getUrl();
 		r.col = COL_INFOBAR_TEXT;
 		v.push_back(r);
 
@@ -883,9 +889,12 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	spaceoffset = std::max(spaceoffset, f->getRenderWidth(std::string(g_Locale->getText(LOCALE_STREAMINFO_BITRATE)) + ": "));
 
 	for (std::vector<row>::iterator it = v.begin(); it != v.end(); ++it) {
-		f->RenderString (xpos, ypos, box_width, it->key, COL_INFOBAR_TEXT);
-		f->RenderString (xpos+spaceoffset, ypos, box_width, it->val, it->col);
-		ypos += sheight;
+		f->RenderString (xpos, ypos, spaceoffset, it->key, COL_INFOBAR_TEXT);
+		const char *text = it->val.c_str();
+		do {
+			text = f->RenderString (xpos + spaceoffset, ypos, box_width - spaceoffset, text, it->col);
+			ypos += sheight;
+		} while (*text);
 	}
 
 	if(box_h == 0)
