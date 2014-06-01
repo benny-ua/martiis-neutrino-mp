@@ -69,6 +69,10 @@ class CStreamInfo2 : public CMenuTarget
 		int   sig_text_snr_x;
 		int   sig_text_rate_x;
 		int   average_bitrate_pos;
+
+		int   techinfo_xpos, techinfo_ypos;
+		int   box_width;
+
 		int   spaceoffset;
 		unsigned int scaling;
 		unsigned int pmt_version;
@@ -96,6 +100,7 @@ class CStreamInfo2 : public CMenuTarget
 		unsigned char *probebuf;
 		unsigned int probebuf_off;
 		unsigned int probebuf_size;
+		unsigned int probebuf_length;
 		OpenThreads::Mutex probe_mutex;
 		pthread_t probe_thread;
 		bool probed;

@@ -217,7 +217,6 @@ static cDemux * dmx = NULL;
 
 #define TS_LEN		188
 #define TS_BUF_SIZE	(1024 * 1024 * 8 / TS_LEN * TS_LEN)		
-#define PROBEBUF_SIZE	(1024 * 1024 / 2 / TS_LEN * TS_LEN)		
 
 static int read_packet(void *opaque, uint8_t *buf, int buf_size)
 {
@@ -229,13 +228,13 @@ int CStreamInfo2::readPacket(uint8_t *buf, int buf_size)
 {
 	if (!probebuf)
 		return 0;
-	while (!abort_probing && (probebuf_size == probebuf_off) && (probebuf_off != PROBEBUF_SIZE))
+	while (!abort_probing && (probebuf_length == probebuf_off) && (probebuf_off != probebuf_size))
 		usleep(10000);
 
 	if (!abort_probing) {
 		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(probe_mutex);
 		if (probebuf) {
-			int len = std::min(buf_size, (int)(probebuf_size - probebuf_off));
+			int len = std::min(buf_size, (int)(probebuf_length - probebuf_off));
 			memcpy(buf, probebuf + probebuf_off, len);
 			probebuf_off += len;
 			return len;
@@ -295,7 +294,7 @@ void CStreamInfo2::probeStreams()
 
 		avfc->pb = avioc;
 		avfc->flags |= AVFMT_FLAG_CUSTOM_IO;
-		avfc->probesize = PROBEBUF_SIZE;
+		avfc->probesize = probebuf_size/2;
 
 		if (!avformat_open_input(&avfc, "", NULL, NULL)) {
 			avformat_find_stream_info(avfc, NULL);
@@ -311,8 +310,6 @@ bye:
 			delete [] probebuf;
 			probebuf = NULL;
 		}
-		if (g_RemoteControl->current_PIDs.PIDs.vpid && dmx && !abort_probing)
-			dmx->addPid(g_RemoteControl->current_PIDs.PIDs.vpid);
 	}
 }
 
@@ -355,8 +352,9 @@ int CStreamInfo2::doSignalStrengthLoop ()
 	char tmp_str[150];
 	int delay_counter = 0;
 	const int delay = 15;
-	int sw = g_Font[font_info]->getRenderWidth ("99999.999");
+	int sw = 3 * g_Font[font_small]->getRenderWidth(" ") + 8 * g_Font[font_small]->getMaxDigitWidth();
 	maxb = minb = lastb = tmp_rate = 0;
+	bool repaint_bitrate = true;
 	ts_setup ();
 	frameBuffer->blit();
 	while (1) {
@@ -393,32 +391,39 @@ int CStreamInfo2::doSignalStrengthLoop ()
 					delay_counter = 0;
 				}
 			}
-			if (got_rate && (lastb != bit_s)) {
-				frameBuffer->paintBoxRel (dx1, average_bitrate_pos - sheight, sw + spaceoffset, sheight, COL_MENUHEAD_PLUS_0);
-				char currate[150];
-				snprintf(tmp_str, sizeof(tmp_str), "%s:",g_Locale->getText(LOCALE_STREAMINFO_BITRATE));
-				g_Font[font_small]->RenderString(dx1 , average_bitrate_pos, spaceoffset, tmp_str, COL_INFOBAR_TEXT);
+			if (got_rate && (rate.short_average || lastb) && (lastb != bit_s)) {
+				if (repaint_bitrate) {
+					snprintf(tmp_str, sizeof(tmp_str), "%s:",g_Locale->getText(LOCALE_STREAMINFO_BITRATE));
+					g_Font[font_small]->RenderString(dx1, average_bitrate_pos, spaceoffset, tmp_str, COL_INFOBAR_TEXT);
 
-				snprintf(currate, sizeof(currate), "%5llu.%02llu", rate.short_average / 1000ULL, rate.short_average % 1000ULL);
-				g_Font[font_small]->RenderString (dx1 + spaceoffset, average_bitrate_pos, sw - 10, currate, COL_INFOBAR_TEXT);
+					snprintf(tmp_str, sizeof(tmp_str), "(%s)",g_Locale->getText(LOCALE_STREAMINFO_AVERAGE_BITRATE));
+					g_Font[font_small]->RenderString(dx1 + spaceoffset + sw , average_bitrate_pos, box_width - spaceoffset - sw, tmp_str, COL_INFOBAR_TEXT);
+					repaint_bitrate = false;
+				}
 
-				snprintf(tmp_str, sizeof(tmp_str), "(%s)",g_Locale->getText(LOCALE_STREAMINFO_AVERAGE_BITRATE));
-				g_Font[font_small]->RenderString (dx1 + spaceoffset + sw , average_bitrate_pos, sw *2, tmp_str, COL_INFOBAR_TEXT);
-
+				frameBuffer->paintBoxRel (dx1 + spaceoffset, average_bitrate_pos - sheight, sw, sheight, COL_MENUHEAD_PLUS_0);
+				char currate[140];
+				snprintf(currate, sizeof(currate), "%10u", rate.short_average);
+				currate[0] = currate[2];
+				currate[1] = currate[3];
+				currate[2] = ' ';
+				currate[3] = currate[4];
+				currate[4] = currate[5];
+				currate[5] = currate[6];
+				currate[6] = ' ';
+				g_Font[font_small]->RenderString (dx1 + spaceoffset, average_bitrate_pos, sw, currate, COL_INFOBAR_TEXT);
+				lastb = bit_s;
 			}
 			if((!mp && pmt_version != current_pmt_version && delay_counter > delay) || probed){
-				if (probed) {
-					maxb = minb = lastb = tmp_rate = 0;
-					rate.short_average = rate.max_short_average = rate.min_short_average = 0;
-					probed = false;
-				}
+				probed = false;
 				current_pmt_version = pmt_version;
-				delete signalbox;
-				signalbox = NULL;
-				paint(paint_mode);
+				paint_techinfo(techinfo_xpos, techinfo_ypos);
+				repaint_bitrate = true;
+				continue;
 			}
 			if (!mp)
 				showSNR ();
+
 			delay_counter++;
 		}
 		rate.short_average = abit_s;
@@ -453,6 +458,7 @@ int CStreamInfo2::doSignalStrengthLoop ()
 			hide ();
 			paint_mode = !paint_mode;
 			paint (paint_mode);
+			repaint_bitrate = true;
 			continue;
 		}
 		else if(msg == CRCInput::RC_setup || msg == CRCInput::RC_home) {
@@ -516,23 +522,23 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 
 	if (!mp) {
 		frameBuffer->paintBoxRel(_x+xd*col,y1- 12,16,2, COL_RED);
-		g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*4, "BER", COL_INFOBAR_TEXT);
+		g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*4, "BER [%]", COL_INFOBAR_TEXT);
 		sig_text_ber_x =  _x +  5 + xd * col;
 		col++;
 
 		frameBuffer->paintBoxRel(_x+xd*col,y1- 12,16,2, COL_BLUE);
-		g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*4, "SNR", COL_INFOBAR_TEXT);
+		g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*4, "SNR [%]", COL_INFOBAR_TEXT);
 		sig_text_snr_x =  _x +  5 + xd * col;
 		col++;
 
 		frameBuffer->paintBoxRel(_x+xd*col,y1- 12,16,2, COL_GREEN);
-		g_Font[font_small]->RenderString(_x+28+xd*col, y1, fw*4, "SIG", COL_INFOBAR_TEXT);
+		g_Font[font_small]->RenderString(_x+28+xd*col, y1, fw*4, "SIG [%]", COL_INFOBAR_TEXT);
 		sig_text_sig_x =  _x +  5 + xd * col;
 		col++;
 	}
 
 	frameBuffer->paintBoxRel(_x+xd*col,y1- 12,16,2,COL_YELLOW); // near yellow
-	g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*5, "Bitrate", COL_INFOBAR_TEXT);
+	g_Font[font_small]->RenderString(_x+20+xd*col, y1, fw*5, "Bitrate [kbps]", COL_INFOBAR_TEXT);
 	sig_text_rate_x = _x + 10 + xd * col;
 
 	int maxmin_x; // x-position of min and max
@@ -663,6 +669,9 @@ void CStreamInfo2::paint (int /*mode*/)
 			pip = new CComponentsPIP(width-width/3-10, y+10, 33);
 		pip->paint();
 
+		techinfo_xpos = xpos;
+		techinfo_ypos = ypos;
+
 		paint_techinfo (xpos, ypos);
 		paint_signal_fe_box (width - width/3 - 10, (y + 10 + height/3 + hheight), width/3, height/3 + hheight);
 	} else {
@@ -691,7 +700,7 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	int xres = 0, yres = 0, aspectRatio = 0, framerate = -1;
 	// paint labels
 	int ypos1 = ypos;
-	int box_width = width*2/3 - 10 - xpos;
+	box_width = width*2/3 - 10 - xpos;
 
 	yypos = ypos;
 	if(box_h > 0)
@@ -908,7 +917,6 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 void CStreamInfo2::paintCASystem(int xpos, int ypos)
 {
 	int ypos1 = 0;
-	int box_width = width*2/3-10;
 	if(box_h2 > 0)
 		frameBuffer->paintBoxRel (0, ypos+(iheight*2), box_width, box_h2, COL_MENUHEAD_PLUS_0);
 
@@ -922,7 +930,7 @@ void CStreamInfo2::paintCASystem(int xpos, int ypos)
 		return;
 
 	for(int i = 0; i < NUM_CAIDS; i++) {
-		array[i] = g_Font[font_info]->getRenderWidth(casys[i]);
+		array[i] = g_Font[font_small]->getRenderWidth(casys[i]);
 		caids[i] = false;
 	}
 
@@ -1047,7 +1055,7 @@ bool CStreamInfo2::ts_setup ()
 	if (mp) {
 		mp->GetReadCount();
 	} else {
-		probebuf_size = 0;
+		probebuf_length = 0;
 		probebuf_off = 0;
 		abort_probing = false;
 		probed = false;
@@ -1068,10 +1076,11 @@ bool CStreamInfo2::ts_setup ()
 
 		for (unsigned int i = 0; i < g_RemoteControl->current_PIDs.APIDs.size(); i++)
 			pids.push_back(g_RemoteControl->current_PIDs.APIDs[i].pid);
-#if 0
+		probebuf_size = 2 * ((100000 * pids.size()) / TS_LEN) * TS_LEN;
+
 		if (g_RemoteControl->current_PIDs.PIDs.vpid)
 			pids.push_back(g_RemoteControl->current_PIDs.PIDs.vpid);
-
+#if 0
 		if (g_RemoteControl->current_PIDs.PIDs.vtxtpid)
 			pids.push_back(g_RemoteControl->current_PIDs.PIDs.vtxtpid);
 
@@ -1090,7 +1099,7 @@ bool CStreamInfo2::ts_setup ()
 		++it;
 		for (; it != pids.end(); ++it)
 			dmx->addPid(*it);
-		probebuf = new unsigned char[PROBEBUF_SIZE];
+		probebuf = new unsigned char[probebuf_size];
 
 		dmx->Start(true);
 		if (pthread_create(&probe_thread, NULL, probeStreams, this)) {
@@ -1120,17 +1129,27 @@ bool CStreamInfo2::update_rate ()
 		usleep(timeout * 1000);
 		b_len = mp->GetReadCount();
 	} else {
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(probe_mutex);
-		if (probebuf && (probebuf_size < PROBEBUF_SIZE)) {
-			b_len = dmx->Read(probebuf + probebuf_size, PROBEBUF_SIZE - probebuf_size, timeout);
-			if (b_len > 0)
-				probebuf_size += b_len;
-			return false;
-		} else {
-			b_len = dmx->Read(dmxbuf, TS_BUF_SIZE, timeout);
+		b_len = dmx->Read(dmxbuf, TS_BUF_SIZE, timeout);
+		if (probebuf && b_len > TS_LEN - 1 && probebuf_length < probebuf_size) {
+			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(probe_mutex);
+			if (probebuf) {
+				int len = (b_len / TS_LEN) * TS_LEN;
+				uint16_t vpid = g_RemoteControl->current_PIDs.PIDs.vpid;
+				if (vpid) {
+					unsigned char *p = dmxbuf, *p_end = dmxbuf + len;
+					for (; probebuf_size - TS_LEN > probebuf_length && p < p_end; p += TS_LEN)
+						if (vpid != (0x1fff & (p[1] << 8 | p[2]))) {
+							memcpy(probebuf + probebuf_length, p, TS_LEN);
+							probebuf_length += TS_LEN;
+						}
+				} else {
+					int n = std::min(len, (int) probebuf_size - (int) probebuf_length);
+					memcpy(probebuf + probebuf_length, dmxbuf, n);
+					probebuf_length += n;
+				}
+			}
 		}
 	}
-	//printf("ts: read %d\n", b_len);
 
 	long b = b_len;
 	if (b <= 0)
