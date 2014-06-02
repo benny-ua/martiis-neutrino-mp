@@ -157,7 +157,8 @@ class CProgressBar : public CComponentsItem
 			PB_MATRIX = 0,	/* 0 */
 			PB_LINES_V,	/* 1 */
 			PB_LINES_H,	/* 2 */
-			PB_COLOR	/* 3 */
+			PB_COLOR,	/* 3 */
+			PB_GRADIENT,	/* 4 */
 		};
 
 };

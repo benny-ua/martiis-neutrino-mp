@@ -1489,6 +1489,7 @@ const char * locale_real_names[] =
 	"miscsettings.progressbar_design_2",
 	"miscsettings.progressbar_design_3",
 	"miscsettings.progressbar_design_4",
+	"miscsettings.progressbar_design_5",
 	"miscsettings.progressbar_design_long",
 	"miscsettings.progressbar_infobar_position_0",
 	"miscsettings.progressbar_infobar_position_1",
