@@ -3931,9 +3931,7 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 #ifdef ENABLE_GRAPHLCD
 		nGLCD::StandbyMode(true);
 #endif
-#if HAVE_SPARK_HARDWARE
-		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, true);
-#else
+#if !HAVE_SPARK_HARDWARE
 		CVFD::getInstance()->ShowText("standby...        ");
 #endif
 		if( mode == mode_scart ) {
@@ -3984,6 +3982,9 @@ void CNeutrinoApp::standbyMode( bool bOnOff, bool fromDeepStandby )
 			CVFD::getInstance()->Clear();
 			CVFD::getInstance()->setMode(CVFD::MODE_STANDBY);
 		}
+#if HAVE_SPARK_HARDWARE
+		CVFD::getInstance()->setledmode(SNeutrinoSettings::LED_MODE_STANDBY, true);
+#endif
 		CVFD::getInstance()->setBacklight(g_settings.backlight_standby);
 
 		InfoClock->enableInfoClock(false);
