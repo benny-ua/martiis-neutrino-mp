@@ -146,9 +146,10 @@ void CProgressBar::paintSimple()
 		int _py = pb_y - fr_thickness;
 		int _pw = width;
 		int _ph = height;
-		fb_pixel_t *p = frameBuffer->getFrameBufferPointer() + _py * DEFAULT_XRES + _px;
+		unsigned int stride = frameBuffer->getScreenWidth(true);
+		fb_pixel_t *p = frameBuffer->getFrameBufferPointer() + _py * stride + _px;
 		for (int _y = _ph - 1; _y > -1; _y--) {
-			int _o = _y * DEFAULT_XRES;
+			int _o = _y * stride;
 			fb_pixel_t last_old = 0;
 			fb_pixel_t last_new = 0;
 			for (int _x = _pw - 1; _x > -1; _x--) {
