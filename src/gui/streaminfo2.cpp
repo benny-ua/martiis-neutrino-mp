@@ -1092,6 +1092,7 @@ bool CStreamInfo2::ts_setup ()
 			dmx = NULL;
 			delete[] dmxbuf;
 			dmxbuf = NULL;
+			return false;
 		}
 #endif
 		std::vector<unsigned short>::iterator it = pids.begin();
