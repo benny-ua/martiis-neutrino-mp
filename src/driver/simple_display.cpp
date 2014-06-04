@@ -553,6 +553,14 @@ void CLCD::ShowText(const char * str, bool rescheduleTime)
 					continue;
 					
 				}
+				if ((*t == 0xd0 || *t == 0xd1) && (t + 1 < t_end)) {
+					// aotom can handle these
+					s += (char)*t;
+					t += 1;
+					s += (char)*t;
+					t += 1;
+					continue;
+				}
 				if ((*t & 0xe0) == 0xc0) {
 					t += 1;
 					const char *c380[] = {
