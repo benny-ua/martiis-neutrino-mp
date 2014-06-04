@@ -429,6 +429,8 @@ void CMoviePlayerGui::fillPids()
 				break;
 		}
 	}
+	if (!p_movie_info->epgVideoPid)
+		p_movie_info->epgVideoPid = playback->GetVPid();
 	vpid = p_movie_info->epgVideoPid;
 	vtype = p_movie_info->VideoType;
 }
