@@ -144,8 +144,8 @@ void CProgressBar::paintSimple()
 			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
 			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
 			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
-		}
-		frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
+		} else
+			frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
 	}
 
 	if (pb_active_width != pb_last_width && g_settings.progressbar_design == CProgressBar::PB_GRADIENT) {
