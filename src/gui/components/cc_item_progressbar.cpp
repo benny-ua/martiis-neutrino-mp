@@ -139,7 +139,14 @@ void CProgressBar::paintSimple()
 	}
 	
 	if (pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
+	{
+		if (g_settings.progressbar_design == CProgressBar::PB_GRADIENT) {
+			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
+			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
+			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
+		}
 		frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
+	}
 
 	if (pb_active_width != pb_last_width && g_settings.progressbar_design == CProgressBar::PB_GRADIENT) {
 		int _px = pb_x - fr_thickness;
