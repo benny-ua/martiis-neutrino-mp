@@ -1,8 +1,6 @@
 noinst_LIBRARIES = liblcddisplay.a
 
-liblcddisplay_a_SOURCES = lcddisplay.cpp fontrenderer.cpp
-
-INCLUDES = \
+liblcddisplay_a_SOURCES = lcddisplay.cpp fontrenderer.cpp \
 	-I$(top_builddir)
 
 AM_CXXFLAGS = \
