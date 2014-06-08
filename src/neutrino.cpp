@@ -919,11 +919,6 @@ int CNeutrinoApp::loadSetup(const char * fname)
 			*u = *um;
 			g_settings.usermenu.push_back(u);
 		}
-		// default titles correspond to gui/user_menue_setup.h:struct usermenu_props_t usermenu
-		g_settings.usermenu[0]->title = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
-		g_settings.usermenu[1]->title = g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD);
-		g_settings.usermenu[2]->title = g_Locale->getText(LOCALE_INFOVIEWER_SUBSERVICE);
-		g_settings.usermenu[3]->title = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
 	} else {
 		for (unsigned int i = 0; ; i++) {
 			std::string name = (i < 4) ? usermenu_default[i].name : to_string(i);
@@ -2083,6 +2078,17 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 		loadLocale_ret = g_Locale->loadLocale(g_settings.language.c_str());
 		show_startwizard = true;
 	}
+
+	// default usermenu titles correspond to gui/user_menue_setup.h:struct usermenu_props_t usermenu
+	if (g_settings.usermenu[0]->title.empty())
+		g_settings.usermenu[0]->title = g_Locale->getText(LOCALE_INFOVIEWER_EVENTLIST);
+	if (g_settings.usermenu[1]->title.empty())
+		g_settings.usermenu[1]->title = g_Locale->getText(LOCALE_AUDIOSELECTMENUE_HEAD);
+	if (g_settings.usermenu[2]->title.empty())
+		g_settings.usermenu[2]->title = g_Locale->getText(LOCALE_INFOVIEWER_SUBSERVICE);
+	if (g_settings.usermenu[3]->title.empty())
+		g_settings.usermenu[3]->title = g_Locale->getText(LOCALE_INFOVIEWER_STREAMINFO);
+
 fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms() - starttime);
 	/* setup GUI */
 	neutrinoFonts = CNeutrinoFonts::getInstance();
