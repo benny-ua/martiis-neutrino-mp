@@ -159,7 +159,6 @@ struct SNeutrinoSettings
 	int infobar_sat_display;
 	int infobar_show_channeldesc;
 	int infobar_subchan_disp_pos;
-	int infobar_cn; // show infoviewer at current-next epg update
 	int fan_speed;
 	int infobar_show;
 	int infobar_show_channellogo;

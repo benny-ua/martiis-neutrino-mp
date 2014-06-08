@@ -512,12 +512,11 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.infobar_show_channeldesc   = configfile.getBool("infobar_show_channeldesc"  , false );
 	g_settings.infobar_subchan_disp_pos = configfile.getInt32("infobar_subchan_disp_pos"  , 0 );
 
-	g_settings.infobar_cn = configfile.getInt32("infobar_cn", 0 );
 	g_settings.menu_numbers_as_icons = configfile.getBool("menu_numbers_as_icons", true);
 
 	g_settings.progressbar_color = configfile.getBool("progressbar_color", true );
 	g_settings.progressbar_design =  configfile.getInt32("progressbar_design", 2); //horizontal bars
-	g_settings.infobar_show  = configfile.getInt32("infobar_show", 1);
+	g_settings.infobar_show = configfile.getInt32("infobar_show", configfile.getInt32("infobar_cn", 1));
 	g_settings.infobar_show_channellogo   = configfile.getInt32("infobar_show_channellogo"  , 3 );
 	g_settings.infobar_progressbar   = configfile.getInt32("infobar_progressbar"  , 1 ); // below channel name
 	g_settings.casystem_display = configfile.getInt32("casystem_display", 1 );//discreet ca mode default
@@ -1108,7 +1107,6 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("infobar_sat_display"  , g_settings.infobar_sat_display  );
 	configfile.setBool("infobar_show_channeldesc"  , g_settings.infobar_show_channeldesc  );
 	configfile.setInt32("infobar_subchan_disp_pos"  , g_settings.infobar_subchan_disp_pos  );
-	configfile.setInt32("infobar_cn"  , g_settings.infobar_cn);
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
 	configfile.setInt32("progressbar_color", g_settings.progressbar_color);
 	configfile.setInt32("progressbar_design", g_settings.progressbar_design);
@@ -2648,7 +2646,7 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				g_InfoViewer->showSubchan();
 			}
 			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
-						(g_settings.infobar_cn && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
+						(g_settings.infobar_show && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
 						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
 			{
 				bool show_info = ((msg != NeutrinoMessages::SHOW_INFOBAR) || (g_InfoViewer->is_visible || g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] != 0));

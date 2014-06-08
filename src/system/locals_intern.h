@@ -1461,7 +1461,6 @@ const char * locale_real_names[] =
 	"miscsettings.general",
 	"miscsettings.head",
 	"miscsettings.infobar",
-	"miscsettings.infobar_autoshow_if_cn",
 	"miscsettings.infobar_casystem_display",
 	"miscsettings.infobar_casystem_mini",
 	"miscsettings.infobar_casystem_mode",
