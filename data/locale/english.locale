@@ -1434,7 +1434,6 @@ miscsettings.epg_scan_standby Standby
 miscsettings.general General
 miscsettings.head Extended settings
 miscsettings.infobar Infobar
-miscsettings.infobar_autoshow_if_cn Show infobar at program start
 miscsettings.infobar_casystem_display CA-System Display
 miscsettings.infobar_casystem_mini mini
 miscsettings.infobar_casystem_mode discreet
