@@ -679,6 +679,7 @@ void CFrameBuffer::paletteSet(struct fb_cmap *map)
                 realcolor[i] = make16color(cmap.red[i], cmap.green[i], cmap.blue[i], cmap.transp[i],
                                            rl, ro, gl, go, bl, bo, tl, to);
 	}
+	realcolor[(COL_BACKGROUND + 0)] = 0; // background, no alpha
 }
 
 inline fb_pixel_t mergeColor(fb_pixel_t oc, int ol, fb_pixel_t ic, int il)
