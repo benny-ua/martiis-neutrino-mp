@@ -2652,7 +2652,6 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 				g_InfoViewer->showSubchan();
 			}
 			else if( ( msg == CRCInput::RC_help ) || ( msg == CRCInput::RC_info) ||
-						(g_settings.infobar_show && (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)) ||
 						( msg == NeutrinoMessages::SHOW_INFOBAR ) )
 			{
 				bool show_info = ((msg != NeutrinoMessages::SHOW_INFOBAR) || (g_InfoViewer->is_visible || g_settings.timing[SNeutrinoSettings::TIMING_INFOBAR] != 0));
@@ -2664,10 +2663,8 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 					showInfo();
 				}
 #ifdef ENABLE_GRAPHLCD
-				if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG)
+				if (msg == NeutrinoMessages::SHOW_INFOBAR)
 					nGLCD::Update();
-			} else if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) {
-				nGLCD::Update();
 #endif
 			}
 			else if (msg == CRCInput::RC_aux)
@@ -2944,6 +2941,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 	// else fprintf(stderr, "channelList = NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	res = res | CRecordManager::getInstance()->handleMsg(msg, data);
 	res = res | CEpgScan::getInstance()->handleMsg(msg, data);
+#ifdef ENABLE_GRAPHLCD
+	res = res | nGLCD::getInstance()->handleMsg(msg, data);
+#endif
 
 	if( res != messages_return::unhandled ) {
 		if( ( msg>= CRCInput::RC_WithData ) && ( msg< CRCInput::RC_WithData+ 0x10000000 ) ) {

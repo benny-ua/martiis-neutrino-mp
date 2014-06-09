@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <semaphore.h>
 #include <zapit/include/zapit/client/zapittypes.h>
+#include <neutrinoMessages.h>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include <glcdgraphics/bitmap.h>
@@ -129,6 +130,7 @@ class nGLCD
 		static void Blit();
 		static void SetBrightness(unsigned int b);
 		void UpdateBrightness();
+		int handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t data);
 };
 #endif
 #endif

@@ -826,4 +826,14 @@ void nGLCD::Blit()
 	if (nglcd)
 		nglcd->blitFlag = true;
 }
+
+int nGLCD::handleMsg(const neutrino_msg_t msg, neutrino_msg_data_t /* data */)
+{
+	if (msg == NeutrinoMessages::EVT_CURRENTNEXT_EPG) {
+		Update();
+		return messages_return::handled;
+	}
+
+	return messages_return::unhandled;
+}
 // vim: ts=4
