@@ -1445,7 +1445,7 @@ void COsdSetup::paintWindowSize(int w, int h)
 		win_demo = new CComponentsShapeSquare(0, 0, 0, 0);
 		win_demo->setFrameThickness(8);
 		win_demo->setShadowOnOff(CC_SHADOW_OFF);
-		win_demo->setColorBody(COL_BACKGROUND);
+		win_demo->setColorBody(COL_BACKGROUND_PLUS_0);
 		win_demo->setColorFrame(COL_RED);
 		win_demo->doPaintBg(true);
 	}
