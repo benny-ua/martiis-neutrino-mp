@@ -95,7 +95,6 @@ extern bool epg_filter_except_current_next;
 
 static bool messaging_zap_detected = false;
 /*static*/ bool dvb_time_update = false;
-static bool sendEvent_needed = false;
 
 //NTP-Config
 #define CONF_FILE CONFIGDIR "/neutrino.conf"
@@ -307,7 +306,6 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 					unlockMessaging();
 					dprintf("addevent-cn: added running (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
-					sendEvent_needed = true;
 				} else {
 					writeLockMessaging();
 					messaging_got_CN |= 0x01;
@@ -325,7 +323,6 @@ xprintf("addEvent: ch %012" PRIx64 " running %d (%s) got_CN %d\n", evt.get_chann
 					unlockMessaging();
 					dprintf("addevent-cn: added next    (%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
-					sendEvent_needed = true;
 				} else {
 					dprintf("addevent-cn: not added next(%d) event 0x%04x '%s'\n",
 						evt.runningStatus(), evt.eventID, evt.getName().c_str());
