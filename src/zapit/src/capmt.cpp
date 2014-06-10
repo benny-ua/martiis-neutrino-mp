@@ -244,7 +244,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 		case STREAM:
 		case RECORD:
 #if HAVE_SPARK_HARDWARE
-			channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber());
+			channel->setRecordDemux(CFEManager::getInstance()->allocateFE(channel)->getNumber() + 1);
 #endif
 			frontend = CFEManager::getInstance()->getFrontend(channel);
 			INFO("RECORD/STREAM(%d): fe_num %d rec_dmx %d", mode, frontend ? frontend->getNumber() : -1, channel->getRecordDemux());
