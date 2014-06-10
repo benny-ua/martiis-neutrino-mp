@@ -490,25 +490,29 @@ std::string& htmlEntityDecode(std::string& text, bool removeTags)
 				unsigned int r = 0;
 				if (1 == sscanf(p, format, &r)) {
 					if (r < 0x80) {
-						*u++ = r & 0x7f;
+						u[0] = r & 0x7f;
+						u += 1;
 					} else if (r < 0x800) {
-						*u++ = 0x80 & (r & 0x3f);
+						u[1] = 0x80 & (r & 0x3f);
 						r >>= 6;
-						*u++ = 0xC0 & r;
+						u[0] = 0xC0 & r;
+						u += 2;
 					} else if (r < 0x10000) {
-						*u++ = 0x80 | (0x3f & r);
+						u[2] = 0x80 | (0x3f & r);
 						r >>= 6;
-						*u++ = 0x80 | (0x3f & r);
+						u[1] = 0x80 | (0x3f & r);
 						r >>= 6;
-						*u++ = 0xE0 | r;
+						u[0] = 0xE0 | r;
+						u += 3;
 					} else if (r < 0x110000) {
-						*u++ = 0x80 | (0x3f & r);
+						u[3] = 0x80 | (0x3f & r);
 						r >>= 6;
-						*u++ = 0x80 | (0x3f & r);
+						u[2] = 0x80 | (0x3f & r);
 						r >>= 6;
-						*u++ = 0x80 | (0x3f & r);
+						u[1] = 0x80 | (0x3f & r);
 						r >>= 6;
-						*u++ = 0xF0 | r;
+						u[0] = 0xF0 | r;
+						u += 4;
 					}
 				}
 				while(*p && *p != ';')
