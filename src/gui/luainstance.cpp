@@ -29,6 +29,7 @@
 #include <gui/widget/msgbox.h>
 #include <gui/widget/messagebox.h>
 #include <gui/filebrowser.h>
+#include <gui/movieplayer.h>
 #include <driver/pictureviewer/pictureviewer.h>
 #include <neutrino.h>
 
@@ -384,6 +385,7 @@ const luaL_Reg CLuaInstance::methods[] =
 	{ "Blit", CLuaInstance::Blit },
 	{ "GetLanguage", CLuaInstance::GetLanguage },
 	{ "runScript", CLuaInstance::runScriptExt },
+	{ "PlayFile", CLuaInstance::PlayFile },
 	{ NULL, NULL }
 };
 
@@ -568,6 +570,28 @@ int CLuaInstance::DisplayImage(lua_State *L)
 		trans = luaL_checkint(L, 7);
 	g_PicViewer->DisplayImage(fname, x, y, w, h, trans);
 	CFrameBuffer::getInstance()->blit();
+	return 0;
+}
+
+int CLuaInstance::PlayFile(lua_State *L)
+{
+	printf("CLuaInstance::%s %d\n", __func__, lua_gettop(L));
+	int numargs = lua_gettop(L);
+
+	if (numargs < 3) {
+		printf("CLuaInstance::%s: not enough arguments (%d, expected 3)\n", __func__, numargs);
+		return 0;
+	}
+	const char *title;
+	const char *fname;
+
+	title = luaL_checkstring(L, 2);
+	fname = luaL_checkstring(L, 3);
+	printf("CLuaInstance::%s: title %s file %s\n", __func__, title, fname);
+	std::string st(title);
+	std::string sf(fname);
+	CMoviePlayerGui::getInstance().SetFile(st, sf);
+	CMoviePlayerGui::getInstance().exec(NULL, "http");
 	return 0;
 }
 
