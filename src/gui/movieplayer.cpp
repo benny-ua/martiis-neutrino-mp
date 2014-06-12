@@ -309,6 +309,11 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 		isUPNP = true;
 		PlayFile();
 	}
+	else if (actionKey == "http") {
+		isHTTP = true;
+		is_file_player = 1;
+		PlayFile();
+	}
 	else {
 		running = false;
 		return menu_return::RETURN_REPAINT;
