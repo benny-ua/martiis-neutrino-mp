@@ -88,62 +88,91 @@ inline unsigned int make16color(uint16_t r, uint16_t g, uint16_t b, uint16_t t,
         return ((t << 24) & 0xFF000000) | ((r << 8) & 0xFF0000) | ((g << 0) & 0xFF00) | (b >> 8 & 0xFF);
 }
 
-static int *getQuarterCircle(int radius)
+// return bottom right corner as alpha bitmap
+static unsigned char *getQuarterCircle(unsigned int radius, bool filled = true)
 {
-	static std::map<int,int *> qc_map;
-	std::map<int, int *>::iterator it = qc_map.find(radius);
-	if (it != qc_map.end())
+	if (radius < 2)
+		return NULL;
+	int key = filled ? -radius : radius;
+
+	static std::map<int,unsigned char *> qa_map;
+	std::map<int, unsigned char *>::iterator it = qa_map.find(key);
+	if (it != qa_map.end())
 		return (*it).second;
 
-	int *qc = (int *) malloc((radius * 2 + 2) * sizeof(int));
-	if (!qc)
+	unsigned char *qa = (unsigned char *) calloc(1, radius * radius);
+	if (!qa)
 		return NULL;
-	int *res = qc_map[radius] = qc;
+	qa_map[key] = qa;
 
-	float r = (radius + .5) * (radius + .5);
-	radius++;
-        for (int x = 0; x < radius; x++) {
-                float y = sqrt(r - x*x);
-                *qc++ = (int) floor(y); //rint?
-                int a = (int)(256.0 * (y - floor(y)));
-                *qc++ = a ? a : 255;
-        }
-	return res;
+	unsigned int cs = radius;
+	radius--;
+
+	unsigned int r2 = radius * radius;
+	unsigned int cs2 = cs * cs;
+	for (unsigned int x = 0; x < radius; x++) {
+		double yr = sqrt(r2 - x*x);
+		unsigned int y = (unsigned int) floor(yr);
+		unsigned char a1 = (0xff) & (unsigned char)(256.0 * (yr - y));
+		unsigned char a0 = 255 - a1;
+		qa[x + cs * y] = (unsigned char)a0;
+		qa[y + cs * x] = a0;
+		unsigned int g = x + cs * (y + 1);
+		if (g < cs2)
+			qa[g] = a1;
+		g = y + 1 + cs * x;
+		if (g < cs2)
+			qa[g] = a1;
+		if (x >= y)
+			break;
+	}
+	if (filled)
+		for (unsigned int y = 0; y < radius; y++) {
+			unsigned char *p = qa + y * cs;
+			unsigned int x = 0;
+			for (; x < cs && !*p; x++, p++)
+				*p = 255;
+			for (; x < radius && *(p + 1); x++, p++)
+				*p = 255;
+		}
+	return qa;
 }
 
-static inline bool calcCorners(int *ofs, int *ofl, int *ofr, const int& dy, const int& line, const int& radius,
-				const bool& tl, const bool& tr, const bool& bl, const bool& br, int &alpha)
+static unsigned char *getQuarterArc(unsigned int rad_outer, unsigned int rad_inner)
 {
-/* just a multiplicator for all math to reduce rounding errors */
-	int scl, _ofs = 0;
-	bool ret = false;
-	if (ofl) *ofl = 0;
-	if (ofr) *ofr = 0;
-	int *q_circle = getQuarterCircle(radius);
-	/* one of the top corners */
-	if (line < radius && (tl || tr)) {
-		/* upper round corners */
-		scl = radius - line;
-		_ofs =  radius - q_circle[2 * scl];
-		if (ofl && tl) *ofl = _ofs;
-		if (ofr && tr) *ofr = _ofs;
-		alpha = q_circle[2 * scl + 1];
+	rad_inner++;
+        unsigned int key = (rad_outer << 16 | rad_inner);
+
+        static std::map<unsigned int,unsigned char *> qa_map;
+        std::map<unsigned int, unsigned char *>::iterator it = qa_map.find(key);
+        if (it != qa_map.end())
+                return (*it).second;
+
+        unsigned char *innerQuarter = getQuarterCircle(rad_inner, false);
+        unsigned char *outerQuarter = getQuarterCircle(rad_outer);
+        if (!innerQuarter || !outerQuarter)
+                return NULL;
+
+        unsigned char *qa = (unsigned char *) calloc(1, rad_outer * rad_outer);
+        if (!qa)
+                return NULL;
+        qa_map[key] = qa;
+
+        memcpy(qa, outerQuarter, rad_outer * rad_outer);
+
+        for (unsigned int y = 0; y < rad_inner; y++) {
+		unsigned x = 0;
+                for (; x < rad_inner && !innerQuarter[y * rad_inner + x]; x++)
+			qa[y * rad_outer + x] = qa[x * rad_outer + y] = innerQuarter[y * rad_inner + x];
+                if (x < rad_inner && innerQuarter[y * rad_inner + x])
+			qa[y * rad_outer + x] = qa[x * rad_outer + y] = innerQuarter[y * rad_inner + x];
+		if (x <= y)
+			break;
 	}
-	/* one of the bottom corners */
-	else if ((line >= dy - radius) && (bl || br)) {
-		/* lower round corners */
-		scl = radius - (dy - (line + 1));
-		_ofs = radius - q_circle[2 * scl];
-		if (ofl && bl) *ofl = _ofs;
-		if (ofr && br) *ofr = _ofs;
-		alpha = q_circle[2 * scl + 1];
-	}
-	else
-		ret = true;
-	if (ofs)
-		*ofs = _ofs;
-	return ret;
+
+	return qa;
 }
+
 
 static inline int limitRadius(const int& dx, const int& dy, const int& radius)
 {
@@ -696,11 +725,6 @@ void CFrameBuffer::paintBoxRel(const int x, const int y, const int dx, const int
 	if (!getActive())
 		return;
 
-	bool corner_tl = !!(type & CORNER_TOP_LEFT);
-	bool corner_tr = !!(type & CORNER_TOP_RIGHT);
-	bool corner_bl = !!(type & CORNER_BOTTOM_LEFT);
-	bool corner_br = !!(type & CORNER_BOTTOM_RIGHT);
-
 	checkFbArea(x, y, dx, dy, true);
 
 #if HAVE_SPARK_HARDWARE
@@ -713,45 +737,84 @@ void CFrameBuffer::paintBoxRel(const int x, const int y, const int dx, const int
 		type = 0;
 #endif
 
-	if (!type || !radius)
+	unsigned char *corner = NULL;
+	if (type && radius) {
+		/* limit the radius */
+		radius = limitRadius(dx, dy, radius);
+		if (radius < 1)		/* dx or dy = 0... */
+			radius = 1;	/* avoid div by zero below */
+
+		corner = getQuarterCircle(radius);
+	}
+
+	if (!corner)
 	{
 		accel->paintRect(x, y, dx, dy, col);
 		checkFbArea(x, y, dx, dy, false);
 		return;
 	}
 
-	/* limit the radius */
-	radius = limitRadius(dx, dy, radius);
-	if (radius < 1)		/* dx or dy = 0... */
-		radius = 1;	/* avoid div by zero below */
+	accel->waitForIdle();
 
-	int line = 0;
-	while (line < dy) {
-		int ofl, ofr;
-		int level;
-		if (calcCorners(NULL, &ofl, &ofr, dy, line, radius,
-				corner_tl, corner_tr, corner_bl, corner_br, level))
-		{
-			int height = dy - ((corner_tl || corner_tr)?radius: 0 ) - ((corner_bl || corner_br) ? radius : 0);
-			accel->paintRect(x, y + line, dx, height, col);
-			line += height;
-			continue;
+	int radius_tl = (type & CORNER_TOP_LEFT) ? radius : 0;
+	int radius_tr = (type & CORNER_TOP_RIGHT) ? radius : 0;
+	int radius_bl = (type & CORNER_BOTTOM_LEFT) ? radius : 0;
+	int radius_br = (type & CORNER_BOTTOM_RIGHT) ? radius : 0;
+
+	int radius_t = (type & (CORNER_TOP_LEFT | CORNER_TOP_RIGHT)) ? radius : 0;
+	int radius_b = (type & (CORNER_BOTTOM_LEFT | CORNER_BOTTOM_RIGHT)) ? radius : 0;
+
+	if (radius_tl) {
+		fb_pixel_t *p = accel->lbb + y * stride/sizeof(fb_pixel_t) + x;
+		for (int cy = radius - 1; cy > -1; cy--) {
+			for (int cx = radius - 1; cx > -1; cx--, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
 		}
-		if (dx - ofr - ofl < 1) {
-			//printf("FB-NG::%s:%d x %d y %d dx %d dy %d l %d r %d\n", __func__, __LINE__, x,y,dx,dy, ofl, ofr);
-			line++;
-			continue;
-		}
-
-		fb_pixel_t *p = accel->lbb + (y + line) * stride/sizeof(fb_pixel_t) + x + ofl;
-		*p = mergeColor(*p, 255 - level, col, level);
-
-		p = accel->lbb + (y + line) * stride/sizeof(fb_pixel_t) + x + dx - ofr - 1;
-		*p = mergeColor(*p, 255 - level, col, level);
-
-		accel->paintLine(x + ofl + 1, y + line, x + dx - ofr - 1, y + line, col);
-		line++;
 	}
+	if (radius_tr) {
+		fb_pixel_t *p = accel->lbb + y * stride/sizeof(fb_pixel_t) + x + dx - radius_tr;
+		for (int cy = radius - 1; cy > -1; cy--) {
+			for (int cx = 0; cx < radius; cx++, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
+		}
+	}
+	if (radius_bl) {
+		fb_pixel_t *p = accel->lbb + (y + dy - radius_b) * stride/sizeof(fb_pixel_t) + x;
+		for (int cy = 0; cy < radius; cy++) {
+			for (int cx = radius - 1; cx > -1; cx--, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
+		}
+	}
+	if (radius_br) {
+		fb_pixel_t *p = accel->lbb + (y + dy - radius_b) * stride/sizeof(fb_pixel_t) + x + dx - radius_br;
+		for (int cy = 0; cy < radius; cy++) {
+			for (int cx = 0; cx < radius; cx++, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
+		}
+	}
+
+	if (radius_t)
+		accel->paintRect(x + radius_tl, y                , dx - radius_tl - radius_tr, radius_t, col); // top
+	if (radius_b)
+		accel->paintRect(x + radius_bl, y + dy - radius_b, dx - radius_bl - radius_br, radius_b, col); // bottom
+	accel->paintRect(x, y + radius_t, dx, dy - radius_t - radius_b, col);
+
 	checkFbArea(x, y, dx, dy, false);
 }
 
@@ -1014,90 +1077,81 @@ void CFrameBuffer::loadPal(const std::string & filename, const unsigned char off
 }
 
 
-void CFrameBuffer::paintBoxFrame(const int sx, const int sy, const int dx, const int dy, const int px, const fb_pixel_t col, const int rad, int type)
+void CFrameBuffer::paintBoxFrame(const int x, const int y, const int dx, const int dy, const int px, const fb_pixel_t col, const int rad, int type)
 {
 	if (!getActive())
 		return;
 
 	int radius = rad;
-	bool corner_tl = !!(type & CORNER_TOP_LEFT);
-	bool corner_tr = !!(type & CORNER_TOP_RIGHT);
-	bool corner_bl = !!(type & CORNER_BOTTOM_LEFT);
-	bool corner_br = !!(type & CORNER_BOTTOM_RIGHT);
 
-	int r_tl = 0, r_tr = 0, r_bl = 0, r_br = 0;
-	if (type && radius) {
-		int x_rad = radius - 1;
-		if (corner_tl) r_tl = x_rad;
-		if (corner_tr) r_tr = x_rad;
-		if (corner_bl) r_bl = x_rad;
-		if (corner_br) r_br = x_rad;
-	}
-	paintBoxRel(sx + r_tl,    sy          , dx - r_tl - r_tr, px,               col); // top horizontal
-	paintBoxRel(sx + r_bl,    sy + dy - px, dx - r_bl - r_br, px,               col); // bottom horizontal
-	paintBoxRel(sx          , sy + r_tl,    px,               dy - r_tl - r_bl, col); // left vertical
-	paintBoxRel(sx + dx - px, sy + r_tr,    px,               dy - r_tr - r_br, col); // right vertical
+	radius = limitRadius(dx, dy, rad);
+	if (radius - px < 1)		/* dx or dy = 0... */
+		radius = px + 1;	/* avoid div by zero below */
 
-	if (!radius || !type)
-		return;
+	unsigned char *corner = NULL;
+	if (radius && type)
+		corner = getQuarterArc(radius, radius - px);
 
-	radius = limitRadius(dx, dy, radius);
-	if (radius < 1)		/* dx or dy = 0... */
-		radius = 1;	/* avoid div by zero below */
-	int line = 0;
+	int radius_tl = (corner && (type & CORNER_TOP_LEFT)) ? radius : 0;
+	int radius_tr = (corner && (type & CORNER_TOP_RIGHT)) ? radius : 0;
+	int radius_bl = (corner && (type & CORNER_BOTTOM_LEFT)) ? radius : 0;
+	int radius_br = (corner && (type & CORNER_BOTTOM_RIGHT)) ? radius : 0;
+
+	//int radius_t = (corner && (type & (CORNER_TOP_LEFT | CORNER_TOP_RIGHT))) ? radius : 0;
+	//int radius_b = (corner && (type & (CORNER_BOTTOM_LEFT | CORNER_BOTTOM_RIGHT))) ? radius : 0;
+
 	waitForIdle();
-	while (line < dy) {
-		int ofs = 0, ofs_i = 0;
-		int ilevel = 0, olevel = 0;
-		// inner box
-		if ((line >= px) && (line < (dy - px)))
-			calcCorners(&ofs_i, NULL, NULL, dy - 2 * px, line - px, radius - px,
-					corner_tl, corner_tr, corner_bl, corner_br, ilevel);
-		// outer box
-		calcCorners(&ofs, NULL, NULL, dy, line, radius, corner_tl, corner_tr, corner_bl, corner_br, olevel);
 
-		int _y     = sy + line;
-		if (line < px || line >= (dy - px)) {
-			// left
-			if ((corner_tl && line < radius) || (corner_bl && line >= dy - radius)) {
-				accel->paintLine(sx + ofs, _y, sx + ofs + radius, _y, col);
+	if (radius_tl) {
+		fb_pixel_t *p = accel->lbb + y * stride/sizeof(fb_pixel_t) + x;
+		for (int cy = radius - 1; cy > -1; cy--) {
+			for (int cx = radius - 1; cx > -1; cx--, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
 			}
-			// right
-			if ((corner_tr && line < radius) || (corner_br && line >= dy - radius)) {
-				accel->paintLine(sx + dx - radius, _y, sx + dx - ofs, _y, col);
-			}
+			p += stride/sizeof(fb_pixel_t) - radius;
 		}
-		else if (line < (dy - px)) {
-			int _dx = (ofs_i - ofs) + px;
-			// left
-			if ((corner_tl && line < radius) || (corner_bl && line >= dy - radius)) {
-				fb_pixel_t *p = accel->lbb + _y * stride/sizeof(fb_pixel_t) + sx + ofs;
-				fb_pixel_t *pe = p + _dx;
-
-				*p = mergeColor(*p, 255 - olevel, col, olevel);
-				p++;
-				while (p < pe)
-					*p++ = col;
-				*p = mergeColor(*p, ilevel, col, 255 - ilevel);
-				
+	}
+	if (radius_tr) {
+		fb_pixel_t *p = accel->lbb + y * stride/sizeof(fb_pixel_t) + x + dx - radius_tr;
+		for (int cy = radius - 1; cy > -1; cy--) {
+			for (int cx = 0; cx < radius; cx++, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
 			}
-			// right
-			if ((corner_tr && line < radius) || (corner_br && line >= dy - radius)) {
-				fb_pixel_t *p = accel->lbb + _y * stride/sizeof(fb_pixel_t) + sx + dx - ofs_i - px - 1;
-				fb_pixel_t *pe = p + _dx;
-
-				*p = mergeColor(*p, ilevel, col, 255 - ilevel);
-				p++;
-				while (p < pe)
-					*p++ = col;
-				*p = mergeColor(*p, 255 - olevel, col, olevel);
-			}
+			p += stride/sizeof(fb_pixel_t) - radius;
 		}
-		if (line == radius && dy > 2 * radius)
-			// line outside the rounded corners
-			line = dy - radius;
-		else
-			line++;
+	}
+	if (radius_bl) {
+		fb_pixel_t *p = accel->lbb + (y + dy - radius_bl) * stride/sizeof(fb_pixel_t) + x;
+		for (int cy = 0; cy < radius; cy++) {
+			for (int cx = radius - 1; cx > -1; cx--, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
+		}
+	}
+	if (radius_br) {
+		fb_pixel_t *p = accel->lbb + (y + dy - radius_bl) * stride/sizeof(fb_pixel_t) + x + dx - radius_br;
+		for (int cy = 0; cy < radius; cy++) {
+			for (int cx = 0; cx < radius; cx++, p++) {
+				unsigned char level = corner[cx + cy * radius];
+				if (level)
+					*p = mergeColor(*p, 255 - level, col, level);
+			}
+			p += stride/sizeof(fb_pixel_t) - radius;
+		}
+	}
+
+	for (int i = 0; i < px; i++) {
+		paintHLineRel(x + radius_tl, dx - radius_tl - radius_tr, y + i, col); // top
+		paintVLineRel(x + i, y + radius_tl, dy - radius_tl - radius_bl, col); // left
+		paintVLineRel(x + dx - i - 1, y + radius_tr, dy - radius_tr - radius_br, col); // right
+		paintHLineRel(x + radius_tl, dx - radius_bl - radius_br, y + dy - i - 1, col); // bottom
 	}
 }
 
