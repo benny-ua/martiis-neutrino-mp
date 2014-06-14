@@ -61,7 +61,6 @@ CLCD::CLCD()
 	}
 
 	mode = MODE_MENU_UTF8;
-	servicename = "";
 
 	sem_init(&sem, 0, 0);
 
