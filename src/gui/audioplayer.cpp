@@ -290,10 +290,10 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 	videoDecoder->setBlank(true);
 	videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
 
+	m_LastMode=(CNeutrinoApp::getInstance()->getLastMode());
+
 	// tell neutrino we're in audio mode
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , NeutrinoMessages::mode_audio );
-
-	m_LastMode=(CNeutrinoApp::getInstance()->getLastMode());
 
 	// Stop sectionsd
 	g_Sectionsd->setPauseScanning(true);
@@ -351,7 +351,7 @@ int CAudioPlayerGui::show()
 	{
 		updateMetaData(m_screensaver);
 
-			updateTimes();
+		updateTimes();
 
 		// stop if mode was changed in another thread
 		if (CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_audio)
@@ -871,7 +871,7 @@ int CAudioPlayerGui::show()
 				ret = menu_return::RETURN_EXIT_ALL;
 				loop = false;
 			}
-			paintLCD();
+			//paintLCD();
 		}
 		m_frameBuffer->blit();
 	}
