@@ -351,7 +351,7 @@ int CAudioPlayerGui::show()
 	{
 		updateMetaData(m_screensaver);
 
-			updateTimes();
+		updateTimes();
 
 		// stop if mode was changed in another thread
 		if (CNeutrinoApp::getInstance()->getMode() != NeutrinoMessages::mode_audio)
@@ -871,7 +871,7 @@ int CAudioPlayerGui::show()
 				ret = menu_return::RETURN_EXIT_ALL;
 				loop = false;
 			}
-			paintLCD();
+			//paintLCD();
 		}
 		m_frameBuffer->blit();
 	}
