@@ -1216,6 +1216,7 @@ int CFrontend::setParameters(TP_params *TP, bool nowait)
 		if (freq < 1000*1000)
 			feparams.dvb_feparams.frequency = freq * 1000;
 		getDelSys(feparams.dvb_feparams.u.qam.fec_inner, feparams.dvb_feparams.u.qam.modulation, f, s, m);
+		break;
 	case FE_OFDM:
 		if (freq < 1000*1000)
 			feparams.dvb_feparams.frequency = freq * 1000;
