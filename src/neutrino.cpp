@@ -2642,6 +2642,9 @@ void CNeutrinoApp::RealRun(CMenuWidget &_mainMenu)
 			else if (CRCInput::isNumeric(msg)) {
 				numericZap( msg );
 			}
+			else if( msg == CRCInput::RC_page_up || msg == CRCInput::RC_page_down) {
+				quickZap(msg == CRCInput::RC_page_up ? CRCInput::RC_right : CRCInput::RC_left);
+			}
 			else if(msg == CRCInput::RC_rewind) {
 				if (mode != mode_webtv) {
 					if(g_RemoteControl->is_video_started) {
