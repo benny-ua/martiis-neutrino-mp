@@ -3861,11 +3861,6 @@ void CNeutrinoApp::tvMode( bool rezap )
 		//recordingstatus = 0;
 	}
 
-	if (oldmode != mode_webtv) {
-		frameBuffer->useBackground(false);
-		frameBuffer->paintBackground();
-	}
-
 	g_RemoteControl->tvMode();
 	SetChannelMode(g_settings.channel_mode);
 	if( rezap ) {
