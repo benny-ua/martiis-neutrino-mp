@@ -231,10 +231,12 @@ void CInfoViewer::start ()
 	time_dot_width = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME]->getRenderWidth(":");
 	time_width = time_left_width* 2+ time_dot_width;
 
+#if 0
 	if (clock) {
 		delete clock;
 		clock = NULL;
 	}
+#endif
 }
 
 void CInfoViewer::changePB()
@@ -256,7 +258,7 @@ void CInfoViewer::changePB()
 	timescale->setRgb(0, 100, 70);
 }
 
-void CInfoViewer::paintTime (bool show_dot)
+void CInfoViewer::paintTime (bool /*show_dot*/)
 {
 	if (!gotTime)
 		gotTime = timeset;
@@ -272,13 +274,15 @@ void CInfoViewer::paintTime (bool show_dot)
 	if (clock == NULL){
 		clock = new CComponentsFrmClock();
 		clock->doPaintBg(false);
+		clock->setBlit(false);
 	}
 
 	clock->setColorBody(COL_INFOBAR_PLUS_0);
 	clock->setCorner(RADIUS_LARGE, CORNER_TOP_RIGHT);
 	clock->setDimensionsAll(clock_x, clock_y, clock_w, clock_h);
 	clock->setClockFont(SNeutrinoSettings::FONT_TYPE_INFOBAR_CHANNAME);
-	clock->setClockFormat(show_dot ? "%H:%M" : "%H %M");
+	clock->setClockFormat("%H:%M");
+	clock->setClockFormat("%H %M");
 	clock->setTextColor(COL_INFOBAR_TEXT);
 
 	clock->paint(CC_SAVE_SCREEN_NO);
@@ -767,7 +771,6 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	/* showChannelLogo() changes this, so better reset it every time... */
 	ChanNameX = BoxStartX + ChanWidth + SHADOW_OFFSET;
 
-
 	paintBackground(col_NumBox);
 
 	bool show_dot = true;
@@ -775,9 +778,8 @@ void CInfoViewer::showTitle (const int ChanNum, const std::string & Channel, con
 	showRecordIcon (show_dot);
 	show_dot = !show_dot;
 
-	if (showButtonBar) {
+	if (showButtonBar)
 		infoViewerBB->paintshowButtonBar();
-	}
 
 	int ChanNumWidth = 0;
 	int ChannelLogoMode = 0;
@@ -956,6 +958,9 @@ void CInfoViewer::loop(bool show_dot)
 	if (isVolscale)
 		CVolume::getInstance()->showVolscale();
 
+	if (clock)
+		clock->setBlit();
+
 	while (!(res & (messages_return::cancel_info | messages_return::cancel_all))) {
 		frameBuffer->blit();
 		g_RCInput->getMsgAbsoluteTimeout (&msg, &data, &timeoutEnd);
@@ -1073,6 +1078,9 @@ void CInfoViewer::loop(bool show_dot)
                 }
 #endif
 	}
+
+	if (clock)
+		clock->setBlit(false);
 
 	if (hideIt) {
 		CVolume::getInstance()->hideVolscale();
