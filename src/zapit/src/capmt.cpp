@@ -263,7 +263,7 @@ bool CCamManager::SetMode(t_channel_id channel_id, enum runmode mode, bool start
 	else
 		newmask = cam->makeMask(demux, start);
 
-	if(cam->getSource() > 0)
+	if(cam->getSource() >= 0)
 		source = cam->getSource();
 
 	INFO("channel %" PRIx64 " [%s] mode %d %s src %d mask %d -> %d update %d", channel_id, channel->getName().c_str(),
