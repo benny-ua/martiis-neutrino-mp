@@ -79,6 +79,8 @@ CComponentsFrmClock::CComponentsFrmClock( 	const int& x_pos, const int& y_pos, c
 
 	activeClock		= activ;
 
+	may_blit		= true;
+
 	initCCLockItems();
 	initParent(parent);
 
@@ -345,7 +347,8 @@ void CComponentsFrmClock::paint(bool do_save_bg)
 	//paint form contents
 	paintForm(do_save_bg);
 
-	frameBuffer->blit();
+	if (may_blit)
+		frameBuffer->blit();
 }
 
 void CComponentsFrmClock::setClockFontSize(int font_size)
