@@ -116,7 +116,6 @@ CInfoViewer::CInfoViewer ()
 	time_dot_width = 0;
 	time_width = 0;
 	time_height = 0;
-	old_timestr[0] = 0;
 	lastsnr = 0;
 	lastsig = 0;
 	lasttime = 0;
@@ -124,7 +123,6 @@ CInfoViewer::CInfoViewer ()
 	ChanInfoX = 0;
 	Init();
 	infoViewerBB->Init();
-	strcpy(old_timestr, "");
 	oldinfo.current_uniqueKey = 0;
 	oldinfo.next_uniqueKey = 0;
 	isVolscale = false;
