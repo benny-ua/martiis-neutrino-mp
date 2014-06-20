@@ -69,7 +69,7 @@ CLCD::CLCD()
 	memset(led_mode, 0, sizeof(led_mode));
 #endif
 
-	if (pthread_create (&thrTime, NULL, TimeThread, NULL))
+	if (pthread_create (&thrTime, NULL, TimeThread, this))
 		perror("[lcdd]: pthread_create(TimeThread)");
 
 }
@@ -108,33 +108,39 @@ void CLCD::wake_up()
 {
 }
 
-void* CLCD::TimeThread(void *)
+void* CLCD::TimeThread(void *arg)
+{
+	CLCD *me = (CLCD *)arg;
+	me->TimeThread();
+	pthread_exit(NULL);
+}
+
+void CLCD::TimeThread()
 {
         set_threadname("CLCD::TimeThread");
 
-	CLCD *cvfd = CLCD::getInstance();
 #if HAVE_SPARK_HARDWARE
 	// disable spinner
 	struct aotom_ioctl_data vData;
 	vData.u.led.led_nr = 2;
 	vData.u.led.on = 0;
-	ioctl(cvfd->fd, VFDSETLED, &vData);
+	ioctl(fd, VFDSETLED, &vData);
 #endif
-	cvfd->timeThreadRunning = true;
-	cvfd->waitSec = 0;
-	while (cvfd->timeThreadRunning) {
+	timeThreadRunning = true;
+	waitSec = 0;
+	while (timeThreadRunning) {
 		int res;
 
-		if (cvfd->waitSec == -1)
-			res = sem_wait(&cvfd->sem);
+		if (waitSec == -1)
+			res = sem_wait(&sem);
 		else {
 			struct timespec ts;
 			clock_gettime(CLOCK_REALTIME, &ts);
-			ts.tv_sec += cvfd->waitSec;
-			res = sem_timedwait(&cvfd->sem, &ts);
+			ts.tv_sec += waitSec;
+			res = sem_timedwait(&sem, &ts);
 		}
-		if (!cvfd->showclock) {
-			cvfd->waitSec = -1; // forever
+		if (!showclock) {
+			waitSec = -1; // forever
 			continue;
 		}
 		switch (res) {
@@ -144,15 +150,14 @@ void* CLCD::TimeThread(void *)
 		case -1:
 			if (errno == ETIMEDOUT) {
 				 // timed out, so update displayed time or service name
-				cvfd->showTime();
+				showTime();
 				continue;
 			}
 			// fallthrough, should not happen
 		default:
-			cvfd->timeThreadRunning = false;
+			timeThreadRunning = false;
 		}
 	}
-	return NULL;
 }
 
 void CLCD::init(const char *, const char *, const char *, const char *, const char *, const char *)
@@ -197,7 +202,7 @@ void CLCD::showServicename(const std::string name, bool)
 	if (mode != MODE_TVRADIO)
 		return;
 
-	ShowText((char *) name.c_str());
+	ShowText(name.c_str());
 }
 
 void CLCD::showTime(bool)
@@ -267,7 +272,7 @@ void CLCD::showMenuText(const int position __attribute__((unused)), const char *
 	if (mode != MODE_MENU_UTF8)
 		return;
 
-	ShowText((char *) txt);
+	ShowText(txt);
 }
 
 void CLCD::showAudioTrack(const std::string & artist __attribute__((unused)), const std::string & title, const std::string & album __attribute__((unused)))
@@ -276,7 +281,7 @@ void CLCD::showAudioTrack(const std::string & artist __attribute__((unused)), co
 	if (mode != MODE_AUDIO) 
 		return;
 //printf("CLCD::showAudioTrack: %s\n", title.c_str());
-	ShowText((char *) title.c_str());
+	ShowText(title.c_str());
 }
 
 void CLCD::showAudioPlayMode(AUDIOMODES m __attribute__((unused)))
@@ -294,7 +299,7 @@ void CLCD::setMode(const MODES m, const char * const title)
 	if(mode == MODE_AUDIO)
 		ShowIcon(FP_ICON_MP3, false);
 	if(strlen(title))
-		ShowText((char *) title);
+		ShowText(title);
 	mode = m;
 	setlcdparameter();
 

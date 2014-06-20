@@ -189,6 +189,7 @@ class CLCD
 		sem_t		sem;
 #endif
 #if HAVE_SPARK_HARDWARE
+		void TimeThread(void);
 		int led_mode[SNeutrinoSettings::LED_MODE_COUNT];
 		void setLED(int nr, bool onoff);
 #endif
