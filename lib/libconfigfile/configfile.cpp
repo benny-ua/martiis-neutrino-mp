@@ -203,7 +203,10 @@ int32_t CConfigFile::getInt32(const std::string & key, const int32_t defaultVal)
 			return defaultVal;
 		}
 	}
-
+	if (configData[key] == "false")
+		return 0;
+	if (configData[key] == "true")
+		return 1;
 	return atoi(configData[key].c_str());
 }
 
