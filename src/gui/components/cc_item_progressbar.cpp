@@ -137,10 +137,12 @@ void CProgressBar::paintSimple()
 			paintShapes(pb_x, pb_y, pb_active_width, pb_height, pb_active_col); // active bar
 		paintShapes(pb_start_x_passive, pb_y, pb_passive_width, pb_height, pb_passive_col); // passive bar
 	}
+
+	bool gradient = g_settings.progressbar_color && (g_settings.progressbar_design == CProgressBar::PB_GRADIENT);
 	
 	if (pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
 	{
-		if (g_settings.progressbar_design == CProgressBar::PB_GRADIENT) {
+		if (gradient) {
 			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
 			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
 			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
@@ -148,7 +150,7 @@ void CProgressBar::paintSimple()
 			frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
 	}
 
-	if (pb_active_width != pb_last_width && g_settings.progressbar_design == CProgressBar::PB_GRADIENT) {
+	if (gradient && (pb_active_width != pb_last_width)) {
 		int _px = pb_x - fr_thickness;
 		int _py = pb_y - fr_thickness;
 		int _pw = width;
@@ -283,6 +285,13 @@ void CProgressBar::paintAdvanced()
 				frameBuffer->paintBoxRel(sh_x, sh_y, pointx, pointy, pb_passive_col);
 			}
 		}
+		int left = pb_max_width - total * itemw;
+		if (left > 0)
+			for (j = 0; j < hcnt; j++) {
+				int sh_x = pb_x + total * itemw;
+				int sh_y = py + j * itemh;
+				frameBuffer->paintBoxRel(sh_x, sh_y, left, pointy, pb_passive_col);
+			}
 		is_painted = true;
 	}
 }
