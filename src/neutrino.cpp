@@ -2341,8 +2341,13 @@ fprintf(stderr, "[neutrino start] %d  -> %5ld ms\n", __LINE__, time_monotonic_ms
 	C3DSetup::getInstance()->exec(NULL, "zapped");
 	CPSISetup::getInstance()->blankScreen(false);
 #endif
-	if (!access("/etc/init.d/cam", X_OK))
-		safe_system("/etc/init.d/cam init >/dev/null 2>/dev/null&");
+	if (!access("/etc/init.d/cam", X_OK)) {
+		CZapitChannel* channel = channelList->getActiveChannel();
+		// no need to rezap on a FTA channel
+		std::string cmd((channel && channel->scrambled) ? "/bin/env REZAP=1 " : "");
+		cmd += "/etc/init.d/cam init >/dev/null 2>/dev/null&";
+		safe_system(cmd.c_str());
+	}
 #if ENABLE_SHAIRPLAY
 	shairPlay = g_settings.shairplay_enabled ? new CShairPlay(&shairplay_enabled_cur, &shairplay_active) : NULL;
 #endif
@@ -3848,7 +3853,6 @@ void CNeutrinoApp::tvMode( bool rezap )
 	}
 
 	bool stopauto = (mode != mode_ts);
-	int oldmode = mode;
 	mode = mode_tv;
 #ifdef ENABLE_PIP
 	pipDecoder->Pig(g_settings.pip_x, g_settings.pip_y,
@@ -4275,7 +4279,7 @@ int CNeutrinoApp::exec(CMenuTarget* parent, const std::string & actionKey)
 				g_Locale->getText(LOCALE_SERVICEMENU_RESTARTING_CAM));
 			hintBox->paint();
 
-			safe_system("/etc/init.d/cam restart");
+			safe_system("/etc/init.d/cam restart >/dev/null 2>/dev/null&");
 
 			hintBox->hide();
 			delete hintBox;
