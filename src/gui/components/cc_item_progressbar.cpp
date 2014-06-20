@@ -283,6 +283,7 @@ void CProgressBar::paintAdvanced()
 				frameBuffer->paintBoxRel(sh_x, sh_y, pointx, pointy, pb_passive_col);
 			}
 		}
+		is_painted = true;
 	}
 }
 
