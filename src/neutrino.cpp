@@ -1111,8 +1111,8 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setInt32("infobar_subchan_disp_pos"  , g_settings.infobar_subchan_disp_pos  );
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
 	configfile.setBool("progressbar_color", g_settings.progressbar_color);
-	configfile.setBool("progressbar_design", g_settings.progressbar_design);
-	configfile.setInt32("progressbar_gradient", g_settings.progressbar_gradient);
+	configfile.setBool("progressbar_gradient", g_settings.progressbar_gradient);
+	configfile.setInt32("progressbar_design", g_settings.progressbar_design);
 	configfile.setInt32("infobar_show", g_settings.infobar_show);
 	configfile.setInt32("infobar_show_channellogo"  , g_settings.infobar_show_channellogo  );
 	configfile.setInt32("infobar_progressbar"  , g_settings.infobar_progressbar  );
