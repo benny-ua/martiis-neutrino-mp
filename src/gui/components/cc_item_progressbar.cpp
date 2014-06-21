@@ -69,7 +69,7 @@ CProgressBar::CProgressBar(	const int x_pos, const int y_pos, const int w, const
 	pb_active_col	= active_col;
 	pb_passive_col 	= passive_col;
 
-	pb_bl_changed 		= g_settings.progressbar_color && g_settings.progressbar_design != CProgressBar::PB_GRADIENT;
+	pb_bl_changed 		= g_settings.progressbar_color;
 	pb_last_width 		= -1;
 	pb_value		= 0;
 	pb_max_value		= 0;
@@ -138,46 +138,8 @@ void CProgressBar::paintSimple()
 		paintShapes(pb_start_x_passive, pb_y, pb_passive_width, pb_height, pb_passive_col); // passive bar
 	}
 
-	bool gradient = g_settings.progressbar_color && (g_settings.progressbar_design == CProgressBar::PB_GRADIENT);
-	
 	if (pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
-	{
-		if (gradient) {
-			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
-			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
-			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
-		} else
-			frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
-	}
-
-	if (gradient && (pb_active_width != pb_last_width)) {
-		int _px = pb_x - fr_thickness;
-		int _py = pb_y - fr_thickness;
-		int _pw = width;
-		int _ph = height;
-		unsigned int stride = frameBuffer->getScreenWidth(true);
-		fb_pixel_t *p = frameBuffer->getFrameBufferPointer() + _py * stride + _px;
-		for (int _y = _ph - 1; _y > -1; _y--) {
-			int _o = _y * stride;
-			fb_pixel_t last_old = 0;
-			fb_pixel_t last_new = 0;
-			for (int _x = _pw - 1; _x > -1; _x--) {
-				fb_pixel_t &v = *(p + _o + _x);
-				if (v != last_old) {
-					last_old = v;
-					double s = sin(_y * M_PI / _ph);
-					float fr = ((last_old >> 16) & 0xff) * s + 0.5;
-					float fg = ((last_old >>  8) & 0xff) * s + 0.5;
-					float fb = ((last_old      ) & 0xff) * s + 0.5;
-					last_new = (last_old & 0xFF000000)
-						| ((0xff & (int)fr) << 16)
-						| ((0xff & (int)fg) <<  8)
-						| ((0xff & (int)fb)      );
-				}
-				v = last_new;
-			}
-		}
-	}
+		frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
 }
 
 void CProgressBar::paintAdvanced()
@@ -299,9 +261,11 @@ void CProgressBar::paintAdvanced()
 
 void CProgressBar::paintProgress(bool do_save_bg)
 {
-	bool _pb_bl_changed 		= g_settings.progressbar_color && g_settings.progressbar_design != CProgressBar::PB_GRADIENT;
-	if(pb_bl_changed != _pb_bl_changed) {
-		pb_bl_changed 		= _pb_bl_changed;
+	if (g_settings.progressbar_gradient)
+		setFrameThickness(0);
+
+	if(pb_bl_changed != g_settings.progressbar_color) {
+		pb_bl_changed = g_settings.progressbar_color;
 		reset();
 	}
 
@@ -312,13 +276,50 @@ void CProgressBar::paintProgress(bool do_save_bg)
 		paintInit(do_save_bg); 
 
 	//progress
-	if (!pb_blink || !g_settings.progressbar_color || (g_settings.progressbar_design == CProgressBar::PB_GRADIENT))
+	if (!pb_blink || !g_settings.progressbar_color)
 		paintSimple();
 	else
 		paintAdvanced();
 
 	if (is_painted)
 		pb_last_width = pb_active_width;
+
+	if (is_painted && g_settings.progressbar_gradient) {
+		if ((!pb_blink || !g_settings.progressbar_color) && pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
+		{
+			// draw a thicker zero-line
+			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
+			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
+			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
+		}
+
+		int _px = pb_x - fr_thickness;
+		int _py = pb_y - fr_thickness;
+		int _pw = width;
+		int _ph = height;
+		unsigned int stride = frameBuffer->getScreenWidth(true);
+		fb_pixel_t *p = frameBuffer->getFrameBufferPointer() + _py * stride + _px;
+		for (int _y = _ph - 1; _y > -1; _y--) {
+			int _o = _y * stride;
+			fb_pixel_t last_old = 0;
+			fb_pixel_t last_new = 0;
+			for (int _x = _pw - 1; _x > -1; _x--) {
+				fb_pixel_t &v = *(p + _o + _x);
+				if (v != last_old) {
+					last_old = v;
+					double s = sin(_y * M_PI / _ph);
+					float fr = ((last_old >> 16) & 0xff) * s + 0.5;
+					float fg = ((last_old >>  8) & 0xff) * s + 0.5;
+					float fb = ((last_old      ) & 0xff) * s + 0.5;
+					last_new = (last_old & 0xFF000000)
+						| ((0xff & (int)fr) << 16)
+						| ((0xff & (int)fg) <<  8)
+						| ((0xff & (int)fb)      );
+				}
+				v = last_new;
+			}
+		}
+	}
 }
 
 

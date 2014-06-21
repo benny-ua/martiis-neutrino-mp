@@ -165,6 +165,7 @@ struct SNeutrinoSettings
 	int infobar_progressbar;
 	int progressbar_color;
 	int progressbar_design;
+	int progressbar_gradient;
 	int casystem_display;
 	int scrambled_message;
 	int volume_pos;

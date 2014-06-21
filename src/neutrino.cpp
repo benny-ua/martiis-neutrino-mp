@@ -515,7 +515,14 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	g_settings.menu_numbers_as_icons = configfile.getBool("menu_numbers_as_icons", true);
 
 	g_settings.progressbar_color = configfile.getBool("progressbar_color", true );
-	g_settings.progressbar_design =  configfile.getInt32("progressbar_design", 2); //horizontal bars
+	g_settings.progressbar_gradient = configfile.getBool("progressbar_gradient", true );
+	g_settings.progressbar_design =  configfile.getInt32("progressbar_design", 3); // color
+	if (g_settings.progressbar_design == 4) {
+		// 4 meant monochrome gradient which is no longer a design option
+		g_settings.progressbar_design = 3;
+		g_settings.progressbar_color = false;
+		g_settings.progressbar_gradient = true;
+	}
 	g_settings.infobar_show = configfile.getInt32("infobar_show", configfile.getInt32("infobar_cn", 1));
 	g_settings.infobar_show_channellogo   = configfile.getInt32("infobar_show_channellogo"  , 3 );
 	g_settings.infobar_progressbar   = configfile.getInt32("infobar_progressbar"  , 1 ); // below channel name
@@ -1103,8 +1110,9 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("infobar_show_channeldesc"  , g_settings.infobar_show_channeldesc  );
 	configfile.setInt32("infobar_subchan_disp_pos"  , g_settings.infobar_subchan_disp_pos  );
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
-	configfile.setInt32("progressbar_color", g_settings.progressbar_color);
-	configfile.setInt32("progressbar_design", g_settings.progressbar_design);
+	configfile.setBool("progressbar_color", g_settings.progressbar_color);
+	configfile.setBool("progressbar_design", g_settings.progressbar_design);
+	configfile.setInt32("progressbar_gradient", g_settings.progressbar_gradient);
 	configfile.setInt32("infobar_show", g_settings.infobar_show);
 	configfile.setInt32("infobar_show_channellogo"  , g_settings.infobar_show_channellogo  );
 	configfile.setInt32("infobar_progressbar"  , g_settings.infobar_progressbar  );
