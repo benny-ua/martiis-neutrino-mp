@@ -1171,7 +1171,6 @@ menu.hint_osd Farben, Schriftarten, Anzeigegröße, Ansichtsoptionen der Menüs 
 menu.hint_osd_language Wählen Sie ihre Menü-Sprache
 menu.hint_osd_preset Wählen Sie zwischen Röhren-TV (CRT) oder Flachbildschirm (LCD)
 menu.hint_osd_timing Einblendzeit, die das OSD auf dem TV angezeigt wird
-menu.hint_other_fonts Ändern anderer Schriftgrößen
 menu.hint_other_fonts Ändern Sie andere Schriftgrößen
 menu.hint_parentallock_changepin Geben Sie den 4-stelligen PIN-Code ein, der dann ggf. abgefragt wird
 menu.hint_parentallock_lockage Legen Sie fest, bei welcher Altersklasse die Abfrage der PIN erfolgt
@@ -1192,6 +1191,7 @@ menu.hint_power_leds Konfiguriert das Verhalten der LEDs an der Power-Taste
 menu.hint_pref_lang Wählen Sie ihre bevorzugte Tonspur und EPG-Sprache,\ndie Einstellung 'none' deaktiviert diese Option
 menu.hint_pref_subs Wählen Sie ihre bevorzugte Untertitel-Sprache,\ndie Einstellung 'none' deaktiviert diese Option
 menu.hint_progressbar_color Erscheinungsbild der Fortschrittsbalken auswählen
+menu.hint_progressbar_gradient Fügt dem Fortschrittsbalken einen vertikalen Helligkeitsverlauf hinzu.
 menu.hint_protection Schützen Sie Inhalte per PIN-Code\nStandard-PIN ist 0000
 menu.hint_radiomode Schaltet zum Radio-Modus
 menu.hint_rass Schaltet in den interaktiven "Radio Screen Show"-Modus
@@ -1461,8 +1461,8 @@ miscsettings.progressbar_design_1 farbige vertikale Linien
 miscsettings.progressbar_design_2 farbige horizontale Linien
 miscsettings.progressbar_design_3 Farbverlauf
 miscsettings.progressbar_design_4 monochrom
-miscsettings.progressbar_design_5 monochromer Farbverlauf
-miscsettings.progressbar_design_long Progressbardesign
+miscsettings.progressbar_design_long Fortschrittsbalken-Design
+miscsettings.progressbar_gradient Fortschrittsbalken mit vertikalem Farbverlauf
 miscsettings.progressbar_infobar_position_0 Standard
 miscsettings.progressbar_infobar_position_1 unterhalb Kanalname
 miscsettings.progressbar_infobar_position_2 unterhalb Kanalname (schmal)
