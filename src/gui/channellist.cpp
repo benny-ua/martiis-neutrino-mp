@@ -2068,7 +2068,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 		int pb_space = prg_offset - title_offset;
 		CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4, pb_space + 2, fheight/2,
 				0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3,
-				g_settings.channellist_extended == 2, 0, 100, 50, true);
+				g_settings.channellist_extended == 2, 0, 100, 70);
 		pb.setCornerType(0);
 		pb.setFrameThickness(2);
 		int pb_max = pb_space - 4;
