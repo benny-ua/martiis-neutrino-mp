@@ -707,7 +707,7 @@ void *tuxtxt_CacheThread(void * /*arg*/)
 			continue;
 
 		/* read packet */
-		ssize_t readcnt;
+		ssize_t readcnt = 0;
 
 #if HAVE_SPARK_HARDWARE
 		if (isTtxEplayer) {
