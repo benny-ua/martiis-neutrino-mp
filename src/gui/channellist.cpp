@@ -2066,11 +2066,12 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			l = snprintf(nameAndDescription, sizeof(nameAndDescription), "%s", chan->getName().c_str());
 
 		int pb_space = prg_offset - title_offset;
-		CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4, pb_space + 2, fheight/2,
+		int pb_frame_offset = (g_settings.progressbar_color && (g_settings.channellist_extended == 2)) ? 2 : 0;
+		CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + pb_frame_offset, pb_space + 2, fheight/2 - 2 * pb_frame_offset,
 				0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3,
 				g_settings.channellist_extended == 2, 0, 100, 70);
 		pb.setCornerType(0);
-		pb.setFrameThickness(2);
+		pb.setFrameThickness(2 - pb_frame_offset);
 		int pb_max = pb_space - 4;
 		if (!(p_event->description.empty())) {
 			snprintf(nameAndDescription+l, sizeof(nameAndDescription)-l,g_settings.channellist_epgtext_align_right ? "  ":" - ");
