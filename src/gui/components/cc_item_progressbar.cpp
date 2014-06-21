@@ -139,7 +139,15 @@ void CProgressBar::paintSimple()
 	}
 
 	if (pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
-		frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
+	{
+		if (g_settings.progressbar_gradient) {
+			// draw a thicker zero-line
+			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
+			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
+			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
+		} else
+			frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
+	}
 }
 
 void CProgressBar::paintAdvanced()
@@ -281,18 +289,7 @@ void CProgressBar::paintProgress(bool do_save_bg)
 	else
 		paintAdvanced();
 
-	if (is_painted)
-		pb_last_width = pb_active_width;
-
-	if (is_painted && g_settings.progressbar_gradient) {
-		if ((!pb_blink || !g_settings.progressbar_color) && pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
-		{
-			// draw a thicker zero-line
-			frameBuffer->paintLine(pb_x  , pb_y  , pb_x+width-3-2  , pb_y+height-3  , pb_active_col); // zero line
-			frameBuffer->paintLine(pb_x+1, pb_y  , pb_x+width-3-2  , pb_y+height-3-1, pb_active_col);
-			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
-		}
-
+	if ((pb_active_width != pb_last_width) && g_settings.progressbar_gradient) {
 		int _px = pb_x - fr_thickness;
 		int _py = pb_y - fr_thickness;
 		int _pw = width;
@@ -320,6 +317,9 @@ void CProgressBar::paintProgress(bool do_save_bg)
 			}
 		}
 	}
+
+	if (is_painted)
+		pb_last_width = pb_active_width;
 }
 
 
