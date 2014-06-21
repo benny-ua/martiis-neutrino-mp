@@ -304,7 +304,7 @@ void CProgressBar::paintProgress(bool do_save_bg)
 				fb_pixel_t &v = *(p + _o + _x);
 				if (v != last_old) {
 					last_old = v;
-					double s = sin(_y * M_PI / _ph);
+					double s = sin((_y + .5) * M_PI / _ph) * .8 + .2;
 					float fr = ((last_old >> 16) & 0xff) * s + 0.5;
 					float fg = ((last_old >>  8) & 0xff) * s + 0.5;
 					float fb = ((last_old      ) & 0xff) * s + 0.5;
