@@ -2112,10 +2112,24 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 							runningPercent = pb_max;	// later on which can be fatal...
 					}
 
-					if (liststart + pos != selected)
-						pb.setStatusColors(COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1);
-					else
-						pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, COL_MENUCONTENTSELECTED_PLUS_0);
+					if (g_settings.progressbar_color) {
+						if (liststart + pos != selected) {
+							fb_pixel_t pbgcol = COL_MENUCONTENT_PLUS_1;
+							if (pbgcol == bgcolor)
+								pbgcol = COL_MENUCONTENT_PLUS_0;
+							pb.setStatusColors(COL_MENUCONTENT_PLUS_3, pbgcol);
+						} else {
+							fb_pixel_t pbgcol = COL_MENUCONTENTSELECTED_PLUS_0;
+							if (pbgcol == bgcolor)
+								pbgcol = COL_MENUCONTENT_PLUS_0;
+							pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, pbgcol);
+						}
+					} else {
+						if (liststart + pos != selected)
+							pb.setStatusColors(COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1);
+						else
+							pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, COL_MENUCONTENTSELECTED_PLUS_0);
+					}
 					pb.setValues(runningPercent, pb_max);
 					pb.paint();
 				}
@@ -2132,15 +2146,16 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			}
 		}
 		else {
+#if 0 // don't paint empty progress bar --martii
 			if(g_settings.channellist_extended) {
 				if (liststart + pos != selected)
 					pb.setStatusColors(COL_MENUCONTENT_PLUS_2, COL_MENUCONTENT_PLUS_1);
 				else
 					pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, COL_MENUCONTENTSELECTED_PLUS_0);
 				pb.setValues(0, pb_max);
-				pb.setZeroLine();
  				pb.paint();
 			}
+#endif
 			//name
 			g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->RenderString(x+ 5+ numwidth+ 10+prg_offset, ypos+ fheight, width- numwidth- 40- 15-prg_offset, nameAndDescription, color);
 		}
