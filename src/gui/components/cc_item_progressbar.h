@@ -43,7 +43,6 @@
 	frame_col >	general frame color of progressbar, set 0 for no frame
 	shadowbar_col	color > shadow behind progressbar, set 0 for no shadow
 
-	paintZero > optional, if set to true and value = 0, then paints a diagonal line instead of active bar as symbolic for a zero value
 */
 
 #ifndef __CC_PROGRESSBAR_H__
@@ -82,20 +81,8 @@ class CProgressBar : public CComponentsItem
 
 		bool pb_blink, pb_invert, pb_bl_changed;
 
-		///causes a diagonal line as a sign for 0 value instead of an empty bar
-		bool pb_paint_zero;
-
 		///to evaluate values, these will be convert to the graph
 		int pb_value, pb_max_value;
-
-		///paint simple version of progressbar with simple color modifications
-		void paintSimple();
-		///paint version of progressbar with color and advanced display modifications
-		void paintAdvanced();
-		///painting of activ/passive bars via shape object
-#if 0
-		void paintShapes(int &shx, int &shy, int &shw, int &shh, fb_pixel_t &col);
-#endif
 
 		void initDimensions();
 
@@ -128,9 +115,6 @@ class CProgressBar : public CComponentsItem
 		void setMaxValue(const int max_val){pb_max_value = max_val;};
 		///set up booth values to display at once
 		void setValues(const int val, const int max_val){pb_value = val; pb_max_value = max_val;};
-
-		///causes painting a diagonal line if value = 0, Note: ineffective in colored mode
-		void setZeroLine(bool paint_zero_line = true){pb_paint_zero = paint_zero_line;};
 
 		///setters for status colors
 		void setActiveColor(fb_pixel_t active_color) {pb_active_col = active_color;};
