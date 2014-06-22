@@ -58,6 +58,7 @@ class COsdSetup : public CMenuTarget, public CChangeObserver
 		bool is_wizard;
 		int show_menu_hints;
 		int show_tuner_icon;
+		int pb_color;
 
 		int screenshot_res;
 		CMenuOptionChooser *screenshot_res_chooser;

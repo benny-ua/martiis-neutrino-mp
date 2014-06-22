@@ -361,6 +361,11 @@ int COsdSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		fontsizenotifier->changeNotify(NONEXISTANT_LOCALE, NULL);
 		return res;
 	}
+	else if (actionKey == "channellist_setup") {
+		CMenuWidget osd_menu_chanlist(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_CHANNELLIST);
+		showOsdChanlistSetup(&osd_menu_chanlist);
+		return osd_menu_chanlist.exec(NULL, "");
+	}
 
 	res = showOsdSetup();
 
@@ -690,9 +695,7 @@ int COsdSetup::showOsdSetup()
 	osd_menu->addItem(mf);
 
 	//channellist
-	CMenuWidget osd_menu_chanlist(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_CHANNELLIST);
-	showOsdChanlistSetup(&osd_menu_chanlist);
-	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, &osd_menu_chanlist, NULL, CRCInput::convertDigitToKey(shortcut++));
+	mf = new CMenuForwarder(LOCALE_MISCSETTINGS_CHANNELLIST, true, NULL, this, "channellist_setup", CRCInput::convertDigitToKey(shortcut++));
 	mf->setHint("", LOCALE_MENU_HINT_CHANNELLIST_SETUP);
 	osd_menu->addItem(mf);
 
@@ -752,7 +755,7 @@ int COsdSetup::showOsdSetup()
 	osd_menu->addItem(mfWindowSize);
 
 	// color progress bar
-	int pb_color = g_settings.progressbar_color ? g_settings.progressbar_design : -1;
+	pb_color = g_settings.progressbar_color ? g_settings.progressbar_design : -1;
 	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_LONG, &pb_color, PROGRESSBAR_COLOR_OPTIONS, PROGRESSBAR_COLOR_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_COLOR);
 	osd_menu->addItem(mc);
@@ -776,6 +779,7 @@ int COsdSetup::showOsdSetup()
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_OPTIONS_SHOW_BACKGROUND_PICTURE, &g_settings.show_background_picture, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
 	int oldVolumeSize = g_settings.volume_size;
+	int old_channellist_extended = g_settings.channellist_extended;
 
 	int res = osd_menu->exec(NULL, "");
 
@@ -785,6 +789,9 @@ int COsdSetup::showOsdSetup()
 		g_settings.progressbar_color = 1;
 		g_settings.progressbar_design = pb_color;
 	}
+
+	if (pb_color == -1 && g_settings.channellist_extended && old_channellist_extended)
+		g_settings.channellist_extended = old_channellist_extended;
 
 	if (g_settings.screenshot_mode == 3)
 		g_settings.screenshot_mode = screenshot_res;
@@ -1187,8 +1194,10 @@ void COsdSetup::showOsdChanlistSetup(CMenuWidget *menu_chanlist)
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EPG_ALIGN);
 	menu_chanlist->addItem(mc);
 
-	// extended channel list
-	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_extended, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS_COUNT, true);
+	// extended channel list (progressbars)
+	if ((pb_color == -1) && g_settings.channellist_extended)
+		g_settings.channellist_extended = 1;
+	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_extended, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS_COUNT - (pb_color == -1), true);
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EXTENDED);
 	menu_chanlist->addItem(mc);
 
