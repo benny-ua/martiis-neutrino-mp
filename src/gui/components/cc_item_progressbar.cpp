@@ -120,6 +120,7 @@ void CProgressBar::initDimensions()
 		col_frame = pb_active_col;
 }
 
+#if 0
 void CProgressBar::paintShapes(int &shx, int &shy, int &shw, int &shh, fb_pixel_t &col)
 {
 	CComponentsShapeSquare shape(shx, shy, shw, shh, NULL, false);
@@ -127,6 +128,7 @@ void CProgressBar::paintShapes(int &shx, int &shy, int &shw, int &shh, fb_pixel_
 	shape.allowPaint(cc_allow_paint);
 	shape.paint(false);
 }
+#endif
 
 
 void CProgressBar::paintSimple()
@@ -134,8 +136,11 @@ void CProgressBar::paintSimple()
 	// progress value
 	if (pb_active_width != pb_last_width){
 		if (pb_active_width)
-			paintShapes(pb_x, pb_y, pb_active_width, pb_height, pb_active_col); // active bar
-		paintShapes(pb_start_x_passive, pb_y, pb_passive_width, pb_height, pb_passive_col); // passive bar
+			//paintShapes(pb_x, pb_y, pb_active_width, pb_height, pb_active_col); // active bar
+			frameBuffer->paintBoxRel(pb_x, pb_y, pb_active_width, pb_height, pb_active_col); // active bar
+		//paintShapes(pb_start_x_passive, pb_y, pb_passive_width, pb_height, pb_passive_col); // passive bar
+		frameBuffer->paintBoxRel(pb_start_x_passive, pb_y, pb_passive_width, pb_height, pb_passive_col); // passive bar
+		is_painted = true;
 	}
 
 	if (pb_paint_zero && pb_value == 0) //TODO: use shape cc-item, not available for lines yet
@@ -147,6 +152,7 @@ void CProgressBar::paintSimple()
 			frameBuffer->paintLine(pb_x  , pb_y+1, pb_x+width-3-2-1, pb_y+height-3  , pb_active_col);
 		} else
 			frameBuffer->paintLine(pb_x , pb_y, pb_x+width-3, pb_y+height-3, pb_active_col); // zero line
+		is_painted = true;
 	}
 }
 
