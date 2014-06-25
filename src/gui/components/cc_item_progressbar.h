@@ -84,6 +84,8 @@ class CProgressBar : public CComponentsItem
 		///to evaluate values, these will be convert to the graph
 		int pb_value, pb_max_value;
 
+		int *pb_design, *pb_gradient;
+
 		void initDimensions();
 
 		///paints graph
@@ -140,12 +142,19 @@ class CProgressBar : public CComponentsItem
 		void paint(bool do_save_bg = CC_SAVE_SCREEN_NO);
 
 		enum pb_color_t {
-			PB_MATRIX = 0,	/* 0 */
-			PB_LINES_V,	/* 1 */
-			PB_LINES_H,	/* 2 */
-			PB_COLOR,	/* 3 */
+			PB_OFF = -2,	/* -2 */
+			PB_MONO,	/* -1 */
+			PB_MATRIX,	/*  0 */
+			PB_LINES_V,	/*  1 */
+			PB_LINES_H,	/*  2 */
+			PB_COLOR,	/*  3 */
 		};
 
+		//set design (overides g_settings.progressbar_design)
+		void setDesign(int &design) { pb_design = &design; }
+
+		//set gradient (overides g_settings.progressbar_gradient)
+		void setGradient(int &gradient) { pb_gradient = &gradient; }
 };
 
 #endif /* __CC_PROGRESSBAR_H__ */

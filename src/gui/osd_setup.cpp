@@ -483,10 +483,11 @@ const CMenuOptionChooser::keyval OPTIONS_COLORED_EVENTS_OPTIONS[OPTIONS_COLORED_
 #define _LOCALE_PROGRESSBAR_COLOR_FULL		LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_3
 #define _LOCALE_PROGRESSBAR_COLOR_MONO		LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_4
 
-#define PROGRESSBAR_COLOR_OPTION_COUNT 5
+#define PROGRESSBAR_COLOR_OPTION_COUNT 6
 const CMenuOptionChooser::keyval PROGRESSBAR_COLOR_OPTIONS[PROGRESSBAR_COLOR_OPTION_COUNT] =
 {
-	{ -1,				_LOCALE_PROGRESSBAR_COLOR_MONO },
+	{ CProgressBar::PB_OFF,		LOCALE_OPTIONS_OFF },
+	{ CProgressBar::PB_MONO,	_LOCALE_PROGRESSBAR_COLOR_MONO },
 	{ CProgressBar::PB_MATRIX,	_LOCALE_PROGRESSBAR_COLOR_MATRIX },
 	{ CProgressBar::PB_LINES_V,	_LOCALE_PROGRESSBAR_COLOR_VERTICAL },
 	{ CProgressBar::PB_LINES_H,	_LOCALE_PROGRESSBAR_COLOR_HORIZONTAL },
@@ -755,8 +756,7 @@ int COsdSetup::showOsdSetup()
 	osd_menu->addItem(mfWindowSize);
 
 	// color progress bar
-	pb_color = g_settings.progressbar_color ? g_settings.progressbar_design : -1;
-	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_LONG, &pb_color, PROGRESSBAR_COLOR_OPTIONS, PROGRESSBAR_COLOR_OPTION_COUNT, true);
+	mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_LONG, &g_settings.progressbar_design, PROGRESSBAR_COLOR_OPTIONS + 1, PROGRESSBAR_COLOR_OPTION_COUNT - 1, true);
 	mc->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_COLOR);
 	osd_menu->addItem(mc);
 
@@ -779,19 +779,8 @@ int COsdSetup::showOsdSetup()
  	osd_menu->addItem(new CMenuOptionChooser(LOCALE_OPTIONS_SHOW_BACKGROUND_PICTURE, &g_settings.show_background_picture, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true));
 
 	int oldVolumeSize = g_settings.volume_size;
-	int old_channellist_extended = g_settings.channellist_extended;
 
 	int res = osd_menu->exec(NULL, "");
-
-	if (pb_color == -1)
-		g_settings.progressbar_color = 0;
-	else {
-		g_settings.progressbar_color = 1;
-		g_settings.progressbar_design = pb_color;
-	}
-
-	if (pb_color == -1 && g_settings.channellist_extended && old_channellist_extended)
-		g_settings.channellist_extended = old_channellist_extended;
 
 	if (g_settings.screenshot_mode == 3)
 		g_settings.screenshot_mode = screenshot_res;
@@ -1169,14 +1158,6 @@ void COsdSetup::showOsdInfobarSetup(CMenuWidget *menu_infobar)
  	menu_infobar->addItem(mc);
 }
 
-#define OPTIONS_CHANNELLIST_EXTENDED_OPTIONS_COUNT 3
-const CMenuOptionChooser::keyval OPTIONS_CHANNELLIST_EXTENDED_OPTIONS[OPTIONS_CHANNELLIST_EXTENDED_OPTIONS_COUNT] =
-{
-	{ 0, LOCALE_OPTIONS_OFF },
-	{ 1, LOCALE_OPTIONS_ON  },
-	{ 2, LOCALE_PROGRESSBAR_COLOR_FULL }
-};
-
 //channellist
 void COsdSetup::showOsdChanlistSetup(CMenuWidget *menu_chanlist)
 {
@@ -1195,9 +1176,7 @@ void COsdSetup::showOsdChanlistSetup(CMenuWidget *menu_chanlist)
 	menu_chanlist->addItem(mc);
 
 	// extended channel list (progressbars)
-	if ((pb_color == -1) && g_settings.channellist_extended)
-		g_settings.channellist_extended = 1;
-	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_extended, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS, OPTIONS_CHANNELLIST_EXTENDED_OPTIONS_COUNT - (pb_color == -1), true, NULL, CRCInput::RC_nokey, NULL, true);
+	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_progressbar_design, PROGRESSBAR_COLOR_OPTIONS, PROGRESSBAR_COLOR_OPTION_COUNT, true, NULL, CRCInput::RC_nokey, NULL, true);
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EXTENDED);
 	menu_chanlist->addItem(mc);
 
@@ -1352,7 +1331,7 @@ int COsdSetup::showContextChanlistMenu()
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EPG_ALIGN);
 	menu_chanlist->addItem(mc);
 
-	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_extended, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_progressbar_design, PROGRESSBAR_COLOR_OPTIONS, PROGRESSBAR_COLOR_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EXTENDED);
 	menu_chanlist->addItem(mc);
 

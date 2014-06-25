@@ -69,7 +69,10 @@ CProgressBar::CProgressBar(	const int x_pos, const int y_pos, const int w, const
 	pb_active_col	= active_col;
 	pb_passive_col 	= passive_col;
 
-	pb_bl_changed 		= g_settings.progressbar_color;
+	pb_design		= &g_settings.progressbar_design;
+	pb_gradient		= &g_settings.progressbar_gradient;
+
+	pb_bl_changed 		= *pb_design == PB_MONO;
 	pb_last_width 		= -1;
 	pb_value		= 0;
 	pb_max_value		= 0;
@@ -126,7 +129,7 @@ class CProgressBarCache
 		int pb_height, pb_max_width;
 		int pb_active_col, pb_passive_col;
 		int design;
-		bool colored, pb_invert, gradient;
+		bool pb_invert, gradient;
 		int pb_red, pb_yellow, pb_green;
 
 		int yoff;
@@ -134,16 +137,16 @@ class CProgressBarCache
 		fb_pixel_t *active;
 		fb_pixel_t *passive;
 		static inline unsigned int make16color(__u32 rgb){return 0xFF000000 | rgb;};
-		CProgressBarCache(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _colored, bool _invert, bool _gradient, int _red, int _yellow, int _green)
-			: pb_height(_height), pb_max_width(_width), pb_active_col(_pb_active_col), pb_passive_col(_pb_passive_col), design(_design), colored(_colored), pb_invert(_invert), gradient(_gradient),
+		CProgressBarCache(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _invert, bool _gradient, int _red, int _yellow, int _green)
+			: pb_height(_height), pb_max_width(_width), pb_active_col(_pb_active_col), pb_passive_col(_pb_passive_col), design(_design), pb_invert(_invert), gradient(_gradient),
 			  pb_red(_red), pb_yellow(_yellow), pb_green(_green), yoff(0)
 			{
-				if (_colored) {
-					active = paintAdvanced(true);
-					passive = paintAdvanced(false);
-				} else {
+				if (design == CProgressBar::PB_MONO) {
 					active = paintSimple(true);
 					passive = paintSimple(false);
+				} else {
+					active = paintAdvanced(true);
+					passive = paintAdvanced(false);
 				}
 			}
 		void paintBoxRel(fb_pixel_t *b, int x, int y, int dx, int dy, fb_pixel_t col);
@@ -152,27 +155,27 @@ class CProgressBarCache
 		fb_pixel_t *paintAdvanced(bool full);
 	public:
 		void paint(int x, int y, int pb_active_width, int pb_passive_width);
-		static CProgressBarCache *lookup(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _colored, bool _invert, bool _gradient, int _red, int _yellow, int _green);
+		static CProgressBarCache *lookup(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _invert, bool _gradient, int _red, int _yellow, int _green);
 };
 
-CProgressBarCache *CProgressBarCache::lookup(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _colored, bool _invert, bool _gradient, int _red, int _yellow, int _green)
+CProgressBarCache *CProgressBarCache::lookup(int _height, int _width, int _pb_active_col, int _pb_passive_col, int _design, bool _invert, bool _gradient, int _red, int _yellow, int _green)
 {
 	static std::vector<CProgressBarCache *> pbCache;
 
 	// sanitize
-	if (!_colored)
-		_design = -1, _red = _yellow = _green = 0;
+	if (_design == CProgressBar::PB_MONO)
+		_red = _yellow = _green = 0;
 
 	// lookup
 	std::vector<CProgressBarCache *>::iterator it = pbCache.begin();
 	for (; it != pbCache.end() && ((*it)->pb_height != _height || (*it)->pb_max_width != _width ||
 				       (*it)->pb_active_col != _pb_active_col || (*it)->pb_passive_col != _pb_passive_col ||
-				       (*it)->design != _design || (*it)->colored != _colored || (*it)->pb_invert != _invert || (*it)->gradient != _gradient ||
+				       (*it)->design != _design || (*it)->pb_invert != _invert || (*it)->gradient != _gradient ||
 				       (*it)->pb_red != _red || (*it)->pb_yellow != _yellow || (*it)->pb_green != _green); ++it);
 	if (it != pbCache.end())
 		return *it;
 
-	CProgressBarCache *pbc = new CProgressBarCache(_height, _width, _pb_active_col, _pb_passive_col, _design, _colored, _invert, _gradient, _red, _yellow, _green);
+	CProgressBarCache *pbc = new CProgressBarCache(_height, _width, _pb_active_col, _pb_passive_col, _design, _invert, _gradient, _red, _yellow, _green);
 	pbCache.push_back(pbc);
 	return pbc;
 }
@@ -371,11 +374,12 @@ void CProgressBarCache::applyGradient(fb_pixel_t *b)
 
 void CProgressBar::paintProgress(bool do_save_bg)
 {
-	if (g_settings.progressbar_gradient)
+	if (*pb_gradient)
 		setFrameThickness(0);
 
-	if(pb_bl_changed != g_settings.progressbar_color) {
-		pb_bl_changed = g_settings.progressbar_color;
+	bool _pb_bl_changed = (*pb_design == PB_MONO);
+	if(pb_bl_changed != _pb_bl_changed) {
+		pb_bl_changed = _pb_bl_changed;
 		reset();
 	}
 
@@ -387,7 +391,7 @@ void CProgressBar::paintProgress(bool do_save_bg)
 
 	//progress
 	if (pb_active_width != pb_last_width) {
-		CProgressBarCache *pbc = CProgressBarCache::lookup(pb_height, pb_max_width, pb_active_col, pb_passive_col, g_settings.progressbar_design, pb_blink && g_settings.progressbar_color, pb_invert, g_settings.progressbar_gradient, pb_red, pb_yellow, pb_green);
+		CProgressBarCache *pbc = CProgressBarCache::lookup(pb_height, pb_max_width, pb_active_col, pb_passive_col, *pb_design, pb_invert, *pb_gradient, pb_red, pb_yellow, pb_green);
 		if (pbc)
 			pbc->paint(pb_x, pb_y, pb_active_width, pb_passive_width);
 		is_painted = true;
