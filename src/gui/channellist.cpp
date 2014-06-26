@@ -2071,7 +2071,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			unsigned int ch_desc_len = g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->getRenderWidth(p_event->description);
 
 			int max_desc_len = width - numwidth - prg_offset - ch_name_len - 15 - 20; // 15 = scrollbar, 20 = spaces
-			if (chan->scrambled || (g_settings.channellist_progressbar_design ||g_settings.channellist_epgtext_align_right))
+			if (chan->scrambled || g_settings.channellist_epgtext_align_right)
 				max_desc_len -= icon_space+g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->getWidth(); /* do we need space for the lock/rec icon? */
 
 			if (max_desc_len < 0)
@@ -2093,13 +2093,13 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 					time_t jetzt=time(NULL);
 					int runningPercent = 0;
 					int pb_space = prg_offset - title_offset;
-					int pb_frame_offset = (g_settings.channellist_progressbar_design != CProgressBar::PB_MONO) ? 2 : 0;
-					CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + pb_frame_offset, pb_space + 2, fheight/2 - 2 * pb_frame_offset,
+					CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + 2, pb_space + 2, fheight/2 - 4,
 							0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3,
-							g_settings.channellist_progressbar_design != CProgressBar::PB_MONO, 0, 100, 70);
+							0, 100, 70);
 					pb.setDesign(g_settings.channellist_progressbar_design);
 					pb.setCornerType(0);
-					pb.setFrameThickness(2 - pb_frame_offset);
+					pb.setFrameThickness(0);	// no frame
+					pb.doPaintBg(false);		// no background
 					int pb_max = pb_space - 4;
 
 					if (((jetzt - p_event->startTime + 30) / 60) < 0 )

@@ -834,13 +834,11 @@ void CInfoViewerBB::changePB()
 	hddwidth = frameBuffer->getScreenWidth(true) * ((g_settings.screen_preset == 1) ? 10 : 8) / 128; /* 80(CRT)/100(LCD) pix if screen is 1280 wide */
 	if (!hddscale) {
 		hddscale = new CProgressBar();
-		hddscale->setBlink();
 		hddscale->setInvert();
 	}
 	
 	if (!sysscale) {
 		sysscale = new CProgressBar();
-		sysscale->setBlink();
 		sysscale->setInvert();
 	}
 }

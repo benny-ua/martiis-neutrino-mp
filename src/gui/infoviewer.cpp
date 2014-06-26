@@ -244,17 +244,14 @@ void CInfoViewer::changePB()
 	if (sigscale)
 		delete sigscale;
 	sigscale = new CProgressBar();
-	sigscale->setBlink();
 	
 	if (snrscale)
 		delete snrscale;
 	snrscale = new CProgressBar();
-	snrscale->setBlink();
 	
 	if (timescale)
 		delete timescale;
 	timescale = new CProgressBar();
-	timescale->setBlink();
 	timescale->setRgb(0, 100, 70);
 }
 

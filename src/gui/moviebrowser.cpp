@@ -1443,7 +1443,6 @@ void CMovieBrowser::info_hdd_level(bool paint_hdd)
 		const short pbw = 100;
 		const short border = m_cBoxFrameTitleRel.iHeight/4;
 		CProgressBar pb(m_cBoxFrame.iX+ m_cBoxFrameFootRel.iWidth - pbw - border, m_cBoxFrame.iY+m_cBoxFrameTitleRel.iY + border, pbw,  m_cBoxFrameTitleRel.iHeight/2);
-		pb.setBlink();
 		pb.setInvert();
 		pb.setValues( blocks_percent_used, 100);
 		pb.paint(false);		
@@ -4859,7 +4858,6 @@ static off64_t cut_movie(MI_MOVIE_INFO * minfo, CMovieInfo * cmovie)
 	CFrameBuffer * frameBuffer = CFrameBuffer::getInstance();
 	if (! timescale)
 		timescale = new CProgressBar();
-	timescale->setBlink();
         int dx = 256;
         int x = (((g_settings.screen_EndX- g_settings.screen_StartX)- dx) / 2) + g_settings.screen_StartX;
         int y = g_settings.screen_EndY - 50;
@@ -5119,7 +5117,6 @@ printf("copy: len %d minute %" PRId64 " second %" PRId64 "\n", len, len ? size/l
 	CFrameBuffer * frameBuffer = CFrameBuffer::getInstance();
 	if (! timescale)
 		timescale = new CProgressBar();
-	timescale->setBlink();
         int dx = 256;
         int x = (((g_settings.screen_EndX- g_settings.screen_StartX)- dx) / 2) + g_settings.screen_StartX;
         int y = g_settings.screen_EndY - 50;

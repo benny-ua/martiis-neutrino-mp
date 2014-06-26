@@ -93,10 +93,8 @@ CPSISetup::CPSISetup (const neutrino_locale_t Name)
   name = Name;
   selected = 0;
 
-  for (int i = 0; i < PSI_RESET; i++) {
+  for (int i = 0; i < PSI_RESET; i++)
     psi_list[i].scale = new CProgressBar();
-    psi_list[i].scale->setBlink(true);
-  }
 
   psi_list[PSI_CONTRAST].value = g_settings.psi_contrast;
   psi_list[PSI_SATURATION].value = g_settings.psi_saturation;

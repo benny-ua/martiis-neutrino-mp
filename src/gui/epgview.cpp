@@ -684,7 +684,6 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 	{
 		int pbx = sx + 10 + widthl + 10 + ((ox-104-widthr-widthl-10-10-20)>>1);
 		CProgressBar pb(pbx, sy+oy-height, 104, height-6);
-		pb.setBlink();
 		pb.setRgb(0, 100, 70);
 		pb.setValues(epg_done, 100);
 		pb.paint(false);
@@ -731,7 +730,6 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 					if ( epg_done!= -1 ) {
  						int pbx = sx + 10 + widthl + 10 + ((ox-104-widthr-widthl-10-10-20)>>1);
 						CProgressBar pb(pbx, sy+oy-height, 104, height-6);
-						pb.setBlink();
 						pb.setRgb(0, 100, 70);
 						pb.setValues(epg_done, 100);
 						pb.paint(false);

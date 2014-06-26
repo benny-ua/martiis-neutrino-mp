@@ -79,7 +79,7 @@ class CProgressBar : public CComponentsItem
 		///start position of activ/passiv area
 		int pb_x, pb_y;
 
-		bool pb_blink, pb_invert, pb_bl_changed;
+		bool pb_invert, pb_bl_changed;
 
 		///to evaluate values, these will be convert to the graph
 		int pb_value, pb_max_value;
@@ -91,14 +91,11 @@ class CProgressBar : public CComponentsItem
 		///paints graph
 		void paintProgress(bool do_save_bg = CC_SAVE_SCREEN_NO);
 
-		static inline unsigned int make16color(__u32 rgb){return 0xFF000000 | rgb;};
-
 	public:
 		///parameters:
 		///x_pos, y_pos, w, h: position and dimension in pixel
-		///blinkenlights: true if you want code to follow progressbar_color. needed, no default.
 		///w, h: width / height of bar. Can later be set with paintProgressbar.
-		///r, g, b: percentage of the bar where red/green/yellow is used, only used if blinkenlights (colored) == true.
+		///r, g, b: percentage of the bar where red/green/yellow is used, only used for colored designs
 		///inv:  false => red on the left side, true: red on right side.
 		///active_col, passive_col: sets colors for displayed values, activ_col means the the displayed progress
 		///color_frame, color_body, color_shadow: colores of progressbar for frame, body and shadow, Note: color of frame is ineffective on fr_thickness = 0
@@ -106,7 +103,6 @@ class CProgressBar : public CComponentsItem
 				const int w = -1, const int h = -1,
 				fb_pixel_t color_frame = 0, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0,
 				const fb_pixel_t active_col = COL_INFOBAR_PLUS_7, const fb_pixel_t passive_col = COL_INFOBAR_PLUS_3,
-				const bool blinkenlights = false,
 				const int r = 40, const int g = 100, const int b =70,
 				const bool inv = false,
 				CComponentsForm *parent = NULL);
@@ -127,9 +123,7 @@ class CProgressBar : public CComponentsItem
 		///invert: false => red on the left side, true: red on right side.
 		void setInvert(bool inverted = true){pb_invert = inverted;};
 
-		///blinkenlights: true (default) if you want code to follow progressbar_color.
-		void setBlink(bool blinkenlights = true){pb_blink = blinkenlights;};
-		///r, g, b: percentage of the bar where red/green/yellow is used, only used if blinkenlights (colored) == true.
+		///r, g, b: percentage of the bar where red/green/yellow is used, only used for colored designs
 		void setRgb(const int r, const int g, const int b){pb_red =  r; pb_green = g; pb_yellow = b;};
 
 		///x, y, width, height, value, max_value: set most wanted parameters at once
