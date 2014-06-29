@@ -255,65 +255,74 @@ fb_pixel_t *CProgressBarCache::createBitmap(bool full)
 	int hcnt = (pb_height + spc) / itemh;		/* how many POINTs is the bar high */
 	yoff = (pb_height + spc - itemh * hcnt) / 2;
 
-	int total = pb_width / itemw + 1;	/* total number of POINTs, plus one in case of a remainder */
 	int i = 0;
 
 	int sh_x = 0;
-	if (full) {
-		/* red, yellow, green are given in percent */
-		int rd = pb_red    * pb_width / (100 * itemw);	/* how many POINTs red */
-		int yw = pb_yellow * pb_width / (100 * itemw);	/* how many POINTs yellow */
-		int gn = pb_green  * pb_width / (100 * itemw);	/* how many POINTs green */
+	/* red, yellow, green are given in percent */
+	int rd = pb_red    * pb_width / (100 * itemw);	/* how many POINTs red */
+	int yw = pb_yellow * pb_width / (100 * itemw);	/* how many POINTs yellow */
+	int gn = pb_green  * pb_width / (100 * itemw);	/* how many POINTs green */
+	gn++;
 
-		uint32_t rgb, diff = 0;
-		int step, b = 0;
+	uint32_t rgb, diff = 0;
+	int step, b = 0;
 
-		for (i = 0; i < rd; i++, sh_x += itemw) {
-			diff = i * 255 / rd;
-			if (pb_invert)
-				rgb = GREEN + (diff << 16); // adding red
-			else
-				rgb = RED + (diff << 8); // adding green
-			fb_pixel_t color = make16color(rgb);
-			int sh_y = 0;
-			for (int j = 0; j < hcnt; j++, sh_y += itemh)
-				paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
-		}
-		step = yw - rd - 1;
-		if (step < 1)
-			step = 1;
-		for (; i < yw; i++, sh_x += itemw) {
-			diff = b++ * 255 / step / 2;
-			if (pb_invert)
-				rgb = YELLOW - (diff << 8); // removing green
-			else
-				rgb = YELLOW - (diff << 16); // removing red
-			fb_pixel_t color = make16color(rgb);
-			int sh_y = 0;
-			for (int j = 0; j < hcnt; j++, sh_y += itemh)
-				paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
-		}
-		int off = diff;
-		b = 0;
-		step = gn - yw - 1;
-		if (step < 1)
-			step = 1;
-		for (; i < gn; i++, sh_x += itemw) {
-			diff = b++ * 255 / step / 2 + off;
-			if (pb_invert)
-				rgb = YELLOW - (diff << 8); // removing green
-			else
-				rgb = YELLOW - (diff << 16); // removing red
-			fb_pixel_t color = make16color(rgb);
-			int sh_y = 0;
-			for (int j = 0; j < hcnt; j++, sh_y += itemh)
-				paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
-		}
-	}
-	for(; i < total + 1; i++, sh_x += itemw) {
+	for (i = 0; i < rd; i++, sh_x += itemw) {
+		diff = i * 255 / rd;
+		if (pb_invert)
+			rgb = GREEN + (diff << 16); // adding red
+		else
+			rgb = RED + (diff << 8); // adding green
+		fb_pixel_t color = make16color(rgb);
 		int sh_y = 0;
 		for (int j = 0; j < hcnt; j++, sh_y += itemh)
-			paintBoxRel(buf, sh_x, sh_y, pointx, pointy, pb_passive_col);
+			paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
+	}
+	step = yw - rd - 1;
+	if (step < 1)
+		step = 1;
+	for (; i < yw; i++, sh_x += itemw) {
+		diff = b++ * 255 / step / 2;
+		if (pb_invert)
+			rgb = YELLOW - (diff << 8); // removing green
+		else
+			rgb = YELLOW - (diff << 16); // removing red
+		fb_pixel_t color = make16color(rgb);
+		int sh_y = 0;
+		for (int j = 0; j < hcnt; j++, sh_y += itemh)
+			paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
+	}
+	int off = diff;
+	b = 0;
+	step = gn - yw - 1;
+	if (step < 1)
+		step = 1;
+	for (; i < gn; i++, sh_x += itemw) {
+		diff = b++ * 255 / step / 2 + off;
+		if (pb_invert)
+			rgb = YELLOW - (diff << 8); // removing green
+		else
+			rgb = YELLOW - (diff << 16); // removing red
+		fb_pixel_t color = make16color(rgb);
+		int sh_y = 0;
+		for (int j = 0; j < hcnt; j++, sh_y += itemh)
+			paintBoxRel(buf, sh_x, sh_y, pointx, pointy, color);
+	}
+	if (!full) {
+		fb_pixel_t *p = buf;
+		fb_pixel_t *end = buf + pb_width * pb_height;
+		for (; p < end; p++) {
+			fb_pixel_t q = *p;
+			unsigned int gray = ((q & 0xff) + ((q >> 8) & 0xff) + ((q >> 16) & 0xff)) / 3;
+			q >>= 24;
+			q <<= 8;
+			q |= gray;
+			q <<= 8;
+			q |= gray;
+			q <<= 8;
+			q |= gray;
+			*p = q;
+		}
 	}
 
 	if (gradient)
