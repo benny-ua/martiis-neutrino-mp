@@ -236,7 +236,6 @@ int CAudioSetup::showAudioSetup()
 #endif
 	CMenuOptionNumberChooser *ch;
 #if HAVE_SPARK_HARDWARE
-	audioSetupNotifier->openMixers();
 	audioSettings->addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_AUDIOMENU_MIXER_VOLUME));
 	ch = new CMenuOptionNumberChooser(LOCALE_AUDIOMENU_MIXER_VOLUME_ANALOG,
 		(int *)&g_settings.audio_mixer_volume_analog, true, 0, 100, audioSetupNotifier);
@@ -264,9 +263,6 @@ int CAudioSetup::showAudioSetup()
 
 	int res = audioSettings->exec(NULL, "");
 	selected = audioSettings->getSelected();
-#if HAVE_SPARK_HARDWARE
-	audioSetupNotifier->closeMixers();
-#endif
 	CZapit::getInstance()->SetVolumePercent(g_settings.audio_volume_percent_ac3, g_settings.audio_volume_percent_pcm);
 	delete audioSettings;
 #ifdef BOXMODEL_APOLLO

@@ -100,16 +100,7 @@ class CColorSetupNotifier : public CChangeObserver
 
 class CAudioSetupNotifier : public CChangeObserver
 {
-#if HAVE_SPARK_HARDWARE
-		mixerVolume *mixerAnalog, *mixerHDMI, *mixerSPDIF;
-#endif
 	public:
-#if HAVE_SPARK_HARDWARE
-		void openMixers(void);
-		void closeMixers(void);
-		CAudioSetupNotifier(void);
-		~CAudioSetupNotifier(void);
-#endif
 		bool changeNotify(const neutrino_locale_t OptionName, void *);
 };
 
