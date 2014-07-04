@@ -520,14 +520,14 @@ int CScanSetup::showScanMenu()
 		/* FIXME leak, satSelect added to both auto and manual scan, so one of them cannot be deleted */
 		CMenuWidget * autoScan = new CMenuWidget(LOCALE_SERVICEMENU_SCANTS, NEUTRINO_ICON_SETTINGS, w, MN_WIDGET_ID_SCAN_AUTO_SCAN);
 		addScanMenuAutoScan(autoScan);
-		mf = new CMenuDForwarder(autoscan, true, NULL, autoScan, "", have_other ? CRCInput::RC_nokey : CRCInput::RC_green, have_other ? NULL : NEUTRINO_ICON_BUTTON_GREEN);
+		mf = new CMenuDForwarder(autoscan, true, NULL, autoScan, "", have_other ? CRCInput::RC_nokey : CRCInput::RC_green);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_AUTO);
 		settings->addItem(mf);
 
 		//manual scan
 		CMenuWidget * manualScan = new CMenuWidget(LOCALE_SATSETUP_MANUAL_SCAN, NEUTRINO_ICON_SETTINGS, w, MN_WIDGET_ID_SCAN_MANUAL_SCAN);
 		addScanMenuManualScan(manualScan);
-		mf = new CMenuForwarder(LOCALE_SATSETUP_MANUAL_SCAN, true, NULL, manualScan, "", have_other ? CRCInput::RC_nokey : CRCInput::RC_yellow, have_other ? NULL : NEUTRINO_ICON_BUTTON_YELLOW);
+		mf = new CMenuForwarder(LOCALE_SATSETUP_MANUAL_SCAN, true, NULL, manualScan, "", have_other ? CRCInput::RC_nokey : CRCInput::RC_yellow);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_MANUAL);
 		settings->addItem(mf);
 		settings->addItem(GenericMenuSeparatorLine);
@@ -617,23 +617,18 @@ int CScanSetup::showScanMenuFrontendSetup()
 
 		const char * icon = NULL;
 		neutrino_msg_t key = CRCInput::RC_nokey;
-		if (i == 0) {
+		if (i == 0)
 			key = CRCInput::RC_red;
-			icon = NEUTRINO_ICON_BUTTON_RED;
-		} else if (i == 1) {
+		else if (i == 1)
 			key = CRCInput::RC_green;
-			icon = NEUTRINO_ICON_BUTTON_GREEN;
-		} else if (i == 2) {
+		else if (i == 2)
 			key = CRCInput::RC_yellow;
-			icon = NEUTRINO_ICON_BUTTON_YELLOW;
-		} else if (i == 3) {
+		else if (i == 3)
 			key = CRCInput::RC_blue;
-			icon = NEUTRINO_ICON_BUTTON_BLUE;
-		}
 
 		modestr[i] = g_Locale->getText(getModeLocale(fe->getMode()));
 
-		mf = new CMenuForwarder(name, allow_start, modestr[i], this, tmp, key, icon);
+		mf = new CMenuForwarder(name, allow_start, modestr[i], this, tmp, key);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_SETUP_FE);
 		setupMenu->addItem(mf);
 		if(i != 0)
@@ -803,7 +798,7 @@ int CScanSetup::showFrontendSetup(int number)
 		femaster = fe->getMaster();
 
 	CMenuOptionChooser * mc = new CMenuOptionChooser(LOCALE_SATSETUP_FE_MODE, (int *)&femode, SATSETUP_FRONTEND_MODE, mode_count,
-			enable, this, CRCInput::RC_red, NEUTRINO_ICON_BUTTON_RED, true);
+			enable, this, CRCInput::RC_red, NULL, true);
 	mc->setHint("", LOCALE_MENU_HINT_SCAN_FEMODE);
 	setupMenu->addItem(mc);
 
@@ -891,7 +886,7 @@ int CScanSetup::showFrontendSetup(int number)
 		rotorMenu->addItem(mf);
 		msettings.Add(mf);
 
-		mf = new CMenuDForwarder(LOCALE_SATSETUP_EXTENDED_MOTOR, allow_moptions, NULL, rotorMenu, "", CRCInput::RC_blue, NEUTRINO_ICON_BUTTON_BLUE);
+		mf = new CMenuDForwarder(LOCALE_SATSETUP_EXTENDED_MOTOR, allow_moptions, NULL, rotorMenu, "", CRCInput::RC_blue);
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_MOTOR);
 		setupMenu->addItem(mf);
 	}
@@ -1313,7 +1308,7 @@ void CScanSetup::addScanMenuFastScan(CMenuWidget *fast_ScanMenu)
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_START);
 	fast_ScanMenu->addItem(mf);
 #endif
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SATSETUP_FASTSCAN_AUTO_DISEQC, allow_start, NULL, this, "fastdiseqc", CRCInput::RC_green, NEUTRINO_ICON_BUTTON_GREEN);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SATSETUP_FASTSCAN_AUTO_DISEQC, allow_start, NULL, this, "fastdiseqc", CRCInput::RC_green);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_START);
 	fast_ScanMenu->addItem(mf);
 }
@@ -1342,7 +1337,7 @@ int CScanSetup::showFastscanDiseqcSetup()
 		sat_setup->addItem(diseqc);
 	}
 	sat_setup->addItem(GenericMenuSeparatorLine);
-	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, "sfast", CRCInput::RC_yellow, NEUTRINO_ICON_BUTTON_YELLOW);
+	CMenuForwarder * mf = new CMenuForwarder(LOCALE_SCANTS_STARTNOW, allow_start, NULL, this, "sfast", CRCInput::RC_yellow);
 	mf->setHint("", LOCALE_MENU_HINT_SCAN_START);
 	sat_setup->addItem(mf);
 
