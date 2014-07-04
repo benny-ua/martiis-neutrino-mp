@@ -3246,6 +3246,7 @@ _repeat:
 		if( ( !g_InfoViewer->is_visible ) && data && !autoshift)
 			g_RCInput->postMsg( NeutrinoMessages::SHOW_INFOBAR, 0 );
 
+		CVFD::getInstance()->ShowIcon(FP_ICON_RECORD, CRecordManager::getInstance()->RecordingStatus());
 		return messages_return::handled;
 	}
 	else if (msg == NeutrinoMessages::RECORD_START) {
