@@ -66,11 +66,13 @@ static user_menu_data_t user_menu[COL_BUTTONMAX] =
 // const neutrino_msg_t col_key_helper_msg_def[COL_BUTTONMAX]={CRCInput::RC_red,CRCInput::RC_green,CRCInput::RC_yellow,CRCInput::RC_blue};
 // const char * col_key_helper_icon_def[COL_BUTTONMAX]={NEUTRINO_ICON_BUTTON_RED,NEUTRINO_ICON_BUTTON_GREEN,NEUTRINO_ICON_BUTTON_YELLOW,NEUTRINO_ICON_BUTTON_BLUE};
 
-class CUserMenu : public CChangeObserver, CMenuTarget
+class CUserMenu : public /*CChangeObserver,*/ CMenuTarget
 {	
 	private:		
 		int width;
+#if 0
 		bool changeNotify(const neutrino_locale_t OptionName, void *);
+#endif
 		int exec(CMenuTarget* parent, const std::string & actionKey);
 				
 	public:

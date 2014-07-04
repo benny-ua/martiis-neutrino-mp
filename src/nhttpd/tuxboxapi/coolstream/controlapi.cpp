@@ -355,13 +355,17 @@ void CControlAPI::SetModeCGI(CyhookHandler *hh)
 		{
 			if(hh->ParamList["stopplayback"] == "true")
 				NeutrinoAPI->Zapit->stopPlayBack();
+#if 0
 			NeutrinoAPI->Sectionsd->setPauseScanning(true);
+#endif
 			NeutrinoAPI->Zapit->setRecordMode(true);
 		}
 		else if (hh->ParamList["record"] == "stop")	// stop record mode
 		{
 			NeutrinoAPI->Zapit->setRecordMode(false);
+#if 0
 			NeutrinoAPI->Sectionsd->setPauseScanning(false);
+#endif
 			if (!NeutrinoAPI->Zapit->isPlayBackActive())
 				NeutrinoAPI->Zapit->startPlayBack();
 		}
@@ -1701,7 +1705,9 @@ void CControlAPI::ZaptoCGI(CyhookHandler *hh)
 		{
 			if(NeutrinoAPI->Zapit->isPlayBackActive()){
 				NeutrinoAPI->Zapit->stopPlayBack();
+#if 0
 				NeutrinoAPI->Sectionsd->setPauseScanning(true);
+#endif
 			}
 			hh->SendOk();
 		}
@@ -1709,7 +1715,9 @@ void CControlAPI::ZaptoCGI(CyhookHandler *hh)
 		{
 			if(!NeutrinoAPI->Zapit->isPlayBackActive()){
 				NeutrinoAPI->Zapit->startPlayBack();
+#if 0
 				NeutrinoAPI->Sectionsd->setPauseScanning(false);
+#endif
 				dprintf("start playback requested..\n");
 			}
 			hh->SendOk();
@@ -1718,12 +1726,16 @@ void CControlAPI::ZaptoCGI(CyhookHandler *hh)
 			hh->Write((char *) (NeutrinoAPI->Zapit->isPlayBackActive() ? "1" : "0"));
 		else if (hh->ParamList["1"] == "stopsectionsd")
 		{
+#if 0
 			NeutrinoAPI->Sectionsd->setPauseScanning(true);
+#endif
 			hh->SendOk();
 		}
 		else if (hh->ParamList["1"] == "startsectionsd")
 		{
+#if 0
 			NeutrinoAPI->Sectionsd->setPauseScanning(false);
+#endif
 			hh->SendOk();
 		}
 		else if (hh->ParamList["1"] == "statussectionsd")

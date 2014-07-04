@@ -492,7 +492,9 @@ void CShairPlay::exec(void)
 
 	showingCoverArt = false;
         videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+#if 0
         g_Sectionsd->setPauseScanning(true);
+#endif
 
 	if (!initialized) {
 		lock(&audioMutex);
@@ -588,7 +590,9 @@ void CShairPlay::exec(void)
 	g_RCInput->killTimer(coverArtTimer);
 	lock(&videoMutex);
         CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
+#if 0
         g_Sectionsd->setPauseScanning(false);
+#endif
         videoDecoder->StopPicture();
 	firstAudioPacket = true;
 	unlock(&videoMutex);

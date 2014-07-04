@@ -295,8 +295,10 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	m_LastMode=(CNeutrinoApp::getInstance()->getLastMode());
 
+#if 0
 	// Stop sectionsd
 	g_Sectionsd->setPauseScanning(true);
+#endif
 
 	puts("[audioplayer.cpp] executing " AUDIOPLAYER_START_SCRIPT ".");
 	if (my_system(AUDIOPLAYER_START_SCRIPT) != 0)
@@ -315,8 +317,10 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 		perror(AUDIOPLAYER_END_SCRIPT " failed");
 
 	CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
+#if 0
 	// Start Sectionsd
 	g_Sectionsd->setPauseScanning(false);
+#endif
 	videoDecoder->StopPicture();
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , m_LastMode );
 	g_RCInput->postMsg( NeutrinoMessages::SHOW_INFOBAR, 0 );

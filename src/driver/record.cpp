@@ -928,7 +928,7 @@ bool CRecordManager::Record(const CTimerd::RecordingInfo * const eventinfo, cons
 	if (g_settings.recording_type == CNeutrinoApp::RECORDING_OFF)
 		return false;
 
-#if 1 // FIXME test
+#if 0 // FIXME test
 	StopSectionsd = false;
 	if( !recmap.empty() )
 		StopSectionsd = true;

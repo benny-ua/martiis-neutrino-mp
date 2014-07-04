@@ -135,8 +135,10 @@ int CUpnpBrowserGui::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 		m_x = ConnectLineBox_Width;
 	m_y=getScreenStartY(m_height);
 
+#if 0
 	// Stop sectionsd
 	g_Sectionsd->setPauseScanning(true);
+#endif
 
 	m_deviceliststart=0;
 	m_selecteddevice=0;
@@ -149,8 +151,10 @@ int CUpnpBrowserGui::exec(CMenuTarget* parent, const std::string & /*actionKey*/
 
 	//g_Zapit->setStandby(false);
 
+#if 0
 	// Start Sectionsd
 	g_Sectionsd->setPauseScanning(false);
+#endif
 	videoDecoder->StopPicture();
 	m_frameBuffer->Clear();
 	g_Zapit->startPlayBack();

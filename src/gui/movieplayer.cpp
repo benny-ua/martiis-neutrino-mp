@@ -195,7 +195,9 @@ void CMoviePlayerGui::cutNeutrino()
 		return;
 
 	CZapit::getInstance()->lockPlayBack();
+#if 0
 	g_Sectionsd->setPauseScanning(true);
+#endif
 
 #ifdef HAVE_AZBOX_HARDWARE
 	/* we need sectionsd to get idle and zapit to release the demuxes
@@ -224,7 +226,9 @@ void CMoviePlayerGui::restoreNeutrino()
 		return;
 
 	CZapit::getInstance()->unlockPlayBack();
+#if 0
 	g_Sectionsd->setPauseScanning(false);
+#endif
 	//CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 	if (m_LastMode == NeutrinoMessages::mode_tv)
 		g_RCInput->postMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, 0x200, false);

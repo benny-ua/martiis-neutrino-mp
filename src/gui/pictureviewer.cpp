@@ -200,8 +200,10 @@ int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 		// blank background screen
 		videoDecoder->setBlank(true);
 
+#if 0
 		// Stop Sectionsd
 		g_Sectionsd->setPauseScanning(true);
+#endif
 	}
 
 	// Save and Clear background
@@ -220,8 +222,10 @@ int CPictureViewerGui::exec(CMenuTarget* parent, const std::string & actionKey)
 		//g_Zapit->setStandby(false);
 		CNeutrinoApp::getInstance()->handleMsg(NeutrinoMessages::EVT_PROGRAMLOCKSTATUS, (neutrino_msg_data_t) 0x200);
 
+#if 0
 		// Start Sectionsd
 		g_Sectionsd->setPauseScanning(false);
+#endif
 	}
 
 	// Restore previous background
