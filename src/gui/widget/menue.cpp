@@ -275,12 +275,8 @@ void CMenuItem::paintItemButton(const bool select_mode, int item_height, const c
 
 	//define icon name depends of numeric value
 	bool isNumeric = CRCInput::isNumeric(directKey);
-	if (isNumeric) {
-		if (g_settings.menu_numbers_as_icons)
-			icon_name = to_string(CRCInput::getNumericValue(directKey & ~CRCInput::RC_Repeat)).c_str();
-		else if (icon_name && icon_name[0] >= '0' && icon_name[0] <= '9' && !icon_name[1])
-			icon_name = NULL;
-	}
+	if (isNumeric && !g_settings.menu_numbers_as_icons)
+		icon_name = NULL;
 
 	//define select icon
 	if (selected && offx > 0)
@@ -369,6 +365,36 @@ void CMenuItem::setIconName()
 			break;
 		case CRCInput::RC_stop:
 			iconName = NEUTRINO_ICON_BUTTON_STOP;
+			break;
+		case CRCInput::RC_0:
+			iconName = NEUTRINO_ICON_BUTTON_0;
+			break;
+		case CRCInput::RC_1:
+			iconName = NEUTRINO_ICON_BUTTON_1;
+			break;
+		case CRCInput::RC_2:
+			iconName = NEUTRINO_ICON_BUTTON_2;
+			break;
+		case CRCInput::RC_3:
+			iconName = NEUTRINO_ICON_BUTTON_3;
+			break;
+		case CRCInput::RC_4:
+			iconName = NEUTRINO_ICON_BUTTON_4;
+			break;
+		case CRCInput::RC_5:
+			iconName = NEUTRINO_ICON_BUTTON_5;
+			break;
+		case CRCInput::RC_6:
+			iconName = NEUTRINO_ICON_BUTTON_6;
+			break;
+		case CRCInput::RC_7:
+			iconName = NEUTRINO_ICON_BUTTON_7;
+			break;
+		case CRCInput::RC_8:
+			iconName = NEUTRINO_ICON_BUTTON_8;
+			break;
+		case CRCInput::RC_9:
+			iconName = NEUTRINO_ICON_BUTTON_9;
 			break;
 	}
 }
@@ -1020,18 +1046,14 @@ void CMenuWidget::calcSize()
 	page_start.push_back(items.size());
 
 	iconOffset= 0;
-	for (unsigned int i= 0; i< items.size(); i++) {
-		const char *icon_name = items[i]->iconName;
-		if (!icon_name && g_settings.menu_numbers_as_icons && CRCInput::isNumeric(items[i]->directKey))
-			icon_name = to_string(CRCInput::getNumericValue(items[i]->directKey)).c_str();
-		if (items[i]->iconName)
+	for (unsigned int i= 0; i< items.size(); i++)
+		if (items[i]->iconName && (!g_settings.menu_numbers_as_icons || !CRCInput::isNumeric(items[i]->directKey)))
 		{
 			int w, h;
 			frameBuffer->getIconSize(items[i]->iconName, &w, &h);
 			if (w > iconOffset)
 				iconOffset = w;
 		}
-	}
 
 	iconOffset += 10;
 	width += iconOffset;
