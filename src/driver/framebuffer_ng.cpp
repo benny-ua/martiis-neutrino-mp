@@ -964,6 +964,13 @@ bool CFrameBuffer::paintIcon(const std::string & filename, const int x, const in
 		if(data) {
 			dsize = width*height*sizeof(fb_pixel_t);
 			//printf("CFrameBuffer::paintIcon: %s found, data %x size %d x %d\n", newname.c_str(), data, width, height);fflush(stdout);
+			if(cache_size+dsize >= ICON_CACHE_SIZE) {
+				//purge cache
+				for(it = icon_cache.begin(); it != icon_cache.end(); ++it)
+					cs_free_uncached(it->second.data);
+				icon_cache.clear();
+				cache_size = 0;
+			}
 			if(cache_size+dsize < ICON_CACHE_SIZE) {
 				cache_size += dsize;
 				tmpIcon.width = width;
