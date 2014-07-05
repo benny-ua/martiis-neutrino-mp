@@ -79,12 +79,11 @@ class CProgressBar : public CComponentsItem
 		///start position of activ/passiv area
 		int pb_x, pb_y;
 
-		bool pb_invert, pb_bl_changed;
-
 		///to evaluate values, these will be convert to the graph
 		int pb_value, pb_max_value;
 
 		int *pb_design, *pb_gradient;
+		int pb_type;
 
 		void initDimensions();
 
@@ -96,7 +95,6 @@ class CProgressBar : public CComponentsItem
 		///x_pos, y_pos, w, h: position and dimension in pixel
 		///w, h: width / height of bar. Can later be set with paintProgressbar.
 		///r, g, b: percentage of the bar where red/green/yellow is used, only used for colored designs
-		///inv:  false => red on the left side, true: red on right side.
 		///active_col, passive_col: sets colors for displayed values, activ_col means the the displayed progress
 		///color_frame, color_body, color_shadow: colores of progressbar for frame, body and shadow, Note: color of frame is ineffective on fr_thickness = 0
 		CProgressBar(	const int x_pos = 0, const int y_pos = 0,
@@ -104,7 +102,6 @@ class CProgressBar : public CComponentsItem
 				fb_pixel_t color_frame = 0, fb_pixel_t color_body = COL_MENUCONTENT_PLUS_0, fb_pixel_t color_shadow = COL_MENUCONTENTDARK_PLUS_0,
 				const fb_pixel_t active_col = COL_INFOBAR_PLUS_7, const fb_pixel_t passive_col = COL_INFOBAR_PLUS_3,
 				const int r = 40, const int g = 100, const int b =70,
-				const bool inv = false,
 				CComponentsForm *parent = NULL);
 
 
@@ -119,9 +116,6 @@ class CProgressBar : public CComponentsItem
 		void setPassiveColor(fb_pixel_t passive_color) {pb_passive_col = passive_color;};
 		///set up booth status colors at once
 		void setStatusColors(fb_pixel_t active_color, fb_pixel_t passive_color) {pb_passive_col = passive_color; pb_active_col = active_color;};
-
-		///invert: false => red on the left side, true: red on right side.
-		void setInvert(bool inverted = true){pb_invert = inverted;};
 
 		///r, g, b: percentage of the bar where red/green/yellow is used, only used for colored designs
 		void setRgb(const int r, const int g, const int b){pb_red =  r; pb_green = g; pb_yellow = b;};
@@ -143,6 +137,14 @@ class CProgressBar : public CComponentsItem
 			PB_LINES_H,	/*  2 */
 			PB_COLOR,	/*  3 */
 		};
+
+		enum pb_type_t {
+			PB_REDLEFT = 0,
+			PB_REDRIGHT,
+			PB_TIMESCALE,
+		};
+
+		void setType(pb_type_t type);
 
 		//set design (overides g_settings.progressbar_design)
 		void setDesign(int &design) { pb_design = &design; }
