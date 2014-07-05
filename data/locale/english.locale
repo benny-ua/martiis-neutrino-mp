@@ -1192,6 +1192,10 @@ menu.hint_pref_lang Select preferred audio and EPG language\nselect 'none' to di
 menu.hint_pref_subs Select preferred subtitle language\nselect 'none' to disable
 menu.hint_progressbar_color Change appearance of progress bars
 menu.hint_progressbar_gradient Add a vertical brightness gradient to progress bars
+menu.hint_progressbar_timescale_green Choose the green portion of colored progressbars
+menu.hint_progressbar_timescale_invert Select your preferred color gradient
+menu.hint_progressbar_timescale_red Choose the red portion of colored progressbars
+menu.hint_progressbar_timescale_yellow Choose the yellow portion of colored progressbars
 menu.hint_protection Protect content by PIN code\nDefault PIN 0000
 menu.hint_radiomode Switch box to radio mode
 menu.hint_rass Switch to interactive Rass (radio screen show) mode.
@@ -1462,12 +1466,20 @@ miscsettings.progressbar_design_1 colored vertical lines
 miscsettings.progressbar_design_2 colored horizontal lines
 miscsettings.progressbar_design_3 colored bar
 miscsettings.progressbar_design_4 monochrome
-miscsettings.progressbar_design_long Progress bar design
-miscsettings.progressbar_gradient Progress bar with 3D effect
+miscsettings.progressbar_design_long Design
+miscsettings.progressbar_gradient 3D effect
 miscsettings.progressbar_infobar_position_0 standard
 miscsettings.progressbar_infobar_position_1 below channel name
 miscsettings.progressbar_infobar_position_2 small below channel name
 miscsettings.progressbar_infobar_position_3 narrow between EPG-Events
+miscsettings.progressbar_preview Preview
+miscsettings.progressbar_timescale Time scale
+miscsettings.progressbar_timescale_green green
+miscsettings.progressbar_timescale_green_red from green to red
+miscsettings.progressbar_timescale_invert Color gradient
+miscsettings.progressbar_timescale_red red
+miscsettings.progressbar_timescale_red_green from red to green
+miscsettings.progressbar_timescale_yellow yellow
 miscsettings.radiotext Radiotext
 miscsettings.rename_picons Rename Picons to channel names
 miscsettings.restart The change will be active after restart.
@@ -1789,6 +1801,7 @@ opkg.title Package Management
 opkg.upgrade Upgrade installed packages
 options.default Reset to defaults
 options.fb framebuffer
+options.hint_default Reset the values to their defaults
 options.ntp_off DVB
 options.ntp_on NTP
 options.null null

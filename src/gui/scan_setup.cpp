@@ -615,7 +615,6 @@ int CScanSetup::showScanMenuFrontendSetup()
 			name += std::string(g_Locale->getText(loc)) + " ";
 		name += fe->getInfo()->name;
 
-		const char * icon = NULL;
 		neutrino_msg_t key = CRCInput::RC_nokey;
 		if (i == 0)
 			key = CRCInput::RC_red;

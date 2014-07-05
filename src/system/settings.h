@@ -165,6 +165,10 @@ struct SNeutrinoSettings
 	int infobar_progressbar;
 	int progressbar_design;
 	int progressbar_gradient;
+	int progressbar_timescale_red;
+	int progressbar_timescale_green;
+	int progressbar_timescale_yellow;
+	int progressbar_timescale_invert;
 	int casystem_display;
 	int scrambled_message;
 	int volume_pos;

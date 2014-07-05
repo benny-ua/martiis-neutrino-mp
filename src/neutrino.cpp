@@ -524,6 +524,10 @@ int CNeutrinoApp::loadSetup(const char * fname)
 	bool pb_color = configfile.getBool("progressbar_color", true );
 	if (!pb_color)
 		g_settings.progressbar_design = CProgressBar::PB_MONO;
+        g_settings.progressbar_timescale_red = configfile.getInt32("progressbar_timescale_red", 0);
+        g_settings.progressbar_timescale_green = configfile.getInt32("progressbar_timescale_green", 100);
+        g_settings.progressbar_timescale_yellow = configfile.getInt32("progressbar_timescale_yellow", 70);
+        g_settings.progressbar_timescale_invert = configfile.getBool("progressbar_timescale_invert", false);
 	g_settings.infobar_show = configfile.getInt32("infobar_show", configfile.getInt32("infobar_cn", 1));
 	g_settings.infobar_show_channellogo   = configfile.getInt32("infobar_show_channellogo"  , 3 );
 	g_settings.infobar_progressbar   = configfile.getInt32("infobar_progressbar"  , 1 ); // below channel name
@@ -1113,6 +1117,10 @@ void CNeutrinoApp::saveSetup(const char * fname)
 	configfile.setBool("menu_numbers_as_icons", g_settings.menu_numbers_as_icons);
 	configfile.setBool("progressbar_gradient", g_settings.progressbar_gradient);
 	configfile.setInt32("progressbar_design", g_settings.progressbar_design);
+        configfile.setInt32("progressbar_timescale_red", g_settings.progressbar_timescale_red);
+        configfile.setInt32("progressbar_timescale_green", g_settings.progressbar_timescale_green);
+        configfile.setInt32("progressbar_timescale_yellow", g_settings.progressbar_timescale_yellow);
+        configfile.setInt32("progressbar_timescale_invert", g_settings.progressbar_timescale_invert);
 	configfile.setInt32("infobar_show", g_settings.infobar_show);
 	configfile.setInt32("infobar_show_channellogo"  , g_settings.infobar_show_channellogo  );
 	configfile.setInt32("infobar_progressbar"  , g_settings.infobar_progressbar  );

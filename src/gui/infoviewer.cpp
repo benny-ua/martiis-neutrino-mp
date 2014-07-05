@@ -252,7 +252,7 @@ void CInfoViewer::changePB()
 	if (timescale)
 		delete timescale;
 	timescale = new CProgressBar();
-	timescale->setRgb(0, 100, 70);
+	timescale->setType(CProgressBar::PB_TIMESCALE);
 }
 
 void CInfoViewer::paintTime (bool /*show_dot*/)
