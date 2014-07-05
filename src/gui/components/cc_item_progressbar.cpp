@@ -401,6 +401,8 @@ void CProgressBar::paintProgress(bool do_save_bg)
 	if (pb_type == PB_TIMESCALE)
 		setRgb(g_settings.progressbar_timescale_red, g_settings.progressbar_timescale_green, g_settings.progressbar_timescale_yellow);
 
+	if (!pb_red && !pb_yellow && !pb_green)
+		pb_green = 1;
 	int sum = pb_red + pb_yellow + pb_green;
 	pb_red *= 100;
 	pb_yellow *= 100;
