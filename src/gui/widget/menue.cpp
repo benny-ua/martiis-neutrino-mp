@@ -2186,24 +2186,26 @@ int CMenuSelectorTarget::exec(CMenuTarget* /*parent*/, const std::string & actio
 	return menu_return::RETURN_EXIT;
 }
 
-CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text, CComponentsItem *_ci) : CMenuItem(false, CRCInput::RC_nokey, NULL, NULL, false)
+CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
+	inert = true;
 	name = Text;
 	nameString = "";
 	ci = _ci;
 }
 
-CMenuProgressbar::CMenuProgressbar(const std::string & Text, CComponentsItem *_ci) : CMenuItem(false, CRCInput::RC_nokey, NULL, NULL, false)
+CMenuProgressbar::CMenuProgressbar(const std::string & Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
+	inert = true;
 	name = NONEXISTANT_LOCALE;
 	nameString = Text;
 	ci = _ci;
 }
 
-int CMenuProgressbar::paint(bool /*selected*/)
+int CMenuProgressbar::paint(bool selected)
 {
 	//paint item
-	prepareItem(false, height);
+	prepareItem(selected, height);
 
 	//left text
 	const char *left_text = getName();
@@ -2220,6 +2222,7 @@ int CMenuProgressbar::paint(bool /*selected*/)
 		ci_x = name_start_x;
 
 	ci->setPos(ci_x, y + (height - ci->getHeight())/2);
+	ci->reset();
 	ci->paint();
 
 	return y + height;
@@ -2236,4 +2239,15 @@ int CMenuProgressbar::getWidth(void)
 	if (width)
 		width += 10;
 	return width + ci->getWidth();
+}
+
+int CMenuProgressbar::exec(CMenuTarget*)
+{
+	int val = ci->getValue() + 25;
+	if (val > 100)
+		val = 0;
+	ci->setValue(val);
+	ci->reset();
+	ci->paint();
+	return menu_return::RETURN_NONE;
 }

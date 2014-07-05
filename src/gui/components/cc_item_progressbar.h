@@ -106,24 +106,26 @@ class CProgressBar : public CComponentsItem
 
 
 		///set up to display available values
-		void setValue(const int val){ pb_value = val;};
-		void setMaxValue(const int max_val){pb_max_value = max_val;};
+		void setValue(const int val){ pb_value = val;}
+		//return current value
+		int getValue(void) { return pb_value; }
+		void setMaxValue(const int max_val){pb_max_value = max_val;}
 		///set up booth values to display at once
-		void setValues(const int val, const int max_val){pb_value = val; pb_max_value = max_val;};
+		void setValues(const int val, const int max_val){pb_value = val; pb_max_value = max_val;}
 
 		///setters for status colors
-		void setActiveColor(fb_pixel_t active_color) {pb_active_col = active_color;};
-		void setPassiveColor(fb_pixel_t passive_color) {pb_passive_col = passive_color;};
+		void setActiveColor(fb_pixel_t active_color) {pb_active_col = active_color;}
+		void setPassiveColor(fb_pixel_t passive_color) {pb_passive_col = passive_color;}
 		///set up booth status colors at once
-		void setStatusColors(fb_pixel_t active_color, fb_pixel_t passive_color) {pb_passive_col = passive_color; pb_active_col = active_color;};
+		void setStatusColors(fb_pixel_t active_color, fb_pixel_t passive_color) {pb_passive_col = passive_color; pb_active_col = active_color;}
 
 		///r, g, b: percentage of the bar where red/green/yellow is used, only used for colored designs
-		void setRgb(const int r, const int g, const int b){pb_red =  r; pb_green = g; pb_yellow = b;};
+		void setRgb(const int r, const int g, const int b){pb_red =  r; pb_green = g; pb_yellow = b;}
 
 		///x, y, width, height, value, max_value: set most wanted parameters at once
 		void setProgress(const int x_pos, const int y_pos,
 					const int w, const int h,
-					const int val, const int max_val){x=x_pos; y=y_pos; width=w; height=h; pb_value=val; pb_max_value=max_val;};
+					const int val, const int max_val){x=x_pos; y=y_pos; width=w; height=h; pb_value=val; pb_max_value=max_val;}
 
 		///force update on next paint
 		void reset() { pb_last_width = -1; }

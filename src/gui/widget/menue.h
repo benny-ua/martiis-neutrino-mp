@@ -610,16 +610,17 @@ class CMenuSelectorTarget : public CMenuTarget
 class CMenuProgressbar : public CMenuItem
 {
 	private:
-		CComponentsItem *ci;
+		CProgressBar *ci;
 	public:
 
-		CMenuProgressbar(const neutrino_locale_t Text, CComponentsItem *_ci);
-		CMenuProgressbar(const std::string & Text, CComponentsItem *_ci);
+		CMenuProgressbar(const neutrino_locale_t Text, CProgressBar *_ci);
+		CMenuProgressbar(const std::string & Text, CProgressBar *_ci);
 		virtual ~CMenuProgressbar(){}
 
 		int paint(bool selected=false);
 		int getWidth(void);
 		int getHeight(void);
+		int exec(CMenuTarget *parent);
 };
 
 extern CMenuSeparator * const GenericMenuSeparator;

@@ -724,6 +724,7 @@ int CProgressbarSetup::show()
 
 	// preview
 	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, scale);
+	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
 	m.addItem(mb);
 	m.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MISCSETTINGS_PROGRESSBAR_TIMESCALE));
 
@@ -752,6 +753,7 @@ int CProgressbarSetup::show()
 	m.addItem(mc);
 
 	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, timescale);
+	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
 	m.addItem(mb);
 
 	CMenuForwarder* mf = new CMenuForwarder(LOCALE_OPTIONS_DEFAULT, true, NULL, this, "reset", CRCInput::RC_red);
@@ -766,6 +768,7 @@ int CProgressbarSetup::show()
 	m.addItem(mc);
 
 	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, channelscale);
+	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
 	m.addItem(mb);
 
 	return m.exec(NULL, "");
@@ -840,6 +843,7 @@ int CChannellistSetup::show()
 
 	// extended channel list preview
 	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, channelscale);
+	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
 	m.addItem(mb);
 
 	//m.addItem(GenericMenuSeparatorLine);
