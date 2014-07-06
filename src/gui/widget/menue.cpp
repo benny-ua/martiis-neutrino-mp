@@ -2188,7 +2188,6 @@ int CMenuSelectorTarget::exec(CMenuTarget* /*parent*/, const std::string & actio
 
 CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
-	inert = true;
 	name = Text;
 	nameString = "";
 	ci = _ci;
@@ -2196,7 +2195,6 @@ CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text, CProgressBar *_
 
 CMenuProgressbar::CMenuProgressbar(const std::string & Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
-	inert = true;
 	name = NONEXISTANT_LOCALE;
 	nameString = Text;
 	ci = _ci;
