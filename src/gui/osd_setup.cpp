@@ -709,7 +709,7 @@ int CProgressbarSetup::show()
 	timescale->reset();
 	channelscale->reset();
 
-	m.addIntroItems(LOCALE_MISCSETTINGS_PROGRESSBAR, LOCALE_MISCSETTINGS_GENERAL);
+	m.addIntroItems(LOCALE_MISCSETTINGS_PROGRESSBAR /*, LOCALE_MISCSETTINGS_GENERAL*/);
 
 	// general progress bar design
 	CMenuOptionChooser *mc = new CMenuOptionChooser(LOCALE_MISCSETTINGS_PROGRESSBAR_DESIGN_LONG,
