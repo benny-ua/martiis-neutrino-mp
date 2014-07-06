@@ -923,9 +923,11 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 #define NUM_CAIDS 11
 void CStreamInfo2::paintCASystem(int xpos, int ypos)
 {
-	int ypos1 = 0;
+	ypos += iheight*2;
+	int ypos1 = ypos;
+
 	if(box_h2 > 0)
-		frameBuffer->paintBoxRel (0, ypos+(iheight*2), box_width, box_h2, COL_MENUHEAD_PLUS_0);
+		frameBuffer->paintBoxRel (0, ypos, box_width, box_h2, COL_MENUHEAD_PLUS_0);
 
 	std::string casys[NUM_CAIDS]={"Irdeto:","Betacrypt:","Seca:","Viaccess:","Nagra:","Conax: ","Cryptoworks:","Videoguard:","EBU:","XCrypt:","PowerVU:"};
 	bool caids[NUM_CAIDS];
@@ -1005,7 +1007,6 @@ void CStreamInfo2::paintCASystem(int xpos, int ypos)
 	}
 
 	off+=4;
-	ypos += iheight*2;
 	bool cryptsysteme = true;
 	for(int ca_id = 0; ca_id < NUM_CAIDS; ca_id++){
 		if(caids[ca_id] == true){
