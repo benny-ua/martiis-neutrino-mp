@@ -640,46 +640,14 @@ int CMenuInfoClockSetup::show(void)
 class CProgressbarSetup : public CMenuTarget, public CChangeObserver
 {
 	private:
-		CProgressBar *scale, *timescale, *channelscale;
 		int show();
 	public:
 		int exec(CMenuTarget* parent, const std::string &);
 		bool changeNotify(const neutrino_locale_t /* OptionName */, void * /* data */);
-		CProgressbarSetup();
-		~CProgressbarSetup();
 };
-
-CProgressbarSetup::CProgressbarSetup()
-{
-	int pb_h = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight()/2;
-
-	scale = new CProgressBar(0, 0, 100, pb_h);
-	scale->setValue(100);
-
-	timescale = new CProgressBar(0, 0, 100, pb_h);
-	timescale->setType(CProgressBar::PB_TIMESCALE);
-	timescale->setValue(100);
-
-	channelscale = new CProgressBar(0, 0, 100, pb_h,
-		0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3);
-	channelscale->setType(CProgressBar::PB_TIMESCALE);
-	channelscale->setDesign(g_settings.channellist_progressbar_design);
-	channelscale->doPaintBg(false);
-	channelscale->setValue(100);
-}
-
-CProgressbarSetup::~CProgressbarSetup()
-{
-	delete scale;
-	delete timescale;
-	delete channelscale;
-}
 
 bool CProgressbarSetup::changeNotify(const neutrino_locale_t /* OptionName */, void * /* data */)
 {
-	scale->reset();
-	timescale->reset();
-	channelscale->reset();
 	return true; // repaint
 }
 
@@ -690,9 +658,6 @@ int CProgressbarSetup::exec(CMenuTarget* parent, const std::string &actionKey)
 		g_settings.progressbar_timescale_green = 100;
 		g_settings.progressbar_timescale_yellow = 70;
 		g_settings.progressbar_timescale_invert = false;
-		scale->reset();
-		timescale->reset();
-		channelscale->reset();
 		return menu_return::RETURN_REPAINT;
 	}
 	if (parent)
@@ -704,10 +669,6 @@ int CProgressbarSetup::show()
 {
 	int width = w_max (40, 10); //%
 	CMenuWidget m(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_PROGRESSBAR);
-
-	scale->reset();
-	timescale->reset();
-	channelscale->reset();
 
 	m.addIntroItems(LOCALE_MISCSETTINGS_PROGRESSBAR /*, LOCALE_MISCSETTINGS_GENERAL*/);
 
@@ -723,7 +684,7 @@ int CProgressbarSetup::show()
 	m.addItem(mc);
 
 	// preview
-	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, scale);
+	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW);
 	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
 	m.addItem(mb);
 	m.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MISCSETTINGS_PROGRESSBAR_TIMESCALE));
@@ -752,24 +713,29 @@ int CProgressbarSetup::show()
 	mc->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_TIMESCALE_INVERT);
 	m.addItem(mc);
 
-	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, timescale);
+	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW);
 	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
+	mb->getScale()->setType(CProgressBar::PB_TIMESCALE);
 	m.addItem(mb);
 
 	CMenuForwarder* mf = new CMenuForwarder(LOCALE_OPTIONS_DEFAULT, true, NULL, this, "reset", CRCInput::RC_red);
 	mf->setHint("", LOCALE_OPTIONS_HINT_DEFAULT);
 	m.addItem(mf);
 
+	// extended channel list (progressbars)
 	m.addItem(new CMenuSeparator(CMenuSeparator::LINE | CMenuSeparator::STRING, LOCALE_MAINMENU_CHANNELS));
 
-	// extended channel list (progressbars)
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_EXTENDED, &g_settings.channellist_progressbar_design, PROGRESSBAR_COLOR_OPTIONS, PROGRESSBAR_COLOR_OPTION_COUNT, true, this);
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_EXTENDED);
 	m.addItem(mc);
 
-	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, channelscale);
+	mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW);
 	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
+	mb->getScale()->setType(CProgressBar::PB_TIMESCALE);
+	mb->getScale()->setDesign(g_settings.channellist_progressbar_design);
+	mb->getScale()->doPaintBg(false);
 	m.addItem(mb);
+
 
 	return m.exec(NULL, "");
 }
@@ -777,36 +743,14 @@ int CProgressbarSetup::show()
 class CChannellistSetup : public CMenuTarget, public CChangeObserver
 {
 	private:
-		CProgressBar *channelscale;
 		int show();
 	public:
 		int exec(CMenuTarget* parent, const std::string &);
 		bool changeNotify(const neutrino_locale_t /* OptionName */, void * /* data */);
-		CChannellistSetup();
-		~CChannellistSetup();
 };
-
-
-CChannellistSetup::CChannellistSetup()
-{
-	int pb_h = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight()/2;
-
-	channelscale = new CProgressBar(0, 0, 100, pb_h,
-		0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3);
-	channelscale->setType(CProgressBar::PB_TIMESCALE);
-	channelscale->setDesign(g_settings.channellist_progressbar_design);
-	channelscale->doPaintBg(false);
-	channelscale->setValue(100);
-}
-
-CChannellistSetup::~CChannellistSetup()
-{
-	delete channelscale;
-}
 
 bool CChannellistSetup::changeNotify(const neutrino_locale_t /* OptionName */, void * /* data */)
 {
-	channelscale->reset();
 	return true; // repaint
 }
 
@@ -821,8 +765,6 @@ int CChannellistSetup::show()
 {
 	int width = w_max (40, 10); //%
 	CMenuWidget m(LOCALE_MAINMENU_SETTINGS, NEUTRINO_ICON_SETTINGS, width, MN_WIDGET_ID_OSDSETUP_CHANNELLIST);
-
-	channelscale->reset();
 
 	m.addIntroItems(LOCALE_MISCSETTINGS_CHANNELLIST);
 
@@ -842,11 +784,12 @@ int CChannellistSetup::show()
 	m.addItem(mc);
 
 	// extended channel list preview
-	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW, channelscale);
+	CMenuProgressbar *mb = new CMenuProgressbar(LOCALE_MISCSETTINGS_PROGRESSBAR_PREVIEW);
 	mb->setHint("", LOCALE_MENU_HINT_PROGRESSBAR_PREVIEW);
+	mb->getScale()->setType(CProgressBar::PB_TIMESCALE);
+	mb->getScale()->setDesign(g_settings.channellist_progressbar_design);
+	mb->getScale()->doPaintBg(false);
 	m.addItem(mb);
-
-	//m.addItem(GenericMenuSeparatorLine);
 
 	// foot
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_FOOT, &g_settings.channellist_foot, CHANNELLIST_FOOT_OPTIONS, CHANNELLIST_FOOT_OPTIONS_COUNT, true);

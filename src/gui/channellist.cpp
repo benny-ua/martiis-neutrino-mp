@@ -2093,8 +2093,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 					time_t jetzt=time(NULL);
 					int runningPercent = 0;
 					int pb_space = prg_offset - title_offset;
-					CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + 2, pb_space + 2, fheight/2 - 4,
-							0, COL_MENUCONTENT_PLUS_0, COL_MENUCONTENTDARK_PLUS_0, COL_INFOBAR_PLUS_7, COL_INFOBAR_PLUS_3);
+					CProgressBar pb(x+5+numwidth + title_offset, ypos + fheight/4 + 2, pb_space + 2, fheight/2 - 4);
 					pb.setType(CProgressBar::PB_TIMESCALE);
 					pb.setDesign(g_settings.channellist_progressbar_design);
 					pb.setCornerType(0);

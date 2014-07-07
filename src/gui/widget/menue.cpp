@@ -2186,18 +2186,22 @@ int CMenuSelectorTarget::exec(CMenuTarget* /*parent*/, const std::string & actio
 	return menu_return::RETURN_EXIT;
 }
 
-CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
+CMenuProgressbar::CMenuProgressbar(const neutrino_locale_t Text) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
-	name = Text;
-	nameString = "";
-	ci = _ci;
+	init(Text, "");
 }
 
-CMenuProgressbar::CMenuProgressbar(const std::string & Text, CProgressBar *_ci) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
+CMenuProgressbar::CMenuProgressbar(const std::string &Text) : CMenuItem(true, CRCInput::RC_nokey, NULL, NULL, false)
 {
-	name = NONEXISTANT_LOCALE;
+	init(NONEXISTANT_LOCALE, Text);
+}
+
+void CMenuProgressbar::init(const neutrino_locale_t Loc, const std::string &Text)
+{
+	name = Loc;
 	nameString = Text;
-	ci = _ci;
+	scale.setDimensionsAll(0, 0, 100, g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight()/2);
+	scale.setValue(100);
 }
 
 int CMenuProgressbar::paint(bool selected)
@@ -2213,22 +2217,22 @@ int CMenuProgressbar::paint(bool selected)
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(name_start_x, y + height, _dx- (name_start_x - x), left_text, item_color);
 
 	//progress bar
-	int ci_x;
+	int pb_x;
 	if (*left_text)
-		ci_x = std::max(name_start_x + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(left_text) + icon_frame_w, x + dx - ci->getWidth() - icon_frame_w);
+		pb_x = std::max(name_start_x + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(left_text) + icon_frame_w, x + dx - scale.getWidth() - icon_frame_w);
 	else
-		ci_x = name_start_x;
+		pb_x = name_start_x;
 
-	ci->setPos(ci_x, y + (height - ci->getHeight())/2);
-	ci->reset();
-	ci->paint();
+	scale.setPos(pb_x, y + (height - scale.getHeight())/2);
+	scale.reset();
+	scale.paint();
 
 	return y + height;
 }
 
 int CMenuProgressbar::getHeight(void)
 {
-	return std::max(CMenuItem::getHeight(), ci->getHeight());
+	return std::max(CMenuItem::getHeight(), scale.getHeight());
 }
 
 int CMenuProgressbar::getWidth(void)
@@ -2236,16 +2240,16 @@ int CMenuProgressbar::getWidth(void)
 	int width = g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(getName());
 	if (width)
 		width += 10;
-	return width + ci->getWidth();
+	return width + scale.getWidth();
 }
 
 int CMenuProgressbar::exec(CMenuTarget*)
 {
-	int val = ci->getValue() + 25;
+	int val = scale.getValue() + 25;
 	if (val > 100)
 		val = 0;
-	ci->setValue(val);
-	ci->reset();
-	ci->paint();
+	scale.setValue(val);
+	scale.reset();
+	scale.paint();
 	return menu_return::RETURN_NONE;
 }
