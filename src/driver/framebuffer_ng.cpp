@@ -211,10 +211,6 @@ CFrameBuffer::CFrameBuffer()
 	memset(green, 0, 256*sizeof(__u16));
 	memset(blue, 0, 256*sizeof(__u16));
 	memset(trans, 0, 256*sizeof(__u16));
-
-#if HAVE_SPARK_HARDWARE
-	setMixerColor(g_settings.video_mixer_color);
-#endif
 }
 
 CFrameBuffer* CFrameBuffer::getInstance()
@@ -311,6 +307,9 @@ void CFrameBuffer::init(const char * const fbDevice)
         useBackground(false);
 	m_transparent = m_transparent_default;
 	accel = new CFbAccel(this);
+#if HAVE_SPARK_HARDWARE
+	setMixerColor(g_settings.video_mixer_color);
+#endif
 	return;
 
 nolfb:
