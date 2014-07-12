@@ -444,9 +444,9 @@ void cNKFeedParser::Cleanup(bool delete_thumbnails)
 
 std::string cNKFeedParser::GetUrl(std::string &s, bool rtmp)
 {
-#if 0 // FFMPEG currently doesn't support f4m files
+#if 0 // FFMPEG currently doesn't support HDS demultiplexing
 	if (rtmp)
-		return "http://netzkino_seite-vh.akamaihd.net/z/" + s + ".mp4/manifest.f4m?hdcore=2.11.3"
+		return "http://netzkino_seite-vh.akamaihd.net/z/" + s + ".mp4/manifest.f4m?hdcore=2.11.3";
 #endif
 	return "http://pmd.netzkino-seite.netzkino.de/" + s + ".mp4";
 }
