@@ -4100,17 +4100,21 @@ bool CMovieBrowser::showNKMenu(bool calledExternally)
 		mainMenu.addItem(GenericMenuSeparatorLine);
 	}
 
+#if 0
 	#define NK_PROTOCOL_OPTION_COUNT 2
 	const CMenuOptionChooser::keyval NK_PROTOCOL_OPTIONS[NK_PROTOCOL_OPTION_COUNT] =
 	{
 		{ 0, LOCALE_PROTOCOL_HTTP },
 		{ 1, LOCALE_PROTOCOL_RTMP }
 	};
+#endif
 
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_RESULTS, &m_settings.nkresults, true, 0, 1000, NULL, 0, 0, LOCALE_MOVIEBROWSER_UNLIMITED));
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_MAX_HISTORY, &m_settings.nksearch_history_max, true, 10, 50, NULL));
 	mainMenu.addItem(new CMenuOptionNumberChooser(LOCALE_MOVIEBROWSER_YT_CONCURRENT_CONNECTIONS, &m_settings.nkconcconn, true, 1, 8));
+#if 0
 	mainMenu.addItem(new CMenuOptionChooser(LOCALE_MOVIEBROWSER_NK_PROTOCOL, &m_settings.nkrtmp, NK_PROTOCOL_OPTIONS, NK_PROTOCOL_OPTION_COUNT, true));
+#endif
 
 	CFileChooser fc(&m_settings.nkthumbnaildir);
 	mainMenu.addItem(new CMenuForwarder(LOCALE_MOVIEBROWSER_CACHE_DIR, true, m_settings.nkthumbnaildir, &fc));

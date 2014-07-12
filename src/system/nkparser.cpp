@@ -79,7 +79,7 @@ size_t cNKFeedParser::CurlWriteToString(void *ptr, size_t size, size_t nmemb, vo
 		std::string* pStr = (std::string*) data;
 		pStr->append((char*) ptr, nmemb);
 	}
-        return size*nmemb;
+	return size*nmemb;
 }
 
 bool cNKFeedParser::getUrl(std::string &url, std::string &answer, CURL *_curl_handle)
@@ -444,7 +444,9 @@ void cNKFeedParser::Cleanup(bool delete_thumbnails)
 
 std::string cNKFeedParser::GetUrl(std::string &s, bool rtmp)
 {
+#if 0 // FFMPEG currently doesn't support f4m files
 	if (rtmp)
-		return "rtmp://mf.netzkino.c.nmdn.net/netzkino/_definst_/mp4:" + s;
-	return "http://dl.netzkinotv.c.nmdn.net/netzkino_tv/" + s + ".mp4";
+		return "http://netzkino_seite-vh.akamaihd.net/z/" + s + ".mp4/manifest.f4m?hdcore=2.11.3"
+#endif
+	return "http://pmd.netzkino-seite.netzkino.de/" + s + ".mp4";
 }
