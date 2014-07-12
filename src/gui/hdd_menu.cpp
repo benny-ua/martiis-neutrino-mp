@@ -650,8 +650,8 @@ int CHDDFmtExec::exec(CMenuTarget* /*parent*/, const std::string& key)
 	mke3fs  = find_executable("mkfs.ext3");
 	mke4fs  = find_executable("mkfs.ext4");
 	tune2fs = find_executable("tune2fs");
-	if (! fdisk.empty()) {
-		snprintf(cmd, sizeof(cmd), "%s -f -uM /dev/%s", fdisk.c_str(), key.c_str());
+	if (! sfdisk.empty()) {
+		snprintf(cmd, sizeof(cmd), "%s -f -uM /dev/%s", sfdisk.c_str(), key.c_str());
 		strcpy(cmd2, "0,\n;\n;\n;\ny\n");
 	} else if (! fdisk.empty()) {
 		snprintf(cmd, sizeof(cmd), "%s -u /dev/%s", fdisk.c_str(), key.c_str());
