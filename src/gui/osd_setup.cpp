@@ -801,6 +801,11 @@ int CChannellistSetup::show()
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_COLORED);
 	m.addItem(mc);
 
+	//show numbers
+	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_SHOW_CHANNELNUMBER, &g_settings.channellist_show_numbers, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
+	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_SHOW_CHANNELNUMBER);
+	m.addItem(mc);
+
 	//show channel logo
 	mc = new CMenuOptionChooser(LOCALE_CHANNELLIST_SHOW_CHANNELLOGO, &g_settings.channellist_show_channellogo, OPTIONS_OFF0_ON1_OPTIONS, OPTIONS_OFF0_ON1_OPTION_COUNT, true);
 	mc->setHint("", LOCALE_MENU_HINT_CHANNELLIST_SHOW_CHANNELLOGO);

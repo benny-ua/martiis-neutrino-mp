@@ -2055,9 +2055,12 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 
 		int icon_space = r_icon_w+s_icon_w;
 
-		//number
-		int numpos = x+5+numwidth- g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->getRenderWidth(tmp);
-		g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->RenderString(numpos,ypos+fheight, numwidth+5, tmp, color, fheight);
+		//channel numbers
+		if (g_settings.channellist_show_numbers) {
+			int numpos = x+5+numwidth- g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->getRenderWidth(tmp);
+			g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_NUMBER]->RenderString(numpos,ypos+fheight, numwidth+5, tmp, color, fheight);
+		} else
+			numwidth = -5;
 
 		int l=0;
 		if (this->historyMode)
@@ -2112,19 +2115,7 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 							runningPercent = pb_max;	// later on which can be fatal...
 					}
 
-					if (g_settings.progressbar_design != CProgressBar::PB_MONO) {
-						if (liststart + pos != selected) {
-							fb_pixel_t pbgcol = COL_MENUCONTENT_PLUS_1;
-							if (pbgcol == bgcolor)
-								pbgcol = COL_MENUCONTENT_PLUS_0;
-							pb.setStatusColors(COL_MENUCONTENT_PLUS_3, pbgcol);
-						} else {
-							fb_pixel_t pbgcol = COL_MENUCONTENTSELECTED_PLUS_0;
-							if (pbgcol == bgcolor)
-								pbgcol = COL_MENUCONTENT_PLUS_0;
-							pb.setStatusColors(COL_MENUCONTENTSELECTED_PLUS_2, pbgcol);
-						}
-					} else {
+					if (g_settings.channellist_progressbar_design == CProgressBar::PB_MONO) {
 						if (liststart + pos != selected)
 							pb.setStatusColors(COL_MENUCONTENT_PLUS_3, COL_MENUCONTENT_PLUS_1);
 						else
