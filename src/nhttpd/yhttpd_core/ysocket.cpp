@@ -325,8 +325,7 @@ bool CySocket::SendFile(int filed, off_t start, off_t size) {
 	while (left > 0) {
 		// split sendfile() transfer to smaller chunks to reduce memory-mapping requirements
 		if((written = ::sendfile(sock, filed, &start, 0x8000000)) == -1) {
-			if (errno != EPIPE)
-				perror("sendfile failed");
+			perror("sendfile failed");
 			if (errno != EINVAL)
 				return false;
 			break;
@@ -342,8 +341,7 @@ bool CySocket::SendFile(int filed, off_t start, off_t size) {
 		char sbuf[65536];
 		while (left && (written = read(filed, sbuf, std::min((off_t) sizeof(sbuf), left))) > 0) {
 			if (Send(sbuf, written) < 0) {
-				if (errno != EPIPE)
-					perror("send failed");
+				perror("send failed");
 				return false;
 			}
 			BytesSend += written;
