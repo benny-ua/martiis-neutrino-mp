@@ -127,7 +127,8 @@ THandleStatus CmodSendfile::Hook_PrepareResponse(CyhookHandler *hh) {
 				} else {
 					hh->SendFile(fullfilename);
 					hh->ResponseMimeType = mime;
-					hh->httpStatus = HTTP_PARTIAL_CONTENT;
+					if (hh->RangeStart && (hh->RangeEnd != hh->ContentLength - 1))
+						hh->httpStatus = HTTP_PARTIAL_CONTENT;
 				}
 			} else
 				hh->SetHeader(HTTP_NOT_MODIFIED, mime, HANDLED_READY);
