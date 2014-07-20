@@ -129,8 +129,6 @@ public:
 	std::string 	ResponseMimeType;	// mime-type for response
 	std::string 	NewURL;				// new URL for Redirection
 	off_t		ContentLength;			// Length of Response Body
-	off_t		RangeStart;			// Start of range, used for sendfile only
-	off_t		RangeEnd;			// End of range, used for sendfile only
 	time_t 		LastModified;			// Last Modified Time of Item to send / -1 dynamic content
 	std::string	Sendfile;				// Path & Name (local os style) of file to send
 	bool		keep_alive;
@@ -143,7 +141,7 @@ public:
 	CStringList 	HookVarList;		// Variables in Hook-Handling passing to other Hooks
 	THttp_Method 	Method;				// HTTP Method (requested)
 	// constructor & deconstructor
-	CyhookHandler(){ContentLength = 0; RangeStart = 0; RangeEnd = 0; keep_alive = 0; _outIndent = 0;status = HANDLED_NONE;Method = M_UNKNOWN;httpStatus =  HTTP_NIL;outType = plain;};
+	CyhookHandler(){ContentLength = 0; keep_alive = 0; _outIndent = 0;status = HANDLED_NONE;Method = M_UNKNOWN;httpStatus =  HTTP_NIL;outType = plain;};
 	virtual ~CyhookHandler(){};
 
 	// hook slot handler

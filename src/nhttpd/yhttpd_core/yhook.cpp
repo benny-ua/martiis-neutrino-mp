@@ -249,7 +249,7 @@ std::string CyhookHandler::BuildHeader(bool cache) {
 		}
 	// print Status-line
 	result = string_printf(HTTP_PROTOCOL " %d %s\r\nContent-Type: %s\r\n",httpStatus, responseString, ResponseMimeType.c_str());
-	log_level_printf(2, "Response: HTTP/1.1 %d %s\r\nContent-Type: %s\r\n",
+	log_level_printf(2, "Respose: HTTP/1.1 %d %s\r\nContent-Type: %s\r\n",
 			httpStatus, responseString, ResponseMimeType.c_str());
 
 	switch (httpStatus) {
@@ -285,15 +285,17 @@ std::string CyhookHandler::BuildHeader(bool cache) {
 		// connection type
 #ifdef Y_CONFIG_FEATURE_KEEP_ALIVE
 		if(keep_alive)
-			result += "Connection: keep-alive\r\n";
+		result += "Connection: keep-alive\r\n";
 		else
+		result += "Connection: close\r\n";
+#else
+		result += "Connection: close\r\n";
 #endif
-			result += "Connection: close\r\n";
 		// gzipped ?
 		if (UrlData["fileext"] == "gz")
 			result += "Content-Encoding: gzip\r\n";
 		// content-len, last-modified
-		if (httpStatus == HTTP_NOT_MODIFIED || httpStatus == HTTP_NOT_FOUND || httpStatus == HTTP_REQUEST_RANGE_NOT_SATISFIABLE)
+		if (httpStatus == HTTP_NOT_MODIFIED || httpStatus == HTTP_NOT_FOUND)
 			result += "Content-Length: 0\r\n";
 		else if (GetContentLength() > 0) {
 			time_t mod_time = time(NULL);
@@ -301,14 +303,9 @@ std::string CyhookHandler::BuildHeader(bool cache) {
 				mod_time = LastModified;
 
 			strftime(timeStr, sizeof(timeStr), RFC1123FMT, gmtime(&mod_time));
-			result += string_printf("Last-Modified: %s\r\n", timeStr);
-			if (status == HANDLED_SENDFILE) {
-				result += string_printf("Accept-Ranges: bytes\r\n");
-				result += string_printf("Content-Length: %lld\r\n", RangeEnd - RangeStart + 1);
-				if (httpStatus == HTTP_PARTIAL_CONTENT)
-					result += string_printf("Content-Range: bytes %lld-%lld/%lld\r\n", RangeStart, RangeEnd, ContentLength);
-			} else
-				result += string_printf("Content-Length: %lld\r\n", ContentLength);
+			result += string_printf(
+					"Last-Modified: %s\r\nContent-Length: %lld\r\n", timeStr,
+					(long long) GetContentLength());
 		}
 		result += "\r\n"; // End of Header
 		break;
@@ -323,8 +320,6 @@ std::string CyhookHandler::BuildHeader(bool cache) {
 		case HTTP_ACCEPTED:
 		case HTTP_NO_CONTENT:
 		case HTTP_NOT_FOUND:
-		case HTTP_PARTIAL_CONTENT:
-		case HTTP_REQUEST_RANGE_NOT_SATISFIABLE:
 		case HTTP_INTERNAL_SERVER_ERROR:
 			break;
 

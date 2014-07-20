@@ -140,16 +140,12 @@ bool CWebserverResponse::SendResponse() {
 		//			cache = false;
 		Write(Connection->HookHandler.BuildHeader(cache));
 		if (Connection->Method != M_HEAD)
-			Sendfile(Connection->Request.UrlData["url"], Connection->HookHandler.RangeStart, Connection->HookHandler.RangeEnd - Connection->HookHandler.RangeStart + 1);
+			Sendfile(Connection->Request.UrlData["url"]);
 		return true;
-	}
-	if (Connection->HookHandler.status == HANDLED_SENDFILE && Connection->HookHandler.httpStatus == HTTP_REQUEST_RANGE_NOT_SATISFIABLE) {
-		SendError(Connection->HookHandler.httpStatus);
-		return false;
 	}
 
 	// arrived here? = error!
-	SendError(HTTP_NOT_FOUND);
+	SendError( HTTP_NOT_FOUND);
 	return false;
 }
 
@@ -197,13 +193,13 @@ bool CWebserverResponse::WriteLn(char const *text) {
 }
 
 //-----------------------------------------------------------------------------
-bool CWebserverResponse::Sendfile(std::string filename, off_t start, off_t end) {
+bool CWebserverResponse::Sendfile(std::string filename) {
 	if (Connection->RequestCanceled)
 		return false;
 	int filed = open(filename.c_str(), O_RDONLY);
 	if (filed != -1) //can access file?
 	{
-		if (!Connection->sock->SendFile(filed, start, end))
+		if (!Connection->sock->SendFile(filed))
 			Connection->RequestCanceled = true;
 		close(filed);
 	}
