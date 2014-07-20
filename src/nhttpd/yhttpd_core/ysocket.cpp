@@ -58,7 +58,7 @@ CySocket::CySocket() :
 CySocket::~CySocket() {
 #ifdef Y_CONFIG_USE_OPEN_SSL
 	if(isSSLSocket && ssl != NULL)
-	SSL_free(ssl);
+		SSL_free(ssl);
 #endif
 }
 //-----------------------------------------------------------------------------
@@ -311,20 +311,20 @@ bool CySocket::CheckSocketOpen() {
 // BASIC Send File over Socket for FILE*
 // fd is an opened FILE-Descriptor
 //-----------------------------------------------------------------------------
-int CySocket::SendFile(int filed) {
+bool CySocket::SendFile(int filed, off_t start, off_t size) {
 	if (!isValid)
 		return false;
-#ifdef Y_CONFIG_HAVE_SENDFILE
 	// does not work with SSL !!!
-	off_t start = 0;
 	struct stat st;
 	fstat(filed, &st);
-	size_t end = st.st_size;
+	off_t left = st.st_size - start;
 	off_t written = 0;
-	off_t left = end;
+	if (size > -1 && size < left)
+		left = size;
+#ifdef Y_CONFIG_HAVE_SENDFILE
 	while (left > 0) {
-		// Split sendfile() transfer to smaller chunks to reduce memory-mapping requirements --martii
-		if((written = ::sendfile(sock,filed,&start,0x8000000)) == -1) {
+		// split sendfile() transfer to smaller chunks to reduce memory-mapping requirements
+		if((written = ::sendfile(sock, filed, &start, 0x8000000)) == -1) {
 			perror("sendfile failed");
 			if (errno != EINVAL)
 				return false;
@@ -334,22 +334,20 @@ int CySocket::SendFile(int filed) {
 			left -= written;
 		}
 	}
-	if (left) {
-		::lseek(filed, start, SEEK_SET);
 #endif // Y_CONFIG_HAVE_SENDFILE
+	if (left > 0) {
+		::lseek(filed, start, SEEK_SET);
 
 		char sbuf[65536];
-		int r;
-		while ((r = read(filed, sbuf, 65536)) > 0) {
-			if (Send(sbuf, r) < 0) {
+		while (left && (written = read(filed, sbuf, std::min((off_t) sizeof(sbuf), left))) > 0) {
+			if (Send(sbuf, written) < 0) {
 				perror("send failed");
 				return false;
 			}
 			BytesSend += written;
+			left -= written;
 		}
-#ifdef Y_CONFIG_HAVE_SENDFILE
 	}
-#endif // Y_CONFIG_HAVE_SENDFILE
 
 	log_level_printf(9, "<Sock:SendFile>: Bytes:%ld\n", BytesSend);
 	return true;
