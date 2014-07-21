@@ -123,7 +123,7 @@ void CComponentsPicture::initCCItem()
 	string::size_type pos = pic_name.find("/", 0);
 	is_icon = (pos == string::npos);
 
-	dprintf(DEBUG_INFO, "[CComponentsPicture] %s: detected image file: is_icon: %d (pos= %d), pic_name=%s\n", __func__, is_icon, pos, pic_name.c_str());
+	dprintf(DEBUG_INFO, "[CComponentsPicture] %s: detected image file: is_icon: %d (pos= %d), pic_name=%s\n", __func__, is_icon, (int) pos, pic_name.c_str());
 
 	//get current image size
 	getImageSize(&w_pic, &h_pic);

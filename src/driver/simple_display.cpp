@@ -67,10 +67,10 @@ CLCD::CLCD()
 	showclock = true;
 #if HAVE_SPARK_HARDWARE
 	memset(led_mode, 0, sizeof(led_mode));
-#endif
 
 	if (pthread_create (&thrTime, NULL, TimeThread, this))
 		perror("[lcdd]: pthread_create(TimeThread)");
+#endif
 
 }
 
@@ -108,6 +108,7 @@ void CLCD::wake_up()
 {
 }
 
+#if HAVE_SPARK_HARDWARE
 void* CLCD::TimeThread(void *arg)
 {
 	CLCD *me = (CLCD *)arg;
@@ -119,13 +120,11 @@ void CLCD::TimeThread()
 {
         set_threadname("CLCD::TimeThread");
 
-#if HAVE_SPARK_HARDWARE
 	// disable spinner
 	struct aotom_ioctl_data vData;
 	vData.u.led.led_nr = 2;
 	vData.u.led.on = 0;
 	ioctl(fd, VFDSETLED, &vData);
-#endif
 	timeThreadRunning = true;
 	waitSec = 0;
 	while (timeThreadRunning) {
@@ -159,6 +158,7 @@ void CLCD::TimeThread()
 		}
 	}
 }
+#endif
 
 void CLCD::init(const char *, const char *, const char *, const char *, const char *, const char *)
 {
