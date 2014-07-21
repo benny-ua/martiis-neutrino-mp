@@ -132,7 +132,9 @@ void * nhttpd_main_thread(void *) {
 	}
 	/* we pthread_cancel this thread from the main thread, but still want to clean up */
 	pthread_cleanup_push(thread_cleanup, yhttpd);
+#ifndef Y_CONFIG_FEATURE_THREADING
 	yhttpd->flag_threading_off = true;
+#endif
 
 	yhttpd->hooks_attach();
 	yhttpd->ReadConfig();
