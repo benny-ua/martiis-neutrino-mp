@@ -703,7 +703,7 @@ std::string  CNeutrinoYParser::func_get_partition_list(CyhookHandler *, std::str
 //-------------------------------------------------------------------------
 std::string CNeutrinoYParser::func_get_boxtype(CyhookHandler *, std::string)
 {
-#if HAVE_HARDWARE_SPARK
+#if HAVE_SPARK_HARDWARE
 	std::string boxname = string(g_info.hw_caps->boxvendor) + " " + string(g_info.hw_caps->boxname);
 #else
 	unsigned int system_rev = cs_get_revision();
