@@ -757,6 +757,29 @@ void CMoviePlayerGui::stopPlayBack(void)
 		usleep(100000);
 }
 
+static const char *ProgramSelectionCallback(void *, std::vector<std::string> &keys, std::vector<std::string> &values)
+{
+	CMenuWidgetSelection m(LOCALE_MOVIEBROWSER_PROGRAM_SELECTION , NEUTRINO_ICON_MOVIEPLAYER);
+	m.enableFade(false);
+	m.addIntroItems(NONEXISTANT_LOCALE, NONEXISTANT_LOCALE, CMenuWidget::BTN_TYPE_CANCEL);
+
+	int off = m.getItemsCount();
+
+	for (unsigned int i = 0; i < keys.size(); i++)
+		m.addItem(new CMenuForwarder(values[i]));
+
+	m.exec(NULL, "");
+
+	int res = m.getSelectedLine() - off;
+
+	if (res > -1 && res < (int) keys.size())
+		return keys[res].c_str();
+
+	m.hide();
+
+	return NULL;
+}
+
 bool CMoviePlayerGui::PlayFileStart(void)
 {
 	menu_ret = menu_return::RETURN_REPAINT;
@@ -815,6 +838,9 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		showStartingHint = true;
 		pthread_create(&thrStartHint, NULL, CMoviePlayerGui::ShowStartHint, this);
 	}
+
+	playback->SetProgramSelectionCallback(ProgramSelectionCallback, NULL);
+
 	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
 	if (thrStartHint) {
 		showStartingHint = false;
@@ -1476,7 +1502,7 @@ void CMoviePlayerGui::getCurrentAudioName(std::string &audioname)
 {
 	numpida = REC_MAX_APIDS;
 	playback->FindAllPids(apids, ac3flags, &numpida, language);
-	if(numpida)
+	if(numpida && !currentapid)
 		currentapid = apids[0];
 	for (unsigned int count = 0; count < numpida; count++)
 		if(currentapid == apids[count]){

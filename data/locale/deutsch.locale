@@ -1625,6 +1625,7 @@ moviebrowser.nk_categories Kategorie-Auswahl
 moviebrowser.nk_error Fehler beim Laden des Netzkino-Feeds
 moviebrowser.nk_protocol Protokoll
 moviebrowser.option_browser Anzeigeoptionen
+moviebrowser.program_selection Qualität
 moviebrowser.reload_at_start Filminfos neu laden bei Start
 moviebrowser.remount_at_start Filmdepot verbinden bei Start
 moviebrowser.scan_for_movies Suche Filme ...
@@ -1915,14 +1916,13 @@ plugintype.game Spiel
 plugintype.lua LUA Skript
 plugintype.script Skript
 plugintype.tool Werkzeug
-MENU_HINT_PROGRESSBAR
 progressbar.color.full farbig
 progressbar.color.horizontal farbige horizontale Linien
 progressbar.color.matrix farbige Punkte
 progressbar.color.mono monochrom
 progressbar.color.vertical farbige vertikale Linien
+protocol.f4v F4V
 protocol.http HTTP
-protocol.rtmp RTMP
 rass.head Radio Screen Show
 rclock.lockmsg Die Fernbedienung wird gesperrt.\n Um die Sperre aufzuheben, bitte\n <ROT> und <MENU> auf der Fernbedienung\n drücken.
 rclock.menueadd FB sperren
