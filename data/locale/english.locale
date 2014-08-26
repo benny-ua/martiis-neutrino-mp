@@ -1625,7 +1625,7 @@ moviebrowser.nk_categories Select category
 moviebrowser.nk_error Failed to load Netzkino feed
 moviebrowser.nk_protocol Protocol
 moviebrowser.option_browser Browser Options
-moviebrowser.program_selection Quality
+moviebrowser.program_selection Program
 moviebrowser.reload_at_start Reload movie info at start
 moviebrowser.remount_at_start Remount at start
 moviebrowser.scan_for_movies Scan for Movies ...
