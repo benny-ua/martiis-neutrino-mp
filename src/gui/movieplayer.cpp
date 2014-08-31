@@ -780,6 +780,12 @@ static const char *ProgramSelectionCallback(void *, std::vector<std::string> &ke
 	return NULL;
 }
 
+static const char *ProgramSelectionCallbackWebTV(void *, std::vector<std::string> &keys, std::vector<std::string> &)
+{
+	// FIXME
+	return keys[keys.size() - 1].c_str();
+}
+
 bool CMoviePlayerGui::PlayFileStart(void)
 {
 	menu_ret = menu_return::RETURN_REPAINT;
@@ -839,7 +845,10 @@ bool CMoviePlayerGui::PlayFileStart(void)
 		pthread_create(&thrStartHint, NULL, CMoviePlayerGui::ShowStartHint, this);
 	}
 
-	playback->SetProgramSelectionCallback(ProgramSelectionCallback, NULL);
+	if (isWebTV)
+		playback->SetProgramSelectionCallback(ProgramSelectionCallbackWebTV, NULL);
+	else
+		playback->SetProgramSelectionCallback(ProgramSelectionCallback, NULL);
 
 	bool res = playback->Start((char *) file_name.c_str(), vpid, vtype, currentapid, currentac3, duration);
 	if (thrStartHint) {
