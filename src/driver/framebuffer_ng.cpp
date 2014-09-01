@@ -58,6 +58,7 @@ extern GLFramebuffer *glfb;
 #include <tdgfx/stb04gfx.h>
 extern int gfxfd;
 #endif
+#include <system/set_threadname.h>
 
 extern CPictureViewer * g_PicViewer;
 #define ICON_CACHE_SIZE 1024*1024*2 // 2mb
@@ -211,6 +212,10 @@ CFrameBuffer::CFrameBuffer()
 	memset(green, 0, 256*sizeof(__u16));
 	memset(blue, 0, 256*sizeof(__u16));
 	memset(trans, 0, 256*sizeof(__u16));
+#if HAVE_SPARK_HARDWARE
+	autoBlitStatus = false;
+	autoBlitThreadId = 0;
+#endif
 }
 
 CFrameBuffer* CFrameBuffer::getInstance()
@@ -320,6 +325,9 @@ nolfb:
 
 CFrameBuffer::~CFrameBuffer()
 {
+#if HAVE_SPARK_HARDWARE
+	autoBlit(false);
+#endif
 	active = false; /* keep people/infoclocks from accessing */
 	std::map<std::string, rawIcon>::iterator it;
 
@@ -1527,6 +1535,35 @@ void CFrameBuffer::setMixerColor(uint32_t mixer_background)
 	outputConfig.mixer_background = mixer_background;
 	if(ioctl(fd, STMFBIO_SET_OUTPUT_CONFIG, &outputConfig) < 0)
 		perror("setting output configuration failed");
+}
+
+void *CFrameBuffer::autoBlitThread(void *arg)
+{
+	set_threadname("autoblit");
+	CFrameBuffer *me = (CFrameBuffer *) arg;
+	me->autoBlitThread();
+	pthread_exit(NULL);
+}
+
+void CFrameBuffer::autoBlitThread(void)
+{
+	while (autoBlitStatus) {
+		blit();
+		for (int i = 4; i && autoBlitStatus; i--)
+			usleep(50000);
+	}
+}
+
+void CFrameBuffer::autoBlit(bool b)
+{
+	if (b && !autoBlitThreadId) {
+		autoBlitStatus = true;
+		pthread_create(&autoBlitThreadId, NULL, autoBlitThread, this);
+	} else if (!b && autoBlitThreadId) {
+		autoBlitStatus = false;
+		pthread_join(autoBlitThreadId, NULL);
+		autoBlitThreadId = 0;
+	}
 }
 #endif
 

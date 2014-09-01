@@ -39,6 +39,8 @@
 #if HAVE_SPARK_HARDWARE
 #include <OpenThreads/Thread>
 #include <OpenThreads/Condition>
+
+#include <pthread.h>
 #endif
 
 #define fb_pixel_t uint32_t
@@ -337,6 +339,15 @@ class CFrameBuffer
 		fb_pixel_t getBorderColor(void);
 
 #if HAVE_SPARK_HARDWARE
+	private:
+		bool autoBlitStatus;
+		pthread_t autoBlitThreadId;
+		static void *autoBlitThread(void *arg);
+		void autoBlitThread();
+
+	public:
+		void autoBlit(bool b = true);
+
 		bool allocBPAMem(int &bpa, unsigned char * &mem, size_t s, CFbAccel::BPApart bpapart = CFbAccel::BPApart_vid) { return accel->allocBPAMem(bpa, mem, s, bpapart); };
 		void freeBPAMem(int &bpa, unsigned char * &mem, size_t s) { accel->freeBPAMem(bpa, mem, s); };
 		void blitBPA2FB(unsigned char *mem, SURF_FMT fmt, int w, int h, int x = 0, int y = 0, int pan_x = -1, int pan_y = -1, int fb_x = -1, int fb_y = -1, int fb_w = -1, int fb_h = -1, int transp = false) { accel->blitBPA2FB(mem, fmt, w, h, x, y, pan_x, pan_y, fb_x, fb_y, fb_w, fb_h, transp); };
