@@ -604,7 +604,6 @@ int CLuaInstance::DisplayImage(lua_State *L)
 	if (lua_isnumber(L, 7))
 		trans = luaL_checkint(L, 7);
 	g_PicViewer->DisplayImage(fname, x, y, w, h, trans);
-	CFrameBuffer::getInstance()->blit();
 	return 0;
 }
 
@@ -755,12 +754,6 @@ int CLuaInstance::GCWindow(lua_State *L)
 	return 0;
 }
 
-#if 0
-int CLuaInstance::Blit(lua_State *)
-{
-	return 0;
-}
-#else
 int CLuaInstance::Blit(lua_State *L)
 {
 #if HAVE_SPARK_HARDWARE
@@ -775,7 +768,6 @@ int CLuaInstance::Blit(lua_State *L)
 	}
 	return 0;
 }
-#endif
 
 int CLuaInstance::GetLanguage(lua_State *L)
 {
@@ -1884,7 +1876,6 @@ int CLuaInstance::ComponentsTextPaint(lua_State *L)
 	bool do_save_bg = (tmp == "true" || tmp == "1" || tmp == "yes");
 
 	m->ct->paint(do_save_bg);
-	CFrameBuffer::getInstance()->blit();
 	return 0;
 }
 
@@ -1903,7 +1894,6 @@ int CLuaInstance::ComponentsTextHide(lua_State *L)
 		m->ct->paint();
 	} else
 		m->ct->hide(no_restore);
-	CFrameBuffer::getInstance()->blit();
 	return 0;
 }
 
@@ -1943,7 +1933,6 @@ int CLuaInstance::ComponentsTextScroll(lua_State *L)
 		else
 			ctb->scrollPageUp(1);
 		ctb->enableBackgroundPaint(false);
-		CFrameBuffer::getInstance()->blit();
 	}
 	return 0;
 }
@@ -2087,7 +2076,6 @@ int CLuaInstance::CPictureDelete(lua_State *L)
 
 	m->cp->hide();
 	delete m;
-	CFrameBuffer::getInstance()->blit();
 	return 0;
 }
 
