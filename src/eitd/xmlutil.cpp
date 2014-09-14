@@ -319,6 +319,7 @@ void *insertEventsfromFile(void * data)
 			while (event) {
 				SIevent e(onid,tsid,sid,xmlGetNumericAttribute(event, "id", 16));
 				uint8_t tid = xmlGetNumericAttribute(event, "tid", 16);
+				std::string contentClassification, userClassification;
 				if(tid)
 					e.table_id = tid;
 				e.table_id |= 0x80; /* make sure on-air data has a lower table_id */
@@ -376,9 +377,9 @@ void *insertEventsfromFile(void * data)
 				node = event->xmlChildrenNode;
 				while ((node = xmlGetNextOccurence(node, "content"))) {
 					char cl = xmlGetNumericAttribute(node, "class", 16);
-					e.contentClassification += cl;
+					contentClassification += cl;
 					cl = xmlGetNumericAttribute(node, "user", 16);
-					e.userClassification += cl;
+					userClassification += cl;
 					node = node->xmlNextNode;
 				}
 
@@ -390,7 +391,7 @@ void *insertEventsfromFile(void * data)
 					c.componentTag = xmlGetNumericAttribute(node, "tag", 16);
 					char *s = xmlGetAttribute(node, "text");
 					if (s)
-						c.component = s;
+						c.setComponent(s);
 					//e.components.insert(c);
 					e.components.push_back(c);
 					node = node->xmlNextNode;
@@ -423,6 +424,12 @@ void *insertEventsfromFile(void * data)
 					node = node->xmlNextNode;
 				}
 
+				if (contentClassification.size()) {
+					ssize_t off = e.classifications.reserve(2 * contentClassification.size());
+					if (off > -1)
+						for (unsigned i = 0; i < contentClassification.size(); i++)
+							off = e.classifications.set(off, contentClassification.at(i), userClassification.at(i));
+				}
 				addEvent(e, 0);
 				ev_count++;
 
