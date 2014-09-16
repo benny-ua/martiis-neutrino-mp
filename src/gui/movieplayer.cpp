@@ -329,6 +329,7 @@ int CMoviePlayerGui::exec(CMenuTarget * parent, const std::string & actionKey)
 
 	std::string oldservicename = CVFD::getInstance()->getServicename();
 	while(!isHTTP && !isUPNP && SelectFile()) {
+		Cleanup();
 		CVFD::getInstance()->setMode(CVFD::MODE_TVRADIO);
 		if (isWebTV || isYT || isNK)
 			CVFD::getInstance()->showServicename(pretty_name.c_str());
