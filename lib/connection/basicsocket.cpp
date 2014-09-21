@@ -29,52 +29,52 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <poll.h>
 
 bool send_data(int fd, const void * data, const size_t size, const timeval timeout)
 {
-	fd_set       writefds;
-	timeval      tv;
-	const void * buffer;
-	size_t       n;
-	int          rc;
+	char *buffer = (char *)data;
+	size_t left = size;
 
-	n = size;
-
-	while (n > 0)
+	while (left > 0)
 	{
-		buffer = (void *)((char *)data + (size - n));
-		rc = ::send(fd, buffer, n, MSG_DONTWAIT | MSG_NOSIGNAL);
-		
-		if (rc == -1)
+		int len = ::send(fd, buffer, left, MSG_DONTWAIT | MSG_NOSIGNAL);
+
+		if (len < 0)
 		{
 			perror("[basicsocket] send_data");
-char * buf = (char *) data;
-printf("send_data: errno %d data %X\n", errno, buf[0]);
-			//if (errno == EPIPE)
-			if (errno == EPIPE || errno == ESPIPE)
+
+			if (errno != EINTR && errno != EAGAIN)
 				return false;
-			
-			FD_ZERO(&writefds);
-			FD_SET(fd, &writefds);
-			
-			tv = timeout;
-			
-			rc = select(fd + 1, NULL, &writefds, NULL, &tv);
-			
+
+			struct pollfd pfd;
+			pfd.fd = fd;
+			pfd.events = POLLOUT;
+			pfd.revents = 0;
+
+			int rc = poll(&pfd, 1, timeout.tv_sec * 1000 + timeout.tv_usec / 1000);
+
 			if (rc == 0)
 			{
 				printf("[basicsocket] send timed out.\n");
 				return false;
 			}
-			if (rc == -1)
+			if (rc < 0)
 			{
-				perror("[basicsocket] send_data select");
+				perror("[basicsocket] send_data poll");
+				return false;
+			}
+			if (!(pfd.revents & POLLOUT))
+			{
+				perror("[basicsocket] send_data POLLOUT");
 				return false;
 			}
 		}
 		else
-			n -= rc;
+		{
+			buffer += len;
+			left -= len;
+		}
 	}
 	return true;
 }
@@ -82,59 +82,55 @@ printf("send_data: errno %d data %X\n", errno, buf[0]);
 
 bool receive_data(int fd, void * data, const size_t size, const timeval timeout)
 {
-	fd_set    readfds;
-	timeval   tv;
-	void    * buffer;
-	size_t    n;
-	int       rc;
+	char *buffer = (char *)data;
+	size_t left = size;
 
-	n = size;
-
-	while (n > 0)
+	while (left > 0)
 	{
-		FD_ZERO(&readfds);
-		FD_SET(fd, &readfds);
-		
-		tv = timeout;
-		
-		rc = select(fd + 1, &readfds, NULL, NULL, &tv);
-			
+		struct pollfd pfd;
+		pfd.fd = fd;
+		pfd.events = POLLIN;
+		pfd.revents = 0;
+
+		int to = timeout.tv_sec * 1000 + timeout.tv_usec / 1000;
+
+		int rc = poll(&pfd, 1, to);
+
 		if (rc == 0)
 		{
-			printf("[basicsocket] receive timed out.\n");
+			printf("[basicsocket] recv timed out.\n");
 			return false;
 		}
-		if (rc == -1)
+		if (rc < 0)
 		{
-			perror("[basicsocket] receive_data select");
+			perror("[basicsocket] recv_data poll");
 			return false;
 		}
-		buffer = (void *)((char *)data + (size - n));
-		rc = ::recv(fd, buffer, n, MSG_DONTWAIT | MSG_NOSIGNAL);
-		
-		if ((rc == 0) || (rc == -1))
+		if (!(pfd.revents & POLLIN))
 		{
-			if (rc == -1)
-			{
-				perror("[basicsocket] receive_data");
+			perror("[basicsocket] recv_data POLLIN");
+			return false;
+		}
+		int len = ::recv(fd, data, left, MSG_DONTWAIT | MSG_NOSIGNAL);
 
-				//if (errno == EPIPE)
-				if (errno == EPIPE || errno == ESPIPE)
-					return false;
-			}
-			else
-			{
-				/*
-				 * silently return false
-				 *
-				 * printf("[basicsocket] no more data\n");
-				 */
+		if (len > 0) {
+			left -= len;
+			buffer += len;
+		} else if (len < 0)
+		{
+			perror("[basicsocket] receive_data");
+			if (errno != EINTR && errno != EAGAIN)
 				return false;
-			}
-
 		}
-		else
-			n -= rc;
+		else // len == 0
+		{
+			/*
+			 * silently return false
+			 *
+			 * printf("[basicsocket] no more data\n");
+			 */
+			return false;
+		}
 	}
 	return true;
 }
