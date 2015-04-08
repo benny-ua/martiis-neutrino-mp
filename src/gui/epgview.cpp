@@ -54,6 +54,8 @@
 
 extern CPictureViewer * g_PicViewer;
 
+bool is_unknown_genre = false;
+
 #define ICON_LARGE_WIDTH 26
 
 int findItem(std::string strItem, std::vector<std::string> & vecItems) {
@@ -223,7 +225,7 @@ void CEpgData::showText( int startPos, int ypos )
 
 	int textSize = epgText.size();
 	int y=ypos;
-	const char tok = ' ';
+	const char tok = '?';
 	int offset = 0, count = 0;
 	int max_mon_w = 0, max_wday_w = 0;
 	int digi = g_Font[SNeutrinoSettings::FONT_TYPE_EPG_INFO2]->getRenderWidth("29..");
@@ -417,6 +419,7 @@ const neutrino_locale_t * genre_sub_classes_list[10] =
 const char * GetGenre(const unsigned char contentClassification) // UTF-8
 {
 	neutrino_locale_t res;
+	is_unknown_genre = false;
 
 	//unsigned char i = (contentClassification & 0x0F0);
 	int i = (contentClassification & 0xF0);
@@ -428,8 +431,11 @@ const char * GetGenre(const unsigned char contentClassification) // UTF-8
 //printf("GetGenre: i %d content %d\n", i, contentClassification & 0x0F); fflush(stdout);
 		res = genre_sub_classes_list[i][((contentClassification & 0x0F) < genre_sub_classes[i]) ? (contentClassification & 0x0F) : 0];
 	}
-	else
+	else 
+	{
 		res = LOCALE_GENRE_UNKNOWN;
+		is_unknown_genre = true;
+	}
 	return g_Locale->getText(res);
 }
 
@@ -600,10 +606,12 @@ int CEpgData::show(const t_channel_id channel_id, uint64_t a_id, time_t* a_start
 	}
 
 	// Show genre information
-	if (epgData.contentClassification.length()> 0)
-		processTextToArray(std::string(g_Locale->getText(LOCALE_EPGVIEWER_GENRE)) + ": " + GetGenre(epgData.contentClassification[0])); // UTF-8
+	if (epgData.contentClassification.length()> 0){
+	std::string genre = GetGenre(epgData.contentClassification[0]);
+	if (is_unknown_genre == false)
+		processTextToArray(std::string(g_Locale->getText(LOCALE_EPGVIEWER_GENRE)) + ": " + genre); // UTF-8
 //	processTextToArray( epgData.userClassification.c_str() );
-
+	}
 	// -- display more screenings on the same channel
 	// -- 2002-05-03 rasc
 	has_follow_screenings = false;
