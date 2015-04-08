@@ -70,7 +70,7 @@ CStreamInfo2::CStreamInfo2 ()
 	pip        	= NULL;
 	signalbox	= NULL;
 	font_head = SNeutrinoSettings::FONT_TYPE_MENU_TITLE;
-	font_info = SNeutrinoSettings::FONT_TYPE_MENU;
+	font_info = SNeutrinoSettings::FONT_TYPE_CHANNELLIST_EVENT;
 	font_small = SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL;
 
 	hheight = g_Font[font_head]->getHeight ();
@@ -394,14 +394,14 @@ int CStreamInfo2::doSignalStrengthLoop ()
 			if (got_rate && (rate.short_average || lastb) && (lastb != bit_s)) {
 				if (repaint_bitrate) {
 					snprintf(tmp_str, sizeof(tmp_str), "%s:",g_Locale->getText(LOCALE_STREAMINFO_BITRATE));
-					g_Font[font_small]->RenderString(dx1, average_bitrate_pos, spaceoffset, tmp_str, COL_INFOBAR_TEXT);
+					g_Font[font_info]->RenderString(dx1, average_bitrate_pos, spaceoffset, tmp_str, COL_INFOBAR_TEXT);
 
-					snprintf(tmp_str, sizeof(tmp_str), "(%s)",g_Locale->getText(LOCALE_STREAMINFO_AVERAGE_BITRATE));
-					g_Font[font_small]->RenderString(dx1 + spaceoffset + sw , average_bitrate_pos, box_width - spaceoffset - sw, tmp_str, COL_INFOBAR_TEXT);
+					snprintf(tmp_str, sizeof(tmp_str), " (%s)",g_Locale->getText(LOCALE_STREAMINFO_AVERAGE_BITRATE));
+					g_Font[font_info]->RenderString(dx1 + spaceoffset + sw + 25, average_bitrate_pos, box_width - spaceoffset - sw, tmp_str, COL_INFOBAR_TEXT);
 					repaint_bitrate = false;
 				}
 
-				frameBuffer->paintBoxRel (dx1 + spaceoffset, average_bitrate_pos - sheight, sw, sheight, COL_MENUHEAD_PLUS_0);
+				frameBuffer->paintBoxRel (dx1 + spaceoffset, average_bitrate_pos - sheight, sw + 25, sheight, COL_MENUHEAD_PLUS_0);
 				char currate[140];
 				snprintf(currate, sizeof(currate), "%10u", rate.short_average);
 				currate[0] = currate[2];
@@ -411,7 +411,7 @@ int CStreamInfo2::doSignalStrengthLoop ()
 				currate[4] = currate[5];
 				currate[5] = currate[6];
 				currate[6] = ' ';
-				g_Font[font_small]->RenderString (dx1 + spaceoffset, average_bitrate_pos, sw, currate, COL_INFOBAR_TEXT);
+				g_Font[font_info]->RenderString (dx1 + spaceoffset, average_bitrate_pos, sw + 25 , currate, COL_INFOBAR_TEXT);
 				lastb = bit_s;
 			}
 			if((!mp && pmt_version != current_pmt_version && delay_counter > delay) || probed){
@@ -538,20 +538,20 @@ void CStreamInfo2::paint_signal_fe_box(int _x, int _y, int w, int h)
 	g_Font[font_small]->RenderString(maxmin_x, y1 + (sheight * 3) +5, fw*3, "min", COL_INFOBAR_TEXT);
 
 	if (!mp) {
-		g_Font[font_small]->RenderString(_x+xd*col, y1, fw*8, "BER [%]", COL_RED);
+		g_Font[font_small]->RenderString(_x + 25 + xd*col, y1, fw*8, "BER", COL_RED);
 		sig_text_ber_x =  _x +  5 + xd * col;
 		col++;
 
-		g_Font[font_small]->RenderString(_x+xd*col, y1, fw*8, "SNR [%]", COL_WHITE);
+		g_Font[font_small]->RenderString(_x + 25 + xd*col, y1, fw*8, "SNR", COL_WHITE);
 		sig_text_snr_x =  _x +  5 + xd * col;
 		col++;
 
-		g_Font[font_small]->RenderString(_x+xd*col, y1, fw*8, "SIG [%]", COL_GREEN);
+		g_Font[font_small]->RenderString(_x + 25 + xd*col, y1, fw*8, "SIG", COL_GREEN);
 		sig_text_sig_x =  _x +  5 + xd * col;
 		col++;
 	}
 
-	g_Font[font_small]->RenderString(_x+xd*col, y1, fw*10, "BR [kbps]", COL_YELLOW);
+	g_Font[font_small]->RenderString(_x+5+xd*col, y1, fw*10, "Bitrate", COL_YELLOW);
 	sig_text_rate_x = _x + 5 + xd * col;
 
 	sigBox_pos = 0;
@@ -632,11 +632,11 @@ int CStreamInfo2::y_signal_fe (unsigned long value, unsigned long max_value, int
 	// and if it overflows, just return max_y
 	m = (unsigned long long)value * max_y;
 	if (m > 0xffffffff)
-		return max_y;
-
+	return max_y;
 	l = m / max_value;
+
 	if (l > (unsigned long)max_y)
-		l = max_y;
+	l = max_y;
 
 	return (int) l;
 }
@@ -702,7 +702,7 @@ struct row {
 
 void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 {
-	Font *f = g_Font[font_small];
+	Font *f = g_Font[font_info];
 	char buf[100];
 	int xres = 0, yres = 0, aspectRatio = 0, framerate = -1;
 	// paint labels
@@ -728,6 +728,39 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		 	yres = 1080;
 		 aspectRatio = videoDecoder->getAspectRatio();
 	}
+// first block
+	if (!mp){
+		// satellite
+		transponder t;
+		CServiceManager::getInstance()->GetTransponder(channel->getTransponderId(), t);
+
+		if(t.deltype == FE_QPSK)
+			r.key = g_Locale->getText (LOCALE_SATSETUP_SATELLITE);
+		else if(t.deltype == FE_QAM)
+			r.key = g_Locale->getText (LOCALE_CHANNELLIST_PROVS);
+		else
+			r.key = g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA);
+
+		r.key += ": ";
+		r.val = CServiceManager::getInstance()->GetSatelliteName(channel->getSatellitePosition()).c_str();
+		r.col = COL_INFOBAR_TEXT;
+		v.push_back(r);
+
+		// ts frequency
+		scaling = 27000;
+		scaling = (t.deltype == FE_QPSK && t.feparams.dvb_feparams.u.qpsk.fec_inner < FEC_S2_QPSK_1_2) ? 15000 : 27000;
+		r.key = g_Locale->getText (LOCALE_SCANTS_FREQDATA);
+		r.val = t.description();
+		r.col = COL_INFOBAR_TEXT;
+		v.push_back(r);
+
+		// channel
+		r.key = g_Locale->getText (LOCALE_TIMERLIST_CHANNEL);
+		r.key += ": ";
+		r.val = channel->getName().c_str();
+		r.col = COL_INFOBAR_TEXT;
+		v.push_back(r);
+		}
 
 	// video resolution
 	r.key = g_Locale->getText (LOCALE_STREAMINFO_RESOLUTION);
@@ -761,18 +794,19 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 	r.col = COL_INFOBAR_TEXT;
 	v.push_back(r);
 
-	// place for average bitrate
-	average_bitrate_pos = ypos + sheight * v.size();
-	r.key = r.val = "";
-	v.push_back(r);
-
 	// audio
+	if (mp) {
 	r.key = g_Locale->getText (LOCALE_STREAMINFO_AUDIOTYPE);
 	r.key += ": ";
 	r.val = mp ? mp->getAPIDDesc(mp->getAPID()).c_str() : g_RemoteControl->current_PIDs.APIDs[g_RemoteControl->current_PIDs.PIDs.selected_apid].desc;
 	r.col = COL_INFOBAR_TEXT;
 	v.push_back(r);
-
+	}
+	// place for average bitrate
+	average_bitrate_pos = ypos + sheight * v.size();
+	r.key = r.val = "";
+	v.push_back(r);
+	
 	if (mp) {
 		if (CNeutrinoApp::getInstance()->getMode() == NeutrinoMessages::mode_webtv) {
 			// url
@@ -788,38 +822,26 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		v.push_back(r);
 
 		scaling = 8000;
-	} else {
-		// satellite
-		transponder t;
-		CServiceManager::getInstance()->GetTransponder(channel->getTransponderId(), t);
+		} 
+		spaceoffset = 0;
+	for (std::vector<row>::iterator it = v.begin(); it != v.end(); ++it)
+		spaceoffset = std::max(spaceoffset, f->getRenderWidth(it->key));
 
-		if(t.deltype == FE_QPSK)
-			r.key = g_Locale->getText (LOCALE_SATSETUP_SATELLITE);
-		else if(t.deltype == FE_QAM)
-			r.key = g_Locale->getText (LOCALE_CHANNELLIST_PROVS);
-		else
-			r.key = g_Locale->getText (LOCALE_TERRESTRIALSETUP_AREA);
+	spaceoffset = std::max(spaceoffset, f->getRenderWidth(std::string(g_Locale->getText(LOCALE_STREAMINFO_BITRATE)) + ": "));
 
-		r.key += ": ";
-		r.val = CServiceManager::getInstance()->GetSatelliteName(channel->getSatellitePosition()).c_str();
-		r.col = COL_INFOBAR_TEXT;
-		v.push_back(r);
+	for (std::vector<row>::iterator it = v.begin(); it != v.end(); ++it) {
+		f->RenderString (xpos, ypos, spaceoffset, it->key, COL_INFOBAR_TEXT);
+		const char *text = it->val.c_str();
+		do {
+			text = f->RenderString (xpos + spaceoffset, ypos, box_width - spaceoffset, text, it->col);
+			ypos += sheight;
+		} while (*text);
+	}
 
-		// channel
-		r.key = g_Locale->getText (LOCALE_TIMERLIST_CHANNEL);
-		r.key += ": ";
-		r.val = channel->getName().c_str();
-		r.col = COL_INFOBAR_TEXT;
-		v.push_back(r);
 
-		// ts frequency
-		scaling = 27000;
-		scaling = (t.deltype == FE_QPSK && t.feparams.dvb_feparams.u.qpsk.fec_inner < FEC_S2_QPSK_1_2) ? 15000 : 27000;
-		r.key = g_Locale->getText (LOCALE_SCANTS_FREQDATA);
-		r.val = t.description();
-		r.col = COL_INFOBAR_TEXT;
-		v.push_back(r);
-	
+// second block
+	if (!mp){
+		v.clear();
 		// onid
 		r.key = "ONid: ";
 		int i = channel->getOriginalNetworkId();
@@ -828,17 +850,17 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 		r.col = COL_INFOBAR_TEXT;
 		v.push_back(r);
 
-		// sid
-		r.key = "Sid: ";
-		i = channel->getServiceId();
+		// tsid
+		r.key = "TSid: ";
+		i = channel->getTransportStreamId();
 		snprintf(buf, sizeof(buf), "0x%04X (%i)", i, i);
 		r.val = buf;
 		r.col = COL_INFOBAR_TEXT;
 		v.push_back(r);
 
-		// tsid
-		r.key = "TSid: ";
-		i = channel->getTransportStreamId();
+		// sid
+		r.key = "Sid: ";
+		i = channel->getServiceId();
 		snprintf(buf, sizeof(buf), "0x%04X (%i)", i, i);
 		r.val = buf;
 		r.col = COL_INFOBAR_TEXT;
@@ -897,22 +919,22 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 			r.col = COL_INFOBAR_TEXT;
 			v.push_back(r);
 		}
-	}
-	spaceoffset = 0;
+	
+	int spaceoffset1 = 0;
 	for (std::vector<row>::iterator it = v.begin(); it != v.end(); ++it)
-		spaceoffset = std::max(spaceoffset, f->getRenderWidth(it->key));
+		spaceoffset1 = std::max(spaceoffset1, g_Font[font_small]->getRenderWidth(it->key));
 
-	spaceoffset = std::max(spaceoffset, f->getRenderWidth(std::string(g_Locale->getText(LOCALE_STREAMINFO_BITRATE)) + ": "));
+	spaceoffset1 = std::max(spaceoffset1, g_Font[font_small]->getRenderWidth(std::string("VTXTpid: ")));
 
 	for (std::vector<row>::iterator it = v.begin(); it != v.end(); ++it) {
-		f->RenderString (xpos, ypos, spaceoffset, it->key, COL_INFOBAR_TEXT);
+		g_Font[font_small]->RenderString (xpos, ypos, spaceoffset1, it->key, COL_INFOBAR_TEXT);
 		const char *text = it->val.c_str();
 		do {
-			text = f->RenderString (xpos + spaceoffset, ypos, box_width - spaceoffset, text, it->col);
+			text = g_Font[font_small]->RenderString (xpos + spaceoffset1, ypos, box_width - spaceoffset1, text, it->col);
 			ypos += sheight;
 		} while (*text);
 	}
-
+}
 	if(box_h == 0)
 		box_h = ypos - ypos1;
 	yypos = ypos;
@@ -924,11 +946,9 @@ void CStreamInfo2::paint_techinfo(int xpos, int ypos)
 void CStreamInfo2::paintCASystem(int xpos, int ypos)
 {
 	ypos += iheight*2;
-	int ypos1 = ypos;
-
+        int ypos1 = ypos;
 	if(box_h2 > 0)
 		frameBuffer->paintBoxRel (0, ypos, box_width, box_h2, COL_MENUHEAD_PLUS_0);
-
 	std::string casys[NUM_CAIDS]={"Irdeto:","Betacrypt:","Seca:","Viaccess:","Nagra:","Conax: ","Cryptoworks:","Videoguard:","EBU:","XCrypt:","PowerVU:"};
 	bool caids[NUM_CAIDS];
 	int array[NUM_CAIDS];
@@ -1100,7 +1120,7 @@ bool CStreamInfo2::ts_setup ()
 			dmx = NULL;
 			delete[] dmxbuf;
 			dmxbuf = NULL;
-			return false;
+			return false;	
 		}
 #endif
 		std::vector<unsigned short>::iterator it = pids.begin();
@@ -1209,7 +1229,7 @@ int CStreamInfo2::ts_close ()
 void CStreamInfo2::showSNR ()
 {
 	if (signalbox == NULL){
-		signalbox = new CSignalBox(x + 10, yypos, 240, 50, frontend);
+		signalbox = new CSignalBox(x + 10, yypos, 280, iheight * 2, frontend);
 		signalbox->setColorBody(COL_MENUHEAD_PLUS_0);
 		signalbox->setTextColor(COL_INFOBAR_TEXT);
 		signalbox->doPaintBg(true);
