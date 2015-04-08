@@ -2127,13 +2127,15 @@ void CChannelList::paintItem(int pos, const bool firstpaint)
 			}
 
 			g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST]->RenderString(x+ 5+ numwidth+ 10+prg_offset, ypos+ fheight, width- numwidth- 40- 15-prg_offset, nameAndDescription, color);
+			if (g_settings.colored_events_channellist == 1) // current event color
+					color = COL_COLORED_EVENTS_TEXT;
 			if (g_settings.channellist_epgtext_align_right) {
 				// align right
-				g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->RenderString(x + width - 20 - ch_desc_len - icon_space - 4, ypos + fheight, ch_desc_len, p_event->description, (curr == selected)?COL_MENUCONTENTSELECTED_TEXT:(!displayNext ? COL_MENUCONTENT_TEXT : COL_MENUCONTENTINACTIVE_TEXT));
+				g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->RenderString(x + width - 20 - ch_desc_len - icon_space - 4, ypos + fheight, ch_desc_len, p_event->description, (curr == selected)?COL_MENUCONTENTSELECTED_TEXT:(!displayNext ? color : COL_MENUCONTENTINACTIVE_TEXT));
 			}
 			else {
 				// align left
-				g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->RenderString(x+ 5+ numwidth+ 10+ ch_name_len+ 5+prg_offset, ypos+ fheight, ch_desc_len, p_event->description, (curr == selected)?COL_MENUCONTENTSELECTED_TEXT:(!displayNext ? COL_MENUCONTENT_TEXT : COL_MENUCONTENTINACTIVE_TEXT));
+				g_Font[SNeutrinoSettings::FONT_TYPE_CHANNELLIST_DESCR]->RenderString(x+ 5+ numwidth+ 10+ ch_name_len+ 5+prg_offset, ypos+ fheight, ch_desc_len, p_event->description, (curr == selected)?COL_MENUCONTENTSELECTED_TEXT:(!displayNext ? color : COL_MENUCONTENTINACTIVE_TEXT));
 			}
 		}
 		else {
