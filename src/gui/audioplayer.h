@@ -154,6 +154,7 @@ class CAudioPlayerGui : public CMenuTarget
 	void paintCover();
 	void paintLCD();
 	void hide();
+	void showBackGround();
 
 	void get_id3(CAudiofileExt * audiofile);
 	void get_mp3info(CAudiofileExt * audiofile);

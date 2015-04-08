@@ -287,8 +287,8 @@ int CAudioPlayerGui::exec(CMenuTarget* parent, const std::string &actionKey)
 
 	// set zapit in lock mode
 	g_Zapit->lockPlayBack();
-	videoDecoder->setBlank(true);
-	videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+
+	showBackGround();
 
 	// tell neutrino we're in audio mode
 	CNeutrinoApp::getInstance()->handleMsg( NeutrinoMessages::CHANGEMODE , NeutrinoMessages::mode_audio );
@@ -742,15 +742,15 @@ int CAudioPlayerGui::show()
 		else if ( (msg == CRCInput::RC_info) && (!m_playlist.empty()) )
 		{
 			pictureviewer = true;
-			m_frameBuffer->Clear();
 			videoDecoder->StopPicture();
+			m_frameBuffer->Clear();
+			videoDecoder->setBlank(true);
 			CPictureViewerGui * picture = new CPictureViewerGui();
 			picture->m_audioPlayer = this;
 			picture->exec(this, "audio");
 			delete picture;
 			pictureviewer = false;
-			videoDecoder->setBlank(true);
-			videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+			//showBackGround();
 			CVFD::getInstance()->setMode(CVFD::MODE_AUDIO);
 			paintLCD();
 			screensaver(false);
@@ -1878,10 +1878,11 @@ void CAudioPlayerGui::paintItemID3DetailsLine (int pos)
 		dline->paint(false);
 
 		// paint id3 infobox
+		m_frameBuffer->paintBoxRel(m_x, ypos2, m_width, m_info_height, COL_MENUCONTENT_PLUS_6, RADIUS_LARGE);
 		if (ibox == NULL)
-			ibox = new CComponentsInfoBox(m_x, ypos2, m_width, m_info_height);
+			ibox = new CComponentsInfoBox(m_x+2, ypos2+2, m_width-4, m_info_height-4);
 		ibox->setCorner(RADIUS_LARGE);
-		ibox->setYPos(ypos2);
+		ibox->setYPos(ypos2+2);
 		ibox->setColorBody(COL_MENUCONTENTDARK_PLUS_0);
 		ibox->paint(false);
 
@@ -1906,7 +1907,7 @@ void CAudioPlayerGui::paintItemID3DetailsLine (int pos)
 		{
 			tmp += " (";
 			tmp += m_playlist[m_selected].MetaData.album;
-			tmp += ')';
+			tmp += ")";
 		}
 		g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->RenderString(m_x + 10, ypos2 + 2*m_fheight - 2, m_width - 20,
 				tmp, COL_MENUCONTENTDARK_TEXT);
@@ -2264,10 +2265,24 @@ void CAudioPlayerGui::screensaver(bool on)
 	{
 		g_RCInput->killTimer(stimer);
 		m_screensaver = false;
-		videoDecoder->StopPicture();
-		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+		showBackGround();
 		paint();
 		m_idletime = time(NULL);
+	}
+}
+
+
+void CAudioPlayerGui::showBackGround()
+{
+	if (g_settings.show_background_picture) {
+		m_frameBuffer->Clear();
+		videoDecoder->setBlank(false);
+		videoDecoder->ShowPicture(DATADIR "/neutrino/icons/mp3.jpg");
+	}
+	else
+	{
+	m_frameBuffer->Clear();
+	videoDecoder->setBlank(true);
 	}
 }
 
