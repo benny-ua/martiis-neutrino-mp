@@ -161,7 +161,7 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 			free (m_NextPic_Buffer);
 			m_NextPic_Buffer = NULL;
 		}
-
+/*
 #if HAVE_SPARK_HARDWARE
 		size_t new_bpasize = x * y * 3;
 
@@ -200,7 +200,7 @@ bool CPictureViewer::DecodeImage (const std::string & _name, bool showBusySign, 
 			return false;
 		}
 #endif
-
+*/
 		m_NextPic_Buffer = (unsigned char *) malloc (x * y * 3);
 		if (m_NextPic_Buffer == NULL) {
 			printf ("DecodeImage: Error: malloc\n");
@@ -334,7 +334,7 @@ void CPictureViewer::Zoom (float factor)
 {
 	//  dbout("Zoom %f\n",factor);
 	showBusy (m_startx + 3, m_starty + 3, 10, 0xff, 0xff, 00);
-
+/*
 #if HAVE_SPARK_HARDWARE
 	if (bpamem) {
 		int center_x = bpa_x + (bpa_pan_w >> 1);
@@ -405,6 +405,7 @@ void CPictureViewer::Zoom (float factor)
 		return;
 	}
 #endif
+*/
 	int oldx = m_CurrentPic_X;
 	int oldy = m_CurrentPic_Y;
 	unsigned char *oldBuf = m_CurrentPic_Buffer;
@@ -445,28 +446,28 @@ void CPictureViewer::Move (int dx, int dy)
 	//  dbout("Move %d %d\n",dx,dy);
 	showBusy (m_startx + 3, m_starty + 3, 10, 0x00, 0xff, 00);
 
-#if HAVE_SPARK_HARDWARE
-	if (bpamem) {
-		bpa_x += dx;
-
-		if (bpa_x < 0)
-			bpa_x = 0;
-		else if (bpa_x + bpa_pan_w >= bpa_w)
-			bpa_x = bpa_w - bpa_pan_w;
-
-		bpa_y += dy;
-
-		if (bpa_y < 0)
-			bpa_y = 0;
-		else if (bpa_y + bpa_pan_h >= bpa_h)
-			bpa_y = bpa_h - bpa_pan_h;
-
-		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
-		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
-		frameBuffer->blit();
-		return;
-	}
-#endif
+//#if HAVE_SPARK_HARDWARE
+//	if (bpamem) {
+//		bpa_x += dx;
+//
+//		if (bpa_x < 0)
+//			bpa_x = 0;
+//		else if (bpa_x + bpa_pan_w >= bpa_w)
+//			bpa_x = bpa_w - bpa_pan_w;
+//
+//		bpa_y += dy;
+//
+//		if (bpa_y < 0)
+//			bpa_y = 0;
+//		else if (bpa_y + bpa_pan_h >= bpa_h)
+//			bpa_y = bpa_h - bpa_pan_h;
+//
+//		frameBuffer->paintBoxRel(0, 0, DEFAULT_XRES, DEFAULT_YRES, 0);
+//		frameBuffer->blitBPA2FB(bpamem, SURF_BGR888, bpa_w, bpa_h, bpa_x, bpa_y, bpa_pan_w, bpa_pan_h, fb_x, fb_y, fb_w, fb_h, true);
+//		frameBuffer->blit();
+//		return;
+//	}
+//#endif
 	int xs, ys;
 
 	xs = frameBuffer->getScreenWidth(true);
@@ -536,13 +537,13 @@ CPictureViewer::CPictureViewer ()
 	m_aspect_ratio_correction = m_aspect / ((double) xs / ys);
 
 	m_busy_buffer = NULL;
-#if HAVE_SPARK_HARDWARE
-	bpafd = -1;
-	bpamem = NULL;
-	bpasize = 0;
-	bpa_w = 0;
-	bpa_h = 0;
-#endif
+//#if HAVE_SPARK_HARDWARE
+//	bpafd = -1;
+//	bpamem = NULL;
+//	bpasize = 0;
+//	bpa_w = 0;
+//	bpa_h = 0;
+//#endif
 	pic_cache_size = 0;
 	pic_cache_maxsize = 0x100000; // 1 MB default
 
@@ -643,10 +644,10 @@ void CPictureViewer::Cleanup ()
 		free (m_CurrentPic_Buffer);
 		m_CurrentPic_Buffer = NULL;
 	}
-#if HAVE_SPARK_HARDWARE
-	if (bpamem)
-		frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
-#endif
+//#if HAVE_SPARK_HARDWARE
+//	if (bpamem)
+//		frameBuffer->freeBPAMem(bpafd, bpamem, bpasize);
+//#endif
 	cacheClear();
 }
 
