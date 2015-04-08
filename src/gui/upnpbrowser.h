@@ -99,6 +99,7 @@ class CUpnpBrowserGui : public CMenuTarget
 	int            m_playid;
 	time_t         m_time_played;
 	bool           m_playing_entry_is_shown;
+	bool           PicMode;
 	time_t         timeout;
 	CComponentsDetailLine * dline;
 
@@ -113,6 +114,7 @@ class CUpnpBrowserGui : public CMenuTarget
 	void paintDevice(unsigned int pos);
 	void paintDeviceInfo();
 	void playnext();
+	void showBackGround();
 
 	bool getItems(std::string id, unsigned int index, std::vector<UPnPEntry> * &entries, unsigned int &total);
 	bool updateItemSelection(std::string id, std::vector<UPnPEntry> * &entries, int newpos, unsigned int &selected, unsigned int &liststart);

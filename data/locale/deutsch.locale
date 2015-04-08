@@ -2276,6 +2276,15 @@ upnpbrowser.head UPnP Browser
 upnpbrowser.noservers Kein UPnP-Server gefunden
 upnpbrowser.rescan Neue Suche
 upnpbrowser.scanning Suche nach UPnP-Servern
+upnpbrowser.current Derzeit
+upnpbrowser.dir Verzeichnis
+upnpbrowser.duration länge
+upnpbrowser.nores keine ressource
+upnpbrowser.proto Protokoll
+upnpbrowser.res Ressource
+upnpbrowser.selected Ausgewählte
+upnpbrowser.type MIME-Typ
+upnpbrowser.url URL
 usermenu.button_blue Benutzermenü 'blau'
 usermenu.button_green Benutzermenü 'grün'
 usermenu.button_red Benutzermenü 'rot'
