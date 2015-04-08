@@ -672,7 +672,7 @@ int CScanSetup::showScanMenuFrontendSetup()
 		mf->setHint("", LOCALE_MENU_HINT_SCAN_LONGITUDE);
 		rotorMenu->addItem(mf);
 
-		CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_SATSETUP_USALS_REPEAT, (int *)&zapitCfg.repeatUsals, true, 0, 10, NULL, 0, 0, LOCALE_OPTIONS_OFF);
+		CMenuOptionNumberChooser * nc = new CMenuOptionNumberChooser(LOCALE_SATSETUP_USALS_REPEAT, (int *)&zapitCfg.repeatUsals, true, 0, 10, NULL);
 		nc->setHint("", LOCALE_MENU_HINT_SCAN_USALS_REPEAT);
 		rotorMenu->addItem(nc);
 
