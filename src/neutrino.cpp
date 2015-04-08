@@ -165,7 +165,7 @@ t_channel_id standby_channel_id = 0;
 static pthread_t timer_thread;
 void * timerd_main_thread(void *data);
 static bool timerd_thread_started = false;
-
+bool SubAutoPlay = false;
 void * nhttpd_main_thread(void *data);
 
 //#define DISABLE_SECTIONSD
@@ -2820,7 +2820,10 @@ void CNeutrinoApp::zapTo(t_channel_id channel_id)
 			(recordingStatus && channelList->SameTP(channel_id))) {
 
 		dvbsub_stop();
+// Mute before zap
+		    g_audioMute->AudioMute(current_muted, true);
 		g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
+		    g_audioMute->AudioMute(current_muted, false);
 	}
 }
 
@@ -3271,7 +3274,10 @@ _repeat:
 			dvbsub_stop();
 			CTimerd::RecordingInfo * eventinfo = (CTimerd::RecordingInfo *) data;
 			t_channel_id channel_id=eventinfo->channel_id;
+// Mute before zap
+		g_audioMute->AudioMute(current_muted, true);
 			g_Zapit->zapTo_serviceID_NOWAIT(channel_id);
+		g_audioMute->AudioMute(current_muted, false);
 		}
 #endif
 		//zap to rec channel in standby-mode
@@ -4939,8 +4945,10 @@ void CNeutrinoApp::StartSubtitles(bool show)
 #endif
 	if(!show)
 		return;
-	dvbsub_start(0);
-	tuxtx_pause_subtitle(false);
+ if(SubAutoPlay == true) {
+   dvbsub_start(0);
+   tuxtx_pause_subtitle(false);
+}
 }
 
 void CNeutrinoApp::SelectSubtitles()
