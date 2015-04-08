@@ -321,7 +321,7 @@ int CMotorControl::exec(CMenuTarget* parent, const std::string &)
 	signalbox = NULL;
 	hide();
 	frontend->setTsidOnid(0);
-
+	g_Zapit->startPlayBack();
 	return retval;
 }
 
@@ -405,7 +405,7 @@ void CMotorControl::paintStatus()
 	char buf2[256];
 
 	int xpos1 = x + 10;
-	int xpos2 = xpos1 + 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(g_Locale->getText(LOCALE_MOTORCONTROL_MOTOR_POS));
+	int xpos2 = xpos1 + 10 + g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getRenderWidth(g_Locale->getText(LOCALE_MOTORCONTROL_STEP_DRIVE));
 	int width2 = width - (xpos2 - xpos1) - 10;
 	int width1 = width - 10;
 
@@ -591,8 +591,8 @@ void CMotorControl::showSNR ()
 {
 	if (signalbox == NULL){
 		int xpos1 = x + 10;
-		//signalbox = new CSignalBox(xpos1, y + height - mheight - 5, width - 2*(xpos1-x), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight(), frontend, false);
-		signalbox = new CSignalBox(xpos1, y + height - (mheight*2*3)/2 - 5, width - 2*(xpos1-x), (g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight()*2*3)/2, frontend, true);
+	signalbox = new CSignalBox(xpos1, y + height - mheight - 5, width - 2*(xpos1-x), g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight(), frontend, false);
+	//	signalbox = new CSignalBox(xpos1, y + height - (mheight*2*3)/2 - 5, width - 2*(xpos1-x), (g_Font[SNeutrinoSettings::FONT_TYPE_MENU]->getHeight()*2*3)/2, frontend, true);
 		signalbox->setColorBody(COL_MENUCONTENT_PLUS_0);
 		signalbox->setTextColor(COL_MENUCONTENT_TEXT);
 		signalbox->doPaintBg(true);
