@@ -103,7 +103,8 @@ class CInfoViewerBB
 		//int lasthdd, lastsys;
 		bool fta;
 		int minX;
-
+		int infowidth;
+    
 		bool scrambledErr, scrambledErrSave;
 		bool scrambledNoSig, scrambledNoSigSave;
 		pthread_t scrambledT;
@@ -118,6 +119,7 @@ class CInfoViewerBB
 		void paint_ca_icons(int, char*, int&);
 		void paintCA_bar(int,int);
 		void showOne_CAIcon();
+		void showEMUinfo();
 		void changePB(void);
 
 		static void* scrambledThread(void *arg);

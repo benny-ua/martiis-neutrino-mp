@@ -90,6 +90,7 @@ CInfoViewerBB::CInfoViewerBB()
 	BBarFontY = 0;
 	hddscale 		= NULL;
 	sysscale 		= NULL;
+	infowidth = 0;
 
 	Init();
 }
@@ -746,15 +747,15 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 
 	int acaid = 0;
 	if(!notfirst) {
-		FILE *f = fopen("/tmp/ecm.info", "rt");
+		FILE *f = popen("/bin/caid", "r");
 		if (f) {
 			char buf[80];
 			if (fgets(buf, sizeof(buf), f) != NULL) {
 				char *b = strchr(buf, '0');
 				if (b)
-					sscanf(b, "%X", &acaid);
+				sscanf(b, "%X", &acaid);
 			}
-			fclose(f);
+			pclose(f);
 		}
 	}
 
@@ -764,6 +765,7 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 			showOne_CAIcon();
 		}
 		else if(g_settings.casystem_display == 0) {
+
 			for (int i = 0; i < (int)(sizeof(caids)/sizeof(int)); i++) {
 				paint_ca_icons(caids[i], (char *) white, icon_space_offset);
 			}
@@ -780,15 +782,23 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 		showOne_CAIcon();
 		return;
 	}
-
 	if(!notfirst) {
-#if 0
-		static int icon_space_offset = 0;
-		if ((g_settings.casystem_display == 1) && (icon_space_offset)) {
+		if (g_settings.casystem_display == 1) {
 			paintCA_bar(0,icon_space_offset);
-			icon_space_offset = 0;
+			showEMUinfo();
+		for (int i = 0; i < (int)(sizeof(caids)/sizeof(int)); i++) {
+			bool found = false;
+			for(casys_map_iterator_t it = channel->camap.begin(); it != channel->camap.end(); ++it) {
+				int caid = (*it) & 0xFF00;
+				if (caid == 0x1700)
+					caid = 0x0600;
+				if((found = (caid == caids[i])))
+					break;
+			}
+		if ((caids[i] & 0xFF00) == (acaid & 0xFF00) || (caids[i] == 0x1700 && (acaid & 0xFF00) == 0x0600))
+					paint_ca_icons(caids[i], (char *) green, icon_space_offset);
 		}
-#endif
+	}
 		for (int i = 0; i < (int)(sizeof(caids)/sizeof(int)); i++) {
 			bool found = false;
 			for(casys_map_iterator_t it = channel->camap.begin(); it != channel->camap.end(); ++it) {
@@ -806,6 +816,8 @@ void CInfoViewerBB::showIcon_CA_Status(int notfirst)
 			}
 		}
 	}
+if(g_settings.casystem_display == 0)
+showEMUinfo();
 }
 
 void CInfoViewerBB::paintCA_bar(int left, int right)
@@ -827,6 +839,102 @@ void CInfoViewerBB::paintCA_bar(int left, int right)
 			frameBuffer->paintBoxRel((g_InfoViewer->ChanInfoX + 2) + i*4, g_InfoViewer->BoxEndY + 2 + j*4, 2, 2, COL_INFOBAR_PLUS_1);
 		}
 	}
+}
+
+void CInfoViewerBB::showEMUinfo()
+{
+int iconheight = 0;
+int iconwidth = 0;
+int offset = 0;
+string emu;
+string state;
+string icon_emu = "blank";
+string icon_state = "blank";
+string icon_mode = "ICONS";
+string emu_string = "";
+
+FILE *pp;
+	pp = popen("/bin/ecm", "r");
+	 if (pp != NULL) {
+	    char *line;
+	    char buf[100];
+	    line = fgets(buf, sizeof buf, pp);
+	 if (line != NULL) 
+	     emu_string = (const char*) line;
+	}
+pclose(pp);
+
+	istringstream iss(emu_string);
+	iss >> icon_mode;
+	iss >> emu;
+	iss >> state;
+
+//printf ("--%s \n", emu_string.c_str());
+//printf("emu: %s \n", emu.c_str());
+//printf("state: %s \n", state.c_str());
+//printf("icons: %s \n", icon_mode.c_str());
+//printf("---------------- \n");
+
+if (icon_mode == "ICONS"){
+if  (emu != "NONE") {
+    if (emu == "OSCAM") {
+	icon_emu="oscam_white";
+	    if (state != "OFFLINE")
+		icon_emu="oscam_yellow";}
+    if (emu == "WICARD") {
+	icon_emu="wicard_white";
+	    if (state != "OFFLINE")
+		icon_emu="wicard_yellow";}
+    if (emu == "MGCAMD") {
+        icon_emu="mgcamd_white";
+	    if (state != "OFFLINE")
+		icon_emu="mgcamd_yellow";}
+    if (emu == "CAMD3") {
+        icon_emu="camd3_white";
+	    if (state != "OFFLINE")
+		icon_emu="camd3_yellow";}
+}
+
+frameBuffer->getIconSize(icon_emu.c_str(), &iconwidth, &iconheight);
+frameBuffer->paintBoxRel(g_InfoViewer->ChanInfoX + 12, g_InfoViewer->BoxEndY+1, iconwidth, iconheight, COL_BLACK);
+frameBuffer->paintIcon(icon_emu, g_InfoViewer->ChanInfoX + 12, g_InfoViewer->BoxEndY+2);
+
+offset = offset + 5 + iconwidth;
+icon_state = "int_white";
+if (state == "EMU")
+    icon_state="int_green";
+
+frameBuffer->getIconSize(icon_state.c_str(), &iconwidth, &iconheight);
+frameBuffer->paintBoxRel(g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+1, iconwidth, iconheight, COL_BLACK);
+frameBuffer->paintIcon(icon_state, g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+2);
+
+offset = offset + 5 + iconwidth;
+icon_state = "net_white";
+if (state == "NET")
+    icon_state="net_green";
+
+frameBuffer->getIconSize(icon_state.c_str(), &iconwidth, &iconheight);
+frameBuffer->paintBoxRel(g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+1, iconwidth, iconheight, COL_BLACK);
+frameBuffer->paintIcon(icon_state, g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+2);
+
+offset = offset + 5 + iconwidth;
+icon_state = "card_white";
+if (state == "CARD")
+    icon_state="card_green";
+
+frameBuffer->getIconSize(icon_state.c_str(), &iconwidth, &iconheight);
+frameBuffer->paintBoxRel(g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+1, iconwidth, iconheight, COL_BLACK);
+frameBuffer->paintIcon(icon_state, g_InfoViewer->ChanInfoX + 20 + offset, g_InfoViewer->BoxEndY+2);
+}
+
+if (icon_mode == "TEXT"){
+emu_string = emu + ", " + emu_string.substr(emu_string.find(state));
+infowidth = g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->getRenderWidth(emu_string);
+frameBuffer->paintBoxRel(g_InfoViewer->ChanInfoX + 10, g_InfoViewer->BoxEndY, infowidth, 22, COL_BLACK);
+g_Font[SNeutrinoSettings::FONT_TYPE_INFOBAR_SMALL]->RenderString(g_InfoViewer->ChanInfoX + 10, g_InfoViewer->BoxEndY+bottom_bar_offset+2,
+infowidth, emu_string, COL_COLORED_EVENTS_TEXT);
+}
+return;
 }
 
 void CInfoViewerBB::changePB()
