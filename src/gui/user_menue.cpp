@@ -564,10 +564,12 @@ bool CUserMenu::changeNotify(const neutrino_locale_t OptionName, void * Data)
 }
 #endif
 
-int CUserMenu::exec(CMenuTarget* /*parent*/, const std::string & actionKey)
+int CUserMenu::exec(CMenuTarget* parent, const std::string & actionKey)
 {
 	if (actionKey == "")
 		return menu_return::RETURN_NONE;
+	if (parent)
+		parent->hide();
 	g_PluginList->startPlugin(actionKey.c_str());
 	return menu_return::RETURN_EXIT;
 }
