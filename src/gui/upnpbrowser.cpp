@@ -837,6 +837,7 @@ bool CUpnpBrowserGui::selectItem(std::string id)
 							} else
 								CNeutrinoApp::getInstance()->handleMsg(msg, data);
 						}
+						timeout = 0;
 						PicMode = false;
 						showBackGround();
 						refresh = true;
@@ -1106,7 +1107,7 @@ void CUpnpBrowserGui::paintItemInfo(UPnPEntry *entry)
 	ts << g_Locale->getText(LOCALE_UPNPBROWSER_RES) << ": " << entry->resources.size() << ", " << g_Locale->getText(LOCALE_UPNPBROWSER_SELECTED) << ": " << preferred+1 << ", ";
 	tmp = ts.str();
 
-	if (preferred != -1){
+	if (preferred != -1 && (entry->mime).substr(0,6)!="image/"){
 	    char d_time[8];
 	    char* ds = const_cast <char*> ((entry->resources[preferred].duration).c_str());
 	    snprintf(d_time, 8, "%.8s", ds);
