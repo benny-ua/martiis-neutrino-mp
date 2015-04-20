@@ -11,7 +11,7 @@ audio.srs_algo Алгоритм SRS
 audio.srs_algo_heavy Тяжелый
 audio.srs_algo_light Лёгкий
 audio.srs_algo_normal Нормальный
-audio.srs_iq SRS Выравнивание 
+audio.srs_iq Выравнивание уровня 
 audio.srs_nmgr Менеджер шума
 audio.srs_volume Стандартная громкость
 audiomenu.analog_mode Аналоговый режим
@@ -484,7 +484,7 @@ flashupdate.currentversiondate Дата
 flashupdate.currentversiontime Время
 flashupdate.erasefailed Не удалось стереть флеш
 flashupdate.erasing Стирание флеш
-flashupdate.experimentalimage Выбранная ПО не проверено и ваш\nресивер может не загрузиться после обновления.\n\nВы действительно хотите обновить на эту версию?
+flashupdate.experimentalimage Выбранное ПО не проверено и ваш\nресивер может не загрузиться после обновления.\n\nВы действительно хотите обновиться на эту версию?
 flashupdate.expertfunctions Экспертные функции
 flashupdate.fileis0bytes Размер файла 0 байт
 flashupdate.fileselector Выбор файла
@@ -514,11 +514,11 @@ flashupdate.namemode2_default <partition>+<time>.img
 flashupdate.namemode2_hostname_time <partition>+<time>+<hostname>.img
 flashupdate.new_found Найдена новая версия!
 flashupdate.new_notfound Новых версий не найдено
-flashupdate.noversion Проверка версии доступна только для онлай-обновления.\nПродолжить установку этого ПО?
+flashupdate.noversion Проверка версии доступна только для онлайн-обновления.\nПродолжить установку этого ПО?
 flashupdate.programmingflash Программирование флеш
 flashupdate.proxypassword Пароль
 flashupdate.proxypassword_hint1 Введите пароль прокси-сервера
-flashupdate.proxypassword_hint2 Не заполняйте, если имя пароль не требуется
+flashupdate.proxypassword_hint2 Не заполняйте, если пароль не требуется
 flashupdate.proxyserver Имя хоста
 flashupdate.proxyserver_hint1 Введите имя прокси-сервера или IP-адрес в виде host:port
 flashupdate.proxyserver_hint2 Пустое поле означает, что прокси-сервера нет
@@ -532,13 +532,13 @@ flashupdate.read_volume_error Размер раздела %s \nне опреде
 flashupdate.readflash Сохранить полный образ
 flashupdate.readflashmtd Сохранить один из разделов
 flashupdate.ready Готов
-flashupdate.reallyflashmtd Уверены что хотите записать?\nимя имиджа: %s\nЦель: %s
+flashupdate.reallyflashmtd Уверены что хотите записать?\nОбраз: %s\nЦель: %s
 flashupdate.savesuccess Образ успешно сохранен\nв %s.
 flashupdate.selectimage Доступные ПО и файлы
 flashupdate.settings Параметры обновления
 flashupdate.titlereadflash Чтение флеш
 flashupdate.titlewriteflash Запись флеш
-flashupdate.update_with_settings_del_skipped Каталог [%s] не удается удалить, пропуск.
+flashupdate.update_with_settings_del_skipped Каталог [%s] не удается удалить, будет пропущено.
 flashupdate.update_with_settings_error Ошибка записи!\n \nВ новом образ осталось только %ld KB (из %ld KB). \nНедостаточно памяти. \n \nОперация отменена!
 flashupdate.update_with_settings_processed Обработка образа ПО...
 flashupdate.update_with_settings_skipped Запись в каталог [%s] невозможна, пропуск.
@@ -758,7 +758,7 @@ ipsetup.hint_1 Используйте 0..9, или Up/Down,
 ipsetup.hint_2 OK - сохранить, EXIT - отмена
 kerneloptions.apply Применить
 kerneloptions.head Параметры ядра
-kerneloptions.hint.disabled_loaded Модуль еще загружен.
+kerneloptions.hint.disabled_loaded Модуль уже загружен.
 kerneloptions.hint.disabled_not_loaded Модуль не загружен.
 kerneloptions.hint.enabled_loaded Модуль загружен и готов к использованию.
 kerneloptions.hint.enabled_not_loaded Примените изменения для загрузки модулей.
@@ -1573,11 +1573,11 @@ moviebrowser.head_filter Фильтровать фильмы по категор
 moviebrowser.head_playlist Последний запущеный:
 moviebrowser.head_recordlist Последний записанный:
 moviebrowser.hide_series Скрыть серии
-moviebrowser.hint_jumpbackward Вперед на 5 s\n '0' для отмены 
-moviebrowser.hint_jumpforward Назад на 5 s\n '0' для отмены 
-moviebrowser.hint_movieend Filmende in 5 s\n '0' zum weitersehen 
-moviebrowser.hint_newbook_backward Новый переход назад\n 'синняя' для концевой позиции 
-moviebrowser.hint_newbook_forward Новый переход вперед\n 'синяя' для концевой позиции 
+moviebrowser.hint_jumpbackward Вперед на 5 s\n '0' - отмена
+moviebrowser.hint_jumpforward Назад на 5 s\n '0' - отмена
+moviebrowser.hint_movieend Filmende in 5 s\n '0' - отмена
+moviebrowser.hint_newbook_backward Переход назад\n 'синяя' - в конец фильма
+moviebrowser.hint_newbook_forward Переход вперед\n 'синяя' - в конец фильма 
 moviebrowser.info_audio Аудио
 moviebrowser.info_channel Канал
 moviebrowser.info_file Файл
@@ -1585,7 +1585,7 @@ moviebrowser.info_filename Имя
 moviebrowser.info_genre_major Жанр
 moviebrowser.info_genre_minor Жанр
 moviebrowser.info_head Информация о фильме
-moviebrowser.info_head_update Сохранение изменений во всех инфо-файлах кино
+moviebrowser.info_head_update Сохранение изменений во всех инфо-файлах
 moviebrowser.info_info1 Информация
 moviebrowser.info_length Продолжительность, в минутах
 moviebrowser.info_parental_lockage Родительский контроль
@@ -1763,8 +1763,8 @@ networkmenu.test Тест сетевого соединения
 networkmenu.wlan_security Безопасность
 neutrino_starting Neutrino запускается...
 nfs.alreadymounted Уже подключен
-nfs.automount Подключать при включении
-nfs.dir Имя каталога или общего ресурса
+nfs.automount Подключать при включении ресивера
+nfs.dir Имя общего ресурса
 nfs.ip IP-адрес сервера
 nfs.localdir Локальный каталог
 nfs.mount Подключение сетевого диска
@@ -2234,8 +2234,8 @@ timerlist.repeatcount.help1 Укажите количество повторны
 timerlist.repeatcount.help2 запусков. "0" - повторять всегда
 timerlist.save Сохранить событие
 timerlist.standby Действие для режима ожидания: 
-timerlist.standby.off оставить в режиме ожидания
-timerlist.standby.on вывести из режима ожидания
+timerlist.standby.off переход в режим ожидания
+timerlist.standby.on выход из режима ожидания
 timerlist.stoptime Закончить в:
 timerlist.type Режим:
 timerlist.type.batchepg обновление данных телегида
